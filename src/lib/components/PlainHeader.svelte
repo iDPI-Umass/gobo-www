@@ -1,0 +1,17 @@
+<nav>
+  <a href="/">GOBO</a>
+</nav>
+
+<style>
+  nav > a {
+    font-family: var(--sl-font-sans);
+    font-size: var(--sl-font-size-2x-large);
+    text-decoration: none;
+    color: initial;
+    margin: 1rem;
+  }
+
+  nav > a:focus {
+    margin: calc(1rem - 2px);
+  }
+</style>
