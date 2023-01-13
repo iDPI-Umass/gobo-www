@@ -27,7 +27,7 @@ p, h1, h2, h3, h4, h5, h6 {
 
 body {
   font-family: var(--sl-font-sans);
-  line-height: var(--sl-line-height-normal);
+  line-height: var(--sl-line-height-dense);
   letter-spacing: var(--sl-letter-spacing-normal);
   -webkit-font-smoothing: antialiased;
   -moz-font-feature-settings: "kern" 1; 

@@ -3,14 +3,51 @@
   import '@shoelace-style/shoelace/dist/components/checkbox/checkbox.js';
   import '@shoelace-style/shoelace/dist/components/button/button.js';
   import '@shoelace-style/shoelace/dist/components/divider/divider.js';
+  import { onMount } from "svelte";
+  import { goto } from '$app/navigation';
+  import { sleep } from "@dashkite/joy/time";
+  let form, button;
+
+  const validate = function() {
+    return form.reportValidity();  
+  };
+
+  const login = async function () {
+    console.log( "HTTP request goes here..." );
+    await sleep( 500 );
+  };
+
+  const submit = async function () {
+    const isValid = validate();
+    if ( isValid === true ) {
+      await login();
+      form.reset();
+      button.loading = false;
+      goto( "/home" );
+    } else {
+      button.loading = false;
+    }
+  };
+
+  onMount(() => {
+    form.addEventListener('submit', function(event) {
+      event.preventDefault();
+      if ( button.loading !== true ) {
+        button.loading = true;
+        submit();
+      }
+    });
+  });
 </script>
 
-<form>
+<form bind:this={form}>
   <h1>Log In To Your Account</h1>
 
   <sl-input 
     name="username" 
     label="Email address or username"
+    inputmode="text"
+    autocomplete="username"
     size="medium"
     required>
   </sl-input>
@@ -18,12 +55,14 @@
   <sl-input
     class="password-helper" 
     name="password" 
-    label="Password" 
+    label="Password"
+    inputmode="text"
     type="password"
     placeholder="Password"
-    size="medium" 
-    required 
-    password-toggle>
+    size="medium"
+    autocomplete="current-password"
+    password-toggle
+    required>
 
     <p slot="help-text" style="font-size: var(--sl-font-size-small);">
       <a
@@ -38,7 +77,9 @@
     Remember me
   </sl-checkbox>
 
-  <sl-button 
+  <sl-button
+    bind:this={button}
+    type="submit"
     variant="primary"
     size="medium"
     width="100%">
@@ -50,14 +91,15 @@
   <p>
     New to GOBO? 
     <a href="/create-account">
-      Create an Account
+      Create an account.
     </a>
   </p>
 </form>
 
 <style>
   form {
-    width: 20rem;
+    flex: 1 1 100%;
+    max-width: 20rem;
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
@@ -76,16 +118,16 @@
     box-shadow: none;
   }
 
-  .password-helper::part(form-control) {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-  }
-
   form > sl-divider {
     --width: 1px;
     --color: var(--sl-color-neutral-400);
     margin: 2rem 0 1rem 0;
+  }
+
+  .password-helper::part(form-control) {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
   }
 
   /*
