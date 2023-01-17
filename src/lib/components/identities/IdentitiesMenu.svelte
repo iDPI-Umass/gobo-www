@@ -4,6 +4,7 @@
 </script>
 
 <VerticalNav>
-  <NavLink href="identities-add">Add Identity</NavLink>
-  <NavLink href="identities-about">About Identities</NavLink>
+  <NavLink href="/identities">Your Identities</NavLink>
+  <NavLink href="/identities-add">Add Identity</NavLink>
+  <NavLink href="/identities-about">About Identities</NavLink>
 </VerticalNav>

@@ -5,17 +5,6 @@
 
 
 <section>
-
-  <sl-button
-    variant="neutral"
-    href="/identities"
-    size="medium"
-    outline
-    pill>
-    Close
-    <sl-icon slot="prefix" src="/icons/x-lg.svg" ></sl-icon>
-  </sl-button>
-
   <h1>About Identities</h1>
 
   <p>

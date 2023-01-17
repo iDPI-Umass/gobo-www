@@ -1,17 +1,21 @@
 <script>
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
+  import Identity from "$lib/components/identities/Identity.svelte"
 </script>
 
 <section>
   <h1>Your Identities</h1>
   <h2>Mastodon</h2>
-  <p>No identities currently registered.</p>
+  <Identity type="mastodon"></Identity>
+  <!-- <p>No identities currently registered.</p> -->
   <sl-divider></sl-divider>
   <h2>Reddit</h2>
-  <p>No identities currently registered.</p>
+  <Identity type="reddit"></Identity>
+  <!-- <p>No identities currently registered.</p> -->
   <sl-divider></sl-divider>
   <h2>Twitter</h2>
-  <p>No identities currently registered.</p>
+  <Identity type="twitter"></Identity>
+  <!-- <p>No identities currently registered.</p> -->
 </section>
 
 <style>

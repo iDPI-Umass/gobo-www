@@ -43,7 +43,6 @@
 
 
 <form bind:this={form}>
-
   <h1>Add Identity</h1>
 
   <h2>Select a Platform</h2>
@@ -86,11 +85,11 @@
   }
 
   h1 {
-    margin: 0 0 2rem 0;
+    margin: 2rem 0 1rem 0;
   }
 
   h2 {
-    margin: 2rem 0 1rem 0;
+    margin: 0 0 1rem 0;
   }
 
   p {
