@@ -1,8 +1,8 @@
 <script>
-  import '@shoelace-style/shoelace/dist/components/input/input.js';
-  import '@shoelace-style/shoelace/dist/components/checkbox/checkbox.js';
-  import '@shoelace-style/shoelace/dist/components/button/button.js';
-  import '@shoelace-style/shoelace/dist/components/divider/divider.js';
+  import "@shoelace-style/shoelace/dist/components/input/input.js";
+  import "@shoelace-style/shoelace/dist/components/checkbox/checkbox.js";
+  import "@shoelace-style/shoelace/dist/components/button/button.js";
+  import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import { onMount } from "svelte";
   import { goto } from '$app/navigation';
   import { sleep } from "@dashkite/joy/time";
@@ -70,7 +70,7 @@
     name="username" 
     label="Username"
     size="medium"
-    help-text="How would you like to be known?"
+    help-text="This is your ID on GOBO. You'll be able to pick a different display name later."
     inputmode="text"
     autocomplete="off"
     minLength=3

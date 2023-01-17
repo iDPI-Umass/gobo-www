@@ -1,8 +1,8 @@
 <script>
-  import PlainHeader from "$lib/components/PlainHeader.svelte"
-  import LeftRight from "$lib/components/LeftRight.svelte"
-  import Login from "$lib/components/Login.svelte"
-  import Fascinator from "$lib/components/Fascinator.svelte"
+  import PlainHeader from "$lib/components/headers/PlainHeader.svelte"
+  import LeftRight from "$lib/components/layouts/LeftRight.svelte"
+  import Login from "$lib/components/logins/Login.svelte"
+  import Fascinator from "$lib/components/primitives/Fascinator.svelte"
 </script>
 
 <PlainHeader></PlainHeader>

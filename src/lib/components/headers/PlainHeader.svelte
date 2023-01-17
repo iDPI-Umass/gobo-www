@@ -1,9 +1,9 @@
-<nav>
+<header>
   <a href="/">GOBO</a>
-</nav>
+</header>
 
 <style>
-  nav > a {
+  header > a {
     font-family: var(--sl-font-sans);
     font-size: var(--sl-font-size-2x-large);
     text-decoration: none;
@@ -11,7 +11,7 @@
     margin: 1rem;
   }
 
-  nav > a:focus {
+  header > a:focus {
     margin: calc(1rem - 2px);
   }
 </style>
