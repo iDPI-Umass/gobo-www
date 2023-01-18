@@ -4,7 +4,6 @@
 </script>
 
 <VerticalNav>
-  <NavLink href="/identities">Your Identities</NavLink>
-  <NavLink href="/identities/add">Add Identity</NavLink>
-  <NavLink href="/identities/about">About Identities</NavLink>
+  <NavLink href="/settings/profile">Profile</NavLink>
+  <NavLink href="/settings/appearance">Apperance</NavLink>
 </VerticalNav>

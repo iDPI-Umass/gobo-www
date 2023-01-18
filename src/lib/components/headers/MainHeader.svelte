@@ -1,9 +1,9 @@
 <script>
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
-  import "@shoelace-style/shoelace/dist/components/badge/badge.js";
   import "@shoelace-style/shoelace/dist/components/drawer/drawer.js";
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
+  import ProfileBadge from "$lib/components/primitives/ProfileBadge.svelte"
   import VerticalNav from "$lib/components/primitives/VerticalNav.svelte";
   import NavLink from "$lib/components/primitives/NavLink.svelte";
   import { onMount } from "svelte";
@@ -31,9 +31,7 @@
     <div class="spacer" aria-hidden=true ></div>
     <a href="/home">Home</a>
     <a href=/identities>Identities</a>
-    <div class="badge">
-      David Harper
-    </div>
+    <ProfileBadge name="David Harper"></ProfileBadge>
   </nav>
 </header>
 
@@ -57,6 +55,7 @@
   placement="start">
   
   <VerticalNav>
+    <NavLink href="/settings/profile" action={ checkClose("/settings/profile") }>Profile</NavLink>
     <NavLink href="/home" action={ checkClose("/home") }>Home</NavLink>
     <NavLink href="/identities" action={ checkClose("/identities") }>Identities</NavLink>
   </VerticalNav>
@@ -108,19 +107,6 @@
 
   header > nav > a:focus {
     padding: calc( 1rem - 2px );
-  }
-
-  header > nav > .badge {
-    min-width: max-content;
-    padding: 0.5rem 1rem 0.5rem 1rem;
-    border-radius: var(--sl-border-radius-pill);
-    font-size: var(--sl-font-size-small);
-    font-weight: var(--sl-font-weight-bold);
-    font-family: var(--sl-font-sans);
-    background-color: var(--sl-color-primary-600);
-    color: var(--sl-color-neutral-0);
-    margin: 1rem;
-    flex: 1 0 0%;
   }
 
   .desktop {

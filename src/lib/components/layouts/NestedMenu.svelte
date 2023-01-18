@@ -32,7 +32,7 @@
 
   .right-panel {
     flex: 0 0 auto;
-    margin: 0 1rem 1rem 1rem;
+    margin: 2rem 1rem 1rem 1rem;
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
@@ -52,6 +52,7 @@
     .right-panel {
       flex: 2 1 67%;
       margin: 1rem;
+      padding-left: 3rem;
     }
   }  
 </style>
