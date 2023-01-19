@@ -65,7 +65,7 @@
   header {
     flex-direction: row;
     flex-wrap: nowrap;
-    background: #fafafa;
+    background: var(--sl-color-neutral-50);
     border-bottom: 1px solid var(--sl-color-neutral-700);
   }
 
