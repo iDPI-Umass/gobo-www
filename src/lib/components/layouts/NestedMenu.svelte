@@ -39,7 +39,7 @@
     align-items: stretch;
   }
 
-  @media ( min-width: 680px ) {
+  @media ( min-width: 750px ) {
     .panels {
       flex-direction: row;
     }

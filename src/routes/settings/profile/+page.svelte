@@ -1,7 +1,4 @@
 <script>
-  import MainHeader from "$lib/components/headers/MainHeader.svelte"
-  import NestedMenu from "$lib/components/layouts/NestedMenu.svelte";
-  import SettingsMenu from "$lib/components/settings/SettingsMenu.svelte";
   import Form from "$lib/components/primitives/Form.svelte";
   import Divider from "$lib/components/primitives/Divider.svelte"
   import "@shoelace-style/shoelace/dist/components/button/button.js";
@@ -44,37 +41,34 @@
 
 </script>
 
-<MainHeader></MainHeader>
-<NestedMenu>
-  <SettingsMenu slot="left"></SettingsMenu>
-  <section slot="right">
-    <h1>Your Profile</h1>
 
-    <Form>
-      <h2>Update Profile Name</h2>
-      
-      <sl-input 
-        name="name" 
-        label="Profile Name"
-        help-text="You can control how you appear to others."
-        inputmode="text"
-        autocomplete="off"
-        size="medium">
-      </sl-input>
+<section>
+  <h1>Your Profile</h1>
+
+  <Form>
+    <h2>Update Profile Name</h2>
     
-      <Divider></Divider>
-
-      <sl-button
-        bind:this={button}
-        type="submit"
-        variant="primary"
-        size="medium">
-        Add Identity
-      </sl-button>
-    </Form>
-  </section>
+    <sl-input 
+      name="name" 
+      label="Profile Name"
+      help-text="You can control how you appear to others."
+      inputmode="text"
+      autocomplete="off"
+      size="medium">
+    </sl-input>
   
-</NestedMenu>
+    <Divider></Divider>
+
+    <sl-button
+      bind:this={button}
+      type="submit"
+      variant="primary"
+      size="medium">
+      Add Identity
+    </sl-button>
+  </Form>
+</section>
+  
 
 
 <style>

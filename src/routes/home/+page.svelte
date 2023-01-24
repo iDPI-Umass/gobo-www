@@ -1,7 +1,18 @@
 <script>
-  import MainHeader from "$lib/components/headers/MainHeader.svelte"
+  import Post from "$lib/components/Post.svelte";
+  import posts from "./posts.js";
 </script>
 
-<MainHeader></MainHeader>
 
-<h1>Logged In Home</h1>
+<section>
+  <h1>Home Feed</h1>
+  {#each posts as post (post.id)}
+    <Post {...post}></Post>
+  {/each}
+</section>
+
+<style>
+  h1 {
+    font-size: var(--sl-font-size-x-large);
+  }
+</style>

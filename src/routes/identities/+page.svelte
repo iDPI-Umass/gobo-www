@@ -1,31 +1,22 @@
 <script>
-  import MainHeader from "$lib/components/headers/MainHeader.svelte"
-  import NestedMenu from "$lib/components/layouts/NestedMenu.svelte"
-  import IdentitiesMenu from "$lib/components/identities/IdentitiesMenu.svelte"
-  import Identity from "$lib/components/identities/Identity.svelte"
+  import Identity from "$lib/components/Identity.svelte"
   import Divider from "$lib/components/primitives/Divider.svelte"
 </script>
-
-<MainHeader></MainHeader>
-<NestedMenu>
-  <IdentitiesMenu slot="left"></IdentitiesMenu>
   
-  <section slot="right">
-    <h1>Your Identities</h1>
-    <h2>Mastodon</h2>
-    <Identity type="mastodon"></Identity>
-    <!-- <p>No identities currently registered.</p> -->
-    <Divider top="2rem" bottom="1rem"></Divider>
-    <h2>Reddit</h2>
-    <Identity type="reddit"></Identity>
-    <!-- <p>No identities currently registered.</p> -->
-    <Divider top="2rem" bottom="1rem"></Divider>
-    <h2>Twitter</h2>
-    <Identity type="twitter"></Identity>
-    <!-- <p>No identities currently registered.</p> -->
-  </section>
-
-</NestedMenu>
+<section>
+  <h1>Your Identities</h1>
+  <h2>Mastodon</h2>
+  <Identity type="mastodon"></Identity>
+  <!-- <p>No identities currently registered.</p> -->
+  <Divider top="2rem" bottom="1rem"></Divider>
+  <h2>Reddit</h2>
+  <Identity type="reddit"></Identity>
+  <!-- <p>No identities currently registered.</p> -->
+  <Divider top="2rem" bottom="1rem"></Divider>
+  <h2>Twitter</h2>
+  <Identity type="twitter"></Identity>
+  <!-- <p>No identities currently registered.</p> -->
+</section>
 
 <style>
   section {

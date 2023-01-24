@@ -69,7 +69,7 @@ a, a:hover, a:visited {
   display: var(--color-link-display, inline-block);
   text-decoration: var(--color-link-decoration, underline);
   font-weight: var(--color-link-weight, var(--sl-font-weight-normal));
-  color: var(--color-link, var(--sl-color-primary-600));
+  color: var(--color-link, var(--sl-color-primary-700));
 }
 
 p > a, p > a:hover, p > a:visited {

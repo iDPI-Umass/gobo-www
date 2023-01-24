@@ -1,7 +1,4 @@
 <script>
-  import MainHeader from "$lib/components/headers/MainHeader.svelte"
-  import NestedMenu from "$lib/components/layouts/NestedMenu.svelte";
-  import SettingsMenu from "$lib/components/settings/SettingsMenu.svelte";
   import Divider from "$lib/components/primitives/Divider.svelte"
   import "@shoelace-style/shoelace/dist/components/checkbox/checkbox.js";
   import "@shoelace-style/shoelace/dist/components/switch/switch.js";
@@ -10,8 +7,8 @@
   let darkModeSwitch, darkModeState, unsubscribeTheme;
 
   unsubscribeTheme = theme.subscribe( function ( config ) {
-    darkModeState = config.dark;
-  });
+      darkModeState = config.dark;
+    });
 
   onMount(() => {
     darkModeSwitch.addEventListener( "sl-change", function( event ) {
@@ -29,32 +26,29 @@
 
 </script>
 
-<MainHeader></MainHeader>
-<NestedMenu>
-  <SettingsMenu slot="left"></SettingsMenu>
-  <section slot="right" class="frame">
-    <h1>Appearance</h1>
 
-    <section class="panel dark-mode">
-      <h2>Dark Mode</h2>
-      <p>Dark Mode is GOBO's light-on-dark color scheme. By default, GOBO tries
-        to respect the preference set in your operating system, but you can set
-        it here.
-      </p>
-      
+<section class="frame">
+  <h1>Appearance</h1>
 
-      <sl-switch
-        bind:this={darkModeSwitch}
-        checked={darkModeState}
-        size="medium">
-        Dark Mode
-      </sl-switch>
-    </section>
+  <section class="panel dark-mode">
+    <h2>Dark Mode</h2>
+    <p>Dark Mode is GOBO's light-on-dark color scheme. By default, GOBO tries
+      to respect the preference set in your operating system, but you can
+      configure it directly here.
+    </p>
     
 
-    <Divider top="1rem" bottom="4rem"></Divider>
+    <sl-switch
+      bind:this={darkModeSwitch}
+      checked={darkModeState}
+      size="medium">
+      Dark Mode
+    </sl-switch>
   </section>
-</NestedMenu>
+  
+
+  <Divider top="1rem" bottom="4rem"></Divider>
+</section>
 
 
 <style>
@@ -76,16 +70,4 @@
   .panel > p {
     margin-bottom: 2rem;
   }
-
-  .dark-mode {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-  }
-
-  .dark-mode > * {
-    margin-bottom: 1rem;
-  }
-
 </style>
