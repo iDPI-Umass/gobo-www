@@ -42,7 +42,7 @@ export default [{
   id: 4,
   type: "image",
   platform: "twitter",
-  url: "https://twitter.com/clairewillett/status/1305249223491739648",
+  url: "https://twitter.com/meakoopa/status/1585105165111025664",
   content: "<p>suspect there is much of Jessica Harper in SUSPIRIA (1977) informing " +
     "Kitty Pryde’s character and design in X-Men #129 (1980) - a young dancer overwhelmed " +
     "at potentially sinister boarding school, menaced by a severe headmistress’s psychic attacks</p>",

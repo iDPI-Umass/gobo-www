@@ -1,0 +1,25 @@
+.gobo-copy {
+  max-width:  36rem;
+  margin: 0;
+  padding: 0;
+}
+
+.gobo-copy > h1 {
+  font-size: var(--sl-font-size-x-large);
+  margin-bottom: 2rem;
+}
+
+.gobo-copy > h2 {
+  font-size: var(--sl-font-size-large);
+  margin-bottom: 1rem;
+}
+
+.gobo-copy > p + h2 {
+  font-size: var(--sl-font-size-large);
+  margin-top: 2rem;
+}
+
+.gobo-copy > p {
+  font-size: var(--sl-font-size-medium);
+  margin-bottom: 1rem;
+}

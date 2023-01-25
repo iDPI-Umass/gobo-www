@@ -24,7 +24,6 @@
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
-    /* justify-content: center; */
     align-items: center;
     margin: 1rem;
   }

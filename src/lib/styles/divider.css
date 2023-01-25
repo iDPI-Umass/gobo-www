@@ -1,0 +1,4 @@
+.gobo-divider {
+  --width: 1px;
+  --color: var(--sl-color-neutral-400);
+}

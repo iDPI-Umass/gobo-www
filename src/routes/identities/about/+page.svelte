@@ -1,8 +1,7 @@
 <script>
-  import Copy from "$lib/components/primitives/Copy.svelte";
 </script>
 
-<Copy maxWidth="32rem">
+<section class="gobo-copy">
   <h1>About Identities</h1>
 
   <p>
@@ -31,4 +30,7 @@
     cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat 
     non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
   </p> 
-</Copy>
+</section>
+
+<style>
+</style>

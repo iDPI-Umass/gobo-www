@@ -1,10 +1,8 @@
 <script>
-  import Form from "$lib/components/primitives/Form.svelte";
-  import Divider from "$lib/components/primitives/Divider.svelte"
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/input/input.js";
+  import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import { onMount } from "svelte";
-  import { goto } from '$app/navigation';
   import { sleep } from "@dashkite/joy/time";
   let form, button;
 
@@ -12,7 +10,7 @@
     return form.reportValidity();  
   };
 
-  const login = async function () {
+  const issueRequest = async function () {
     console.log( "HTTP request goes here..." );
     await sleep( 500 );
   };
@@ -20,32 +18,31 @@
   const submit = async function () {
     const isValid = validate();
     if ( isValid === true ) {
-      await login();
+      await issueRequest();
       form.reset();
       button.loading = false;
-      goto( "/identities" );
     } else {
       button.loading = false;
     }
   };
 
-  // onMount(() => {
-  //   form.addEventListener('submit', function(event) {
-  //     event.preventDefault();
-  //     if ( button.loading !== true ) {
-  //       button.loading = true;
-  //       submit();
-  //     }
-  //   });
-  // });
+  onMount(() => {
+    form.addEventListener('submit', function(event) {
+      event.preventDefault();
+      if ( button.loading !== true ) {
+        button.loading = true;
+        submit();
+      }
+    });
+  });
 
 </script>
 
 
-<section>
+<section class="frame">
   <h1>Your Profile</h1>
 
-  <Form>
+  <form bind:this={form} class="gobo-form">
     <h2>Update Profile Name</h2>
     
     <sl-input 
@@ -56,38 +53,40 @@
       autocomplete="off"
       size="medium">
     </sl-input>
-  
-    <Divider></Divider>
 
     <sl-button
       bind:this={button}
       type="submit"
       variant="primary"
       size="medium">
-      Add Identity
+      Update Profile
     </sl-button>
-  </Form>
+  </form>
+
+  <sl-divider class="gobo-divider"></sl-divider>
 </section>
   
 
 
 <style>
-  section {
-    max-width: 32rem;
+  .frame {
+    max-width:  36rem;
     margin: 0;
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
   }
 
-  section > * {
-    margin-bottom: 4rem;
-  }
-
-  section > h1 {
+  .frame > h1 {
     font-size: var(--sl-font-size-x-large);
     margin-bottom: 2rem;
+  }
+
+  form > sl-button {
+    align-self: flex-start;
+    margin-bottom: 0;
+  }
+
+  .frame > sl-divider {
+    margin-top: 1rem;
+    margin-bottom: 4rem;
   }
 
 </style>

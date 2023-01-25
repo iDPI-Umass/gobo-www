@@ -16,6 +16,7 @@
   export let image = null;
   export let video = null;
   export let results = [];
+  export let total = 0;
 
   let colors = {
     mastodon: "#6364FF",
@@ -26,9 +27,9 @@
   let logo, brandColor;
 
   if ( platform != null ) {
-    logo = `icons/${ platform }.svg`;
+    logo = `/icons/${ platform }.svg`;
   } else {
-    logo = "icons/circle.svg";
+    logo = "/icons/circle.svg";
   }
 
   if ( colors[ platform ] != null ) {
@@ -106,6 +107,7 @@
           </div>
         {/each}
       </div>
+      <p class="tally">{ new Intl.NumberFormat().format( total ) } Votes</p>
     </section>
   {/if}
 
@@ -136,9 +138,8 @@
     align-items: stretch;
     margin: 1rem 0 1rem 0;
     padding: 0;
-    max-width: 32rem;
-    /* border: 2px solid var(--sl-color-neutral-400); */
-    border: 2px solid var(--brand-color);
+    max-width:  36rem;
+    border: 2px solid var(--sl-color-neutral-400);
     border-radius: var(--sl-border-radius-medium);
     margin-bottom: 4rem;
   }
@@ -185,15 +186,14 @@
 
   .outer-frame > sl-divider {
     --width: 1px;
-    /* --color: var(--sl-color-neutral-400); */
-    --color: var(--brand-color);
+    --color: var(--sl-color-neutral-400);
     margin: 0.5rem 1rem 0 1rem;
   }
 
   .outer-frame > section {
     margin: 1rem 1rem 0 1rem;
     padding: 0;
-    max-width: 32rem;
+    max-width:  36rem;
     border: none;
   }
 
@@ -339,6 +339,10 @@
 
   article > .question-container > .question-box > .question > .question-value {
     z-index: 1;
+  }
+
+  article > .question-container > .tally {
+    margin-bottom: 0;
   }
 
 </style>

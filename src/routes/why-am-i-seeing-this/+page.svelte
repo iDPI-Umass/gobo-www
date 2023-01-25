@@ -1,84 +1,61 @@
 <script>
   import MainHeader from "$lib/components/headers/MainHeader.svelte"
-  import Center from "$lib/components/layouts/Center.svelte"
-  import "@shoelace-style/shoelace/dist/components/input/input.js";
+  import LeftRight from "$lib/components/layouts/LeftRight.svelte"
+  import Fascinator from "$lib/components/primitives/Fascinator.svelte"
   import "@shoelace-style/shoelace/dist/components/button/button.js";
-  import { onMount } from "svelte";
-  import { goto } from '$app/navigation';
-  import { sleep } from "@dashkite/joy/time";
-  let form, button;
-
-  const validate = function() {
-    return form.reportValidity();  
-  };
-
-  const issueRequest = async function () {
-    console.log( "HTTP request goes here..." );
-    await sleep( 500 );
-  };
-
-  const submit = async function () {
-    const isValid = validate();
-    if ( isValid === true ) {
-      await issueRequest();
-      form.reset();
-      button.loading = false;
-      goto( "/identities" );
-    } else {
-      button.loading = false;
-    }
-  };
-
-  onMount(() => {
-    form.addEventListener('submit', function(event) {
-      event.preventDefault();
-      if ( button.loading !== true ) {
-        button.loading = true;
-        submit();
-      }
-    });
-  });
+  import "@shoelace-style/shoelace/dist/components/divider/divider.js";
 </script>
 
 <MainHeader></MainHeader>
-<Center>
-  <h1>Why Am I Seeing This?</h1>
-  
+<LeftRight>
+  <section slot="left" class="gobo-copy">
+    <h1>Why Am I Seeing This?</h1>
+    <p>
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+      tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim 
+      veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea 
+      commodo consequat.
+    </p>
+    <p>
+      Duis aute irure dolor in reprehenderit in voluptate velit esse cillum 
+      dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non 
+      proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+    </p>
+
+    <sl-divider class="gobo-divider"></sl-divider>
+
+    <div class="button-panel">
+      <sl-button
+        variant="primary"
+        size="medium"
+        href="/home/settings">
+        Edit Filters
+      </sl-button>
+      <sl-button
+        variant="primary"
+        size="medium"
+        href="/home">
+        Return to Feed
+      </sl-button>
+    </div>
     
+  </section>
   
-  
-</Center>
+  <Fascinator slot="right"></Fascinator>
+</LeftRight>
 
 
 <style>
-  form {
-    flex: 1 1 100%;
-    max-width: 30rem;
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    align-items: stretch;
+  sl-divider {
+    margin-top: 2rem;
   }
 
-  form > * {
-    margin-bottom: 2rem;
-  }
-
-  form > h1 {
-    font-size: var(--sl-font-size-x-large);
-  }
-
-  form > h2 {
-    font-size: var(--sl-font-size-large);
-    margin-bottom: 1rem;
-  }
-
-  section.buttons {
+  .button-panel {
     width: 100%;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: space-between;
-    margin: 1rem 0 0 0;
+    margin-top: 1rem;
   }
 </style>

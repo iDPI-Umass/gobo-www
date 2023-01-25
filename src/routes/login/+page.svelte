@@ -2,10 +2,10 @@
   import PlainHeader from "$lib/components/headers/PlainHeader.svelte"
   import LeftRight from "$lib/components/layouts/LeftRight.svelte"
   import Fascinator from "$lib/components/primitives/Fascinator.svelte"
-  import Divider from "$lib/components/primitives/Divider.svelte"
   import "@shoelace-style/shoelace/dist/components/input/input.js";
   import "@shoelace-style/shoelace/dist/components/checkbox/checkbox.js";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
+  import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import { onMount } from "svelte";
   import { goto } from '$app/navigation';
   import { sleep } from "@dashkite/joy/time";
@@ -45,7 +45,7 @@
 
 <PlainHeader></PlainHeader>
 <LeftRight>
-  <form slot="left" bind:this={form}>
+  <form slot="left" class="gobo-form" bind:this={form}>
     <h1>Log In To Your Account</h1>
   
     <sl-input 
@@ -91,7 +91,7 @@
       Login
     </sl-button>
   
-    <Divider></Divider>
+    <sl-divider class="gobo-divider"></sl-divider>
   
     <p>
       New to GOBO? 
@@ -108,20 +108,11 @@
 
 <style>
   form {
-    flex: 1 1 100%;
-    max-width: 20rem;
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    align-items: stretch;
+    max-width: 24rem;
   }
 
-  form > * {
-    margin-bottom: 2rem;
-  }
-
-  form > h1 {
-    font-size: var(--sl-font-size-x-large);
+  form > sl-divider {
+    margin-bottom: 1rem;
   }
 
   .password-helper::part(form-control) {

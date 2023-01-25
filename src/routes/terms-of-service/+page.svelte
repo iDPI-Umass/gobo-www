@@ -1,1 +1,1 @@
-<h1>Password Recovery</h1>
+<h1>Terms of Service</h1>

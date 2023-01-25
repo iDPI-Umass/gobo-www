@@ -26,7 +26,6 @@ export const humanize = function ( time ) {
   const diff = now.diff( target );
  
   if ( diff < 604800000 ) {
-    console.log( now.diff( target, "day" ));
     return dayjs( time ).fromNow( true );
   } else if ( now.$y === target.$y ) {
     return target.format("MMM DD");

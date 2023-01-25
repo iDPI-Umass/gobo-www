@@ -1,13 +1,13 @@
 <script>
-  import Divider from "$lib/components/primitives/Divider.svelte"
-  export let href
+  import "@shoelace-style/shoelace/dist/components/divider/divider.js";
+  export let href;
   export let action = function () {};
 </script>
 
 <a href={href} on:click={ action }>
   <slot></slot>
 </a>
-<Divider></Divider>
+<sl-divider class="gobo-divider"></sl-divider>
 
 <style>
   a {

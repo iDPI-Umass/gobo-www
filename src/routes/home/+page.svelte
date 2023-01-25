@@ -15,4 +15,8 @@
   h1 {
     font-size: var(--sl-font-size-x-large);
   }
+
+  section {
+    overflow-y: scroll;
+  }
 </style>

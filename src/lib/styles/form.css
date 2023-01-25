@@ -1,0 +1,29 @@
+.gobo-form {
+  max-width:  36rem;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.gobo-form > h1 {
+  font-size: var(--sl-font-size-x-large);
+  margin-bottom: 2rem;
+}
+
+.gobo-form > h2 {
+  font-size: var(--sl-font-size-large);
+  margin-bottom: 1rem;
+}
+
+.gobo-form > * {
+  margin-bottom: 2rem;
+}
+
+.gobo-form > sl-divider {
+  margin-bottom: 1rem;
+}
+
+.gobo-form > sl-button {
+  align-self: flex-end;
+}

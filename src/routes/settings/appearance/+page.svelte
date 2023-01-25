@@ -1,7 +1,7 @@
 <script>
-  import Divider from "$lib/components/primitives/Divider.svelte"
   import "@shoelace-style/shoelace/dist/components/checkbox/checkbox.js";
   import "@shoelace-style/shoelace/dist/components/switch/switch.js";
+  import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import { onMount, onDestroy } from "svelte";
   import { theme } from "$lib/stores/theme";
   let darkModeSwitch, darkModeState, unsubscribeTheme;
@@ -47,13 +47,13 @@
   </section>
   
 
-  <Divider top="1rem" bottom="4rem"></Divider>
+  <sl-divider class="gobo-divider"></sl-divider>
 </section>
 
 
 <style>
   .frame {
-    max-width: 32rem;
+    max-width:  36rem;
     margin: 0;
   }
 
@@ -69,5 +69,10 @@
 
   .panel > p {
     margin-bottom: 2rem;
+  }
+
+  .frame > sl-divider {
+    margin-top: 1rem;
+    margin-bottom: 4rem;
   }
 </style>

@@ -2,7 +2,7 @@
 </script>
   
 <section>
-  <h1>Settings</h1>
+  <h1>Feed Settings</h1>
 </section>
 
 <style>

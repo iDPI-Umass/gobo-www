@@ -1,6 +1,6 @@
 <script>
-  import Identity from "$lib/components/Identity.svelte"
-  import Divider from "$lib/components/primitives/Divider.svelte"
+  import "@shoelace-style/shoelace/dist/components/divider/divider.js";
+  import Identity from "$lib/components/Identity.svelte";
 </script>
   
 <section>
@@ -8,11 +8,11 @@
   <h2>Mastodon</h2>
   <Identity type="mastodon"></Identity>
   <!-- <p>No identities currently registered.</p> -->
-  <Divider top="2rem" bottom="1rem"></Divider>
+  <sl-divider class="gobo-divider"></sl-divider>
   <h2>Reddit</h2>
   <Identity type="reddit"></Identity>
   <!-- <p>No identities currently registered.</p> -->
-  <Divider top="2rem" bottom="1rem"></Divider>
+  <sl-divider class="gobo-divider"></sl-divider>
   <h2>Twitter</h2>
   <Identity type="twitter"></Identity>
   <!-- <p>No identities currently registered.</p> -->
@@ -37,5 +37,10 @@
   section > h2 {
     font-size: var(--sl-font-size-large);
     margin: 0;
+  }
+
+  section > sl-divider {
+    margin: 2rem 0 1rem 0;
+    max-width: 40rem;
   }
 </style>
