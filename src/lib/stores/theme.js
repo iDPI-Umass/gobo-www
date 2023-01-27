@@ -14,9 +14,15 @@ const createTheme = function () {
 
     if ( theme == null ) {
       if ( prefersDark() === true ) {
-        theme = { dark: true };
+        theme = { 
+          dark: true, 
+          fontSize: "3"
+        };
       } else {
-        theme = { dark: false };
+        theme = { 
+          dark: false,
+          fontSize: "3" 
+        };
       }
     
       LS.write( "gobo-theme", theme );
@@ -48,6 +54,13 @@ const createTheme = function () {
         theme.dark = false;
         LS.write( "gobo-theme", theme );
         return theme; 
+      });
+    },
+    setFontSize: function ( size ) {
+      update( function ( theme ) {
+        theme.fontSize = size;
+        LS.write( "gobo-theme", theme );
+        return theme;
       });
     }
   };

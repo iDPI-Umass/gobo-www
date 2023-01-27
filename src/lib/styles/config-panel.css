@@ -1,0 +1,31 @@
+.gobo-config-frame {
+  margin: 0;
+  overflow-y: scroll;
+}
+
+.gobo-config-frame > h1 {
+  font-size: var(--sl-font-size-x-large);
+  margin-bottom: 2rem;
+}
+
+.gobo-config-frame > * {
+  max-width: 36rem;
+}
+
+.gobo-config-frame > .panel > h2 {
+  font-size: var(--sl-font-size-large);
+  margin-bottom: 1rem;
+}
+
+.gobo-config-frame > .panel > p {
+  margin-bottom: 2rem;
+}
+
+.gobo-config-frame > .gobo-divider {
+  margin-top: 1rem;
+  margin-bottom: 4rem;
+}
+
+.gobo-config-frame > .panel > .gobo-form > sl-button:last-child {
+  margin-bottom: 0;
+}

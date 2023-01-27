@@ -2,7 +2,7 @@
   import posts from "./posts.js";
   export let data;
 
-  const id = Number( data.id );
+  const id = Number( data.bindings.id );
   const url = posts.find( post => post.id === id ).url;
 </script>
 

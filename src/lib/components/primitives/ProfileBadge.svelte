@@ -20,4 +20,9 @@
     margin: 1rem;
     flex: 1 0 0%;
   }
+
+  .profile-badge:focus {
+    margin: calc(1rem - 2px);
+    border: 2px solid var(--sl-color-neutral-1000);
+  }
 </style>

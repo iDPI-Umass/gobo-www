@@ -28,7 +28,7 @@
       <sl-button
         variant="primary"
         size="medium"
-        href="/home/settings">
+        href="/settings/feed">
         Edit Filters
       </sl-button>
       <sl-button

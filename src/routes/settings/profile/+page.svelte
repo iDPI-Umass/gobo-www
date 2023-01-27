@@ -39,54 +39,36 @@
 </script>
 
 
-<section class="frame">
+<section class="gobo-config-frame">
   <h1>Your Profile</h1>
 
-  <form bind:this={form} class="gobo-form">
-    <h2>Update Profile Name</h2>
-    
-    <sl-input 
-      name="name" 
-      label="Profile Name"
-      help-text="You can control how you appear to others."
-      inputmode="text"
-      autocomplete="off"
-      size="medium">
-    </sl-input>
+  <section class="panel">
+    <form bind:this={form} class="gobo-form">
+      <h2>Update Profile Name</h2>
+      
+      <sl-input 
+        name="name" 
+        label="Profile Name"
+        help-text="You can control how you appear to others."
+        inputmode="text"
+        autocomplete="off"
+        size="medium">
+      </sl-input>
 
-    <sl-button
-      bind:this={button}
-      type="submit"
-      variant="primary"
-      size="medium">
-      Update Profile
-    </sl-button>
-  </form>
-
+      <sl-button
+        bind:this={button}
+        type="submit"
+        variant="primary"
+        size="medium">
+        Update Profile
+      </sl-button>
+    </form>
+  </section>
+  
   <sl-divider class="gobo-divider"></sl-divider>
 </section>
   
 
 
 <style>
-  .frame {
-    max-width:  36rem;
-    margin: 0;
-  }
-
-  .frame > h1 {
-    font-size: var(--sl-font-size-x-large);
-    margin-bottom: 2rem;
-  }
-
-  form > sl-button {
-    align-self: flex-start;
-    margin-bottom: 0;
-  }
-
-  .frame > sl-divider {
-    margin-top: 1rem;
-    margin-bottom: 4rem;
-  }
-
 </style>

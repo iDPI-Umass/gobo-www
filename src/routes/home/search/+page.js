@@ -1,4 +1,5 @@
-export function load({ url }) {
-  const search = url.searchParams.get( "search" );
-  return { search };
+import Oxygen from "$lib/helpers/oxygen";
+
+export function load( page ) {
+  return Oxygen.parse( page );
 };

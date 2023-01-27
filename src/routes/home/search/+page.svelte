@@ -12,7 +12,7 @@
   let form, button;
   let results = [];
   let loading = false;
-  let searchTerm = data.search;
+  let searchTerm = data.bindings.search || null;
 
   const isValidString = function ( string ) {
     return ( string != null ) && ( string.length > 0 );

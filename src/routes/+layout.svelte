@@ -5,31 +5,56 @@
 
   // Add in classes created for this project.
   import "$lib/styles/top.css";
+  import "$lib/styles/config-panel.css";
   import "$lib/styles/copy.css";
   import "$lib/styles/divider.css";
   import "$lib/styles/form.css";
+  import "$lib/styles/radio-button.css";
+  import "$lib/styles/brand.css";
 
   // Now we can setup the store stuff with Svelte
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { browser } from "$app/environment";
   import { theme } from "$lib/stores/theme.js";
 
-  let unsubscribeTheme;
+  if ( browser ) {
+    let unsubscribeTheme;
+    
+    onMount( function() {
+      unsubscribeTheme = theme.subscribe( function ( config ) {
 
-  unsubscribeTheme = theme.subscribe( function ( config ) {
-    if ( browser ) {
       const html = document.querySelector( "html" )
       if ( config.dark === true ) {
         html.classList.add( "sl-theme-dark" );
       } else {
         html.classList.remove( "sl-theme-dark" );
       }
-    }
-  });
 
-  onDestroy( function () {
-    unsubscribeTheme();
-  });
+      switch( config.fontSize ) {
+        case "1":
+          html.style.fontSize = "12px";
+          break;
+        case "2":
+          html.style.fontSize = "14px";
+          break;
+        case "3":
+          html.style.fontSize = "16px";
+          break;
+        case "4":
+          html.style.fontSize = "18px";
+          break;
+        case "5":
+          html.style.fontSize = "20px";  
+          break;
+      }
+      });
+    });
+
+    onDestroy( function () {
+      unsubscribeTheme();
+    });
+
+  }
 </script>
 
 <div class="page-wrapper">
