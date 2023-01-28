@@ -8,8 +8,10 @@
   import { browser } from "$app/environment";
   import { marker } from "$lib/stores/feed-marker.js";
   import { config } from "$lib/stores/feed-config.js";
+  import { scroll } from "$lib/stores/scroll.js";
   let feed, unsubscribeMarker;
   let feedSortSelect, feedSort, unsubscribeConfig;
+  let unsubscribeScroll;
   
   if ( browser ) {
     onMount( function () {
@@ -24,6 +26,10 @@
         });
       });
 
+      unsubscribeScroll = scroll.subscribe( function ({ deltaY }) {
+        feed.scrollBy( 0, deltaY );
+      });
+
       feedSortSelect.addEventListener( "sl-change", function () {
         console.log( "Feed update goes here" );
       });
@@ -32,12 +38,13 @@
     onDestroy( function () {
       unsubscribeConfig();
       unsubscribeMarker();
+      unsubscribeScroll();
     });
   }
 </script>
 
 
-<section bind:this={feed}>
+<section bind:this={feed} role="feed">
   <h1>Home Feed</h1>
   <sl-select
     bind:this={feedSortSelect}

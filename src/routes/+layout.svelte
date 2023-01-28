@@ -11,6 +11,7 @@
   import "$lib/styles/form.css";
   import "$lib/styles/radio-button.css";
   import "$lib/styles/brand.css";
+  import "$lib/styles/keyword-table.css";
 
   // Now we can setup the store stuff with Svelte
   import { onDestroy, onMount } from "svelte";

@@ -10,15 +10,16 @@
   import  "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import { onDestroy, onMount } from "svelte";
   import { config } from "$lib/stores/feed-config.js";
+  import { scroll } from "$lib/stores/scroll.js";
   import { browser } from "$app/environment";
   let unsubscribeConfig;
+  let configFrame, unsubscribeScroll;
   let sortSelect, defaultFeedSort;
   let engagementSwitch, displayEngagement;
   let keywordForm;
   
   if ( browser ) {
     unsubscribeConfig = config.subscribe( function  ( config ) {
-      console.log( config );
       defaultFeedSort = config.defaultFeedSort;
       displayEngagement = config.displayEngagement;
     });
@@ -31,10 +32,15 @@
       engagementSwitch.addEventListener( "sl-change", function ( event ) {
         config.setDisplayEngagement( event.target.checked );
       });
+
+      unsubscribeScroll = scroll.subscribe( function ({ deltaY }) {
+        configFrame.scrollBy( 0, deltaY );
+      });
     });
 
     onDestroy( function () {
       unsubscribeConfig();
+      unsubscribeScroll();
     });
   }
 
@@ -53,7 +59,7 @@
   ]
 </script>
 
-<section class="gobo-config-frame">
+<section class="gobo-config-frame" bind:this={configFrame}>
   <h1>Feed Settings</h1>
 
   <section class="panel">
@@ -107,7 +113,7 @@
         <div class="table-row">
           <span>{ word }</span>
           <sl-icon-button
-            variant="danger"
+            class="danger"
             label="Delete Keyword" 
             src="/icons/trash.svg"></sl-icon-button>
         </div>
@@ -146,12 +152,12 @@
           </sl-icon>
           <span>{ account.account }</span>
           <sl-icon-button
-            variant="danger"
+            class="danger"
             label="Delete Keyword" 
             src="/icons/trash.svg"></sl-icon-button>
         </div>
       {/each}
-      </div>
+    </div>
 
     <form bind:this={keywordForm} class="gobo-form">
       <sl-select
@@ -182,50 +188,5 @@
 </section>
 
 <style>
-  .keyword-table {
-    width: 100%;
-    height: 20rem;
-    background: var(--sl-color-neutral-0);
-    color: var(--sl-color-neutral-1000);
-    flex-direction: column;
-    flex-wrap: nowrap;
-    align-items: stretch;
-    overflow-y: scroll;
-    border: 1px solid var(--sl-color-neutral-500);
-    border-radius: var(--sl-border-radius-medium);
-    margin-bottom: 2rem;
-  }
 
-  .keyword-table > .table-row {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: center;
-    padding: 1rem;
-  }
-
-  .keyword-table > .table-row:nth-child(odd) {
-    background: var(--sl-color-neutral-100);
-  }
-
-  .keyword-table > .table-row > sl-icon-button {
-    margin-left: 1rem;
-    font-size: 1.25rem;
-  }
-
-  .keyword-table > .table-row > sl-icon-button::part(base) {
-    color: var(--sl-color-danger-500);
-  }
-
-  .keyword-table > .table-row > span {
-    margin: 0;
-    flex: 1;
-    overflow-x: scroll;
-  }
-
-  .keyword-table > .table-row > sl-icon {
-    margin-right: 1rem;
-    font-size: 1.5rem;
-    min-width: max-content;
-  }
 </style>

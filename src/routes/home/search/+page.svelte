@@ -1,11 +1,12 @@
 <script>
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { sleep } from "@dashkite/joy/time";
   import "@shoelace-style/shoelace/dist/components/input/input.js";
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/spinner/spinner.js";
   import Post from "$lib/components/Post.svelte"
+  import { scroll } from "$lib/stores/scroll.js";
   import posts from "../posts.js";
   
   export let data;
@@ -13,6 +14,7 @@
   let results = [];
   let loading = false;
   let searchTerm = data.bindings.search || null;
+  let unsubscribeScroll, resultsSection;
 
   const isValidString = function ( string ) {
     return ( string != null ) && ( string.length > 0 );
@@ -49,7 +51,16 @@
       await submit();
     }
 
+    unsubscribeScroll = scroll.subscribe( function ({ deltaY }) {
+      if ( resultsSection != null ) {
+        resultsSection.scrollBy( 0, deltaY );
+      }
+    })
   });
+
+  onDestroy( function() {
+    unsubscribeScroll();
+  })
 
 </script>
 
@@ -80,7 +91,7 @@
   </div>
 {:else}
   {#if results.length !== 0 }
-    <section>
+    <section bind:this={resultsSection}>
       <h2>Results</h2>
       {#each results as result (result.id)}
         <Post {...result}></Post>

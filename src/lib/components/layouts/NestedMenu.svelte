@@ -1,5 +1,19 @@
+<script>
+  import { scroll } from "$lib/stores/scroll.js";
+
+  const handleWheel = function ( event ) {
+    if ( window.screen.width > 750 ) {
+      event.preventDefault();
+      scroll.push({
+        deltaY: event.deltaY
+      });
+    }
+  };
+  
+</script>
+
 <div class="panels">
-  <div class="left-panel">
+  <div class="left-panel" on:wheel={handleWheel}>
     <slot name="left"></slot>
   </div>
   
