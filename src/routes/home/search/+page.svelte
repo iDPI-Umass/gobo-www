@@ -1,11 +1,12 @@
 <script>
-  import { onDestroy, onMount } from "svelte";
-  import { sleep } from "@dashkite/joy/time";
   import "@shoelace-style/shoelace/dist/components/input/input.js";
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/spinner/spinner.js";
   import Post from "$lib/components/Post.svelte"
+  import { onDestroy, onMount } from "svelte";
+  import { browser } from "$app/environment";
+  import { sleep } from "@dashkite/joy/time";
   import { scroll } from "$lib/stores/scroll.js";
   import posts from "../posts.js";
   
@@ -42,25 +43,27 @@
     }
   }
 
-  onMount( async function () {
-    form.addEventListener( "submit", async function( event ) {
-      await submit();
+  if ( browser ) {
+    onMount( async function () {
+      form.addEventListener( "submit", async function( event ) {
+        await submit();
+      });
+
+      if ( isValidString( searchTerm ) ) {
+        await submit();
+      }
+
+      unsubscribeScroll = scroll.subscribe( function ({ deltaY }) {
+        if ( resultsSection != null ) {
+          resultsSection.scrollBy( 0, deltaY );
+        }
+      })
     });
 
-    if ( isValidString( searchTerm ) ) {
-      await submit();
-    }
-
-    unsubscribeScroll = scroll.subscribe( function ({ deltaY }) {
-      if ( resultsSection != null ) {
-        resultsSection.scrollBy( 0, deltaY );
-      }
-    })
-  });
-
-  onDestroy( function() {
-    unsubscribeScroll();
-  })
+    onDestroy( function() {
+      unsubscribeScroll();
+    });
+  }
 
 </script>
 

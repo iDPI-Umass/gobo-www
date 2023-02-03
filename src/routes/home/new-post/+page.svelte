@@ -2,68 +2,154 @@
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import "@shoelace-style/shoelace/dist/components/switch/switch.js";
   import "@shoelace-style/shoelace/dist/components/checkbox/checkbox.js";
+  import "@shoelace-style/shoelace/dist/components/select/select.js";
+  import "@shoelace-style/shoelace/dist/components/option/option.js";
   import "@shoelace-style/shoelace/dist/components/input/input.js";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/textarea/textarea.js";
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import { onDestroy, onMount } from "svelte";
   import { browser } from "$app/environment";
+  import { goto } from "$app/navigation";
   import { scroll } from "$lib/stores/scroll.js";
+  import { draft } from "$lib/stores/post-draft.js";
+  import { preview } from "$lib/stores/image-preview.js";
 
   let configFrame, unsubscribeScroll;
+  let draftData, unsubscribeDraft;
+  let identities = [];
+  let identitySwitches = {};
   let files = [];
   let targetsReddit = false;
 
-  const identities = [
-    { platform: "mastodon", account: "@username@instance.com", active: false },
-    { platform: "reddit", account: "u/username", active: false },
-    { platform: "twitter", account: "@username", active: false }
-  ];
 
-  const mastodons = [];
-  const reddits = [];
-  const twitters = [];
-  
-  for ( const i of identities ) {
-    if ( i.platform === "mastodon" )  {
-      mastodons.push( i );
+  const setIdentities = function () {
+    for ( const key in draftData.identities ) {
+      const identity = draftData.identities[ key ];
+      const match = identities.find( i => i.key === identity.key );
+
+      if ( match == null ) {
+        console.log(JSON.stringify(identity, null, 2));
+        identities.push( identity );
+      } else {
+        match.active = identity.active;
+      }
     }
-    if ( i.platform === "reddit" )  {
-      reddits.push( i );
-    }
-    if ( i.platform === "twitter" )  {
-      twitters.push( i );
+
+    identities.sort( function ( A, B ) {
+      if ( A.key < B.key ) {
+        return -1;
+      } else {
+        return 1;
+      }
+    });
+
+    identities = identities;
+
+    console.log({ identities });
+    console.log({ identitySwitches });
+
+    // for ( const identity of identities) {
+    //   identitySwitches[ identity.key ].checked = identity.active;
+    // }
+  };
+
+  const setFiles = function () {
+    files = draftData.files;
+  }
+
+  const setReddit = function () {
+    for ( const identity of identities ) {
+      if ( (identity.platform === "reddit") && (identity.active === true) ) {
+        targetsReddit = true;
+        return;
+      }
+
+      targetsReddit = false;
     }
   }
 
-  const handleRedditSwitch = function ( account ) {
-    return function ( event ) {
-      let match = reddits.find( r => r.account === account );
-      if ( match != null ) {
-        match.active = event.target.checked
-      }
 
-      for ( const reddit of reddits ) {
-        if ( reddit.active === true ) {
-          targetsReddit = true;
-          return;
+
+  const handleIdentitySwitch = function ( identity ) {
+    return function ( event ) {
+      draft.updateIdentity({
+        [ identity.key ]: { 
+          ...identity, 
+          active: event.target.checked 
         }
-        targetsReddit = false;
-      }
+      });
     }
   };
 
-  files.push({ path: "/example.png" })
+
+
+  const addFile = function ( file ) {
+    console.log( file.name, file );
+    draft.update({ files: [ ...files, file ] });
+  }
+
+  const handleDragEnter = function ( event ) {
+    event.preventDefault();
+  };
+
+  const handleDragLeave = function ( event ) {
+    event.preventDefault();
+  };
+
+  const handleDrop = function ( event ) {
+    event.preventDefault();
+
+    // Support both item list and file interfaces.
+    if ( event.dataTransfer.items ) {
+
+      [ ...event.dataTransfer.items ].forEach( function ( item ) {
+        // If dropped items aren't files, reject them
+        if ( item.kind === "file" ) {
+          const file = item.getAsFile();
+          addFile( file );
+        }
+      });
+
+    } else {
+      [ ...event.dataTransfer.files ].forEach( function ( file ) {
+        addFile( file );
+      });
+    }
+  };
+
+  const handlePreview = function( file ) {
+    return function ( event ) {
+      event.preventDefault();
+      preview.set( file );
+      goto( "/upload-preview" );
+    }
+  }
 
   if ( browser ) {
     onMount( function () {
       unsubscribeScroll = scroll.subscribe( function ({ deltaY }) {
         configFrame.scrollBy( 0, deltaY );
+      });
+
+      unsubscribeDraft = draft.subscribe( function ( draft ) {
+        draftData = draft;
+        setIdentities();
+        setFiles();
+        setReddit();
       })
+
+      // Pull in registered identities.
+      draft.seed([
+        { platform: "mastodon", account: "@username@instance.com" },
+        { platform: "reddit", account: "u/username" },
+        { platform: "twitter", account: "@username" }
+      ]);
     });;
 
     onDestroy( function () {
       unsubscribeScroll();
+      unsubscribeDraft();
     });
   }
 
@@ -71,6 +157,7 @@
 
 <section class="gobo-config-frame" bind:this={configFrame}>
   <h1>New Post</h1>
+
   <section class="panel">
     <h2>Choose Identities</h2>
     <p>
@@ -78,31 +165,20 @@
       will submit posts to these platforms on your behalf.
     </p>
 
-    {#each mastodons as mastodon (mastodon.account)}
+    {#each identities as identity (identity.key)}
       <div class="identity">
         <sl-switch
+          bind:this={identitySwitches[ identity.key ]}
+          checked={identity.active}
+          on:sl-change={handleIdentitySwitch( identity )}
           size="medium">
         </sl-switch>
-        <sl-icon src="/icons/mastodon.svg" style="color:var(--gobo-mastodon);"></sl-icon>{mastodon.account}
-      </div>
-    {/each}
-
-    {#each reddits as reddit (reddit.account)}  
-      <div class="identity">
-        <sl-switch
-          on:sl-change={handleRedditSwitch( reddit.account )}
+        <sl-icon 
+          src="/icons/{identity.platform}.svg" 
+          style="color:var(--gobo-{identity.platform});"
           size="medium">
-        </sl-switch>
-        <sl-icon src="/icons/reddit.svg" style="color:var(--gobo-reddit);"></sl-icon>{reddit.account}
-      </div>
-    {/each}
-
-    {#each twitters as twitter (twitter.account)}
-      <div class="identity">
-        <sl-switch
-          size="medium">
-        </sl-switch>
-        <sl-icon src="/icons/twitter.svg" style="color:var(--gobo-twitter);"></sl-icon>{twitter.account}
+        </sl-icon>
+        {identity.account}
       </div>
     {/each}
    
@@ -120,7 +196,8 @@
       appropriate when GOBO submits to each platform.
     </p>
 
-    <sl-checkbox>
+    <sl-checkbox
+      size="medium">
       Post Is Sensitive
     </sl-checkbox>
 
@@ -146,6 +223,22 @@
   <sl-divider class="gobo-divider"></sl-divider>
 
 
+  <section class="panel">
+    <h2>Write Text</h2>
+    <p>
+      If your post contains text, you can compose it here. GOBO will submit
+      this to each platform on your behalf.
+    </p>
+
+    <sl-textarea
+      label="Post Body"
+      size="medium"
+      rows=12>
+    </sl-textarea>
+  </section>
+
+  <sl-divider class="gobo-divider"></sl-divider>
+
 
   <section class="panel">
     <h2>Attach Media</h2>
@@ -154,15 +247,22 @@
       these to each platform on your behalf.
     </p>
 
-    <div class="keyword-table">
-      {#each files as file (file.path)}
+    <div 
+      class="keyword-table" 
+      ondragover="return false" 
+      on:dragenter={handleDragEnter}
+      on:dragleave={handleDragLeave}
+      on:drop={handleDrop}>
+      {#each files as file (file.name)}
         <div class="table-row">
           <sl-icon-button
             class="primary"
             label="Preview File" 
-            src="/icons/search.svg">
+            src="/icons/search.svg"
+            on:click={handlePreview( file )}
+            on:keypress={handlePreview( file )}>
           </sl-icon-button>
-          <span>{ file.path }</span>
+          <span>{ file.name }</span>
           <sl-icon-button
             class="danger"
             label="Delete File" 
@@ -184,21 +284,6 @@
 
 
 
-  <section class="panel">
-    <h2>Write Text</h2>
-    <p>
-      If your post contains text, you can compose it here. GOBO will submit
-      this to each platform on your behalf.
-    </p>
-
-    <sl-textarea
-      label="Post Body"
-      size="large">
-    </sl-textarea>
-  </section>
-
-  <sl-divider class="gobo-divider"></sl-divider>
-
 
   <section class="panel">
     <h2>Preview</h2>
@@ -217,20 +302,31 @@
   <sl-divider class="gobo-divider"></sl-divider>
 
 
+
+
   <section class="panel">
-    <h2>Continue</h2>
+    <h2>Publish</h2>
     <p>
-      Almost there! Once everything is ready, click Continue below. GOBO will
-      ready your posts for submission and get a final approval to submit posts
-      on your behalf.
+      Publish your post. GOBO will issue requests to each of the platforms 
+      you specified.
     </p>
 
-    <sl-button
-      class="continue-button"
-      variant="primary"
-      size="large">
-      Preview
-    </sl-button>
+    <div class="buttons">
+      <sl-button
+        class="discard-button"
+        variant="danger"
+        size="medium">
+        Discard Draft
+      </sl-button>
+
+      <sl-button
+        class="publish-button"
+        variant="primary"
+        size="medium">
+        Publish
+      </sl-button>
+    </div>
+   
   </section>
 
   <sl-divider class="gobo-divider"></sl-divider>
@@ -259,12 +355,16 @@
     margin-bottom: 0;
   }
 
-  sl-button  {
+  sl-button {
     align-self: flex-end;
   }
 
-  sl-button.continue-button {
-    align-self: stretch;
+  .buttons {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
   }
 </style>
 

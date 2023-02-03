@@ -3,7 +3,6 @@
 
   const handleWheel = function ( event ) {
     if ( window.screen.width > 750 ) {
-      event.preventDefault();
       scroll.push({
         deltaY: event.deltaY
       });
@@ -17,7 +16,7 @@
     <slot name="left"></slot>
   </div>
   
-  <main class="right-panel">
+  <main class="right-panel" >
     <slot name="right"></slot>
   </main>
 </div>
