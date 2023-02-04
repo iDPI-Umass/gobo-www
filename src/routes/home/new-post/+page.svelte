@@ -8,6 +8,9 @@
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/textarea/textarea.js";
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
+  import MastodonPreview from "$lib/components/MastodonPreview.svelte";
+  import RedditPreview from "$lib/components/RedditPreview.svelte";
+  import TwitterPreview from "$lib/components/TwitterPreview.svelte";
   import { onDestroy, onMount } from "svelte";
   import { browser } from "$app/environment";
   import { goto } from "$app/navigation";
@@ -19,8 +22,12 @@
   let draftData, unsubscribeDraft;
   let identities = [];
   let identitySwitches = {};
+  let options = {};
+  let targets = {};
+  let content = null;
   let files = [];
-  let targetsReddit = false;
+  let fileInput;
+  
 
 
   const setIdentities = function () {
@@ -29,7 +36,6 @@
       const match = identities.find( i => i.key === identity.key );
 
       if ( match == null ) {
-        console.log(JSON.stringify(identity, null, 2));
         identities.push( identity );
       } else {
         match.active = identity.active;
@@ -45,28 +51,45 @@
     });
 
     identities = identities;
-
-    console.log({ identities });
-    console.log({ identitySwitches });
-
-    // for ( const identity of identities) {
-    //   identitySwitches[ identity.key ].checked = identity.active;
-    // }
   };
 
-  const setFiles = function () {
-    files = draftData.files;
+  const setTargets = function () {
+    const _targets = {}
+
+    for ( const identity of identities ) {
+      if ( identity.active === true ) {
+        _targets[ identity.platform ] = true;
+      }
+    }
+
+    targets = _targets;
   }
 
-  const setReddit = function () {
-    for ( const identity of identities ) {
-      if ( (identity.platform === "reddit") && (identity.active === true) ) {
-        targetsReddit = true;
-        return;
-      }
+  const setOptions = function () {
+    options = draftData.options;
+  }
 
-      targetsReddit = false;
+  const setContent = function () {
+    content = draftData.content;
+  }
+
+  const setFiles = function () {
+    let resetFiles = false;
+    const _files = [];
+    
+    for ( const file of draftData.files ) {
+      if ( ! draft.isFile( file ) ) {
+        resetFiles = true;
+      } else {
+        _files.push( file );
+      }
     }
+
+    if ( resetFiles === true ) {
+      return draft.update({ files: _files });
+    }
+
+    files = draftData.files;
   }
 
 
@@ -84,9 +107,44 @@
 
 
 
+  const handleOptionSensitive = function ( event ) {
+    draft.updateOption({ 
+      sensitive: event.target.checked 
+    });
+  };
+
+  const handleOptionVisibility = function ( event ) {
+    draft.updateOption({
+      visibility: event.target.value 
+    });
+  };
+
+  const handleOptionTitle = function ( event ) {
+    draft.updateOption({
+      title: event.target.value 
+    });
+  };
+
+  const handleOptionSubreddit = function ( event ) {
+    draft.updateOption({
+      subreddit: event.target.value 
+    });
+  };
+
+
+
+  const handleContent = function ( event ) {
+    draft.update({ content: event.target.value });
+  }
+
+
+
   const addFile = function ( file ) {
-    console.log( file.name, file );
-    draft.update({ files: [ ...files, file ] });
+    let match = files.find( f => f.name === file.name );
+
+    if ( match == null ) {
+      draft.update({ files: [ ...files, file ] });
+    }
   }
 
   const handleDragEnter = function ( event ) {
@@ -118,13 +176,39 @@
     }
   };
 
+  const handleFileChrome = function ( event ) {
+    fileInput.click();
+  };
+
+  const handleFileChromeKey = function ( event ) {
+    if ( event.key === "Enter" ) {
+      fileInput.click();
+    }
+  };
+
+
   const handlePreview = function( file ) {
     return function ( event ) {
       event.preventDefault();
       preview.set( file );
       goto( "/upload-preview" );
     }
-  }
+  };
+
+  const handleDelete = function ( file ) {
+    return function ( event ) {
+      event.preventDefault();
+      const index = files.findIndex( f => f.name === file.name );
+
+      if ( index >= 0 ) {
+        files.splice( index, 1 );
+        draft.update({ files });
+      }
+    }
+  };
+
+
+
 
   if ( browser ) {
     onMount( function () {
@@ -135,15 +219,27 @@
       unsubscribeDraft = draft.subscribe( function ( draft ) {
         draftData = draft;
         setIdentities();
+        setOptions();
+        setTargets();
+        setContent();
         setFiles();
-        setReddit();
-      })
+      });
+
+      fileInput.addEventListener( "change", function () {
+        const _files = fileInput.files;
+        if ( _files.length > 0 ) {
+          for ( const file of _files ) {
+            addFile( file );
+          }
+          fileInput.value = null;
+        }
+      });
 
       // Pull in registered identities.
       draft.seed([
-        { platform: "mastodon", account: "@username@instance.com" },
-        { platform: "reddit", account: "u/username" },
-        { platform: "twitter", account: "@username" }
+        { platform: "mastodon", account: "@username@instance.com", name: "Username" },
+        { platform: "reddit", account: "u/username", name: "Username" },
+        { platform: "twitter", account: "@username", name: "Username" }
       ]);
     });;
 
@@ -197,22 +293,35 @@
     </p>
 
     <sl-checkbox
+      on:sl-change={handleOptionSensitive}
+      checked={options.sensitive}
       size="medium">
       Post Is Sensitive
     </sl-checkbox>
 
     <sl-select
+      on:sl-change={handleOptionVisibility}
+      value={options.visibility}
       label="Post Visibility"
       help-text="This tells GOBO how public your post should be when it submits it to each platform."
-      value="public"
       size="medium">
       <sl-option value="public">Public</sl-option>
       <sl-option value="followers">Followers Only</sl-option>
       <sl-option value="private">Private</sl-option>
     </sl-select>
 
-    {#if targetsReddit === true }
+    {#if targets.reddit === true }
       <sl-input
+        on:sl-change={handleOptionTitle}
+        value={options.title}
+        label="Post Title"
+        help-text="Provide a title that will appear in your Reddit post."
+        size="medium">
+      </sl-input>
+    
+      <sl-input
+        on:sl-change={handleOptionSubreddit}
+        value={options.subreddit}
         label="Target Subreddit"
         help-text="This is the subreddit where GOBO will submit your post."
         size="medium">
@@ -231,6 +340,8 @@
     </p>
 
     <sl-textarea
+      on:sl-change={handleContent}
+      value={content}
       label="Post Body"
       size="medium"
       rows=12>
@@ -266,18 +377,28 @@
           <sl-icon-button
             class="danger"
             label="Delete File" 
-            src="/icons/trash.svg">
+            src="/icons/trash.svg"
+            on:click={handleDelete( file )}
+            on:keypress={handleDelete( file )}>>
           </sl-icon-button>
         </div>
       {/each}
     </div>
 
     <sl-button
+      on:click={handleFileChrome}
+      on:keypress={handleFileChromeKey}
       variant="primary"
       size="medium">
       <sl-icon slot="prefix" src="/icons/file-earmark-plus.svg"></sl-icon>
       Add Attachment
     </sl-button>
+
+    <input 
+      bind:this={fileInput}
+      type="file"
+      multiple=true
+      class="hidden">
   </section>
 
   <sl-divider class="gobo-divider"></sl-divider>
@@ -293,9 +414,23 @@
       checkout these previews for feedback before publishing.
     </p>
 
-    <div class="keyword-table"></div>
-    <div class="keyword-table"></div>
-    <div class="keyword-table"></div>
+    {#if targets.mastodon === true}
+      <h3 class="preview-header">Mastodon</h3>
+      <MastodonPreview 
+        bind:content={content}
+        bind:identities={identities}
+        bind:options={options}
+        bind:files={files}>
+      </MastodonPreview>
+    {/if}
+
+    {#if targets.reddit === true}
+      <RedditPreview  {...draftData}></RedditPreview>
+    {/if}
+
+    {#if targets.twitter === true}
+      <TwitterPreview  {...draftData}></TwitterPreview>
+    {/if}
     
   </section>
 
@@ -355,6 +490,10 @@
     margin-bottom: 0;
   }
 
+  .hidden {
+    display: none;
+  }
+
   sl-button {
     align-self: flex-end;
   }
@@ -365,6 +504,10 @@
     flex-wrap: nowrap;
     justify-content: space-between;
     align-items: center;
+  }
+
+  h3.preview-header {
+    margin-bottom: 0.5rem;
   }
 </style>
 
