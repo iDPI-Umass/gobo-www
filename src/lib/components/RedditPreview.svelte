@@ -2,347 +2,333 @@
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
-  import { humanize } from "$lib/helpers/humanize";
+  import { onDestroy, onMount } from "svelte";
+  import { browser } from "$app/environment";
+  import { draft } from "$lib/stores/post-draft.js";
 
-  export let id;
-  export let type;
-  export let platform;
-  export let url;
-  export let author;
-  export let authorURL;
-  export let created;
-  export let heading = null;
-  export let content;
-  export let image = null;
-  export let video = null;
-  export let results = [];
-  export let total = 0;
+  let draftData, unsubscribeDraft;
+  let identity = {};
+  let options = {};
+  let content;
+  let displayedFiles = [];
 
-  let colors = {
-    mastodon: "#6364FF",
-    reddit: "#ff4500",
-    twitter: "#1d9bf0"
+  const setIdentities = function () {
+    for ( const key in draftData.identities ) {
+      const value = draftData.identities[ key ];
+      if (( value.platform === "reddit" ) && ( value.active === true )) {
+        identity = value;
+        return;
+      }
+    }
   };
 
-  let logo, brandColor;
+  const setOptions = function () {
+    options = draftData.options;
+  };
 
-  if ( platform != null ) {
-    logo = `/icons/${ platform }.svg`;
-  } else {
-    logo = "/icons/circle.svg";
+  const setContent = function () {
+    content = draftData.content;
+  };
+
+  const setFiles = function () {
+    displayedFiles = draftData.files.slice( 0, 20 );
+  };
+ 
+  if ( browser ) {
+    onMount( function () {
+      unsubscribeDraft = draft.subscribe( function ( draft ) {
+        draftData = draft;
+        setIdentities();
+        setOptions();
+        setContent();
+        setFiles();
+      });
+    });;
+
+    onDestroy( function () {
+      unsubscribeDraft();
+    });
   }
 
-  if ( colors[ platform ] != null ) {
-    brandColor = colors[ platform ];
-  } else {
-    brandColor = "var(--sl-color-netural=1000)";
-  }
 </script>
 
-<article
-  class="outer-frame"
-  style="--brand-color:{ brandColor };"
-  >
-  <header>
-    <div class="id">
-      <sl-icon src="{logo}"></sl-icon>
-      <a
-        href="{authorURL}"
-        target="_blank" 
-        rel="noopener noreferrer nofollow">
-        {author}
-      </a>
-    </div>   
-    <p class="timestamp">{ humanize( created ) }</p>
-  </header>
+<article class="outer-frame">
   
-  <sl-divider></sl-divider>
+  <div class="gutter">
+    <sl-icon
+      src="/icons/caret-up.svg">
+    </sl-icon>
+    <span>Vote</span>
+    <sl-icon
+      src="/icons/caret-down.svg">
+    </sl-icon>
+  </div>
+  
+  
+  <div class="main">
+    <header>
+      <div class="pfp"></div>
+      <span class="subreddit">{options.subreddit}</span>
+      <span class="interpunct">·</span>
+      <span class="account">Posted by {identity.account}</span>
+      <span class="timestamp">just now</span>
+    </header>
 
-  {#if type === "article"}
-    <section class="article-container">
-      {#if heading != null}
-        <h2>{heading}</h2>
+    <h2 class="title">
+      {options.title}
+    </h2>
+  
+    {#if displayedFiles.length === 0}
+      {#if options.sensitive === true}
+        <div class="text-sensitive">
+          <div>CLICK TO SEE NSFW</div>
+        </div>
+      {:else}
+        <section>
+          {@html content}
+        </section>
       {/if}
 
-      {@html content}
-    </section>
-  {/if}
+    {:else}
 
-  {#if type === "note"}
-    <section class="note-container">
-      {@html content}
-    </section>
-  {/if}
+      <div class="media">
 
-  {#if type === "image"}
-    
-    <section class="image-container">
-      {@html content}
-      <a class="image-box" href="{`/display/${id}`}">
-        <img src="{image}">
-      </a>
-    </section>
-  {/if}
+        {#if options.sensitive === true}
+          <div class="media-sensitive">
+            <div>CLICK TO SEE NSFW</div>
+          </div>
+        {/if}
 
-  {#if type === "video"}
-    <section class="video-container">
-      {@html content}
-      <div class="video-box">
-        <video controls loop>
-          <source src="{video}"/>
-        </video>
-      </div>
-    </section>
-  {/if}
-
-  {#if type === "question"}
-    <section class="question-container">
-      {@html content}
-      <div class="question-box">
-        {#each results as result }
-          <div class="question">
-            <div class="question-value-bar" style="width: {result.value}%;"></div>
-            <div class="question-key">{result.key}</div>
-            <div class="question-value">{result.value}%</div>
+        {#each displayedFiles as file (file.name)}
+          <div class="image-box">
+            <img 
+              src={URL.createObjectURL( file )}
+              alt="uploaded">
           </div>
         {/each}
       </div>
-      <p class="tally">{ new Intl.NumberFormat().format( total ) } Votes</p>
-    </section>
-  {/if}
-
-  <sl-divider></sl-divider>
-
-  <footer>
-    <a
-      class="source-link"
-      href="{url}"
-      target="_blank" 
-      rel="noopener noreferrer nofollow">
-      Source
-    </a>
-    <a
-      class="why"
-      href="/why-am-i-seeing-this">
-      Why am I seeing this?
-    </a>
-  </footer>
+  
+    {/if}
+  
+    <footer>
+      <sl-icon
+        src="/icons/chat.svg">
+      </sl-icon>
+      <span>0 Comments</span>
+  
+      <sl-icon
+        src="/icons/gift.svg">
+      </sl-icon>
+      <span>Award</span>
+  
+      <sl-icon
+        src="/icons/arrow-90deg-right.svg">
+      </sl-icon>
+      <span>Share</span>
+  
+      <sl-icon
+        src="/icons/bookmark.svg">
+      </sl-icon>
+      <span>Save</span>
+  
+      <sl-icon
+        src="/icons/three-dots.svg">
+      </sl-icon>
+    </footer>
+  </div>
+  
 </article>
 
 <style>
   .outer-frame {
     display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: stretch;
+    margin-bottom: 2rem;
+    padding: 0;
+    max-width: 640px;
+    border: 1px solid var(--sl-color-neutral-400);
+    border-radius: 0;
+    background: #fff;
+  }
+
+  .outer-frame > .gutter {
+    display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
     justify-content: flex-start;
-    align-items: stretch;
-    margin: 1rem 0 1rem 0;
-    padding: 0;
-    max-width:  36rem;
-    border: 2px solid var(--sl-color-neutral-400);
-    border-radius: var(--sl-border-radius-medium);
-    margin-bottom: 4rem;
-  }
-
-  .outer-frame > header {
-    flex: 0 0 auto;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-between;
     align-items: center;
+    width: 40px;
+    padding: 8px 4px 8px 4px;
+    background: #eee;
   }
 
-  .outer-frame > header > .id {
+  .outer-frame > .gutter > sl-icon {
+    color: #878a8c;
+    font-size: 20px;
+  }
+
+  .outer-frame > .gutter > span {
+    color: #000;
+    font-size: 12px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: var(--sl-font-weight-bold);
+    margin: 8px 0 8px 0;
+  }
+
+  .outer-frame > .main {
+    flex: 1;
+  }
+
+
+
+  .outer-frame > .main > header {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
+    justify-content: flex-start;
     align-items: center;
+    margin: 8px 0 0 8px;
+    margin-bottom: 10px;
   }
 
-  .outer-frame > header > .id > sl-icon {
-    flex: 0 0 auto;
-    font-size: var(--sl-font-size-x-large);
-    margin: 0.5rem 0.5rem 0 1rem;
-    color: var(--brand-color);
+  .outer-frame > .main > header > .pfp {
+    height: 20px;
+    width: 20px;
+    border-radius: 20px;
+    background: var(--sl-color-neutral-400);
+    margin-right: 10px;
   }
 
-  .outer-frame > header > .id > a {
-    line-break: anywhere;
-    margin: 0.5rem 1rem 0 0;
+  .outer-frame > .main > header > span {
+    margin-right: 4px;
+    font-family: Arial, sans-serif;
   }
 
-  .outer-frame > header > .id > a:focus {
-    line-break: anywhere;
-    margin: calc(0.5rem - 2px) calc(1rem - 2px) -2px -2px;
+  .outer-frame > .main > header > .subreddit {
+    font-size: 12px;
+    font-weight: var(--sl-font-weight-bold);
+    color: #000;
   }
 
-  .outer-frame > header > .timestamp {
-    flex: 0 0 auto;
-    font-size: var(--sl-font-size-medium);
-    margin: 0.5rem 1rem 0 1rem;
+  .outer-frame > .main > header > .interpunct {
+    font-size: 12px;
+    font-weight: var(--sl-font-weight-bold);
+    color: #4B5D44;
+  }
+
+  .outer-frame > .main > header > .account {
+    font-size: 12px;
+    color: #4B5D44;
+  }
+
+  .outer-frame > .main > header > .timestamp {
+    font-size: 12px;
     min-width: max-content;
+    color: #4B5D44;
   }
 
-  .outer-frame > sl-divider {
-    --width: 1px;
-    --color: var(--sl-color-neutral-400);
-    margin: 0.5rem 1rem 0 1rem;
+
+
+  .outer-frame > .main > .title {
+    font-size: 20px;
+    color: #000;
+    margin-left: 8px;
   }
 
-  .outer-frame > section {
-    margin: 1rem 1rem 0 1rem;
-    padding: 0;
-    max-width:  36rem;
-    border: none;
-  }
-
-  .outer-frame > section > :global( * ) {
-    margin-bottom: 1rem;
-  }
-
-  .outer-frame > section > :global( p ) {
-    font-size: var(--sl-font-size-medium);
-  }
-
-  .outer-frame > footer {
-    flex: 0 0 auto;
+  .outer-frame > .main > .text-sensitive {
+    width: 100%;
     display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+    margin: 10px 8px 10px 8px;
   }
 
-  .outer-frame > footer > .source-link {
-    margin: 0.5rem 0.5rem 0.5rem 1rem;
+  .outer-frame > .main > .text-sensitive > div {
+    font-size: 14px;
+    padding: 10px 20px;
+    border: 1px solid #000;
+    color: #000
   }
 
-  .outer-frame > footer > .source-link:focus {
-    margin: calc(0.5rem - 2px) calc(0.5rem - 2px) calc(0.5rem - 2px) calc(1rem - 2px);
-  }
-
-  .outer-frame > footer > .why {
-    margin: 0.5rem 1rem 0.5rem 0.5rem;
-  }
-
-  .outer-frame > footer > .why {
-    margin: calc(0.5rem - 2px) calc(1rem - 2px) calc(0.5rem - 2px) calc(0.5rem - 2px);
-  }
-
-
-
-
-  article > .article-container {
-    max-height: 60vh;
-    overflow-y: scroll;
-  }
-
-  article > .note-container {
+  .outer-frame > .main > section {
+    font-family: var(--sl-font-family-sans);
+    font-size: 14px;
+    color: #000;
+    margin-bottom: 16px;
+    padding: 10px 8px 10px 8px;
+    max-height: 512px;
     overflow-y: hidden;
   }
 
-  article > .image-container {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    align-items: flex-start;
-    max-height: 60vh;
-    /* overflow-y: scroll; */
-  }
-
-
-
-  article > .image-container > .image-box {
-    align-self: center;
+  .outer-frame > .main > .media {
     position: relative;
-    width: min(calc(100vw - 4rem), 30rem);
-    height: min(30vh, 20rem);
-  }
-
-  article > .image-container > .image-box > img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    object-position: center;
-  }
-
-
-
-  article > .video-container {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    align-items: flex-start;
-    max-height: 60vh;
-    /* overflow-y: scroll; */
-  }
-
-  article > .video-container > .video-box {
-    align-self: center;
-    position: relative;
-    width: min(calc(100vw - 4rem), 30rem);
-    height: min(30vh, 20rem);
-  }
-
-  article > .video-container > .video-box > video {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    object-position: center;
-  }
-
-
-
-  article > .question-container {
-    position: relative;
-    max-height: 60vh;
-    overflow-y: scroll;
-  }
-
-  article > .question-container > .question-box {
-    position: relative;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-  }
-
-  article > .question-container > .question-box > .question {
-    position: relative;
-    width: 100%;
-    height: 2rem;
+    margin: 10px 0 0 0;
+    height: 512px;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
-    align-items: center;
-    justify-content: space-between;
-    margin: 0.25rem 0 0.25rem 0;
+    align-items: stretch;
+    overflow-x: scroll;
+    scroll-snap-type: x mandatory;
   }
 
-  article > .question-container > .question-box > .question >.question-value-bar {
-    height: 100%;
+  .outer-frame > .main > .media > .media-sensitive {
     position: absolute;
-    left: 0;
-    background-color: var(--sl-color-primary-500);
-    border-radius: var(--sl-border-radius-large);
-    z-index: 0;
+    height: 512px;
+    width: 100%;
+    backdrop-filter: blur(40px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
-  article > .question-container > .question-box > .question > .question-key {
-    padding-left: 0.5rem;
-    z-index: 1;
+  .outer-frame > .main > .media > .media-sensitive > div {
+    font-size: 14px;
+    padding: 10px 20px;
+    border: 1px solid #000;
+    background: #fff;
+    color: #000;
+  }
+
+  .outer-frame > .main > .media > .image-box {
+    flex: 1 0 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    scroll-snap-align: center;
+  }
+
+  .outer-frame > .main > .media > .image-box > img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .outer-frame > .main > footer {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: left;
+    align-items: center;
+    height: 40px;
+    padding-left: 12px;
+  }
+
+  .outer-frame > .main > footer > sl-icon {
+    font-size: 18px;
+    color: #606984;
+    margin-right: 6px;
+  }
+
+  .outer-frame > .main > footer > span {
+    font-family: Arial;
+    font-size: 12px;
     font-weight: var(--sl-font-weight-bold);
-  }
-
-  article > .question-container > .question-box > .question > .question-value {
-    z-index: 1;
-  }
-
-  article > .question-container > .tally {
-    margin-bottom: 0;
+    color: #606984;
+    margin-right: 20px;
+    padding-top: 4px;
   }
 
 </style>

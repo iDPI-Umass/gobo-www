@@ -2,347 +2,539 @@
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
-  import { humanize } from "$lib/helpers/humanize";
+  import { onDestroy, onMount } from "svelte";
+  import { browser } from "$app/environment";
+  import { draft } from "$lib/stores/post-draft.js";
 
-  export let id;
-  export let type;
-  export let platform;
-  export let url;
-  export let author;
-  export let authorURL;
-  export let created;
-  export let heading = null;
-  export let content;
-  export let image = null;
-  export let video = null;
-  export let results = [];
-  export let total = 0;
+  let draftData, unsubscribeDraft;
+  let identity = {};
+  let options = {};
+  let content;
+  let displayedFiles = [];
+  let singleHeight = 512;
 
-  let colors = {
-    mastodon: "#6364FF",
-    reddit: "#ff4500",
-    twitter: "#1d9bf0"
+  const setIdentities = function () {
+    for ( const key in draftData.identities ) {
+      const value = draftData.identities[ key ];
+      if (( value.platform === "twitter" ) && ( value.active === true )) {
+        identity = value;
+        return;
+      }
+    }
   };
 
-  let logo, brandColor;
+  const setOptions = function () {
+    options = draftData.options;
+  };
 
-  if ( platform != null ) {
-    logo = `/icons/${ platform }.svg`;
-  } else {
-    logo = "/icons/circle.svg";
+  const setContent = function () {
+    content = draftData.content;
+  };
+
+  const setFiles = function () {
+    displayedFiles = draftData.files.slice( 0, 4 );
+
+  };
+
+  const handleSingleLoad = function ( event ) {
+    let previewWidth = event.target.width;
+    let naturalWidth = event.target.naturalWidth;
+    let naturalHeight = event.target.naturalHeight;
+    let ratio = naturalHeight / naturalWidth;
+    let previewHeight = previewWidth * ratio;
+
+
+    if ( previewHeight > 512 ) {
+      event.target.style.height = "512px";
+    } else {
+      event.target.style.height = "unset";
+    }
+  }
+ 
+  if ( browser ) {
+    onMount( function () {
+      unsubscribeDraft = draft.subscribe( function ( draft ) {
+        draftData = draft;
+        setIdentities();
+        setOptions();
+        setContent();
+        setFiles();
+      });
+    });;
+
+    onDestroy( function () {
+      unsubscribeDraft();
+    });
   }
 
-  if ( colors[ platform ] != null ) {
-    brandColor = colors[ platform ];
-  } else {
-    brandColor = "var(--sl-color-netural=1000)";
-  }
 </script>
 
-<article
-  class="outer-frame"
-  style="--brand-color:{ brandColor };"
-  >
-  <header>
-    <div class="id">
-      <sl-icon src="{logo}"></sl-icon>
-      <a
-        href="{authorURL}"
-        target="_blank" 
-        rel="noopener noreferrer nofollow">
-        {author}
-      </a>
-    </div>   
-    <p class="timestamp">{ humanize( created ) }</p>
-  </header>
+<article class="outer-frame">
   
-  <sl-divider></sl-divider>
+  <div class="gutter">
+    <div class="pfp"></div>
+  </div>
+  
+  
+  <div class="main">
+    <header>
+      <span class="name">{identity.name}</span>
+      <span class="account">{identity.account}</span>
+      <span class="interpunct">·</span>
+      <span class="timestamp">1s</span>
+      <div class="spacer"></div>
+      <sl-icon
+        src="/icons/three-dots.svg">
+      </sl-icon>
+    </header>
 
-  {#if type === "article"}
-    <section class="article-container">
-      {#if heading != null}
-        <h2>{heading}</h2>
-      {/if}
 
-      {@html content}
-    </section>
-  {/if}
+    <section> {@html content} </section>
 
-  {#if type === "note"}
-    <section class="note-container">
-      {@html content}
-    </section>
-  {/if}
-
-  {#if type === "image"}
-    
-    <section class="image-container">
-      {@html content}
-      <a class="image-box" href="{`/display/${id}`}">
-        <img src="{image}">
-      </a>
-    </section>
-  {/if}
-
-  {#if type === "video"}
-    <section class="video-container">
-      {@html content}
-      <div class="video-box">
-        <video controls loop>
-          <source src="{video}"/>
-        </video>
-      </div>
-    </section>
-  {/if}
-
-  {#if type === "question"}
-    <section class="question-container">
-      {@html content}
-      <div class="question-box">
-        {#each results as result }
-          <div class="question">
-            <div class="question-value-bar" style="width: {result.value}%;"></div>
-            <div class="question-key">{result.key}</div>
-            <div class="question-value">{result.value}%</div>
+    {#if displayedFiles.length === 1}
+      <div class="media-single">
+        {#if options.sensitive === true}
+          <div class="media-sensitive">
+            <sl-icon src="/icons/eye-slash.svg"></sl-icon>
+            <p>Content warning: Sensitive content</p>
+            <p>The Tweet author flagged this Tweet as showing sensitive content.</p>
+            <div><span>Show</span></div>
           </div>
-        {/each}
+        {/if}
+
+        <div class="image-box">
+          <img 
+            src={URL.createObjectURL( displayedFiles[0] )}
+            alt="uploaded"
+            on:load={handleSingleLoad}>
+        </div>
       </div>
-      <p class="tally">{ new Intl.NumberFormat().format( total ) } Votes</p>
-    </section>
-  {/if}
+    {:else if displayedFiles.length === 2}
+      <div class="media">
+        {#if options.sensitive === true}
+          <div class="media-sensitive">
+            <sl-icon src="/icons/eye-slash.svg"></sl-icon>
+            <p>Content warning: Sensitive content</p>
+            <p>The Tweet author flagged this Tweet as showing sensitive content.</p>
+            <div><span>Show</span></div>
+          </div>
+        {/if}
 
-  <sl-divider></sl-divider>
+        <div class="left">
+          <div class="image-box">
+            <img 
+              src={URL.createObjectURL( displayedFiles[0] )}
+              alt="uploaded">
+          </div>
+        </div>
+  
+        <div class="right">
+          <div class="image-box">
+            <img 
+              src={URL.createObjectURL( displayedFiles[1] )}
+              alt="uploaded">
+          </div>
+        </div>
+      </div>
+    {:else if displayedFiles.length === 3}
+      <div class="media">
+        {#if options.sensitive === true}
+          <div class="media-sensitive">
+            <sl-icon src="/icons/eye-slash.svg"></sl-icon>
+            <p>Content warning: Sensitive content</p>
+            <p>The Tweet author flagged this Tweet as showing sensitive content.</p>
+            <div><span>Show</span></div>
+          </div>
+        {/if}
 
-  <footer>
-    <a
-      class="source-link"
-      href="{url}"
-      target="_blank" 
-      rel="noopener noreferrer nofollow">
-      Source
-    </a>
-    <a
-      class="why"
-      href="/why-am-i-seeing-this">
-      Why am I seeing this?
-    </a>
-  </footer>
+        <div class="left">
+          <div class="image-box">
+            <img 
+              src={URL.createObjectURL( displayedFiles[0] )}
+              alt="uploaded">
+          </div>
+        </div>
+  
+        <div class="right">
+          <div class="top">
+            <div class="image-box">
+              <img 
+                src={URL.createObjectURL( displayedFiles[1] )}
+                alt="uploaded">
+            </div>
+          </div>
+          <div class="bottom">
+            <div class="image-box">
+              <img 
+                src={URL.createObjectURL( displayedFiles[2] )}
+                alt="uploaded">
+            </div>
+          </div>
+        </div>
+      </div>
+  
+    {:else if displayedFiles.length === 4}
+      <div class="media">
+        {#if options.sensitive === true}
+          <div class="media-sensitive">
+            <sl-icon src="/icons/eye-slash.svg"></sl-icon>
+            <p>Content warning: Sensitive content</p>
+            <p>The Tweet author flagged this Tweet as showing sensitive content.</p>
+            <div><span>Show</span></div>
+          </div>
+        {/if}
+
+        <div class="left">
+          <div class="top">
+            <div class="image-box">
+              <img 
+                src={URL.createObjectURL( displayedFiles[0] )}
+                alt="uploaded">
+            </div>
+          </div>
+          <div class="bottom">
+            <div class="image-box">
+              <img 
+                src={URL.createObjectURL( displayedFiles[2] )}
+                alt="uploaded">
+            </div>
+          </div>
+        </div>
+  
+        <div class="right">
+          <div class="top">
+            <div class="image-box">
+              <img 
+                src={URL.createObjectURL( displayedFiles[1] )}
+                alt="uploaded">
+            </div>
+          </div>
+          <div class="bottom">
+            <div class="image-box">
+              <img 
+                src={URL.createObjectURL( displayedFiles[3] )}
+                alt="uploaded">
+            </div>
+          </div>
+        </div>
+      </div>
+    {/if}
+  
+    <footer>
+      <sl-icon
+        src="/icons/chat.svg">
+      </sl-icon>
+
+      <sl-icon
+        src="/icons/arrow-repeat.svg">
+      </sl-icon>
+  
+      <sl-icon
+        src="/icons/heart.svg">
+      </sl-icon>
+  
+      <sl-icon
+        src="/icons/bar-chart.svg">
+      </sl-icon>
+  
+      <sl-icon
+        src="/icons/upload.svg">
+      </sl-icon>
+    </footer>
+  </div>
+  
 </article>
 
 <style>
   .outer-frame {
     display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    align-items: stretch;
-    margin: 1rem 0 1rem 0;
-    padding: 0;
-    max-width:  36rem;
-    border: 2px solid var(--sl-color-neutral-400);
-    border-radius: var(--sl-border-radius-medium);
-    margin-bottom: 4rem;
-  }
-
-  .outer-frame > header {
-    flex: 0 0 auto;
-    display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
+    justify-content: flex-start;
+    align-items: stretch;
+    margin-bottom: 2rem;
+    padding: 12px 16px 0 16px;
+    max-width: 566px;
+    border: 1px solid var(--sl-color-neutral-400);
+    border-radius: 0;
+    background: #fff;
   }
 
-  .outer-frame > header > .id {
+  .outer-frame > .gutter {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    margin-right: 12px;
+  }
+
+  .outer-frame > .gutter > .pfp {
+    height: 48px;
+    width: 48px;
+    border-radius: 48px;
+    background: var(--sl-color-neutral-400);
+  }
+
+  .outer-frame > .main {
+    flex: 1;
+    margin-bottom: 12px;
+  }
+
+  .outer-frame > .main > header {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
+    justify-content: flex-start;
     align-items: center;
+    margin-bottom: 4px;
   }
 
-  .outer-frame > header > .id > sl-icon {
-    flex: 0 0 auto;
-    font-size: var(--sl-font-size-x-large);
-    margin: 0.5rem 0.5rem 0 1rem;
-    color: var(--brand-color);
+  .outer-frame > .main > header > span {
+    margin-right: 4px;
+    font-family: Arial, sans-serif;
   }
 
-  .outer-frame > header > .id > a {
-    line-break: anywhere;
-    margin: 0.5rem 1rem 0 0;
+  .outer-frame > .main > header > .name {
+    font-size: 15px;
+    font-weight: var(--sl-font-weight-bold);
+    color: #000;
   }
 
-  .outer-frame > header > .id > a:focus {
-    line-break: anywhere;
-    margin: calc(0.5rem - 2px) calc(1rem - 2px) -2px -2px;
+  .outer-frame > .main > header > .interpunct {
+    font-size: 15px;
+    font-weight: var(--sl-font-weight-bold);
+    color: #536471;
   }
 
-  .outer-frame > header > .timestamp {
-    flex: 0 0 auto;
-    font-size: var(--sl-font-size-medium);
-    margin: 0.5rem 1rem 0 1rem;
+  .outer-frame > .main > header > .account {
+    font-size: 15px;
+    color: #536471;
+  }
+
+  .outer-frame > .main > header > .timestamp {
+    font-size: 15px;
     min-width: max-content;
+    color: #536471;
   }
 
-  .outer-frame > sl-divider {
-    --width: 1px;
-    --color: var(--sl-color-neutral-400);
-    margin: 0.5rem 1rem 0 1rem;
+  .outer-frame > .main > header > .spacer {
+    flex: 1 1 auto;
   }
 
-  .outer-frame > section {
-    margin: 1rem 1rem 0 1rem;
-    padding: 0;
-    max-width:  36rem;
-    border: none;
+  .outer-frame > .main > header > sl-icon {
+    font-size: 15px;
+    color: #536471;
   }
 
-  .outer-frame > section > :global( * ) {
-    margin-bottom: 1rem;
+
+
+
+  .outer-frame > .main > section {
+    font-family: var(--sl-font-family-sans);
+    font-size: 14px;
+    color: #0f1419;
+    margin-bottom: 12px;
   }
 
-  .outer-frame > section > :global( p ) {
-    font-size: var(--sl-font-size-medium);
+  .outer-frame > .main > .media-single {
+    position: relative;
+    max-width: 100%;
+    margin-bottom: 12px;
+    border-radius: 12px;
   }
 
-  .outer-frame > footer {
-    flex: 0 0 auto;
+  .outer-frame > .main > .media-single > .image-box {
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
-    align-items: center;
-    justify-content: space-between;
+    margin-bottom: 12px;
   }
 
-  .outer-frame > footer > .source-link {
-    margin: 0.5rem 0.5rem 0.5rem 1rem;
-  }
-
-  .outer-frame > footer > .source-link:focus {
-    margin: calc(0.5rem - 2px) calc(0.5rem - 2px) calc(0.5rem - 2px) calc(1rem - 2px);
-  }
-
-  .outer-frame > footer > .why {
-    margin: 0.5rem 1rem 0.5rem 0.5rem;
-  }
-
-  .outer-frame > footer > .why {
-    margin: calc(0.5rem - 2px) calc(1rem - 2px) calc(0.5rem - 2px) calc(0.5rem - 2px);
-  }
-
-
-
-
-  article > .article-container {
-    max-height: 60vh;
-    overflow-y: scroll;
-  }
-
-  article > .note-container {
-    overflow-y: hidden;
-  }
-
-  article > .image-container {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    align-items: flex-start;
-    max-height: 60vh;
-    /* overflow-y: scroll; */
-  }
-
-
-
-  article > .image-container > .image-box {
-    align-self: center;
-    position: relative;
-    width: min(calc(100vw - 4rem), 30rem);
-    height: min(30vh, 20rem);
-  }
-
-  article > .image-container > .image-box > img {
-    width: 100%;
-    height: 100%;
+  .outer-frame > .main > .media-single > .image-box > img {
     object-fit: contain;
-    object-position: center;
+    object-position: top left;
+    border-radius: 12px;
+    border: 1px solid #cfd9de;
   }
 
-
-
-  article > .video-container {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    align-items: flex-start;
-    max-height: 60vh;
-    /* overflow-y: scroll; */
-  }
-
-  article > .video-container > .video-box {
-    align-self: center;
-    position: relative;
-    width: min(calc(100vw - 4rem), 30rem);
-    height: min(30vh, 20rem);
-  }
-
-  article > .video-container > .video-box > video {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    object-position: center;
-  }
-
-
-
-  article > .question-container {
-    position: relative;
-    max-height: 60vh;
-    overflow-y: scroll;
-  }
-
-  article > .question-container > .question-box {
-    position: relative;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-  }
-
-  article > .question-container > .question-box > .question {
-    position: relative;
-    width: 100%;
-    height: 2rem;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: center;
-    justify-content: space-between;
-    margin: 0.25rem 0 0.25rem 0;
-  }
-
-  article > .question-container > .question-box > .question >.question-value-bar {
-    height: 100%;
+  .outer-frame > .main .media-sensitive {
     position: absolute;
-    left: 0;
-    background-color: var(--sl-color-primary-500);
-    border-radius: var(--sl-border-radius-large);
-    z-index: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(40px);
+    background-color: rgba( 0, 0, 0, 0.5 );
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 16px 28px;
+    border-radius: 12px;
   }
 
-  article > .question-container > .question-box > .question > .question-key {
-    padding-left: 0.5rem;
-    z-index: 1;
+  .outer-frame > .main .media-sensitive > sl-icon {
+    align-self: center;
+    font-size: 22px;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+
+  .outer-frame > .main .media-sensitive > p {
+    font-size: 15px;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+
+  .outer-frame > .main .media-sensitive > p:first-of-type {
     font-weight: var(--sl-font-weight-bold);
   }
 
-  article > .question-container > .question-box > .question > .question-value {
-    z-index: 1;
+  .outer-frame > .main .media-sensitive > div {
+    align-self: flex-end;
+    background: rgba( 255, 255, 255, 0.25 );
+    backdrop-filter: blur(4px);
+    height: 32px;
+    padding: 0 16px;
+    border-radius: 9999px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 
-  article > .question-container > .tally {
-    margin-bottom: 0;
+  .outer-frame > .main .media-sensitive > div > span {
+    font-size: 16px;
+    color: #fff;
+  }
+
+  .outer-frame > .main > .media {
+    position: relative;
+    height: 286px;
+    border-radius: 12px;
+    border: 1px solid #cfd9de;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: stretch;
+  }
+
+
+  .outer-frame > .main > .media > .left {
+    flex: 1 1 50%;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+    margin-right: 2px;
+  }
+
+  .outer-frame > .main > .media > .right {
+    flex: 1 1 50%;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+  }
+
+  .outer-frame > .main > .media > .left > .image-box {
+    height: 100%;
+    width: 100%;
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+  }
+
+  .outer-frame > .main > .media > .left > .image-box > img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+  }
+
+  .outer-frame > .main > .media > .right > .image-box {
+    height: 100%;
+    width: 100%;
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+  }
+
+  .outer-frame > .main > .media > .right > .image-box > img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+  }
+
+  .outer-frame > .main > .media > .left > .top {
+    height: 142px;
+    border-top-left-radius: 12px;
+    margin-bottom: 2px;
+  }
+
+  .outer-frame > .main > .media > .left > .bottom {
+    height: 142px;
+    border-bottom-left-radius: 12px;
+  }
+
+  .outer-frame > .main > .media > .right > .top {
+    height: 142px;
+    border-top-right-radius: 12px;
+    margin-bottom: 2px;
+  }
+
+  .outer-frame > .main > .media > .right > .bottom {
+    height: 142px;
+    border-bottom-right-radius: 12px;
+  }
+
+  .outer-frame > .main > .media .image-box {
+    height: 100%;
+    width: 100%;
+  }
+
+  .outer-frame > .main > .media .image-box > img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+  }
+
+  .outer-frame > .main > .media > .left > .top > .image-box > img {
+    border-top-left-radius: 12px;
+  }
+
+  .outer-frame > .main > .media > .left > .bottom > .image-box > img {
+    border-bottom-left-radius: 12px;
+  }
+
+  .outer-frame > .main > .media > .right > .top > .image-box > img {
+    border-top-right-radius: 12px;
+  }
+
+  .outer-frame > .main > .media > .right > .bottom > .image-box > img {
+    border-bottom-right-radius: 12px;
+  }
+
+
+
+  .outer-frame > .main > footer {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    height: 20px;
+    max-width: 425px;
+    margin-top: 12px;
+  }
+
+  .outer-frame > .main > footer > sl-icon {
+    font-size: 15px;
+    color: #536471;
+    stroke-width: 2px;
   }
 
 </style>

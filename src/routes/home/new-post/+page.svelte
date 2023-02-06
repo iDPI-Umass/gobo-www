@@ -312,7 +312,7 @@
 
     {#if targets.reddit === true }
       <sl-input
-        on:sl-change={handleOptionTitle}
+        on:sl-input={handleOptionTitle}
         value={options.title}
         label="Post Title"
         help-text="Provide a title that will appear in your Reddit post."
@@ -320,7 +320,7 @@
       </sl-input>
     
       <sl-input
-        on:sl-change={handleOptionSubreddit}
+        on:sl-input={handleOptionSubreddit}
         value={options.subreddit}
         label="Target Subreddit"
         help-text="This is the subreddit where GOBO will submit your post."
@@ -340,7 +340,7 @@
     </p>
 
     <sl-textarea
-      on:sl-change={handleContent}
+      on:sl-input={handleContent}
       value={content}
       label="Post Body"
       size="medium"
@@ -413,23 +413,24 @@
       on each platform once submitted. As you edit your post above, you can
       checkout these previews for feedback before publishing.
     </p>
+  </section>
 
+
+
+  <section class="panel extra-wide">
     {#if targets.mastodon === true}
       <h3 class="preview-header">Mastodon</h3>
-      <MastodonPreview 
-        bind:content={content}
-        bind:identities={identities}
-        bind:options={options}
-        bind:files={files}>
-      </MastodonPreview>
+      <MastodonPreview></MastodonPreview>
     {/if}
 
     {#if targets.reddit === true}
-      <RedditPreview  {...draftData}></RedditPreview>
+    <h3 class="preview-header">Reddit</h3>
+      <RedditPreview></RedditPreview>
     {/if}
 
     {#if targets.twitter === true}
-      <TwitterPreview  {...draftData}></TwitterPreview>
+    <h3 class="preview-header">Twitter</h3>
+      <TwitterPreview></TwitterPreview>
     {/if}
     
   </section>
@@ -468,6 +469,10 @@
 </section>
 
 <style>
+  .panel.extra-wide {
+    max-width: unset;
+  }
+
   .identity {
     display: flex;
     flex-direction: row;
