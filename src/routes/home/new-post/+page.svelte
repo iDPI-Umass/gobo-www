@@ -29,6 +29,18 @@
   let fileInput;
   
 
+  const nullEmpty = function ( value ) {
+    if ( value == null ) {
+      return null
+    } else {
+      if ( value.length === 0 ) {
+        return null;
+      } else {
+        return value;
+      }
+    }
+  }
+
 
   const setIdentities = function () {
     for ( const key in draftData.identities ) {
@@ -119,15 +131,21 @@
     });
   };
 
+  const handleOptionSpoilerText = function ( event ) {
+    draft.updateOption({ 
+      spoilerText: nullEmpty( event.target.value )
+    });
+  };
+
   const handleOptionTitle = function ( event ) {
     draft.updateOption({
-      title: event.target.value 
+      title: nullEmpty( event.target.value )
     });
   };
 
   const handleOptionSubreddit = function ( event ) {
     draft.updateOption({
-      subreddit: event.target.value 
+      subreddit: nullEmpty( event.target.value )
     });
   };
 
@@ -309,6 +327,17 @@
       <sl-option value="followers">Followers Only</sl-option>
       <sl-option value="private">Private</sl-option>
     </sl-select>
+
+    {#if targets.mastodon === true }
+      <sl-input
+        on:sl-input={handleOptionSpoilerText}
+        value={options.spoilerText}
+        label="Spoiler Text"
+        help-text="Provide text that will contextualize content behind warning."
+        autocomplete="off"
+        size="medium">
+      </sl-input>
+    {/if}
 
     {#if targets.reddit === true }
       <sl-input

@@ -62,120 +62,130 @@
     <p class="timestamp">1 s</p>
   </header>
 
-  <section> {@html content} </section>
-
-  {#if displayedFiles.length === 1}
-    <div class="media">
-      {#if options.sensitive === true}
-        <div class="media-sensitive">
-          <div>Sensitive content</div>
-        </div>
-      {/if}
-      <div class="left">
-        <div class="image-box">
-          <img 
-            src={URL.createObjectURL( displayedFiles[0] )}
-            alt="uploaded">
-        </div>
-      </div>
+  {#if options.spoilerText != null }
+    <div class="spoiler">
+      <p>
+        {options.spoilerText}
+        <span>SHOW MORE</span>
+      </p>
     </div>
-  {:else if displayedFiles.length === 2}
-    <div class="media">
-      {#if options.sensitive === true}
-        <div class="media-sensitive">
-          <div>Sensitive content</div>
-        </div>
-      {/if}
-      <div class="left">
-        <div class="image-box">
-          <img 
-            src={URL.createObjectURL( displayedFiles[0] )}
-            alt="uploaded">
-        </div>
-      </div>
+  {:else}
+    <section> {@html content} </section>
+  
 
-      <div class="right">
-        <div class="image-box">
-          <img 
-            src={URL.createObjectURL( displayedFiles[1] )}
-            alt="uploaded">
-        </div>
-      </div>
-    </div>
-  {:else if displayedFiles.length === 3}
-    <div class="media">
-      {#if options.sensitive === true}
-        <div class="media-sensitive">
-          <div>Sensitive content</div>
-        </div>
-      {/if}
-      <div class="left">
-        <div class="image-box">
-          <img 
-            src={URL.createObjectURL( displayedFiles[0] )}
-            alt="uploaded">
-        </div>
-      </div>
-
-      <div class="right">
-        <div class="top">
-          <div class="image-box">
-            <img 
-              src={URL.createObjectURL( displayedFiles[1] )}
-              alt="uploaded">
+    {#if displayedFiles.length === 1}
+      <div class="media">
+        {#if options.sensitive === true}
+          <div class="media-sensitive">
+            <div>Sensitive content</div>
           </div>
-        </div>
-        <div class="bottom">
-          <div class="image-box">
-            <img 
-              src={URL.createObjectURL( displayedFiles[2] )}
-              alt="uploaded">
-          </div>
-        </div>
-      </div>
-    </div>
-
-  {:else if displayedFiles.length === 4}
-    <div class="media">
-      {#if options.sensitive === true}
-        <div class="media-sensitive">
-          <div>Sensitive content</div>
-        </div>
-      {/if}
-      <div class="left">
-        <div class="top">
+        {/if}
+        <div class="left">
           <div class="image-box">
             <img 
               src={URL.createObjectURL( displayedFiles[0] )}
               alt="uploaded">
           </div>
         </div>
-        <div class="bottom">
+      </div>
+    {:else if displayedFiles.length === 2}
+      <div class="media">
+        {#if options.sensitive === true}
+          <div class="media-sensitive">
+            <div>Sensitive content</div>
+          </div>
+        {/if}
+        <div class="left">
           <div class="image-box">
             <img 
-              src={URL.createObjectURL( displayedFiles[2] )}
+              src={URL.createObjectURL( displayedFiles[0] )}
               alt="uploaded">
           </div>
         </div>
-      </div>
 
-      <div class="right">
-        <div class="top">
+        <div class="right">
           <div class="image-box">
             <img 
               src={URL.createObjectURL( displayedFiles[1] )}
               alt="uploaded">
           </div>
         </div>
-        <div class="bottom">
+      </div>
+    {:else if displayedFiles.length === 3}
+      <div class="media">
+        {#if options.sensitive === true}
+          <div class="media-sensitive">
+            <div>Sensitive content</div>
+          </div>
+        {/if}
+        <div class="left">
           <div class="image-box">
             <img 
-              src={URL.createObjectURL( displayedFiles[3] )}
+              src={URL.createObjectURL( displayedFiles[0] )}
               alt="uploaded">
           </div>
         </div>
+
+        <div class="right">
+          <div class="top">
+            <div class="image-box">
+              <img 
+                src={URL.createObjectURL( displayedFiles[1] )}
+                alt="uploaded">
+            </div>
+          </div>
+          <div class="bottom">
+            <div class="image-box">
+              <img 
+                src={URL.createObjectURL( displayedFiles[2] )}
+                alt="uploaded">
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+
+    {:else if displayedFiles.length === 4}
+      <div class="media">
+        {#if options.sensitive === true}
+          <div class="media-sensitive">
+            <div>Sensitive content</div>
+          </div>
+        {/if}
+        <div class="left">
+          <div class="top">
+            <div class="image-box">
+              <img 
+                src={URL.createObjectURL( displayedFiles[0] )}
+                alt="uploaded">
+            </div>
+          </div>
+          <div class="bottom">
+            <div class="image-box">
+              <img 
+                src={URL.createObjectURL( displayedFiles[2] )}
+                alt="uploaded">
+            </div>
+          </div>
+        </div>
+
+        <div class="right">
+          <div class="top">
+            <div class="image-box">
+              <img 
+                src={URL.createObjectURL( displayedFiles[1] )}
+                alt="uploaded">
+            </div>
+          </div>
+          <div class="bottom">
+            <div class="image-box">
+              <img 
+                src={URL.createObjectURL( displayedFiles[3] )}
+                alt="uploaded">
+            </div>
+          </div>
+        </div>
+      </div>
+    {/if}
   {/if}
 
   <footer>
@@ -211,9 +221,9 @@
     margin-bottom: 2rem;
     padding: 1rem;
     max-width: 580px;
-    border: 1px solid var(--sl-color-neutral-400);
-    border-radius: 0;
     background: #fff;
+    border: 1px solid var(--sl-color-neutral-400);
+    border-radius: var(--sl-border-radius-medium);
   }
 
   .outer-frame > header {
@@ -255,6 +265,30 @@
     font-size: 15px;
     min-width: max-content;
     color: #4B5D44;
+  }
+
+  .outer-frame > .spoiler {
+    margin-bottom: 16px;
+  }
+
+  .outer-frame > .spoiler > p {
+    font-size: 15px;
+    font-family: var(--sl-font-family-sans);
+    color: #000;
+    margin: 0;
+  }
+
+  .outer-frame > .spoiler > p > span {
+    display: inline-flex;
+    height: 20px;
+    width: max-content;
+    flex-direction: column;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: var(--sl-font-weight-bold);
+    background: #d9e1e8;
+    color: #000;
+    padding: 0 6px;
   }
 
   .outer-frame > section {

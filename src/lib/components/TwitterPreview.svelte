@@ -255,9 +255,9 @@
     margin-bottom: 2rem;
     padding: 12px 16px 0 16px;
     max-width: 566px;
-    border: 1px solid var(--sl-color-neutral-400);
-    border-radius: 0;
     background: #fff;
+    border: 1px solid var(--sl-color-neutral-400);
+    border-radius: var(--sl-border-radius-medium);
   }
 
   .outer-frame > .gutter {

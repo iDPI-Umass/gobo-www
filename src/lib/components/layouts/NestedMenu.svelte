@@ -16,7 +16,7 @@
     <slot name="left"></slot>
   </div>
   
-  <main class="right-panel" >
+  <main class="right-panel" on:wheel={handleWheel}>
     <slot name="right"></slot>
   </main>
 </div>

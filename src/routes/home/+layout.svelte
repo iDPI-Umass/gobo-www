@@ -4,6 +4,7 @@
   import VerticalNav from "$lib/components/primitives/VerticalNav.svelte";
   import NavLink from "$lib/components/primitives/NavLink.svelte";
   import { marker } from "$lib/stores/feed-marker.js";
+  import { guard } from "$lib/helpers/guard";
 
   const checkHome = function ( path ) {
     return function ( event ) {
@@ -12,6 +13,8 @@
       }
     };    
   };
+
+  guard();
 </script>
 
 <MainHeader></MainHeader>

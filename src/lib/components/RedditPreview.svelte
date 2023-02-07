@@ -74,9 +74,11 @@
       <span class="timestamp">just now</span>
     </header>
 
-    <h2 class="title">
-      {options.title}
-    </h2>
+    {#if options.title != null}
+      <h2 class="title">
+        {options.title}
+      </h2>
+    {/if}
   
     {#if displayedFiles.length === 0}
       {#if options.sensitive === true}
@@ -149,9 +151,9 @@
     margin-bottom: 2rem;
     padding: 0;
     max-width: 640px;
-    border: 1px solid var(--sl-color-neutral-400);
-    border-radius: 0;
     background: #fff;
+    border: 1px solid var(--sl-color-neutral-400);
+    border-radius: var(--sl-border-radius-medium);
   }
 
   .outer-frame > .gutter {
@@ -163,6 +165,8 @@
     width: 40px;
     padding: 8px 4px 8px 4px;
     background: #eee;
+    border-top-left-radius: var(--sl-border-radius-medium);
+    border-bottom-left-radius: var(--sl-border-radius-medium);
   }
 
   .outer-frame > .gutter > sl-icon {

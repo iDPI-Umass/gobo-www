@@ -23,6 +23,7 @@ const emptyDraft = function () {
     options: {
       sensitive: false,
       visibility: "public",
+      spoilerText: null,
       title: null,
       subreddit: null
     },
