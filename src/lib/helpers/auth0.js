@@ -5,10 +5,10 @@ let client;
 const getClient = async function () {
   if ( client == null ) {
     client = await createAuth0Client({
-      domain: "dev-ojjfq612raektsix.us.auth0.com",
-      clientId: "lES364F2EGwj6SiRwJ5zxtPWm2pLLmI1",
+      domain: "dev-j72vlrggk1ft8e8u.us.auth0.com",
+      clientId: "urDJOCUizzQm4LZ7kv5UQsdIYEnOCuwG",
       authorizationParams: {
-        redirect_uri: "http://localhost:5173/home"
+        redirect_uri: "http://localhost:5173/callback"
       }
     });
   }

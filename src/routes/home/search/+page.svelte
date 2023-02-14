@@ -8,7 +8,7 @@
   import { browser } from "$app/environment";
   import { sleep } from "@dashkite/joy/time";
   import { scroll } from "$lib/stores/scroll.js";
-  import posts from "../posts.js";
+  import posts from "$lib/stores/posts.js";
   
   export let data;
   let form, button;

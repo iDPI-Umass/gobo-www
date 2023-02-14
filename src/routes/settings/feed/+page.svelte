@@ -87,7 +87,7 @@
     <h2>Display Engagement</h2>
     <p>
       Control whether you'd like to see engagement feedback values on posts
-      displayed in GOBO.
+      displayed in Gobo.
     </p>
     
 
@@ -105,7 +105,7 @@
     <h2>Blocked Keywords</h2>
     <p>
       Control which words and phrases you would like to exclude from your 
-      GOBO feed. You can add phrases below or delete any listed in the table.
+      Gobo feed. You can add phrases below or delete any listed in the table.
     </p>
     
     <div class="keyword-table">
@@ -139,7 +139,7 @@
   <section class="panel">
     <h2>Prioritized Accounts</h2>
     <p>
-      Control which accounts you would like GOBO to emphasize when preparing
+      Control which accounts you would like Gobo to emphasize when preparing
       your feed. You can add accounts below or delete any listed in the table.
     </p>
     

@@ -3,6 +3,7 @@
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import { humanize } from "$lib/helpers/humanize";
+  import { isImage, isVideo } from "$lib/helpers/type.js";
 
   export let id;
   export let type;
@@ -13,10 +14,10 @@
   export let created;
   export let heading = null;
   export let content;
-  export let image = null;
-  export let video = null;
+  export let media = [];
   export let results = [];
   export let total = 0;
+  export let fullPage = false;
 
   let colors = {
     mastodon: "#6364FF",
@@ -36,6 +37,21 @@
     brandColor = colors[ platform ];
   } else {
     brandColor = "var(--sl-color-netural=1000)";
+  }
+
+  const handleSingleLoad = function ( event ) {
+    let previewWidth = event.target.width;
+    let naturalWidth = event.target.naturalWidth || event.target.videoWidth;
+    let naturalHeight = event.target.naturalHeight || event.target.videoHeight;
+    let ratio = naturalHeight / naturalWidth;
+    let previewHeight = Math.round( previewWidth * ratio );
+
+
+    if ( previewHeight > 512 ) {
+      event.target.style.height = "512px";
+    } else {
+      event.target.style.height = "unset";
+    }    
   }
 </script>
 
@@ -58,46 +74,220 @@
   
   <sl-divider></sl-divider>
 
-  {#if type === "article"}
-    <section class="article-container">
+  <section class="content" style={fullPage === true ? "max-height:unset" : ""}>
+    <a href={`home/article/${id}`}>
       {#if heading != null}
         <h2>{heading}</h2>
       {/if}
 
       {@html content}
-    </section>
-  {/if}
+    </a>
+  </section>
 
-  {#if type === "note"}
-    <section class="note-container">
-      {@html content}
-    </section>
-  {/if}
 
-  {#if type === "image"}
-    
-    <section class="image-container">
-      {@html content}
-      <a class="image-box" href="{`/display/${id}`}">
-        <img src="{image}">
-      </a>
-    </section>
-  {/if}
-
-  {#if type === "video"}
-    <section class="video-container">
-      {@html content}
-      <div class="video-box">
-        <video controls loop>
-          <source src="{video}"/>
+  {#if media.length === 1}
+    <a class="media-single" href="{`/display/${id}/0`}">
+      {#if isImage( media[0] )}
+        <img 
+          src={media[0].url}
+          alt="uploaded"
+          on:load={handleSingleLoad}>
+      {:else if isVideo( media[0] )}
+        <!-- svelte-ignore a11y-media-has-caption -->
+        <video 
+          loop 
+          controls
+          on:loadedmetadata={handleSingleLoad}>
+          <source 
+            src={media[0].url}
+            type={media[0].type}>
         </video>
+      {/if}
+    </a>
+
+  {:else if media.length === 2}
+    <div class="media">
+      <div class="left">
+        <a class="media-single" href="{`/display/${id}/0`}">
+          {#if isImage( media[0] )}
+            <img 
+              src={media[0].url}
+              alt="uploaded">
+          {:else if isVideo( media[0] )}
+            <!-- svelte-ignore a11y-media-has-caption -->
+            <video loop controls>
+              <source 
+                src={media[0].url}
+                type={media[0].type}
+                on:load={media}>
+            </video>
+          {/if}
+        </a>
       </div>
-    </section>
+
+      <div class="right">
+        <a class="media-single" href="{`/display/${id}/1`}">
+          {#if isImage( media[1] )}
+            <img 
+              src={media[1].url}
+              alt="uploaded">
+          {:else if isVideo( media[1] )}
+            <!-- svelte-ignore a11y-media-has-caption -->
+            <video loop controls>
+              <source 
+                src={media[1].url}
+                type={media[1].type}
+                on:load={media}>
+            </video>
+          {/if}
+        </a>
+      </div>
+    </div>
+
+  {:else if media.length === 3}
+    <div class="media">
+      <div class="left">
+        <a class="media-single" href="{`/display/${id}/0`}">
+          {#if isImage( media[0] )}
+            <img 
+              src={media[0].url}
+              alt="uploaded">
+          {:else if isVideo( media[0] )}
+            <!-- svelte-ignore a11y-media-has-caption -->
+            <video loop controls>
+              <source 
+                src={media[0].url}
+                type={media[0].type}
+                on:load={media}>
+            </video>
+          {/if}
+        </a>
+      </div>
+
+      <div class="right">
+        <div class="top">
+          <a class="media-single" href="{`/display/${id}/1`}">
+            {#if isImage( media[1] )}
+              <img 
+                src={media[1].url}
+                alt="uploaded">
+            {:else if isVideo( media[1] )}
+              <!-- svelte-ignore a11y-media-has-caption -->
+              <video loop controls>
+                <source 
+                  src={media[1].url}
+                  type={media[1].type}
+                  on:load={media}>
+              </video>
+            {/if}
+          </a>
+        </div>
+
+        <div class="bottom">
+          <a class="media-single" href="{`/display/${id}/2`}">
+            {#if isImage( media[2] )}
+              <img 
+                src={media[2].url}
+                alt="uploaded">
+            {:else if isVideo( media[2] )}
+              <!-- svelte-ignore a11y-media-has-caption -->
+              <video loop controls>
+                <source 
+                  src={media[2].url}
+                  type={media[2].type}
+                  on:load={media}>
+              </video>
+            {/if}
+          </a>
+        </div>
+      </div>
+    </div>
+
+  {:else if media.length === 4}
+    <div class="media">
+      <div class="left">
+        <div class="top">
+          <a class="media-single" href="{`/display/${id}/0`}">
+            {#if isImage( media[0] )}
+              <img 
+                src={media[0].url}
+                alt="uploaded">
+            {:else if isVideo( media[0] )}
+              <!-- svelte-ignore a11y-media-has-caption -->
+              <video loop controls>
+                <source 
+                  src={media[0].url}
+                  type={media[0].type}
+                  on:load={media}>
+              </video>
+            {/if}
+          </a>
+        </div>
+
+        <div class="bottom">
+          <a class="media-single" href="{`/display/${id}/2`}">
+            {#if isImage( media[2] )}
+              <img 
+                src={media[2].url}
+                alt="uploaded">
+            {:else if isVideo( media[2] )}
+              <!-- svelte-ignore a11y-media-has-caption -->
+              <video loop controls>
+                <source 
+                  src={media[2].url}
+                  type={media[2].type}
+                  on:load={media}>
+              </video>
+            {/if}
+          </a>
+        </div>
+      </div>
+
+      <div class="right">
+        <div class="top">
+          <a class="media-single" href="{`/display/${id}/1`}">
+            {#if isImage( media[1] )}
+              <img 
+                src={media[1].url}
+                alt="uploaded">
+            {:else if isVideo( media[1] )}
+              <!-- svelte-ignore a11y-media-has-caption -->
+              <video loop controls>
+                <source 
+                  src={media[1].url}
+                  type={media[1].type}
+                  on:load={media}>
+              </video>
+            {/if}
+          </a>
+        </div>
+
+        <div class="bottom">
+          <a class="media-single" href="{`/display/${id}/3`}">
+            {#if isImage( media[3] )}
+              <img 
+                src={media[3].url}
+                alt="uploaded">
+            {:else if isVideo( media[3] )}
+              <!-- svelte-ignore a11y-media-has-caption -->
+              <video loop controls>
+                <source 
+                  src={media[3].url}
+                  type={media[3].type}
+                  on:load={media}>
+              </video>
+            {/if}
+          </a>
+        </div>
+      </div>
+    </div>
+  
   {/if}
+  
+
 
   {#if type === "question"}
     <section class="question-container">
-      {@html content}
       <div class="question-box">
         {#each results as result }
           <div class="question">
@@ -190,20 +380,7 @@
     margin: 0.5rem 1rem 0 1rem;
   }
 
-  .outer-frame > section {
-    margin: 1rem 1rem 0 1rem;
-    padding: 0;
-    max-width:  36rem;
-    border: none;
-  }
 
-  .outer-frame > section > :global( * ) {
-    margin-bottom: 1rem;
-  }
-
-  .outer-frame > section > :global( p ) {
-    font-size: var(--sl-font-size-medium);
-  }
 
   .outer-frame > footer {
     flex: 0 0 auto;
@@ -232,74 +409,129 @@
 
 
 
-
-  article > .article-container {
-    max-height: 60vh;
-    overflow-y: scroll;
-  }
-
-  article > .note-container {
+  .outer-frame > .content {
+    margin: 1rem 1rem 0 1rem;
+    padding: 0;
+    max-width: 36rem;
+    max-height: 20rem;
+    border: none;
     overflow-y: hidden;
   }
 
-  article > .image-container {
+  .outer-frame > .content > a {
+    text-decoration: none;
+    color: unset;
+  }
+
+  .outer-frame > .content > a:focus {
+    margin: -2px;
+  }
+
+  .outer-frame > .content > a > :global( * ) {
+    margin-bottom: 1rem;
+  }
+
+  .outer-frame > .content > a > :global( p ) {
+    font-size: var(--sl-font-size-medium);
+  }
+
+
+
+  article > .media-single {
+    margin: 0rem 1rem 0 1rem;
+    padding: 0;
+    max-width: 36rem;
+    border-radius: var(--sl-border-radius-medium);
+    display: flex;
+    justify-content: center;
+  }
+
+  article > .media-single:focus {
+    margin: calc(1rem - 2px) calc(1rem - 2px) -2px calc(1rem - 2px);
+  }
+
+  article > .media-single > img {
+    object-fit: contain;
+    border-radius: var(--sl-border-radius-medium);
+  }
+
+  article > .media-single > video {
+    width: 100%;
+    object-fit: contain;
+    object-position: center center;
+    background: #000;
+    border-radius: var(--sl-border-radius-medium);
+  }
+
+
+
+  article > .media {
+    position: relative;
+    height: 284px;
+    max-width: 36rem;
+    margin: 0 1rem 0 1rem;
+    border-radius: var(--sl-border-radius-medium);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: stretch;
+  }
+
+  article > .media > .left,
+  article > .media > .right {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
-    justify-content: flex-start;
-    align-items: flex-start;
-    max-height: 60vh;
-    /* overflow-y: scroll; */
+    align-items: stretch;
   }
 
-
-
-  article > .image-container > .image-box {
-    align-self: center;
-    position: relative;
-    width: min(calc(100vw - 4rem), 30rem);
-    height: min(30vh, 20rem);
+  article > .media > .left {
+    margin-right: 4px;
   }
 
-  article > .image-container > .image-box > img {
-    width: 100%;
+  article > .media > .left > .top,
+  article > .media > .left > .bottom,
+  article > .media > .right > .top,
+  article > .media > .right > .bottom {
+    height: 140px;
+    border-radius: var(--sl-border-radius-medium);
+  }
+
+  article > .media > .left > .top,
+  article > .media > .right > .top {
+    margin-bottom: 4px;
+  }
+
+  article > .media .media-single {
     height: 100%;
-    object-fit: contain;
-    object-position: center;
-  }
-
-
-
-  article > .video-container {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    align-items: flex-start;
-    max-height: 60vh;
-    /* overflow-y: scroll; */
-  }
-
-  article > .video-container > .video-box {
-    align-self: center;
-    position: relative;
-    width: min(calc(100vw - 4rem), 30rem);
-    height: min(30vh, 20rem);
-  }
-
-  article > .video-container > .video-box > video {
     width: 100%;
-    height: 100%;
-    object-fit: contain;
-    object-position: center;
+    border-radius: var(--sl-border-radius-medium);
   }
+
+  article > .media .media-single > img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    object-position: center center;
+    border-radius: var(--sl-border-radius-medium);
+  }
+
+  article > .media .media-single > video {
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+    object-position: center center;
+    background: #000;
+    border-radius: var(--sl-border-radius-medium);
+  }
+
 
 
 
   article > .question-container {
     position: relative;
-    max-height: 60vh;
-    overflow-y: scroll;
+    margin: 0 1rem;
+    overflow-y: hidden;
   }
 
   article > .question-container > .question-box {

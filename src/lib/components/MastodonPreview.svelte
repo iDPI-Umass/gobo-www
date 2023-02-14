@@ -11,6 +11,7 @@
   let options = {};
   let content;
   let displayedFiles = [];
+  let sensitiveOverride = false;
 
   const setIdentities = function () {
     for ( const key in draftData.identities ) {
@@ -32,6 +33,10 @@
 
   const setFiles = function () {
     displayedFiles = draftData.files.slice( 0, 4 );
+  };
+
+  const toggleSensitive = function () {
+    sensitiveOverride = !sensitiveOverride;
   };
  
   if ( browser ) {
@@ -75,70 +80,178 @@
 
     {#if displayedFiles.length === 1}
       <div class="media">
-        {#if options.sensitive === true}
-          <div class="media-sensitive">
-            <div>Sensitive content</div>
+        {#if (options.sensitive === true) && ( sensitiveOverride === true )}
+          <div 
+            class="media-hide"
+            on:click={toggleSensitive}
+            on:keypress={toggleSensitive}
+            tabindex="0"
+            role="button">
+            <sl-icon src="/icons/eye-slash.svg"></sl-icon>
           </div>
         {/if}
+        {#if (options.sensitive === true) && ( sensitiveOverride === false )}
+          <div 
+            class="media-sensitive"
+            on:click={toggleSensitive}
+            on:keypress={toggleSensitive}
+            tabindex="0"
+            role="button">
+            <div>
+              Sensitive content
+            </div>
+          </div>
+        {/if}
+
         <div class="left">
           <div class="image-box">
-            <img 
-              src={URL.createObjectURL( displayedFiles[0] )}
-              alt="uploaded">
+            {#if draft.isImage( displayedFiles[0] )}
+              <img 
+                src={URL.createObjectURL( displayedFiles[0] )}
+                alt="uploaded">
+            {:else if draft.isVideo( displayedFiles[0] )}
+              <!-- svelte-ignore a11y-media-has-caption -->
+              <video loop controls>
+                <source 
+                  src={URL.createObjectURL( displayedFiles[0] )}
+                  type={displayedFiles[0].type}>
+              </video>
+            {/if}
           </div>
         </div>
       </div>
     {:else if displayedFiles.length === 2}
       <div class="media">
-        {#if options.sensitive === true}
-          <div class="media-sensitive">
-            <div>Sensitive content</div>
+        {#if (options.sensitive === true) && ( sensitiveOverride === true )}
+          <div 
+            class="media-hide"
+            on:click={toggleSensitive}
+            on:keypress={toggleSensitive}
+            tabindex="0"
+            role="button">
+            <sl-icon src="/icons/eye-slash.svg"></sl-icon>
           </div>
         {/if}
+        {#if (options.sensitive === true) && ( sensitiveOverride === false )}
+          <div 
+            class="media-sensitive"
+            on:click={toggleSensitive}
+            on:keypress={toggleSensitive}
+            tabindex="0"
+            role="button">
+            <div>
+              Sensitive content
+            </div>
+          </div>
+        {/if}
+
         <div class="left">
           <div class="image-box">
-            <img 
-              src={URL.createObjectURL( displayedFiles[0] )}
-              alt="uploaded">
+            {#if draft.isImage( displayedFiles[0] )}
+              <img 
+                src={URL.createObjectURL( displayedFiles[0] )}
+                alt="uploaded">
+            {:else if draft.isVideo( displayedFiles[0] )}
+              <!-- svelte-ignore a11y-media-has-caption -->
+              <video loop controls>
+                <source 
+                  src={URL.createObjectURL( displayedFiles[0] )}
+                  type={displayedFiles[0].type}>
+              </video>
+            {/if}
           </div>
         </div>
 
         <div class="right">
           <div class="image-box">
-            <img 
-              src={URL.createObjectURL( displayedFiles[1] )}
-              alt="uploaded">
+            {#if draft.isImage( displayedFiles[1] )}
+              <img 
+                src={URL.createObjectURL( displayedFiles[1] )}
+                alt="uploaded">
+            {:else if draft.isVideo( displayedFiles[1] )}
+              <!-- svelte-ignore a11y-media-has-caption -->
+              <video loop controls>
+                <source 
+                  src={URL.createObjectURL( displayedFiles[1] )}
+                  type={displayedFiles[1].type}>
+              </video>
+            {/if}
           </div>
         </div>
       </div>
     {:else if displayedFiles.length === 3}
       <div class="media">
-        {#if options.sensitive === true}
-          <div class="media-sensitive">
-            <div>Sensitive content</div>
+        {#if (options.sensitive === true) && ( sensitiveOverride === true )}
+          <div 
+            class="media-hide"
+            on:click={toggleSensitive}
+            on:keypress={toggleSensitive}
+            tabindex="0"
+            role="button">
+            <sl-icon src="/icons/eye-slash.svg"></sl-icon>
           </div>
         {/if}
+        {#if (options.sensitive === true) && ( sensitiveOverride === false )}
+          <div 
+            class="media-sensitive"
+            on:click={toggleSensitive}
+            on:keypress={toggleSensitive}
+            tabindex="0"
+            role="button">
+            <div>
+              Sensitive content
+            </div>
+          </div>
+        {/if}
+
         <div class="left">
           <div class="image-box">
-            <img 
-              src={URL.createObjectURL( displayedFiles[0] )}
-              alt="uploaded">
+            {#if draft.isImage( displayedFiles[0] )}
+              <img 
+                src={URL.createObjectURL( displayedFiles[0] )}
+                alt="uploaded">
+            {:else if draft.isVideo( displayedFiles[0] )}
+              <!-- svelte-ignore a11y-media-has-caption -->
+              <video loop controls>
+                <source 
+                  src={URL.createObjectURL( displayedFiles[0] )}
+                  type={displayedFiles[0].type}>
+              </video>
+            {/if}
           </div>
         </div>
 
         <div class="right">
           <div class="top">
             <div class="image-box">
-              <img 
-                src={URL.createObjectURL( displayedFiles[1] )}
-                alt="uploaded">
+              {#if draft.isImage( displayedFiles[1] )}
+                <img 
+                  src={URL.createObjectURL( displayedFiles[1] )}
+                  alt="uploaded">
+              {:else if draft.isVideo( displayedFiles[1] )}
+                <!-- svelte-ignore a11y-media-has-caption -->
+                <video loop controls>
+                  <source 
+                    src={URL.createObjectURL( displayedFiles[1] )}
+                    type={displayedFiles[1].type}>
+                </video>
+              {/if}
             </div>
           </div>
           <div class="bottom">
             <div class="image-box">
-              <img 
-                src={URL.createObjectURL( displayedFiles[2] )}
-                alt="uploaded">
+              {#if draft.isImage( displayedFiles[2] )}
+                <img 
+                  src={URL.createObjectURL( displayedFiles[2] )}
+                  alt="uploaded">
+              {:else if draft.isVideo( displayedFiles[2] )}
+                <!-- svelte-ignore a11y-media-has-caption -->
+                <video loop controls>
+                  <source 
+                    src={URL.createObjectURL( displayedFiles[2] )}
+                    type={displayedFiles[2].type}>
+                </video>
+              {/if}
             </div>
           </div>
         </div>
@@ -146,24 +259,60 @@
 
     {:else if displayedFiles.length === 4}
       <div class="media">
-        {#if options.sensitive === true}
-          <div class="media-sensitive">
-            <div>Sensitive content</div>
+        {#if (options.sensitive === true) && ( sensitiveOverride === true )}
+          <div 
+            class="media-hide"
+            on:click={toggleSensitive}
+            on:keypress={toggleSensitive}
+            tabindex="0"
+            role="button">
+            <sl-icon src="/icons/eye-slash.svg"></sl-icon>
           </div>
         {/if}
+        {#if (options.sensitive === true) && ( sensitiveOverride === false )}
+          <div 
+            class="media-sensitive"
+            on:click={toggleSensitive}
+            on:keypress={toggleSensitive}
+            tabindex="0"
+            role="button">
+            <div>
+              Sensitive content
+            </div>
+          </div>
+        {/if}
+
         <div class="left">
           <div class="top">
             <div class="image-box">
-              <img 
-                src={URL.createObjectURL( displayedFiles[0] )}
-                alt="uploaded">
+              {#if draft.isImage( displayedFiles[0] )}
+                <img 
+                  src={URL.createObjectURL( displayedFiles[0] )}
+                  alt="uploaded">
+              {:else if draft.isVideo( displayedFiles[0] )}
+                <!-- svelte-ignore a11y-media-has-caption -->
+                <video loop controls>
+                  <source 
+                    src={URL.createObjectURL( displayedFiles[0] )}
+                    type={displayedFiles[0].type}>
+                </video>
+              {/if}
             </div>
           </div>
           <div class="bottom">
             <div class="image-box">
-              <img 
-                src={URL.createObjectURL( displayedFiles[2] )}
-                alt="uploaded">
+              {#if draft.isImage( displayedFiles[2] )}
+                <img 
+                  src={URL.createObjectURL( displayedFiles[2] )}
+                  alt="uploaded">
+              {:else if draft.isVideo( displayedFiles[2] )}
+                <!-- svelte-ignore a11y-media-has-caption -->
+                <video loop controls>
+                  <source 
+                    src={URL.createObjectURL( displayedFiles[2] )}
+                    type={displayedFiles[2].type}>
+                </video>
+              {/if}
             </div>
           </div>
         </div>
@@ -171,16 +320,34 @@
         <div class="right">
           <div class="top">
             <div class="image-box">
-              <img 
-                src={URL.createObjectURL( displayedFiles[1] )}
-                alt="uploaded">
+              {#if draft.isImage( displayedFiles[1] )}
+                <img 
+                  src={URL.createObjectURL( displayedFiles[1] )}
+                  alt="uploaded">
+              {:else if draft.isVideo( displayedFiles[1] )}
+                <!-- svelte-ignore a11y-media-has-caption -->
+                <video loop controls>
+                  <source 
+                    src={URL.createObjectURL( displayedFiles[1] )}
+                    type={displayedFiles[1].type}>
+                </video>
+              {/if}
             </div>
           </div>
           <div class="bottom">
             <div class="image-box">
-              <img 
-                src={URL.createObjectURL( displayedFiles[3] )}
-                alt="uploaded">
+              {#if draft.isImage( displayedFiles[3] )}
+                <img 
+                  src={URL.createObjectURL( displayedFiles[3] )}
+                  alt="uploaded">
+              {:else if draft.isVideo( displayedFiles[3] )}
+                <!-- svelte-ignore a11y-media-has-caption -->
+                <video loop controls>
+                  <source 
+                    src={URL.createObjectURL( displayedFiles[3] )}
+                    type={displayedFiles[3].type}>
+                </video>
+              {/if}
             </div>
           </div>
         </div>
@@ -301,7 +468,7 @@
   .outer-frame > .media {
     position: relative;
     width: 100%;
-    height: 307px;
+    height: 308px;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -309,10 +476,32 @@
     border-radius: 12px;
   }
 
+  .outer-frame > .media > .media-hide {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 27px;
+    height: 27px;
+    backdrop-filter: blur(40px);
+    background: rgba(255, 255, 255, 0.5);
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+
+  .outer-frame > .media > .media-hide > sl-icon {
+    font-size: 14px;
+    font-weight: var(--sl-font-weight-bold);
+    color: #000;
+  }
+
   .outer-frame > .media > .media-sensitive {
     position: absolute;
     width: 100%;
-    height: 307px;
+    height: 308px;
     backdrop-filter: blur(40px);
     display: flex;
     flex-direction: row;
@@ -327,7 +516,10 @@
     background: rgba(255, 255, 255, 0.5);
     padding: 8px 12px;
     border-radius: 12px;
+    cursor: pointer;
   }
+
+  
 
   .outer-frame > .media > .left {
     flex: 1;
@@ -347,17 +539,19 @@
   }
 
   .outer-frame > .media .top {
-    height: calc(50% - 2px);
+    height: 152px;
     margin-bottom: 4px;
   }
     
   .outer-frame > .media .bottom {
-    height: calc(50% - 2px);
+    height: 152px;
   }
 
   .outer-frame > .media .image-box {
     width: 100%;
     height: 100%;
+    background: #000;
+    border-radius: 4px;
   }
 
   .outer-frame > .media .image-box > img {
@@ -366,6 +560,25 @@
     object-fit: cover;
     object-position: center center;
     border-radius: 4px;
+  }
+
+  .outer-frame > .media .image-box > video {
+    width: 100%;
+    object-fit: contain;
+    object-position: center center;
+    border-radius: 4px;
+  }
+
+  .outer-frame > .media > .left > .image-box > video,
+  .outer-frame > .media > .right > .image-box > video {
+    height: 308px;
+  }
+
+  .outer-frame > .media > .left > .top .image-box > video,
+  .outer-frame > .media > .left > .bottom .image-box > video,
+  .outer-frame > .media > .right > .top .image-box > video,
+  .outer-frame > .media > .right > .bottom .image-box > video {
+    height: 152px;
   }
 
   .outer-frame > footer {

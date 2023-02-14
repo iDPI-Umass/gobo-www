@@ -11,7 +11,7 @@
   let options = {};
   let content;
   let displayedFiles = [];
-  let singleHeight = 512;
+  let sensitiveOverride = false;  
 
   const setIdentities = function () {
     for ( const key in draftData.identities ) {
@@ -33,23 +33,26 @@
 
   const setFiles = function () {
     displayedFiles = draftData.files.slice( 0, 4 );
-
   };
 
   const handleSingleLoad = function ( event ) {
     let previewWidth = event.target.width;
-    let naturalWidth = event.target.naturalWidth;
-    let naturalHeight = event.target.naturalHeight;
+    let naturalWidth = event.target.naturalWidth || event.target.videoWidth;
+    let naturalHeight = event.target.naturalHeight || event.target.videoHeight;
     let ratio = naturalHeight / naturalWidth;
-    let previewHeight = previewWidth * ratio;
+    let previewHeight = Math.round( previewWidth * ratio );
 
 
     if ( previewHeight > 512 ) {
       event.target.style.height = "512px";
     } else {
       event.target.style.height = "unset";
-    }
+    }    
   }
+
+  const toggleSensitive = function () {
+    sensitiveOverride = !sensitiveOverride;
+  };
  
   if ( browser ) {
     onMount( function () {
@@ -93,81 +96,193 @@
 
     {#if displayedFiles.length === 1}
       <div class="media-single">
-        {#if options.sensitive === true}
-          <div class="media-sensitive">
-            <sl-icon src="/icons/eye-slash.svg"></sl-icon>
-            <p>Content warning: Sensitive content</p>
-            <p>The Tweet author flagged this Tweet as showing sensitive content.</p>
-            <div><span>Show</span></div>
-          </div>
-        {/if}
-
         <div class="image-box">
-          <img 
-            src={URL.createObjectURL( displayedFiles[0] )}
-            alt="uploaded"
-            on:load={handleSingleLoad}>
+          {#if (options.sensitive === true) && (sensitiveOverride === true)}
+            <div class="media-hide">
+              <div
+                on:click={toggleSensitive}
+                on:keypress={toggleSensitive}
+                tabindex="0"
+                role="button">
+                <span>Hide</span>
+              </div>
+            </div>
+          {/if}
+
+          {#if (options.sensitive === true) && (sensitiveOverride === false)}
+            <div class="media-sensitive">
+              <sl-icon src="/icons/eye-slash.svg"></sl-icon>
+              <p>Content warning: Sensitive content</p>
+              <p>The Tweet author flagged this Tweet as showing sensitive content.</p>
+              <div
+                on:click={toggleSensitive}
+                on:keypress={toggleSensitive}
+                tabindex="0"
+                role="button">
+                <span>Show</span>
+              </div>
+            </div>
+          {/if}
+
+          {#if draft.isImage( displayedFiles[0] )}
+            <img 
+              src={URL.createObjectURL( displayedFiles[0] )}
+              alt="uploaded"
+              on:load={handleSingleLoad}>
+          {:else if draft.isVideo( displayedFiles[0] )}
+            <!-- svelte-ignore a11y-media-has-caption -->
+            <video 
+              loop 
+              controls
+              on:loadedmetadata={handleSingleLoad}>
+              <source 
+                src={URL.createObjectURL( displayedFiles[0] )}
+                type={displayedFiles[0].type}>
+            </video>
+          {/if}
+
         </div>
       </div>
     {:else if displayedFiles.length === 2}
       <div class="media">
-        {#if options.sensitive === true}
+        {#if (options.sensitive === true) && (sensitiveOverride === true)}
+          <div class="media-hide">
+            <div
+              on:click={toggleSensitive}
+              on:keypress={toggleSensitive}
+              tabindex="0"
+              role="button">
+              <span>Hide</span>
+            </div>
+          </div>
+        {/if}
+
+        {#if (options.sensitive === true) && (sensitiveOverride === false)}
           <div class="media-sensitive">
             <sl-icon src="/icons/eye-slash.svg"></sl-icon>
             <p>Content warning: Sensitive content</p>
             <p>The Tweet author flagged this Tweet as showing sensitive content.</p>
-            <div><span>Show</span></div>
+            <div
+              on:click={toggleSensitive}
+              on:keypress={toggleSensitive}
+              tabindex="0"
+              role="button">
+              <span>Show</span>
+            </div>
           </div>
         {/if}
 
         <div class="left">
           <div class="image-box">
-            <img 
-              src={URL.createObjectURL( displayedFiles[0] )}
-              alt="uploaded">
+            {#if draft.isImage( displayedFiles[0] )}
+              <img 
+                src={URL.createObjectURL( displayedFiles[0] )}
+                alt="uploaded">
+            {:else if draft.isVideo( displayedFiles[0] )}
+              <!-- svelte-ignore a11y-media-has-caption -->
+              <video loop controls>
+                <source 
+                  src={URL.createObjectURL( displayedFiles[0] )}
+                  type={displayedFiles[0].type}>
+              </video>
+            {/if}
           </div>
         </div>
   
         <div class="right">
           <div class="image-box">
-            <img 
-              src={URL.createObjectURL( displayedFiles[1] )}
-              alt="uploaded">
+            {#if draft.isImage( displayedFiles[1] )}
+              <img 
+                src={URL.createObjectURL( displayedFiles[1] )}
+                alt="uploaded">
+            {:else if draft.isVideo( displayedFiles[1] )}
+              <!-- svelte-ignore a11y-media-has-caption -->
+              <video loop controls>
+                <source 
+                  src={URL.createObjectURL( displayedFiles[1] )}
+                  type={displayedFiles[1].type}>
+              </video>
+            {/if}
           </div>
         </div>
       </div>
     {:else if displayedFiles.length === 3}
       <div class="media">
-        {#if options.sensitive === true}
+        {#if (options.sensitive === true) && (sensitiveOverride === true)}
+          <div class="media-hide">
+            <div
+              on:click={toggleSensitive}
+              on:keypress={toggleSensitive}
+              tabindex="0"
+              role="button">
+              <span>Hide</span>
+            </div>
+          </div>
+        {/if}
+
+        {#if (options.sensitive === true) && (sensitiveOverride === false)}
           <div class="media-sensitive">
             <sl-icon src="/icons/eye-slash.svg"></sl-icon>
             <p>Content warning: Sensitive content</p>
             <p>The Tweet author flagged this Tweet as showing sensitive content.</p>
-            <div><span>Show</span></div>
+            <div
+              on:click={toggleSensitive}
+              on:keypress={toggleSensitive}
+              tabindex="0"
+              role="button">
+              <span>Show</span>
+            </div>
           </div>
         {/if}
 
         <div class="left">
           <div class="image-box">
-            <img 
-              src={URL.createObjectURL( displayedFiles[0] )}
-              alt="uploaded">
+            {#if draft.isImage( displayedFiles[0] )}
+              <img 
+                src={URL.createObjectURL( displayedFiles[0] )}
+                alt="uploaded">
+            {:else if draft.isVideo( displayedFiles[0] )}
+              <!-- svelte-ignore a11y-media-has-caption -->
+              <video loop controls>
+                <source 
+                  src={URL.createObjectURL( displayedFiles[0] )}
+                  type={displayedFiles[0].type}>
+              </video>
+            {/if}
           </div>
         </div>
   
         <div class="right">
           <div class="top">
             <div class="image-box">
-              <img 
-                src={URL.createObjectURL( displayedFiles[1] )}
-                alt="uploaded">
+              {#if draft.isImage( displayedFiles[1] )}
+                <img 
+                  src={URL.createObjectURL( displayedFiles[1] )}
+                  alt="uploaded">
+              {:else if draft.isVideo( displayedFiles[1] )}
+                <!-- svelte-ignore a11y-media-has-caption -->
+                <video loop controls>
+                  <source 
+                    src={URL.createObjectURL( displayedFiles[1] )}
+                    type={displayedFiles[1].type}>
+                </video>
+              {/if}
             </div>
           </div>
           <div class="bottom">
             <div class="image-box">
-              <img 
-                src={URL.createObjectURL( displayedFiles[2] )}
-                alt="uploaded">
+              {#if draft.isImage( displayedFiles[2] )}
+                <img 
+                  src={URL.createObjectURL( displayedFiles[2] )}
+                  alt="uploaded">
+              {:else if draft.isVideo( displayedFiles[2] )}
+                <!-- svelte-ignore a11y-media-has-caption -->
+                <video loop controls>
+                  <source 
+                    src={URL.createObjectURL( displayedFiles[2] )}
+                    type={displayedFiles[2].type}>
+                </video>
+              {/if}
             </div>
           </div>
         </div>
@@ -175,28 +290,64 @@
   
     {:else if displayedFiles.length === 4}
       <div class="media">
-        {#if options.sensitive === true}
+        {#if (options.sensitive === true) && (sensitiveOverride === true)}
+          <div class="media-hide">
+            <div
+              on:click={toggleSensitive}
+              on:keypress={toggleSensitive}
+              tabindex="0"
+              role="button">
+              <span>Hide</span>
+            </div>
+          </div>
+        {/if}
+
+        {#if (options.sensitive === true) && (sensitiveOverride === false)}
           <div class="media-sensitive">
             <sl-icon src="/icons/eye-slash.svg"></sl-icon>
             <p>Content warning: Sensitive content</p>
             <p>The Tweet author flagged this Tweet as showing sensitive content.</p>
-            <div><span>Show</span></div>
+            <div
+              on:click={toggleSensitive}
+              on:keypress={toggleSensitive}
+              tabindex="0"
+              role="button">
+              <span>Show</span>
+            </div>
           </div>
         {/if}
 
         <div class="left">
           <div class="top">
             <div class="image-box">
-              <img 
-                src={URL.createObjectURL( displayedFiles[0] )}
-                alt="uploaded">
+              {#if draft.isImage( displayedFiles[0] )}
+                <img 
+                  src={URL.createObjectURL( displayedFiles[0] )}
+                  alt="uploaded">
+              {:else if draft.isVideo( displayedFiles[0] )}
+                <!-- svelte-ignore a11y-media-has-caption -->
+                <video loop controls>
+                  <source 
+                    src={URL.createObjectURL( displayedFiles[0] )}
+                    type={displayedFiles[0].type}>
+                </video>
+              {/if}
             </div>
           </div>
           <div class="bottom">
             <div class="image-box">
-              <img 
-                src={URL.createObjectURL( displayedFiles[2] )}
-                alt="uploaded">
+              {#if draft.isImage( displayedFiles[2] )}
+                <img 
+                  src={URL.createObjectURL( displayedFiles[2] )}
+                  alt="uploaded">
+              {:else if draft.isVideo( displayedFiles[2] )}
+                <!-- svelte-ignore a11y-media-has-caption -->
+                <video loop controls>
+                  <source 
+                    src={URL.createObjectURL( displayedFiles[2] )}
+                    type={displayedFiles[2].type}>
+                </video>
+              {/if}
             </div>
           </div>
         </div>
@@ -204,16 +355,34 @@
         <div class="right">
           <div class="top">
             <div class="image-box">
-              <img 
-                src={URL.createObjectURL( displayedFiles[1] )}
-                alt="uploaded">
+              {#if draft.isImage( displayedFiles[1] )}
+                <img 
+                  src={URL.createObjectURL( displayedFiles[1] )}
+                  alt="uploaded">
+              {:else if draft.isVideo( displayedFiles[1] )}
+                <!-- svelte-ignore a11y-media-has-caption -->
+                <video loop controls>
+                  <source 
+                    src={URL.createObjectURL( displayedFiles[1] )}
+                    type={displayedFiles[1].type}>
+                </video>
+              {/if}
             </div>
           </div>
           <div class="bottom">
             <div class="image-box">
-              <img 
-                src={URL.createObjectURL( displayedFiles[3] )}
-                alt="uploaded">
+              {#if draft.isImage( displayedFiles[3] )}
+                <img 
+                  src={URL.createObjectURL( displayedFiles[3] )}
+                  alt="uploaded">
+              {:else if draft.isVideo( displayedFiles[3] )}
+                <!-- svelte-ignore a11y-media-has-caption -->
+                <video loop controls>
+                  <source 
+                    src={URL.createObjectURL( displayedFiles[3] )}
+                    type={displayedFiles[3].type}>
+                </video>
+              {/if}
             </div>
           </div>
         </div>
@@ -345,8 +514,9 @@
   }
 
   .outer-frame > .main > .media-single > .image-box {
-    width: 100%;
-    height: 100%;
+    position: relative;
+    max-width: 100%;
+    height: max-content;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -354,6 +524,13 @@
   }
 
   .outer-frame > .main > .media-single > .image-box > img {
+    object-fit: contain;
+    object-position: top left;
+    border-radius: 12px;
+    border: 1px solid #cfd9de;
+  }
+
+  .outer-frame > .main > .media-single > .image-box > video {
     object-fit: contain;
     object-position: top left;
     border-radius: 12px;
@@ -401,16 +578,40 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+    cursor: pointer;
   }
 
-  .outer-frame > .main .media-sensitive > div > span {
-    font-size: 16px;
+  .outer-frame > .main .media-sensitive div > span {
     color: #fff;
+    font-size: 14px;
+    font-weight: var(--sl-font-weight-bold);
+  }
+
+  .outer-frame > .main .media-hide {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    background: rgba( 0, 0, 0, 0.5 );
+    backdrop-filter: blur(4px);
+    height: 32px;
+    padding: 0 16px;
+    border-radius: 9999px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .outer-frame > .main .media-hide > div {
+    color: #fff;
+    font-size: 14px;
+    font-weight: var(--sl-font-weight-bold);
   }
 
   .outer-frame > .main > .media {
     position: relative;
     height: 286px;
+    width: 100%;
     border-radius: 12px;
     border: 1px solid #cfd9de;
     display: flex;
@@ -444,6 +645,7 @@
     width: 100%;
     border-top-left-radius: 12px;
     border-bottom-left-radius: 12px;
+    background: #000;
   }
 
   .outer-frame > .main > .media > .left > .image-box > img {
@@ -454,11 +656,21 @@
     border-bottom-left-radius: 12px;
   }
 
+  .outer-frame > .main > .media > .left > .image-box > video {
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+    object-position: center center;
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+  }
+
   .outer-frame > .main > .media > .right > .image-box {
     height: 100%;
     width: 100%;
     border-top-right-radius: 12px;
     border-bottom-right-radius: 12px;
+    background: #000;
   }
 
   .outer-frame > .main > .media > .right > .image-box > img {
@@ -469,26 +681,46 @@
     border-bottom-right-radius: 12px;
   }
 
+  .outer-frame > .main > .media > .right > .image-box > video {
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+    object-position: center center;
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+  }
+
   .outer-frame > .main > .media > .left > .top {
-    height: 142px;
+    height: 141px;
     border-top-left-radius: 12px;
     margin-bottom: 2px;
   }
 
   .outer-frame > .main > .media > .left > .bottom {
-    height: 142px;
+    height: 141px;
     border-bottom-left-radius: 12px;
   }
 
   .outer-frame > .main > .media > .right > .top {
-    height: 142px;
+    height: 141px;
     border-top-right-radius: 12px;
     margin-bottom: 2px;
   }
 
   .outer-frame > .main > .media > .right > .bottom {
-    height: 142px;
+    height: 141px;
     border-bottom-right-radius: 12px;
+  }
+
+  .outer-frame > .main > .media > .right > .top video,
+  .outer-frame > .main > .media > .right > .bottom video,
+  .outer-frame > .main > .media > .left > .top video,
+  .outer-frame > .main > .media > .left > .bottom video {
+    height: 141px;
+    width: 100%;
+    object-fit: contain;
+    object-position: center center;
+    background: #000;
   }
 
   .outer-frame > .main > .media .image-box {
@@ -502,19 +734,23 @@
     object-fit: cover;
   }
 
-  .outer-frame > .main > .media > .left > .top > .image-box > img {
+  .outer-frame > .main > .media > .left > .top > .image-box > img,
+  .outer-frame > .main > .media > .left > .top > .image-box > video {
     border-top-left-radius: 12px;
   }
 
-  .outer-frame > .main > .media > .left > .bottom > .image-box > img {
+  .outer-frame > .main > .media > .left > .bottom > .image-box > img,
+  .outer-frame > .main > .media > .left > .bottom > .image-box > video {
     border-bottom-left-radius: 12px;
   }
 
-  .outer-frame > .main > .media > .right > .top > .image-box > img {
+  .outer-frame > .main > .media > .right > .top > .image-box > img,
+  .outer-frame > .main > .media > .right > .top > .image-box > video {
     border-top-right-radius: 12px;
   }
 
-  .outer-frame > .main > .media > .right > .bottom > .image-box > img {
+  .outer-frame > .main > .media > .right > .bottom > .image-box > img,
+  .outer-frame > .main > .media > .right > .bottom > .image-box > video {
     border-bottom-right-radius: 12px;
   }
 

@@ -11,6 +11,8 @@
   let options = {};
   let content;
   let displayedFiles = [];
+  let mediaFrame;
+  let mediaFrameChildren = {};
 
   const setIdentities = function () {
     for ( const key in draftData.identities ) {
@@ -31,8 +33,53 @@
   };
 
   const setFiles = function () {
-    displayedFiles = draftData.files.slice( 0, 20 );
+    let hasVideo = false;
+    const oldLength = displayedFiles.length;
+    let files = draftData.files.slice( 0, 20 );
+    
+    let videoFile = files.find( f => draft.isVideo( f ) );
+    if ( videoFile != null ) {
+      displayedFiles = [ videoFile ];
+    } else {
+      displayedFiles = files;
+    }
+
+    // Only complete the styling below if we're removing media.
+    if ( oldLength <= displayedFiles.length ) {
+      return;
+    }
+
+    for ( const file of displayedFiles ) {
+      const frame = mediaFrameChildren[ file.name ];
+      let previewWidth = frame.width;
+      let naturalWidth = frame.naturalWidth;
+      let naturalHeight = frame.naturalHeight;
+      let ratio = naturalHeight / naturalWidth;
+      let previewHeight = Math.round( previewWidth * ratio );
+
+      if ( previewHeight > 512 ) {
+        mediaFrame.style.height = "512px";
+        return;
+      }
+    }
+
+    mediaFrame.style.height = "unset";
   };
+
+  const handleImageLoad = function ( event ) {
+    let previewWidth = event.target.width;
+    let naturalWidth = event.target.naturalWidth;
+    let naturalHeight = event.target.naturalHeight;
+    let ratio = naturalHeight / naturalWidth;
+    let previewHeight = previewWidth * ratio;
+
+
+    if ( previewHeight > 512 ) {
+      mediaFrame.style.height = "512px";
+    } else {
+      mediaFrame.style.height = "unset";
+    }
+  }
  
   if ( browser ) {
     onMount( function () {
@@ -83,7 +130,7 @@
     {#if displayedFiles.length === 0}
       {#if options.sensitive === true}
         <div class="text-sensitive">
-          <div>CLICK TO SEE NSFW</div>
+          <div>CLICK TO SEE SPOILER</div>
         </div>
       {:else}
         <section>
@@ -93,19 +140,35 @@
 
     {:else}
 
-      <div class="media">
+      <div
+        bind:this={mediaFrame}
+        class="media {options.sensitive === true ? "frozen" : ""}">
 
         {#if options.sensitive === true}
           <div class="media-sensitive">
-            <div>CLICK TO SEE NSFW</div>
           </div>
         {/if}
 
         {#each displayedFiles as file (file.name)}
           <div class="image-box">
-            <img 
-              src={URL.createObjectURL( file )}
-              alt="uploaded">
+            {#if draft.isImage( file )}
+              <img
+                bind:this={mediaFrameChildren[ file.name ]}
+                src={URL.createObjectURL( file )}
+                alt="uploaded"
+                on:load={handleImageLoad}>
+            {/if}
+            {#if draft.isVideo( file )}
+              <!-- svelte-ignore a11y-media-has-caption -->
+              <video 
+                loop 
+                controls
+                bind:this={mediaFrameChildren[ file.name ]}>
+                <source 
+                src={URL.createObjectURL( file )}
+                type={file.type}>
+              </video>
+            {/if}
           </div>
         {/each}
       </div>
@@ -269,7 +332,6 @@
   .outer-frame > .main > .media {
     position: relative;
     margin: 10px 0 0 0;
-    height: 512px;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -278,22 +340,18 @@
     scroll-snap-type: x mandatory;
   }
 
+  .outer-frame > .main > .media.frozen {
+    overflow-x: hidden;
+  }
+
   .outer-frame > .main > .media > .media-sensitive {
     position: absolute;
-    height: 512px;
+    height: 100%;
     width: 100%;
     backdrop-filter: blur(40px);
     display: flex;
     justify-content: center;
     align-items: center;
-  }
-
-  .outer-frame > .main > .media > .media-sensitive > div {
-    font-size: 14px;
-    padding: 10px 20px;
-    border: 1px solid #000;
-    background: #fff;
-    color: #000;
   }
 
   .outer-frame > .main > .media > .image-box {
@@ -302,9 +360,16 @@
     justify-content: center;
     align-items: center;
     scroll-snap-align: center;
+    background: #000;
   }
 
   .outer-frame > .main > .media > .image-box > img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .outer-frame > .main > .media > .image-box > video {
     width: 100%;
     height: 100%;
     object-fit: contain;

@@ -1,5 +1,5 @@
 # gobo-www
-Web Client Frontend for the GOBO Project
+Web Client Frontend for the Gobo Project
 
 
 ## Developing

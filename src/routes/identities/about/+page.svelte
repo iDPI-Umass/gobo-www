@@ -5,7 +5,7 @@
   <h1>About Identities</h1>
 
   <p>
-    Explain that GOBO is a place where the user aggregates
+    Explain that Gobo is a place where the user aggregates
     their feeds across platforms and they can control their own algorithms.
   </p>
   

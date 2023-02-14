@@ -27,7 +27,7 @@
 
 <header class="desktop">
   <nav>
-    <a class="logo" href="/">GOBO</a>
+    <a class="logo" href="/">Gobo</a>
     <div class="spacer" aria-hidden=true ></div>
     <a href="/home">Home</a>
     <a href=/identities>Identities</a>
@@ -37,7 +37,7 @@
 
 <header class="mobile">
   <nav>
-    <a class="logo" href="/">GOBO</a>
+    <a class="logo" href="/">Gobo</a>
     <div class="spacer" aria-hidden=true ></div>
     <sl-button
       bind:this={button}
@@ -51,7 +51,7 @@
 
 <sl-drawer 
   bind:this={drawer}
-  label="GOBO Menu"
+  label="Gobo Menu"
   placement="start">
   
   <VerticalNav>

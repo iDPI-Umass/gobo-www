@@ -45,7 +45,7 @@
   <section class="panel dark-mode">
     <h2>Dark Mode</h2>
     <p>
-      Dark Mode is GOBO's light-on-dark color scheme. By default, GOBO tries
+      Dark Mode is Gobo's light-on-dark color scheme. By default, Gobo tries
       to respect the preference set in your operating system, but you can
       configure it directly here.
     </p>
@@ -65,7 +65,7 @@
     <h2>Text Size</h2>
     <p>
       Adjust the text size according to your preference. Changes will be
-      applied throughout the GOBO interface.
+      applied throughout the Gobo interface.
     </p>
     
 

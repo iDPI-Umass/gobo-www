@@ -14,7 +14,15 @@ const isFile = function ( value ) {
   } else {
     return false;
   }
-}
+};
+
+const isImage = function ( value ) {
+  return /^image/.test( value.type );
+};
+
+const isVideo = function ( value ) {
+  return /^video/.test( value.type );
+};
 
 const emptyDraft = function () {
   return {
@@ -29,7 +37,7 @@ const emptyDraft = function () {
     },
     content: null
   };
-}
+};
 
 const createDraft = function () {
   let draft;
@@ -54,6 +62,8 @@ const createDraft = function () {
     subscribe,
     buildKey: buildKey,
     isFile: isFile,
+    isImage: isImage,
+    isVideo: isVideo,
     clear: function () {
       update( function () {
         return emptyDraft();

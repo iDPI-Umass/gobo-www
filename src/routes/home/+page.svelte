@@ -2,7 +2,7 @@
   import "@shoelace-style/shoelace/dist/components/select/select.js";
   import "@shoelace-style/shoelace/dist/components/option/option.js";
   import Post from "$lib/components/Post.svelte";
-  import posts from "./posts.js";
+  import posts from "$lib/stores/posts.js";
 
   import { onDestroy, onMount } from "svelte";
   import { browser } from "$app/environment";
