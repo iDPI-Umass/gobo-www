@@ -1,6 +1,7 @@
 <script>
   import "@shoelace-style/shoelace/dist/components/select/select.js";
   import "@shoelace-style/shoelace/dist/components/option/option.js";
+  import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
   import Post from "$lib/components/Post.svelte";
   import posts from "$lib/stores/posts.js";
 
@@ -45,7 +46,14 @@
 
 
 <section bind:this={feed} role="feed">
-  <h1>Home Feed</h1>
+  <div class="subheader">
+    <h1>Home Feed</h1>
+    <sl-icon-button 
+      src="/icons/gear.svg"
+      href="/settings/feed">
+    </sl-icon-button>
+  </div>
+  
   <sl-select
     bind:this={feedSortSelect}
     label="Feed Sort"
@@ -62,8 +70,21 @@
 </section>
 
 <style>
-  h1 {
+  .subheader {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    max-width: 36rem;
+  }
+
+  .subheader > h1 {
     font-size: var(--sl-font-size-x-large);
+  }
+
+  .subheader > sl-icon-button {
+    font-size: 1.75rem;
+    color: var(--sl-color-neutral-1000);
   }
 
   section {

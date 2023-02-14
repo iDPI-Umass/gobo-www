@@ -1,5 +1,6 @@
 <script>
   import MainHeader from "$lib/components/headers/MainHeader.svelte"
+  import MainFooter from "$lib/components/headers/MainFooter.svelte";
   import NestedMenu from "$lib/components/layouts/NestedMenu.svelte"
   import VerticalNav from "$lib/components/primitives/VerticalNav.svelte";
   import NavLink from "$lib/components/primitives/NavLink.svelte";
@@ -20,3 +21,4 @@
   <slot slot="right"></slot>
 
 </NestedMenu>
+<MainFooter></MainFooter>

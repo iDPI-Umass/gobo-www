@@ -1,5 +1,6 @@
 <script>
   import MainHeader from "$lib/components/headers/MainHeader.svelte"
+  import MainFooter from "$lib/components/headers/MainFooter.svelte";
   import LeftRight from "$lib/components/layouts/LeftRight.svelte"
   import Fascinator from "$lib/components/primitives/Fascinator.svelte"
   import "@shoelace-style/shoelace/dist/components/button/button.js";
@@ -43,6 +44,7 @@
   
   <Fascinator slot="right"></Fascinator>
 </LeftRight>
+<MainFooter></MainFooter>
 
 
 <style>

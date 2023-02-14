@@ -1,36 +1,16 @@
 <script>
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
-  import "@shoelace-style/shoelace/dist/components/drawer/drawer.js";
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import ProfileBadge from "$lib/components/primitives/ProfileBadge.svelte"
   import VerticalNav from "$lib/components/primitives/VerticalNav.svelte";
   import NavLink from "$lib/components/primitives/NavLink.svelte";
-  import { onMount } from "svelte";
-
-  let button, drawer;
-
-  const checkClose = function ( path ) {
-    return function ( event ) {
-      if ( window.location.pathname === path ) {
-        drawer.hide();
-      }
-    };    
-  };
-
-  onMount(() => {
-    button.addEventListener( "click", () => {
-      drawer.show();
-    });
-  });
 </script>
 
 <header class="desktop">
   <nav>
     <a class="logo" href="/">Gobo</a>
     <div class="spacer" aria-hidden=true ></div>
-    <a href="/home">Home</a>
-    <a href=/identities>Identities</a>
     <ProfileBadge name="David Harper"></ProfileBadge>
   </nav>
 </header>
@@ -38,28 +18,8 @@
 <header class="mobile">
   <nav>
     <a class="logo" href="/">Gobo</a>
-    <div class="spacer" aria-hidden=true ></div>
-    <sl-button
-      bind:this={button}
-      class="hamburger"
-      variant="primary"
-      size="medium">
-      <sl-icon slot="prefix" src="/icons/list.svg" ></sl-icon>
-    </sl-button>
   </nav>
 </header>
-
-<sl-drawer 
-  bind:this={drawer}
-  label="Gobo Menu"
-  placement="start">
-  
-  <VerticalNav>
-    <NavLink href="/settings/profile" action={ checkClose("/settings/profile") }>Profile</NavLink>
-    <NavLink href="/home" action={ checkClose("/home") }>Home</NavLink>
-    <NavLink href="/identities" action={ checkClose("/identities") }>Identities</NavLink>
-  </VerticalNav>
-</sl-drawer>
 
 <style>
   header {
@@ -85,11 +45,6 @@
     color: initial;
     margin: 0;
     flex: 0 0 auto;
-  }
-
-  header > nav > sl-button {
-    flex: 0 0 auto;
-    margin: 1rem;
   }
 
   header > nav > .spacer {

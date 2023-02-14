@@ -1,5 +1,6 @@
 <script>
   import { scroll } from "$lib/stores/scroll.js";
+  export let melting = "false";
 
   const handleWheel = function ( event ) {
     if ( window.screen.width > 750 ) {
@@ -12,7 +13,9 @@
 </script>
 
 <div class="panels">
-  <div class="left-panel" on:wheel={handleWheel}>
+  <div 
+    class="left-panel {melting === "true" ? "melting" : ""}" 
+    on:wheel={handleWheel}>
     <slot name="left"></slot>
   </div>
   
@@ -43,6 +46,10 @@
     max-width: 20rem;
   }
 
+  .left-panel.melting {
+    display: none;
+  }
+
   .right-panel {
     flex: 0 0 auto;
     margin: 2rem 1rem 1rem 1rem;
@@ -60,6 +67,10 @@
     .left-panel {
       flex: 1 2 33%;
       margin: 1rem;
+    }
+
+    .left-panel.melting {
+      display: unset;
     }
 
     .right-panel {
