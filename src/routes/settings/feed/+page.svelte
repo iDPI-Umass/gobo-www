@@ -8,6 +8,7 @@
   import "@shoelace-style/shoelace/dist/components/option/option.js";
   import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
   import  "@shoelace-style/shoelace/dist/components/icon/icon.js";
+  import BackLink from "$lib/components/primitives/BackLink.svelte";
   import { onDestroy, onMount } from "svelte";
   import { config } from "$lib/stores/feed-config.js";
   import { scroll } from "$lib/stores/scroll.js";
@@ -60,7 +61,10 @@
 </script>
 
 <section class="gobo-config-frame" bind:this={configFrame}>
-  <h1>Feed Settings</h1>
+  <BackLink
+    href="/settings"
+    heading="Feed Settings">
+  </BackLink>
 
   <section class="panel">
     <h2>Default Sorting</h2>

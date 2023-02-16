@@ -12,7 +12,8 @@
 }
 
 .gobo-form > h2 {
-  font-size: var(--sl-font-size-large);
+  font-size: var(--sl-font-size-medium);
+  font-weight: var(--sl-font-weight-bold);
   margin-bottom: 1rem;
 }
 

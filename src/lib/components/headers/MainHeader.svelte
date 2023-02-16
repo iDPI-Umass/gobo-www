@@ -9,7 +9,7 @@
 
 <header class="desktop">
   <nav>
-    <a class="logo" href="/">Gobo</a>
+    <a class="logo" href="/home">GOBO</a>
     <div class="spacer" aria-hidden=true ></div>
     <ProfileBadge name="David Harper"></ProfileBadge>
   </nav>
@@ -17,7 +17,7 @@
 
 <header class="mobile">
   <nav>
-    <a class="logo" href="/">Gobo</a>
+    <a class="logo" href="/">GOBO</a>
   </nav>
 </header>
 
@@ -27,6 +27,7 @@
     flex-wrap: nowrap;
     background: var(--sl-color-neutral-50);
     border-bottom: 1px solid var(--sl-color-neutral-700);
+    height: 5rem;
   }
 
 

@@ -2,7 +2,7 @@
   export let name
 </script>
 
-<a href="/settings/profile" class="profile-badge">
+<a href="/settings" class="profile-badge">
   {name}
 </a>
 

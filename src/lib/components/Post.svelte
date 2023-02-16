@@ -467,7 +467,7 @@
 
   article > .media {
     position: relative;
-    height: 284px;
+    height: min( 40vw, 284px );
     max-width: 36rem;
     margin: 0 1rem 0 1rem;
     border-radius: var(--sl-border-radius-medium);
@@ -493,7 +493,7 @@
   article > .media > .left > .bottom,
   article > .media > .right > .top,
   article > .media > .right > .bottom {
-    height: 140px;
+    height: calc( ( 0.5 * min( 40vw, 284px ) ) - 2px);
     border-radius: var(--sl-border-radius-medium);
   }
 

@@ -1,34 +1,19 @@
 <script>
   import MainHeader from "$lib/components/headers/MainHeader.svelte"
-  import MainFooter from "$lib/components/headers/MainFooter.svelte";
-  import NestedMenu from "$lib/components/layouts/NestedMenu.svelte";
-  import VerticalNav from "$lib/components/primitives/VerticalNav.svelte";
-  import NavLink from "$lib/components/primitives/NavLink.svelte";
+  import FooterNav from "$lib/components/headers/FooterNav.svelte";
+  import NavPage from "$lib/components/layouts/NavPage.svelte";
   import { guard } from "$lib/helpers/guard";
-  import { getClient } from "$lib/helpers/auth0.js";
 
   guard();
-
-  const logout = async function ( event ) {
-    event.preventDefault();
-    const client = await getClient();
-    client.logout()
-  };
-
 </script>
 
 <MainHeader></MainHeader>
-<NestedMenu>
 
-  <VerticalNav slot="left">
-    <NavLink href="/home">Home</NavLink>
-    <NavLink href="/settings/profile">Profile</NavLink>
-    <NavLink href="/settings/appearance">Apperance</NavLink>
-    <NavLink href="/settings/feed">Feed</NavLink>
-    <NavLink href="#" action={logout}>Logout</NavLink>
-  </VerticalNav>
+<NavPage>
+  <slot></slot>
+</NavPage>
 
-  <slot slot="right"></slot>
+<FooterNav></FooterNav>
 
-</NestedMenu>
-<MainFooter></MainFooter>
+<style>
+</style>

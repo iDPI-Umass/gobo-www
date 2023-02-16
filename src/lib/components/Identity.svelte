@@ -11,7 +11,7 @@
     twitter: "#1d9bf0"
   };
 
-  let logo = `icons/${ type }.svg`;
+  let logo = `/icons/${ type }.svg`;
   let brandColor = colors[ type ];
 </script>
 

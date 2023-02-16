@@ -1,8 +1,12 @@
 <script>
+  import BackLink from "$lib/components/primitives/BackLink.svelte";
 </script>
 
 <section class="gobo-copy">
-  <h1>About Identities</h1>
+  <BackLink
+    href="/identities"
+    heading="About Identities">
+  </BackLink>
 
   <p>
     Explain that Gobo is a place where the user aggregates

@@ -4,6 +4,7 @@
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import "@shoelace-style/shoelace/dist/components/radio-group/radio-group.js";
   import "@shoelace-style/shoelace/dist/components/radio-button/radio-button.js";
+  import BackLink from "$lib/components/primitives/BackLink.svelte";
   import { onMount, onDestroy } from "svelte";
   import { browser } from "$app/environment";
   import { theme } from "$lib/stores/theme";
@@ -40,7 +41,10 @@
 
 
 <section class="gobo-config-frame">
-  <h1>Appearance</h1>
+  <BackLink
+    href="/settings"
+    heading="Appearance">
+  </BackLink>
 
   <section class="panel dark-mode">
     <h2>Dark Mode</h2>

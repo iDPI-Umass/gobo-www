@@ -1,6 +1,7 @@
 <script>
   import { scroll } from "$lib/stores/scroll.js";
   export let melting = "false";
+  export let heading;
 
   const handleWheel = function ( event ) {
     if ( window.screen.width > 750 ) {
@@ -20,6 +21,9 @@
   </div>
   
   <main class="right-panel" on:wheel={handleWheel}>
+    {#if heading != null}
+      <h1>{heading}</h1>
+    {/if}
     <slot name="right"></slot>
   </main>
 </div>

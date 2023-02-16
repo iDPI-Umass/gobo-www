@@ -2,6 +2,7 @@
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/input/input.js";
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
+  import BackLink from "$lib/components/primitives/BackLink.svelte";
   import { onMount } from "svelte";
   import { sleep } from "@dashkite/joy/time";
   let form, button;
@@ -40,7 +41,11 @@
 
 
 <section class="gobo-config-frame">
-  <h1>Your Profile</h1>
+  <BackLink
+    href="/settings"
+    heading="Your Profile">
+  </BackLink>
+  
 
   <section class="panel">
     <form bind:this={form} class="gobo-form">

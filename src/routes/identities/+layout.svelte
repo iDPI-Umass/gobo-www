@@ -1,6 +1,7 @@
 <script>
   import MainHeader from "$lib/components/headers/MainHeader.svelte"
-  import MainFooter from "$lib/components/headers/MainFooter.svelte";
+  import FooterNav from "$lib/components/headers/FooterNav.svelte";
+  import NavPage from "$lib/components/layouts/NavPage.svelte";
   import NestedMenu from "$lib/components/layouts/NestedMenu.svelte"
   import VerticalNav from "$lib/components/primitives/VerticalNav.svelte";
   import NavLink from "$lib/components/primitives/NavLink.svelte";
@@ -10,15 +11,9 @@
 </script>
 
 <MainHeader></MainHeader>
-<NestedMenu>
 
-  <VerticalNav slot="left">
-    <NavLink href="/identities">Your Identities</NavLink>
-    <NavLink href="/identities/add">Add Identity</NavLink>
-    <NavLink href="/identities/about">About Identities</NavLink>
-  </VerticalNav>
+<NavPage>
+  <slot></slot>
+</NavPage>
 
-  <slot slot="right"></slot>
-
-</NestedMenu>
-<MainFooter></MainFooter>
+<FooterNav></FooterNav>

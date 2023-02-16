@@ -4,6 +4,7 @@
   import "@shoelace-style/shoelace/dist/components/select/select.js";
   import "@shoelace-style/shoelace/dist/components/option/option.js";
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
+  import BackLink from "$lib/components/primitives/BackLink.svelte";
   import { onMount } from "svelte";
   import { goto } from '$app/navigation';
   import { sleep } from "@dashkite/joy/time";
@@ -44,7 +45,10 @@
 
 <form class="gobo-form" bind:this={form}>
 
-  <h1>Add Identity</h1>
+  <BackLink
+    href="/identities"
+    heading="Add Identity">
+  </BackLink>
 
   <h2>Select a Platform</h2>
   
