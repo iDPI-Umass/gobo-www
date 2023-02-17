@@ -17,7 +17,7 @@
 
 <header class="mobile">
   <nav>
-    <a class="logo" href="/">GOBO</a>
+    <a class="logo" href="/home">GOBO</a>
   </nav>
 </header>
 
