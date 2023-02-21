@@ -1,10 +1,12 @@
 <script>
   import VerticalNav from "$lib/components/primitives/VerticalNav.svelte";
   import NavLink from "$lib/components/primitives/NavLink.svelte";
+  import { auth } from "$lib/stores/auth.js";
   import { getClient } from "$lib/helpers/auth0.js";
 
   const logout = async function ( event ) {
     event.preventDefault();
+    auth.logout();
     const client = await getClient();
     client.logout()
   };

@@ -1,5 +1,5 @@
 <header>
-  <a href="/">Gobo</a>
+  <a href="/">GOBO</a>
 </header>
 
 <style>

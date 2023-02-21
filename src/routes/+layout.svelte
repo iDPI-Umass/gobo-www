@@ -14,7 +14,7 @@
   import "$lib/styles/keyword-table.css";
 
   // Now we can setup the store stuff with Svelte
-  import { onDestroy, onMount } from "svelte";
+  import { beforeUpdate, onDestroy, onMount } from "svelte";
   import { browser } from "$app/environment";
   import { theme } from "$lib/stores/theme.js";
   import { handleAuthCallback } from "$lib/helpers/auth-callback.js";
@@ -22,7 +22,7 @@
   if ( browser ) {
     let unsubscribeTheme;
     
-    onMount( async function() {
+    beforeUpdate( function() {
       unsubscribeTheme = theme.subscribe( function ( config ) {
 
         const html = document.querySelector( "html" )
@@ -51,12 +51,6 @@
         }
       });
 
-      // try {
-      //   await handleAuthCallback();
-      // } catch (error) {
-      //   console.error( error );
-      // }
-
     });
 
     onDestroy( function () {
@@ -67,5 +61,27 @@
 </script>
 
 <div class="page-wrapper">
-  <slot></slot>
+  {#await handleAuthCallback()}
+    <div class="spinner-box">
+      <sl-spinner></sl-spinner>
+    </div>
+  {:then}
+    <slot></slot>
+  {:catch}
+    <p>There was a problem with your login.</p>
+  {/await}
 </div>
+
+
+<style>
+  .spinner-box {
+    max-width:  36rem;
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+
+  .spinner-box > sl-spinner {
+    font-size: 3rem;
+  }
+</style>

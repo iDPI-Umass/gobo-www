@@ -66,6 +66,7 @@
 
   nav > sl-button::part(base) {
     padding: 0;
+    align-items: center !important;
   }
 
   nav > sl-button::part(label) {

@@ -1,7 +1,7 @@
 <script>
   import PlainHeader from "$lib/components/headers/PlainHeader.svelte"
   import Center from "$lib/components/layouts/Center.svelte"
-  import "@shoelace-style/shoelace/dist/components/spinner/spinner.js";  
+  // import "@shoelace-style/shoelace/dist/components/spinner/spinner.js";  
 </script>
 
 <PlainHeader></PlainHeader>

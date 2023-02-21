@@ -21,7 +21,7 @@
 	"dependencies": {
 		"@auth0/auth0-spa-js": "^2.0.3",
 		"@dashkite/joy": "^0.3.16",
-		"@shoelace-style/shoelace": "2.0.0",
+		"@shoelace-style/shoelace": "2.1.0",
 		"dayjs": "^1.11.7"
 	}
 }
