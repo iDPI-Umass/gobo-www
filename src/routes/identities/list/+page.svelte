@@ -34,11 +34,6 @@
     max-width: 40rem;
   }
 
-  section > h1 {
-    font-size: var(--sl-font-size-x-large);
-    margin: 0 0 1rem 0;
-  }
-
   section > h2 {
     font-size: var(--sl-font-size-large);
     margin: 0;

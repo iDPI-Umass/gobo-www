@@ -8,7 +8,7 @@ const getClient = async function () {
       domain: "dev-j72vlrggk1ft8e8u.us.auth0.com",
       clientId: "urDJOCUizzQm4LZ7kv5UQsdIYEnOCuwG",
       authorizationParams: {
-        redirect_uri: "http://localhost:5173/callback"
+        redirect_uri: "http://localhost:4173/callback"
       }
     });
   }
