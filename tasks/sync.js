@@ -19,7 +19,6 @@ const syncBucket = async function( config, files ) {
   // next, iterate thru the filesystem looking for differences.
   for ( const file of files ) {
     const key = file.path;
-    console.log( key );
     const remote = published[ key ];
     if ( remote == null) {
       operations.push({ type: "add", key, file });
