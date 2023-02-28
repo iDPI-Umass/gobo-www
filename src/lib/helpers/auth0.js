@@ -1,14 +1,21 @@
 import { createAuth0Client } from '@auth0/auth0-spa-js';
+import { 
+  PUBLIC_AUTH_DOMAIN,
+  PUBLIC_AUTH_CLIENT_ID,
+  PUBLIC_AUTH_REDIRECT_URL
+} from '$env/static/public';
+
 
 let client;
 
 const getClient = async function () {
   if ( client == null ) {
     client = await createAuth0Client({
-      domain: "dev-j72vlrggk1ft8e8u.us.auth0.com",
-      clientId: "urDJOCUizzQm4LZ7kv5UQsdIYEnOCuwG",
+      domain: PUBLIC_AUTH_DOMAIN,
+      clientId: PUBLIC_AUTH_CLIENT_ID,
+      cacheLocation: "localstorage",
       authorizationParams: {
-        redirect_uri: "http://localhost:4173/callback"
+        redirect_uri: PUBLIC_AUTH_REDIRECT_URL
       }
     });
   }

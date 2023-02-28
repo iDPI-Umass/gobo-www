@@ -10,8 +10,8 @@ const handleGuard = async function () {
   if ( await client.isAuthenticated() ) {
     return {};
   } else {
-    return {};
-    // goto("/");
+    goto( "/" );
+    // return {};
   }
 };
 

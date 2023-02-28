@@ -3,6 +3,7 @@ import * as Text from "@dashkite/joy/text";
 import * as Type from "@dashkite/joy/type";
 import * as Route53 from "@dashkite/dolores/route53";
 import * as CF from "@dashkite/dolores/stack";
+import * as Distro from "@dashkite/dolores/cloudfront";
 import _Templates from "@dashkite/template";
 const Templates = _Templates.default;
 
@@ -173,7 +174,7 @@ const teardownEdge = async function ( config ) {
 const invalidateCache = async function ( config ) {
   await Distro.invalidatePaths({
     domain: config.edge.aliases[0],
-    paths: "*"
+    paths: [ "/*" ]
   });
 }
 

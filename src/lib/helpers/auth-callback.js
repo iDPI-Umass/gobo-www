@@ -35,9 +35,9 @@ export async function handleAuthCallback () {
 
     } else {
       if ( exists(state) && ( exists(code) || exists(error) )) {
-        console.log( "refreshing credentials" );
-        auth.update({ state, code, error, loggedIn: true });
-        await client.handleRedirectCallback();
+        console.log( "TBD - refreshing credentials" );
+        // auth.update({ state, code, error, loggedIn: true });
+        // await client.handleRedirectCallback();
         return goto( "/home" );
       }
 

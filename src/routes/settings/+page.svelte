@@ -3,12 +3,17 @@
   import NavLink from "$lib/components/primitives/NavLink.svelte";
   import { auth } from "$lib/stores/auth.js";
   import { getClient } from "$lib/helpers/auth0.js";
+  import { PUBLIC_AUTH_LOGOUT_URL } from '$env/static/public';
 
   const logout = async function ( event ) {
     event.preventDefault();
     auth.logout();
     const client = await getClient();
-    client.logout()
+    client.logout({
+      logoutParams: {
+        returnTo: PUBLIC_AUTH_LOGOUT_URL
+      }
+    })
   };
 </script>
 

@@ -22,7 +22,11 @@ const publish = async function () {
   const files = await Task.getLocalFiles();
   await Task.checkBuckets( config );
   await Task.syncBucket( config, files );
-  // await Task.invalidateCache( config );
+
+  // Only cache invalidate for environments that use caching.
+  if ( config.edge.ttl.default > 0 ) {
+    await Task.invalidateCache( config );
+  }
 };
 
 export {

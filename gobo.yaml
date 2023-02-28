@@ -21,6 +21,9 @@ development:
       default: 0
       min: 0
       max: 31536000 # 1 year
+  auth:
+    name: auth
+    
 
 production:
   namespace: gobo

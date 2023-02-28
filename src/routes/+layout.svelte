@@ -18,8 +18,6 @@
   import { browser } from "$app/environment";
   import { theme } from "$lib/stores/theme.js";
   import { handleAuthCallback } from "$lib/helpers/auth-callback.js";
-  export const prerender = true;
-  export const ssr = false;
 
   if ( browser ) {
     let unsubscribeTheme;
