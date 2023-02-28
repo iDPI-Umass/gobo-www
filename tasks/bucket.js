@@ -44,7 +44,7 @@ const deployBuckets = async function ( config ) {
 };
 
 
-const teardownBucket = async function ( config ) {
+const teardownBucket = async function ( bucket ) {
   await S3.emptyBucket( bucket.name );
   await S3.deleteBucket( bucket.name );
 };
