@@ -24,7 +24,7 @@ export async function handleAuthCallback () {
           auth.update({ state, code, error, loggedIn: true });
           await client.handleRedirectCallback();
           return goto( "/home" );
-        }        
+        }
       } catch ( error ) {
         console.error( error );
         return goto( "/" );
@@ -42,7 +42,7 @@ export async function handleAuthCallback () {
       }
 
       // Passthrough
-      console.log("auth credentials already loaded");
+      console.log( "auth credentials already loaded" );
     }
   }
 

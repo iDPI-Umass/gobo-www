@@ -36,6 +36,7 @@
 		"@auth0/auth0-spa-js": "^2.0.3",
 		"@dashkite/joy": "^0.3.16",
 		"@shoelace-style/shoelace": "2.1.0",
-		"dayjs": "^1.11.7"
+		"dayjs": "^1.11.7",
+		"url-template": "^3.1.0"
 	}
 }

@@ -2,6 +2,21 @@
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import BackLink from "$lib/components/primitives/BackLink.svelte";
   import Identity from "$lib/components/Identity.svelte";
+  import Spinner from "$lib/components/primitives/Spinner.svelte";
+  import { getGOBO } from "$lib/stores/account.js";
+  import { buildClient as buildGOBOClient } from "$lib/helpers/gobo.js";
+
+  let goboClient;
+
+  const loadIdentities = async function () {
+    goboClient = await getGOBO();
+    try {
+      const list = await goboClient.identityInfo();
+      console.log( "identity list", list);
+    } catch ( error ) {
+      console.error( error );
+    }
+  };
 </script>
   
 <section>
@@ -10,17 +25,23 @@
     heading="Your Identities">
   </BackLink>
 
-  <h2>Mastodon</h2>
-  <Identity type="mastodon"></Identity>
-  <!-- <p>No identities currently registered.</p> -->
-  <sl-divider class="gobo-divider"></sl-divider>
-  <h2>Reddit</h2>
-  <Identity type="reddit"></Identity>
-  <!-- <p>No identities currently registered.</p> -->
-  <sl-divider class="gobo-divider"></sl-divider>
-  <h2>Twitter</h2>
-  <Identity type="twitter"></Identity>
-  <!-- <p>No identities currently registered.</p> -->
+  {#await loadIdentities()}
+    <Spinner></Spinner>
+  {:then}
+    <h2>Mastodon</h2>
+    <Identity type="mastodon"></Identity>
+    <!-- <p>No identities currently registered.</p> -->
+    <sl-divider class="gobo-divider"></sl-divider>
+    <h2>Reddit</h2>
+    <Identity type="reddit"></Identity>
+    <!-- <p>No identities currently registered.</p> -->
+    <sl-divider class="gobo-divider"></sl-divider>
+    <h2>Twitter</h2>
+    <Identity type="twitter"></Identity>
+    <!-- <p>No identities currently registered.</p> -->
+  {/await}
+
+  
 </section>
 
 <style>

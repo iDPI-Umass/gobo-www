@@ -8,6 +8,9 @@
   const logout = async function ( event ) {
     event.preventDefault();
     auth.logout();
+
+    // Use getClient here to fetch Auth0 client because we've deleted the store
+    // we normally use to access the singleton.
     const client = await getClient();
     client.logout({
       logoutParams: {
