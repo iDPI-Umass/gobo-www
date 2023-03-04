@@ -5,17 +5,28 @@
   import Spinner from "$lib/components/primitives/Spinner.svelte";
   import { getGOBO } from "$lib/stores/account.js";
   import { buildClient as buildGOBOClient } from "$lib/helpers/gobo.js";
+    import { identity } from "svelte/internal";
 
   let goboClient;
+  let mastodons = [];
+  let reddits = [];
+  let twitters = [];
 
   const loadIdentities = async function () {
     goboClient = await getGOBO();
+    let identities;
     try {
-      const list = await goboClient.identityInfo();
-      console.log( "identity list", list);
+      let body = await goboClient.identityInfo();
+      identities = body.identities;
     } catch ( error ) {
       console.error( error );
+      return;
     }
+    console.log( identities );
+    mastodons = identities.filter( identity => identity.type === "mastodon" );
+    reddits = identities.filter( identity => identity.type === "reddit" );
+    twitters = identities.filter( identity => identity.type === "twitter" );
+    console.log({ mastodons, reddits, twitters });
   };
 </script>
   
@@ -26,19 +37,40 @@
   </BackLink>
 
   {#await loadIdentities()}
+  
     <Spinner></Spinner>
+  
   {:then}
+
     <h2>Mastodon</h2>
-    <Identity type="mastodon"></Identity>
-    <!-- <p>No identities currently registered.</p> -->
+    {#if mastodons.length === 0}
+      <p>No identities currently registered.</p>
+    {:else}
+      {#each mastodons as mastodon}  
+        <Identity type="mastodon"></Identity>
+      {/each}
+    {/if}
     <sl-divider class="gobo-divider"></sl-divider>
+    
     <h2>Reddit</h2>
-    <Identity type="reddit"></Identity>
-    <!-- <p>No identities currently registered.</p> -->
+    {#if reddits.length === 0}
+      <p>No identities currently registered.</p>
+    {:else}
+      {#each reddits as reddit}  
+        <Identity type="reddit"></Identity>
+      {/each}
+    {/if}
     <sl-divider class="gobo-divider"></sl-divider>
+    
     <h2>Twitter</h2>
-    <Identity type="twitter"></Identity>
-    <!-- <p>No identities currently registered.</p> -->
+    {#if twitters.length === 0}
+      <p>No identities currently registered.</p>
+    {:else}
+      {#each twitters as twitter}  
+        <Identity type="twitter"></Identity>
+      {/each}
+    {/if}
+
   {/await}
 
   

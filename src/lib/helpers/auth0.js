@@ -2,7 +2,8 @@ import { createAuth0Client } from '@auth0/auth0-spa-js';
 import { 
   PUBLIC_AUTH_DOMAIN,
   PUBLIC_AUTH_CLIENT_ID,
-  PUBLIC_AUTH_REDIRECT_URL
+  PUBLIC_AUTH_REDIRECT_URL,
+  PUBLIC_AUTH_AUDIENCE
 } from '$env/static/public';
 
 
@@ -15,7 +16,8 @@ const getClient = async function () {
       clientId: PUBLIC_AUTH_CLIENT_ID,
       cacheLocation: "localstorage",
       authorizationParams: {
-        redirect_uri: PUBLIC_AUTH_REDIRECT_URL
+        redirect_uri: PUBLIC_AUTH_REDIRECT_URL,
+        audience: PUBLIC_AUTH_AUDIENCE
       }
     });
   }

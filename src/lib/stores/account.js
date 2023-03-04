@@ -23,7 +23,9 @@ const getAccount = async function() {
     console.log("refreshing account data");
     const authClient = await data.client;
     account = await authClient.getUser();
-    account.token = await authClient.getTokenSilently();
+    account.token = await authClient.getTokenSilently({
+      detailedResponse: true
+    });
     change = false;
   }
 

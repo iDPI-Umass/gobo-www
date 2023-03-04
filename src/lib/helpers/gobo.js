@@ -93,10 +93,10 @@ const buildAction = function ( name, account ) {
     // Prepare request configuration
     const options = {
       method: action.request.method,
-      mode: "no-cors",
+      mode: "cors",
       redirect: "follow",
       headers: {
-        Authorization: `Bearer ${ account.token }`
+        Authorization: `Bearer ${ account.token.id_token }`
       }
     };
 
@@ -134,11 +134,7 @@ const buildAction = function ( name, account ) {
     }
 
     // All done.
-    return {
-      _: response,
-      json: json,
-      status: response.status
-    };
+    return json;
   };
 };
 
