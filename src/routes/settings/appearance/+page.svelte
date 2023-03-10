@@ -7,27 +7,27 @@
   import BackLink from "$lib/components/primitives/BackLink.svelte";
   import { onMount, onDestroy } from "svelte";
   import { browser } from "$app/environment";
-  import { theme } from "$lib/stores/theme";
+  import { themeStore } from "$lib/stores/theme";
   let darkModeSwitch, darkModeState, unsubscribeTheme;
   let fontSizeGroup, fontSizeState;
 
   if ( browser ) {
     onMount(() => {
-      unsubscribeTheme = theme.subscribe( function ( config ) {
+      unsubscribeTheme = themeStore.subscribe( function ( config ) {
         darkModeState = config.dark;
         fontSizeState = config.fontSize;
       });
 
       darkModeSwitch.addEventListener( "sl-change", function ( event ) {
         if ( event.target.checked === true ) {
-          theme.setDark();
+          themeStore.setDark();
         } else {
-          theme.setLight();
+          themeStore.setLight();
         }
       });
 
       fontSizeGroup.addEventListener( "sl-change", function ( event ) {
-        theme.setFontSize( event.target.value );
+        themeStore.setFontSize( event.target.value );
       });
     });
 

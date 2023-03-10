@@ -3,11 +3,11 @@
   import LeftRight from "$lib/components/layouts/LeftRight.svelte"
   import Fascinator from "$lib/components/primitives/Fascinator.svelte"
   import "@shoelace-style/shoelace/dist/components/button/button.js";
-  import { getClient } from "$lib/helpers/auth0.js";
+  import { getAuth0Client } from "$lib/helpers/auth0.js";
 
   const redirect = async function ( event ) {
     event.preventDefault();
-    const client = await getClient();
+    const client = await getAuth0Client();
     client.loginWithRedirect()
   };
 </script>

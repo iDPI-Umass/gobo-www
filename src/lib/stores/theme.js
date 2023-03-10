@@ -6,7 +6,7 @@ const prefersDark = function () {
   return window.matchMedia( "(prefers-color-scheme: dark)" ).matches === true;
 }
 
-const createTheme = function () {
+const createStore = function () {
   let theme;
 
   if ( browser ) {
@@ -67,4 +67,4 @@ const createTheme = function () {
 };
 
 
-export const theme = createTheme();
+export const themeStore = createStore();

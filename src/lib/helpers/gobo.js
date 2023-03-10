@@ -96,7 +96,7 @@ const buildAction = function ( name, account ) {
       mode: "cors",
       redirect: "follow",
       headers: {
-        Authorization: `Bearer ${ account.token.id_token }`
+        Authorization: `Bearer ${ account.token.access_token }`
       }
     };
 
@@ -138,19 +138,16 @@ const buildAction = function ( name, account ) {
   };
 };
 
-let client;
 
-const buildClient = function ({ account }) {
-  if ( client == null ) {
-    client = {};
-    for ( const name in actions ) {
-      client[ name ] = buildAction( name, account );
-    }
+const buildGOBOClient = function ({ account }) {
+  const client = {};
+  for ( const name in actions ) {
+    client[ name ] = buildAction( name, account );
   }
   return client;
 };
 
 export { 
   GOBOError,
-  buildClient
+  buildGOBOClient
 }

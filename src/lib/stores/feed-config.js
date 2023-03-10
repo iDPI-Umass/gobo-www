@@ -3,7 +3,7 @@ import { browser } from "$app/environment";
 import * as LS from "$lib/stores/local-storage.js";
 
 
-const createConfig = function () {
+const createStore = function () {
   let config;
 
   if ( browser ) {
@@ -44,4 +44,4 @@ const createConfig = function () {
 };
 
 
-export const config = createConfig();
+export const feedStore = createStore();

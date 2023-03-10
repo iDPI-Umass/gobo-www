@@ -1,7 +1,7 @@
 <script>
   import posts from "$lib/stores/posts.js";
   import { isImage, isVideo } from "$lib/helpers/type.js";
-  import { guard } from "$lib/helpers/guard";
+  import GuardFrame from "$lib/components/GuardFrame.svelte";
   export let data;
 
   let id = Number( data.bindings.post );
@@ -13,24 +13,24 @@
   if ( media == null ) {
     media = {};
   }
-
-  guard();
 </script>
 
-<div class="frame">
-  {#if isImage( media ) }
-    <img 
-      src="{media.url}"
-      alt="full size">
-  {:else if isVideo( media ) }
-    <!-- svelte-ignore a11y-media-has-caption -->
-    <video loop controls>
-      <source 
-        src={media.url}
-        type={media.type}>
-    </video>
-  {/if}
-</div>
+<GuardFrame>
+  <div class="frame">
+    {#if isImage( media ) }
+      <img 
+        src="{media.url}"
+        alt="full size">
+    {:else if isVideo( media ) }
+      <!-- svelte-ignore a11y-media-has-caption -->
+      <video loop controls>
+        <source 
+          src={media.url}
+          type={media.type}>
+      </video>
+    {/if}
+  </div>
+</GuardFrame>
 
 <style>
   .frame {

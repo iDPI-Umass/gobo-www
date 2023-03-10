@@ -10,8 +10,8 @@
   import  "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import BackLink from "$lib/components/primitives/BackLink.svelte";
   import { onDestroy, onMount } from "svelte";
-  import { config } from "$lib/stores/feed-config.js";
-  import { scroll } from "$lib/stores/scroll.js";
+  import { feedStore } from "$lib/stores/feed-config.js";
+  import { scrollStore } from "$lib/stores/scroll.js";
   import { browser } from "$app/environment";
   let unsubscribeConfig;
   let configFrame, unsubscribeScroll;
@@ -20,21 +20,21 @@
   let keywordForm;
   
   if ( browser ) {
-    unsubscribeConfig = config.subscribe( function  ( config ) {
-      defaultFeedSort = config.defaultFeedSort;
-      displayEngagement = config.displayEngagement;
+    unsubscribeConfig = feedStore.subscribe( function  ( config ) {
+      defaultFeedSort = feedStore.defaultFeedSort;
+      displayEngagement = feedStore.displayEngagement;
     });
 
     onMount( function () {
       sortSelect.addEventListener( "sl-change", function ( event ) {
-        config.setDefaultFeedSort( event.target.value );
+        feedStore.setDefaultFeedSort( event.target.value );
       });
 
       engagementSwitch.addEventListener( "sl-change", function ( event ) {
-        config.setDisplayEngagement( event.target.checked );
+        feedStore.setDisplayEngagement( event.target.checked );
       });
 
-      unsubscribeScroll = scroll.subscribe( function ({ deltaY }) {
+      unsubscribeScroll = scrollStore.subscribe( function ({ deltaY }) {
         configFrame.scrollBy( 0, deltaY );
       });
     });

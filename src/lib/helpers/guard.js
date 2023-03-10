@@ -1,24 +1,26 @@
-import { onMount } from "svelte";
 import { goto } from "$app/navigation";
 import { browser } from "$app/environment";
-import { getClient } from "./auth0.js";
+import { getAccount } from "$lib/helpers/account.js";
+import { getAuth0Client } from "$lib/helpers/auth0.js";
 
-
-const handleGuard = async function () {
-  const client = await getClient();
-  
-  if ( await client.isAuthenticated() ) {
-    return {};
-  } else {
-    goto( "/" );
-    // return {};
-  }
-};
 
 export async function guard() {
   if ( browser ) {
-    onMount( async function () {
-      await handleGuard();
-    });
+    try {
+      const client = await getAuth0Client();
+      if ( await client.isAuthenticated() !== true ) {
+        return goto( "/" );
+      }
+
+      const account = await getAccount();
+      if ( !account.permissions.has("general") ) {
+        return goto( "/permissions" );
+      }
+    
+    } catch ( error ) {
+      // TODO: We need an error page here for internal authentication errors.
+      console.error( error );
+      return goto( "/" );
+    }
   }
 }

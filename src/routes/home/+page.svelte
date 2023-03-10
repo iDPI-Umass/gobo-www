@@ -7,27 +7,24 @@
 
   import { onDestroy, onMount } from "svelte";
   import { browser } from "$app/environment";
-  import { marker } from "$lib/stores/feed-marker.js";
-  import { config } from "$lib/stores/feed-config.js";
-  import { scroll } from "$lib/stores/scroll.js";
-  let feed, unsubscribeMarker;
-  let feedSortSelect, feedSort, unsubscribeConfig;
-  let unsubscribeScroll;
+  import { feedStore } from "$lib/stores/feed-config.js";
+  import { scrollStore } from "$lib/stores/scroll.js";
+  let feed;
+  let feedSortSelect, feedSort;
+  let unsubscribeConfig, unsubscribeScroll;
   
   if ( browser ) {
     onMount( function () {
-      unsubscribeConfig = config.subscribe( function ( config ) {
+      unsubscribeConfig = feedStore.subscribe( function ( config ) {
         feedSort = config.defaultFeedSort;
       });
 
-      unsubscribeMarker = marker.subscribe( function ( config ) { 
-        feed.scroll({
-          top: config.position,
-          behavior: "smooth"
-        });
-      });
+      // feed.scroll({
+      //   top: config.position,
+      //   behavior: "smooth"
+      // });
 
-      unsubscribeScroll = scroll.subscribe( function ({ deltaY }) {
+      unsubscribeScroll = scrollStore.subscribe( function ({ deltaY }) {
         feed.scrollBy( 0, deltaY );
       });
 
@@ -38,7 +35,6 @@
 
     onDestroy( function () {
       unsubscribeConfig();
-      unsubscribeMarker();
       unsubscribeScroll();
     });
   }

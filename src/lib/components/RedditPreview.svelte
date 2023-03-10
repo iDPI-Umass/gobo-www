@@ -4,7 +4,7 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import { onDestroy, onMount } from "svelte";
   import { browser } from "$app/environment";
-  import { draft } from "$lib/stores/post-draft.js";
+  import { draftStore } from "$lib/stores/post-draft.js";
 
   let draftData, unsubscribeDraft;
   let identity = {};
@@ -37,7 +37,7 @@
     const oldLength = displayedFiles.length;
     let files = draftData.files.slice( 0, 20 );
     
-    let videoFile = files.find( f => draft.isVideo( f ) );
+    let videoFile = files.find( f => draftStore.isVideo( f ) );
     if ( videoFile != null ) {
       displayedFiles = [ videoFile ];
     } else {
@@ -83,7 +83,7 @@
  
   if ( browser ) {
     onMount( function () {
-      unsubscribeDraft = draft.subscribe( function ( draft ) {
+      unsubscribeDraft = draftStore.subscribe( function ( draft ) {
         draftData = draft;
         setIdentities();
         setOptions();
@@ -151,14 +151,14 @@
 
         {#each displayedFiles as file (file.name)}
           <div class="image-box">
-            {#if draft.isImage( file )}
+            {#if draftStore.isImage( file )}
               <img
                 bind:this={mediaFrameChildren[ file.name ]}
                 src={URL.createObjectURL( file )}
                 alt="uploaded"
                 on:load={handleImageLoad}>
             {/if}
-            {#if draft.isVideo( file )}
+            {#if draftStore.isVideo( file )}
               <!-- svelte-ignore a11y-media-has-caption -->
               <video 
                 loop 

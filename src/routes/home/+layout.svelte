@@ -2,10 +2,9 @@
   import MainHeader from "$lib/components/headers/MainHeader.svelte";
   import FooterNav from "$lib/components/headers/FooterNav.svelte";
   import NavPage from "$lib/components/layouts/NavPage.svelte";
-  import VerticalNav from "$lib/components/primitives/VerticalNav.svelte";
-  import NavLink from "$lib/components/primitives/NavLink.svelte";
-  import { marker } from "$lib/stores/feed-marker.js";
-  import { guard } from "$lib/helpers/guard";
+  import GuardFrame from "$lib/components/GuardFrame.svelte";
+
+  // import { feedMarkerStore } from "$lib/stores/feed-marker.js";
 
   // const checkHome = function ( path ) {
   //   return function ( event ) {
@@ -14,13 +13,14 @@
   //     }
   //   };    
   // };
-
-  guard();
+  
 </script>
 
-<MainHeader></MainHeader>
-<NavPage>
-  <slot></slot>
-</NavPage>
-<FooterNav></FooterNav>
 
+<GuardFrame>
+  <MainHeader></MainHeader>
+  <NavPage>
+    <slot></slot>
+  </NavPage>
+  <FooterNav></FooterNav>
+</GuardFrame>

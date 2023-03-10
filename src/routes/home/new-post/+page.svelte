@@ -14,9 +14,9 @@
   import { onDestroy, onMount } from "svelte";
   import { browser } from "$app/environment";
   import { goto } from "$app/navigation";
-  import { scroll } from "$lib/stores/scroll.js";
-  import { draft } from "$lib/stores/post-draft.js";
-  import { preview } from "$lib/stores/image-preview.js";
+  import { scrollStore } from "$lib/stores/scroll.js";
+  import { draftStore } from "$lib/stores/post-draft.js";
+  import { previewStore } from "$lib/stores/image-preview.js";
 
   let configFrame, unsubscribeScroll;
   let draftData, unsubscribeDraft;
@@ -90,7 +90,7 @@
     const _files = [];
     
     for ( const file of draftData.files ) {
-      if ( ! draft.isFile( file ) ) {
+      if ( ! draftStore.isFile( file ) ) {
         resetFiles = true;
       } else {
         _files.push( file );
@@ -98,7 +98,7 @@
     }
 
     if ( resetFiles === true ) {
-      return draft.update({ files: _files });
+      return draftStore.update({ files: _files });
     }
 
     files = draftData.files;
@@ -108,7 +108,7 @@
 
   const handleIdentitySwitch = function ( identity ) {
     return function ( event ) {
-      draft.updateIdentity({
+      draftStore.updateIdentity({
         [ identity.key ]: { 
           ...identity, 
           active: event.target.checked 
@@ -120,31 +120,31 @@
 
 
   const handleOptionSensitive = function ( event ) {
-    draft.updateOption({ 
+    draftStore.updateOption({ 
       sensitive: event.target.checked 
     });
   };
 
   const handleOptionVisibility = function ( event ) {
-    draft.updateOption({
+    draftStore.updateOption({
       visibility: event.target.value 
     });
   };
 
   const handleOptionSpoilerText = function ( event ) {
-    draft.updateOption({ 
+    draftStore.updateOption({ 
       spoilerText: nullEmpty( event.target.value )
     });
   };
 
   const handleOptionTitle = function ( event ) {
-    draft.updateOption({
+    draftStore.updateOption({
       title: nullEmpty( event.target.value )
     });
   };
 
   const handleOptionSubreddit = function ( event ) {
-    draft.updateOption({
+    draftStore.updateOption({
       subreddit: nullEmpty( event.target.value )
     });
   };
@@ -152,7 +152,7 @@
 
 
   const handleContent = function ( event ) {
-    draft.update({ content: event.target.value });
+    draftStore.update({ content: event.target.value });
   }
 
 
@@ -161,7 +161,7 @@
     let match = files.find( f => f.name === file.name );
 
     if ( match == null ) {
-      draft.update({ files: [ ...files, file ] });
+      draftStore.update({ files: [ ...files, file ] });
     }
   }
 
@@ -208,7 +208,7 @@
   const handlePreview = function( file ) {
     return function ( event ) {
       event.preventDefault();
-      preview.set( file );
+      previewStore.set( file );
       goto( "/upload-preview" );
     }
   };
@@ -220,7 +220,7 @@
 
       if ( index >= 0 ) {
         files.splice( index, 1 );
-        draft.update({ files });
+        draftStore.update({ files });
       }
     }
   };
@@ -230,11 +230,11 @@
 
   if ( browser ) {
     onMount( function () {
-      unsubscribeScroll = scroll.subscribe( function ({ deltaY }) {
+      unsubscribeScroll = scrollStore.subscribe( function ({ deltaY }) {
         configFrame.scrollBy( 0, deltaY );
       });
 
-      unsubscribeDraft = draft.subscribe( function ( draft ) {
+      unsubscribeDraft = draftStore.subscribe( function ( draft ) {
         draftData = draft;
         setIdentities();
         setOptions();
@@ -254,7 +254,7 @@
       });
 
       // Pull in registered identities.
-      draft.seed([
+      draftStore.seed([
         { platform: "mastodon", account: "@username@instance.com", name: "Username" },
         { platform: "reddit", account: "u/username", name: "Username" },
         { platform: "twitter", account: "@username", name: "Username" }

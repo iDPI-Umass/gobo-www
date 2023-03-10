@@ -39,7 +39,7 @@ const emptyDraft = function () {
   };
 };
 
-const createDraft = function () {
+const createStore = function () {
   let draft;
 
   if ( browser ) {
@@ -107,4 +107,4 @@ const createDraft = function () {
 };
 
 
-export const draft = createDraft();
+export const draftStore = createStore();

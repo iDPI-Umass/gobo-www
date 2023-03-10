@@ -7,7 +7,7 @@
   import { onDestroy, onMount } from "svelte";
   import { browser } from "$app/environment";
   import { sleep } from "@dashkite/joy/time";
-  import { scroll } from "$lib/stores/scroll.js";
+  import { scrollStore } from "$lib/stores/scroll.js";
   import posts from "$lib/stores/posts.js";
   
   export let data;
@@ -53,7 +53,7 @@
         await submit();
       }
 
-      unsubscribeScroll = scroll.subscribe( function ({ deltaY }) {
+      unsubscribeScroll = scrollStore.subscribe( function ({ deltaY }) {
         if ( resultsSection != null ) {
           resultsSection.scrollBy( 0, deltaY );
         }

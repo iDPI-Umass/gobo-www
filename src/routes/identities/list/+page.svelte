@@ -3,20 +3,17 @@
   import BackLink from "$lib/components/primitives/BackLink.svelte";
   import Identity from "$lib/components/Identity.svelte";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
-  import { getGOBO } from "$lib/stores/account.js";
-  import { buildClient as buildGOBOClient } from "$lib/helpers/gobo.js";
-    import { identity } from "svelte/internal";
+  import { getGOBOClient } from "$lib/helpers/account.js";
 
-  let goboClient;
   let mastodons = [];
   let reddits = [];
   let twitters = [];
 
   const loadIdentities = async function () {
-    goboClient = await getGOBO();
+    const client = await getGOBOClient();
     let identities;
     try {
-      let body = await goboClient.identityInfo();
+      let body = await client.identityInfo();
       identities = body.identities;
     } catch ( error ) {
       console.error( error );

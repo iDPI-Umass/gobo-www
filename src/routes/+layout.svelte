@@ -14,16 +14,17 @@
   import "$lib/styles/keyword-table.css";
 
   // Now we can setup the store stuff with Svelte
-  import { beforeUpdate, onDestroy, onMount } from "svelte";
+  import Spinner from "$lib/components/primitives/Spinner.svelte";
+  import { beforeUpdate, onDestroy } from "svelte";
   import { browser } from "$app/environment";
-  import { theme } from "$lib/stores/theme.js";
-  import { handleAuthCallback } from "$lib/helpers/auth-callback.js";
+  import { themeStore } from "$lib/stores/theme.js";
+  import { handleCallbacks } from "$lib/helpers/callback.js";
 
   if ( browser ) {
     let unsubscribeTheme;
     
     beforeUpdate( function() {
-      unsubscribeTheme = theme.subscribe( function ( config ) {
+      unsubscribeTheme = themeStore.subscribe( function ( config ) {
 
         const html = document.querySelector( "html" )
         if ( config.dark === true ) {
@@ -61,10 +62,8 @@
 </script>
 
 <div class="page-wrapper">
-  {#await handleAuthCallback()}
-    <div class="spinner-box">
-      <sl-spinner></sl-spinner>
-    </div>
+  {#await handleCallbacks()}
+    <Spinner></Spinner>
   {:then}
     <slot></slot>
   {:catch}
@@ -74,14 +73,4 @@
 
 
 <style>
-  .spinner-box {
-    max-width:  36rem;
-    display: flex;
-    justify-content: center;
-    margin-top: 2rem;
-  }
-
-  .spinner-box > sl-spinner {
-    font-size: 3rem;
-  }
 </style>

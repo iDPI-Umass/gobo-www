@@ -1,6 +1,6 @@
 import { writable } from "svelte/store";
 
-const createMarker = function () {
+const createStore = function () {
   let marker = { position: 0 };
 
   const { subscribe, update } = writable( marker );
@@ -17,4 +17,4 @@ const createMarker = function () {
 };
 
 
-export const marker = createMarker();
+export const markerStore = createStore();

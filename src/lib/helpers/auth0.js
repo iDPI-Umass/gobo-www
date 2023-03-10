@@ -9,7 +9,7 @@ import {
 
 let client;
 
-const getClient = async function () {
+const getAuth0Client = async function () {
   if ( client == null ) {
     client = await createAuth0Client({
       domain: PUBLIC_AUTH_DOMAIN,
@@ -26,4 +26,4 @@ const getClient = async function () {
 };
 
 
-export { getClient };
+export { getAuth0Client };

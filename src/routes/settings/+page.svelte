@@ -1,22 +1,11 @@
 <script>
   import VerticalNav from "$lib/components/primitives/VerticalNav.svelte";
   import NavLink from "$lib/components/primitives/NavLink.svelte";
-  import { auth } from "$lib/stores/auth.js";
-  import { getClient } from "$lib/helpers/auth0.js";
-  import { PUBLIC_AUTH_LOGOUT_URL } from '$env/static/public';
+  import * as Account from "$lib/helpers/account.js"; 
 
   const logout = async function ( event ) {
     event.preventDefault();
-    auth.logout();
-
-    // Use getClient here to fetch Auth0 client because we've deleted the store
-    // we normally use to access the singleton.
-    const client = await getClient();
-    client.logout({
-      logoutParams: {
-        returnTo: PUBLIC_AUTH_LOGOUT_URL
-      }
-    })
+    await Account.logout();
   };
 </script>
 

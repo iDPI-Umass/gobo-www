@@ -4,7 +4,7 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import { onDestroy, onMount } from "svelte";
   import { browser } from "$app/environment";
-  import { draft } from "$lib/stores/post-draft.js";
+  import { draftStore } from "$lib/stores/post-draft.js";
 
   let draftData, unsubscribeDraft;
   let identity = {};
@@ -41,7 +41,7 @@
  
   if ( browser ) {
     onMount( function () {
-      unsubscribeDraft = draft.subscribe( function ( draft ) {
+      unsubscribeDraft = draftStore.subscribe( function ( draft ) {
         draftData = draft;
         setIdentities();
         setOptions();
@@ -105,11 +105,11 @@
 
         <div class="left">
           <div class="image-box">
-            {#if draft.isImage( displayedFiles[0] )}
+            {#if draftStore.isImage( displayedFiles[0] )}
               <img 
                 src={URL.createObjectURL( displayedFiles[0] )}
                 alt="uploaded">
-            {:else if draft.isVideo( displayedFiles[0] )}
+            {:else if draftStore.isVideo( displayedFiles[0] )}
               <!-- svelte-ignore a11y-media-has-caption -->
               <video loop controls>
                 <source 
@@ -147,11 +147,11 @@
 
         <div class="left">
           <div class="image-box">
-            {#if draft.isImage( displayedFiles[0] )}
+            {#if draftStore.isImage( displayedFiles[0] )}
               <img 
                 src={URL.createObjectURL( displayedFiles[0] )}
                 alt="uploaded">
-            {:else if draft.isVideo( displayedFiles[0] )}
+            {:else if draftStore.isVideo( displayedFiles[0] )}
               <!-- svelte-ignore a11y-media-has-caption -->
               <video loop controls>
                 <source 
@@ -164,11 +164,11 @@
 
         <div class="right">
           <div class="image-box">
-            {#if draft.isImage( displayedFiles[1] )}
+            {#if draftStore.isImage( displayedFiles[1] )}
               <img 
                 src={URL.createObjectURL( displayedFiles[1] )}
                 alt="uploaded">
-            {:else if draft.isVideo( displayedFiles[1] )}
+            {:else if draftStore.isVideo( displayedFiles[1] )}
               <!-- svelte-ignore a11y-media-has-caption -->
               <video loop controls>
                 <source 
@@ -206,11 +206,11 @@
 
         <div class="left">
           <div class="image-box">
-            {#if draft.isImage( displayedFiles[0] )}
+            {#if draftStore.isImage( displayedFiles[0] )}
               <img 
                 src={URL.createObjectURL( displayedFiles[0] )}
                 alt="uploaded">
-            {:else if draft.isVideo( displayedFiles[0] )}
+            {:else if draftStore.isVideo( displayedFiles[0] )}
               <!-- svelte-ignore a11y-media-has-caption -->
               <video loop controls>
                 <source 
@@ -224,11 +224,11 @@
         <div class="right">
           <div class="top">
             <div class="image-box">
-              {#if draft.isImage( displayedFiles[1] )}
+              {#if draftStore.isImage( displayedFiles[1] )}
                 <img 
                   src={URL.createObjectURL( displayedFiles[1] )}
                   alt="uploaded">
-              {:else if draft.isVideo( displayedFiles[1] )}
+              {:else if draftStore.isVideo( displayedFiles[1] )}
                 <!-- svelte-ignore a11y-media-has-caption -->
                 <video loop controls>
                   <source 
@@ -240,11 +240,11 @@
           </div>
           <div class="bottom">
             <div class="image-box">
-              {#if draft.isImage( displayedFiles[2] )}
+              {#if draftStore.isImage( displayedFiles[2] )}
                 <img 
                   src={URL.createObjectURL( displayedFiles[2] )}
                   alt="uploaded">
-              {:else if draft.isVideo( displayedFiles[2] )}
+              {:else if draftStore.isVideo( displayedFiles[2] )}
                 <!-- svelte-ignore a11y-media-has-caption -->
                 <video loop controls>
                   <source 
@@ -285,11 +285,11 @@
         <div class="left">
           <div class="top">
             <div class="image-box">
-              {#if draft.isImage( displayedFiles[0] )}
+              {#if draftStore.isImage( displayedFiles[0] )}
                 <img 
                   src={URL.createObjectURL( displayedFiles[0] )}
                   alt="uploaded">
-              {:else if draft.isVideo( displayedFiles[0] )}
+              {:else if draftStore.isVideo( displayedFiles[0] )}
                 <!-- svelte-ignore a11y-media-has-caption -->
                 <video loop controls>
                   <source 
@@ -301,11 +301,11 @@
           </div>
           <div class="bottom">
             <div class="image-box">
-              {#if draft.isImage( displayedFiles[2] )}
+              {#if draftStore.isImage( displayedFiles[2] )}
                 <img 
                   src={URL.createObjectURL( displayedFiles[2] )}
                   alt="uploaded">
-              {:else if draft.isVideo( displayedFiles[2] )}
+              {:else if draftStore.isVideo( displayedFiles[2] )}
                 <!-- svelte-ignore a11y-media-has-caption -->
                 <video loop controls>
                   <source 
@@ -320,11 +320,11 @@
         <div class="right">
           <div class="top">
             <div class="image-box">
-              {#if draft.isImage( displayedFiles[1] )}
+              {#if draftStore.isImage( displayedFiles[1] )}
                 <img 
                   src={URL.createObjectURL( displayedFiles[1] )}
                   alt="uploaded">
-              {:else if draft.isVideo( displayedFiles[1] )}
+              {:else if draftStore.isVideo( displayedFiles[1] )}
                 <!-- svelte-ignore a11y-media-has-caption -->
                 <video loop controls>
                   <source 
@@ -336,11 +336,11 @@
           </div>
           <div class="bottom">
             <div class="image-box">
-              {#if draft.isImage( displayedFiles[3] )}
+              {#if draftStore.isImage( displayedFiles[3] )}
                 <img 
                   src={URL.createObjectURL( displayedFiles[3] )}
                   alt="uploaded">
-              {:else if draft.isVideo( displayedFiles[3] )}
+              {:else if draftStore.isVideo( displayedFiles[3] )}
                 <!-- svelte-ignore a11y-media-has-caption -->
                 <video loop controls>
                   <source 

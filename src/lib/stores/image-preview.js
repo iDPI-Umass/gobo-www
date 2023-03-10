@@ -1,6 +1,6 @@
 import { writable } from "svelte/store";
 
-const createPreview = function () {
+const createStore = function () {
   let file = {};
 
   const { subscribe, update } = writable( file );
@@ -16,4 +16,4 @@ const createPreview = function () {
 };
 
 
-export const preview = createPreview();
+export const previewStore = createStore();

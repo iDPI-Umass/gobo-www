@@ -1,11 +1,11 @@
 <script>
-  import { scroll } from "$lib/stores/scroll.js";
+  import { scrollStore } from "$lib/stores/scroll.js";
   export let melting = "false";
   export let heading;
 
   const handleWheel = function ( event ) {
     if ( window.screen.width > 750 ) {
-      scroll.push({
+      scrollStore.push({
         deltaY: event.deltaY
       });
     }

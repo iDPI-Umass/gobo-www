@@ -1,13 +1,14 @@
 <script>
   import { onDestroy, onMount } from "svelte";
   import { browser } from "$app/environment";
-  import { preview } from "$lib/stores/image-preview.js";
+  import { previewStore } from "$lib/stores/image-preview.js";
+  import GuardFrame from "$lib/components/GuardFrame.svelte";
 
   let previewImage, unsubscribePreview;
 
   if ( browser ) {
     onMount( function() {
-      unsubscribePreview = preview.subscribe( function ( file ) {
+      unsubscribePreview = previewStore.subscribe( function ( file ) {
         if ( file.name != null ) {
           if ( previewImage.src !== "#" ) {
             URL.revokeObjectURL( previewImage.src );
@@ -24,12 +25,14 @@
 
 </script>
 
-<div class="frame">
-  <img
-    bind:this={previewImage}
-    src="#"
-    alt="preview of upload">
-</div>
+<GuardFrame>
+  <div class="frame">
+    <img
+      bind:this={previewImage}
+      src="#"
+      alt="preview of upload">
+  </div>
+</GuardFrame>
 
 <style>
   .frame {

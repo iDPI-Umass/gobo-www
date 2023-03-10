@@ -1,43 +1,71 @@
 <script>
   import "@shoelace-style/shoelace/dist/components/button/button.js";
+  import "@shoelace-style/shoelace/dist/components/input/input.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/select/select.js";
   import "@shoelace-style/shoelace/dist/components/option/option.js";
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import BackLink from "$lib/components/primitives/BackLink.svelte";
   import { onMount } from "svelte";
-  import { goto } from '$app/navigation';
-  import { sleep } from "@dashkite/joy/time";
-  let form, button;
+  import { getGOBOClient } from "$lib/helpers/account.js";
+  let form, select, button;
+  let targetingMastodon = true;
 
-  const validate = function() {
-    return form.reportValidity();  
-  };
-
-  const login = async function () {
-    console.log( "HTTP request goes here..." );
-    await sleep( 500 );
-  };
 
   const submit = async function () {
-    const isValid = validate();
-    if ( isValid === true ) {
-      await login();
-      form.reset();
-      button.loading = false;
-      goto( "/identities" );
-    } else {
-      button.loading = false;
+    try {
+      let result;
+      const client = await getGOBOClient();
+      const data = new FormData( form );
+      const platform = data.get( "platform" );
+
+      switch ( platform ) {
+        case "mastodon":
+          result = await clcient.addIdentity({
+            parameters: {
+              base_url: data.get( "mastodonURL" )
+            }
+          });
+          break;
+        case "reddit":
+          result = await client.addIdentity({
+            parameters: {
+              base_url: "www.reddit.com"
+            }
+          });
+          break;
+        case "twitter":
+          result = await client.addIdentity({
+            parameters: {
+              base_url: "twitter.com"
+            }
+          });
+          break;
+        default:
+          throw new Error( "unknown platform specified" );
+      } 
+      
+      console.log( result );
+      // window.location = result.redirectURL;
+    } catch ( error ) {
+      // TODO: Figure out how we'd like to represent an error visually here.
+      console.error( error );
     }
+
+    button.loading = false;
   };
 
   onMount(() => {
-    form.addEventListener('submit', function(event) {
+    form.addEventListener( "submit", function( event ) {
       event.preventDefault();
       if ( button.loading !== true ) {
         button.loading = true;
         submit();
       }
+    });
+
+    select.addEventListener( "sl-change", function( event ) {
+      targetingMastodon = ( event.target.value === "mastodon" );
     });
   });
 </script>
@@ -58,6 +86,8 @@
   </p>
 
   <sl-select
+    bind:this={select}
+    name="platform"
     value="mastodon"
     help-text="Select a social media platform. You'll be sent to that platform to sign in."
     size="medium">
@@ -65,6 +95,15 @@
     <sl-option value="reddit">Reddit</sl-option>
     <sl-option value="twitter">Twitter</sl-option>
   </sl-select>
+
+  {#if targetingMastodon === true}
+    <sl-input
+      name="mastodonURL"
+      label="Mastodon URL"
+      help-text="This is the URL of your Mastodon server."
+      size="medium">
+    </sl-input>
+  {/if}
 
   <sl-divider class="gobo-divider"></sl-divider>
 
