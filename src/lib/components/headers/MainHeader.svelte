@@ -11,7 +11,7 @@
   <nav>
     <a class="logo" href="/home">GOBO</a>
     <div class="spacer" aria-hidden=true ></div>
-    <ProfileBadge name="David Harper"></ProfileBadge>
+    <ProfileBadge></ProfileBadge>
   </nav>
 </header>
 

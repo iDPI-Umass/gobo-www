@@ -1,6 +1,8 @@
 import { goto } from "$app/navigation";
 import { browser } from "$app/environment";
+import * as LS from  "$lib/helpers/local-storage.js";
 import * as Account from "$lib/helpers/account.js";
+import { guard } from "$lib/helpers/guard.js";
 import { getAuth0Client } from "$lib/helpers/auth0.js";
 
 const exists = function ( value ) {
@@ -50,6 +52,11 @@ const handleAuthCallback = async function ( query ) {
 
       if ( exists(state) && ( exists(code) || exists(error) )) {
         await client.handleRedirectCallback();
+
+        // A successful authentication with Auth0 does not mean we are authorized
+        // to access the GOBO API. Apply guard first.
+        await guard();
+        await Account.setProfile();
         return goto( "/home" );
       } else {
         console.log( "auth callback lacks expected credentials", query );
@@ -70,19 +77,21 @@ const handleAuthCallback = async function ( query ) {
 const handleAddIdentityCallback = async function ( query ) {
   console.log( "Starting add identity callback", query );
 
-  const base_url = LS.read( "gobo-base_url" );
+  const baseURL = LS.read( "gobo-baseURL" );
+  LS.remove( "gobo-baseURL" );
   
-  if ( base_url != null ) {
+  if ( baseURL != null ) {
     const client = await Account.getGOBOClient();
-    await client.addIdentityCallback({
+    const result = await client.addIdentityCallback({
       parameters: {
-        base_url: base_url,
+        base_url: baseURL,
         oauth_token: query.oauth_token,
         oauth_verifier: query.oauth_verifier,
         code: query.code,
         state: query.state
       }
     });
+    console.log( result );
     return goto( "/identities/list" );
   } else {
     // We hold onto the base_url in local storage before redirecting. If it's

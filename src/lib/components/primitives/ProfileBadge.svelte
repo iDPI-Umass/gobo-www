@@ -1,5 +1,19 @@
 <script>
-  export let name
+  import { profileStore } from "$lib/stores/profile";
+  import { onMount, onDestroy } from "svelte";
+  
+  let unsubscribeProfileStore;
+  let name; 
+
+  onMount( function () {
+    unsubscribeProfileStore = profileStore.subscribe( function ( profile ) {
+      name = profile.display_name;
+    });
+  });
+
+  onDestroy( function () {
+    unsubscribeProfileStore();
+  });
 </script>
 
 <a href="/settings" class="profile-badge">

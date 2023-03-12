@@ -2,8 +2,18 @@
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
-
-  export let type
+  import { getGOBOClient } from "$lib/helpers/account.js";
+  import { goto } from "$app/navigation";
+  import { invalidate } from '$app/navigation';
+ 
+  export let type;
+  export let base_url;
+  export let display_name;
+  export let identity_id;
+  export let profile_image;
+  export let username;
+  
+  let button;
 
   let colors = {
     mastodon: "#6364FF",
@@ -13,6 +23,19 @@
 
   let logo = `/icons/${ type }.svg`;
   let brandColor = colors[ type ];
+
+  const deleteIdentity = async function ( event ) {
+    event.preventDefault();
+    button.loading = true;
+    const client = await getGOBOClient();
+    await client.removeIdentity({
+      parameters: { base_url, identity_id }
+    });
+
+    // TODO: Figure out how to do this in svelte. I keep getting search results
+    // for invalidate, but I don't think it's what we need.
+    location.reload();
+  };
 </script>
 
 <section>
@@ -21,10 +44,13 @@
     <h2>{type}</h2>
   </header>
   <sl-divider></sl-divider>
-  <p>Username</p>
+  <p>{ username }</p>
   <footer>
     <sl-button
+      bind:this={button}
       variant="danger"
+      on:click={deleteIdentity}
+      on:keypress={deleteIdentity}
       size="medium">
       <sl-icon src="/icons/trash.svg" slot="prefix"></sl-icon>
       Delete

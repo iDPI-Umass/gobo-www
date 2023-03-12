@@ -1,9 +1,10 @@
 <script>
   import "@shoelace-style/shoelace/dist/components/spinner/spinner.js";
+  export let size = "3rem";
 </script>
 
 <div class="spinner-box">
-  <sl-spinner></sl-spinner>
+  <sl-spinner style="--size:{size};"></sl-spinner>
 </div>
 
 <style>
@@ -15,6 +16,6 @@
   }
 
   .spinner-box > sl-spinner {
-    font-size: 3rem;
+    font-size: var(--size, 3rem);
   }
 </style>

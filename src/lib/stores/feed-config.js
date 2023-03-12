@@ -1,6 +1,6 @@
 import { writable } from "svelte/store";
 import { browser } from "$app/environment";
-import * as LS from "$lib/stores/local-storage.js";
+import * as LS from "$lib/helpers/local-storage.js";
 
 
 const createStore = function () {

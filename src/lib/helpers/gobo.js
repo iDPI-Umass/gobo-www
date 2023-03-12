@@ -19,7 +19,7 @@ const actions = {
       method: "POST"
     },
     response: {
-      contentType: "application/json",
+      contentType: "text/plain",
       status: 201
     }
   },
@@ -34,7 +34,7 @@ const actions = {
     }
   },
   removeIdentity: {
-    template: "/remove-identity{?base_url,id}",
+    template: "/remove-identity{?base_url,identity_id}",
     request: {
       method: "DELETE"
     },
@@ -50,6 +50,58 @@ const actions = {
     response: {
       contentType: "application/json",
       status: 200
+    }
+  },
+  getBlockedKeywords: {
+    template: "/blocked-keywords",
+    request: {
+      method: "GET"
+    },
+    response: {
+      contentType: "application/json",
+      status: 200
+    }
+  },
+  addBlockedKeyword: {
+    template: "/blocked-keywords{?word,category}",
+    request: {
+      method: "POST",
+      contentType: "application/json"
+    },
+    response: {
+      contentType: "application/json",
+      status: 200
+    }
+  },
+  deleteBlockedKeyword: {
+    template: "/blocked-keywords{?word,category}",
+    request: {
+      method: "DELETE",
+    },
+    response: {
+      status: 200
+    }
+  },
+  getProfile: {
+    template: "/user-profile",
+    request: {
+      method: "GET",
+      contentType: "application/json"
+    },
+    response: {
+      status: 200,
+      contentType: "application/json"
+    }
+  },
+  updateProfile: {
+    template: "/user-profile{?display_name}",
+    request: {
+      method: "PUT",
+      contentType: "application/json"
+    },
+    response: {
+      status: 200,
+      contentType: "application/json"
     }
   }
 
@@ -128,13 +180,19 @@ const buildAction = function ( name, account ) {
     }
 
     // Extract response body.
-    let json;
-    if ( action.response.contentType === "application/json" ) {
-      json = await response.json();
+    let value;
+    let type = response.headers.get( "Content-Type" );
+    
+    if ( response.status === 204 ) {
+      value = undefined;
+    } else if ( type === "application/json" ) {
+      value = await response.json();
+    } else if ( /text/i.test( type ) ) {
+      value = await response.text();
     }
 
     // All done.
-    return json;
+    return value;
   };
 };
 

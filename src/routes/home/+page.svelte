@@ -9,9 +9,16 @@
   import { browser } from "$app/environment";
   import { feedStore } from "$lib/stores/feed-config.js";
   import { scrollStore } from "$lib/stores/scroll.js";
+  import { getGOBOClient } from "$lib/helpers/account";
   let feed;
   let feedSortSelect, feedSort;
   let unsubscribeConfig, unsubscribeScroll;
+
+  const loadFeed = async function () {
+    const client = await getGOBOClient();
+    const result = await client.freshFeed();
+    console.log( result );
+  };
   
   if ( browser ) {
     onMount( function () {
@@ -47,6 +54,12 @@
     <sl-icon-button 
       src="/icons/gear.svg"
       href="/settings/feed">
+    </sl-icon-button>
+
+    <sl-icon-button
+      on:click={loadFeed}
+      on:keypress={loadFeed}
+      src="/icons/twitter.svg">
     </sl-icon-button>
   </div>
   

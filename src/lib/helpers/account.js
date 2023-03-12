@@ -1,9 +1,11 @@
 import * as Bake from "@dashkite/bake";
+import * as Cache from "$lib/helpers/cache.js";
 import { getAuth0Client } from "$lib/helpers/auth0.js";
 import { buildGOBOClient } from "$lib/helpers/gobo.js";
+import { profileStore } from "$lib/stores/profile.js";
 import { PUBLIC_AUTH_LOGOUT_URL } from '$env/static/public';
 
-let account, goboClient;
+let account, goboClient, profile;
 
 const extractPermissions = function ( account ) {
   const encoded = account?.token?.access_token.split(".")[1];
@@ -39,9 +41,31 @@ const getGOBOClient = async function () {
   return goboClient;
 };
 
+const setProfile = async function () {
+  const client = await getGOBOClient();
+  profile = await client.getProfile();
+  
+  if ( profile.display_name == "" ) {
+    profile.display_name = account.email;
+  }
+
+  profileStore.setProfile( profile );
+};
+
+const refreshProfile = async function () {
+  const now = new Date().toISOString();
+  const match = Cache.read( "profile" );
+
+  if ( ( match == null ) || ( match.expires < now ) ) {
+    await setProfile();
+    Cache.write( "profile", 60, profile );
+  }
+};
+
 const logout = async function () {
   account = null;
   goboClient = null;
+  profileStore.logout();
 
   const client = await getAuth0Client();
   client.logout({
@@ -56,8 +80,10 @@ const isLoggedOut = function () {
 };
 
 export { 
-  getAccount, 
+  getAccount,
   getGOBOClient,
+  setProfile,
+  refreshProfile,
   logout,
   isLoggedOut
 }

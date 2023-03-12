@@ -3,8 +3,9 @@
   import "@shoelace-style/shoelace/dist/components/input/input.js";
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import BackLink from "$lib/components/primitives/BackLink.svelte";
+  import { profileStore } from "$lib/stores/profile";
+  import { getGOBOClient } from "$lib/helpers/account";
   import { onMount } from "svelte";
-  import { sleep } from "@dashkite/joy/time";
   let form, button;
 
   const validate = function() {
@@ -12,8 +13,15 @@
   };
 
   const issueRequest = async function () {
-    console.log( "HTTP request goes here..." );
-    await sleep( 500 );
+    const client = await getGOBOClient();
+    const data = new FormData( form );
+    const display_name = data.get( "name" );
+
+    await client.updateProfile({
+      parameters: { display_name }
+    });
+
+    profileStore.updateProfile({ display_name });
   };
 
   const submit = async function () {
@@ -57,6 +65,7 @@
         help-text="You can control how you appear to others."
         inputmode="text"
         autocomplete="off"
+        maxlength=32
         size="medium">
       </sl-input>
 

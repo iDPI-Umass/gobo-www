@@ -7,6 +7,7 @@
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import BackLink from "$lib/components/primitives/BackLink.svelte";
   import { onMount } from "svelte";
+  import * as LS from "$lib/helpers/local-storage.js";
   import { getGOBOClient } from "$lib/helpers/account.js";
   let form, select, button;
   let targetingMastodon = true;
@@ -14,39 +15,35 @@
 
   const submit = async function () {
     try {
-      let result;
+      let baseURL;
       const client = await getGOBOClient();
       const data = new FormData( form );
       const platform = data.get( "platform" );
 
       switch ( platform ) {
         case "mastodon":
-          result = await clcient.addIdentity({
-            parameters: {
-              base_url: data.get( "mastodonURL" )
-            }
-          });
+          baseURL = data.get( "mastodonURL" );
           break;
         case "reddit":
-          result = await client.addIdentity({
-            parameters: {
-              base_url: "www.reddit.com"
-            }
-          });
+          baseURL = "www.reddit.com";
           break;
         case "twitter":
-          result = await client.addIdentity({
-            parameters: {
-              base_url: "twitter.com"
-            }
-          });
+          baseURL = "twitter.com";
           break;
         default:
           throw new Error( "unknown platform specified" );
-      } 
+      }
+
+      LS.write( "gobo-baseURL", baseURL );
       
+      const result = await client.addIdentity({
+        parameters: {
+          base_url: baseURL
+        }
+      });
+
       console.log( result );
-      // window.location = result.redirectURL;
+      window.location = result.redirectURL;
     } catch ( error ) {
       // TODO: Figure out how we'd like to represent an error visually here.
       console.error( error );
@@ -101,6 +98,7 @@
       name="mastodonURL"
       label="Mastodon URL"
       help-text="This is the URL of your Mastodon server."
+      autocomplete="off"
       size="medium">
     </sl-input>
   {/if}

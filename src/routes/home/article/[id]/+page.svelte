@@ -15,6 +15,3 @@
 </script>
 
 <Post {...post} {fullPage}></Post>
-
-<style>
-</style>
