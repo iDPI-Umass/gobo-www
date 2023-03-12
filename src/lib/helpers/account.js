@@ -58,7 +58,7 @@ const refreshProfile = async function () {
 
   if ( ( match == null ) || ( match.expires < now ) ) {
     await setProfile();
-    Cache.write( "profile", 60, profile );
+    Cache.write( "profile", 86400, profile );
   }
 };
 

@@ -42,7 +42,6 @@
         }
       });
 
-      console.log( result );
       window.location = result.redirectURL;
     } catch ( error ) {
       // TODO: Figure out how we'd like to represent an error visually here.

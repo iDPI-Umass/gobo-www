@@ -2,7 +2,6 @@ import { goto } from "$app/navigation";
 import { browser } from "$app/environment";
 import * as LS from  "$lib/helpers/local-storage.js";
 import * as Account from "$lib/helpers/account.js";
-import { guard } from "$lib/helpers/guard.js";
 import { getAuth0Client } from "$lib/helpers/auth0.js";
 
 const exists = function ( value ) {
@@ -17,22 +16,6 @@ const extractQuery = function ( url ) {
     output[ entry[0] ] = entry[1];
   }
   return output;
-};
-
-const determinePlatform = function ( query ) {
-  if ( exists(query.oauth_token) ) {
-    return "twitter.com";
-  }
-
-  if ( exits(query.state) ) {
-    return "www.reddit.com";
-  }
-  
-  if ( exists(query.code) ) {
-    return "mastodon.social";
-  }
-
-  return undefined;
 };
 
 // TODO: We need a landing page to direct people when there is callback problem.
@@ -52,11 +35,6 @@ const handleAuthCallback = async function ( query ) {
 
       if ( exists(state) && ( exists(code) || exists(error) )) {
         await client.handleRedirectCallback();
-
-        // A successful authentication with Auth0 does not mean we are authorized
-        // to access the GOBO API. Apply guard first.
-        await guard();
-        await Account.setProfile();
         return goto( "/home" );
       } else {
         console.log( "auth callback lacks expected credentials", query );
@@ -73,16 +51,19 @@ const handleAuthCallback = async function ( query ) {
   }
 };
 
-// 
+// Handles callbacks from third-party platforms. We need to hold onto the 
 const handleAddIdentityCallback = async function ( query ) {
   console.log( "Starting add identity callback", query );
 
+  // We hold onto the base_url in local storage before redirecting. We need to
+  // provide this information to GOBO, but POST aren't idempotent, so we need to
+  // be careful about only applying this once.
   const baseURL = LS.read( "gobo-baseURL" );
   LS.remove( "gobo-baseURL" );
   
   if ( baseURL != null ) {
     const client = await Account.getGOBOClient();
-    const result = await client.addIdentityCallback({
+    await client.addIdentityCallback({
       parameters: {
         base_url: baseURL,
         oauth_token: query.oauth_token,
@@ -91,11 +72,9 @@ const handleAddIdentityCallback = async function ( query ) {
         state: query.state
       }
     });
-    console.log( result );
     return goto( "/identities/list" );
   } else {
-    // We hold onto the base_url in local storage before redirecting. If it's
-    // not here, we passthrough to avoid a duplicate POST that's not idempotent.
+    // Passthrough if we've marked the base_url as missing.
     return goto( "/identities/list" );
   }
 };

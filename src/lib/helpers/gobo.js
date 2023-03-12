@@ -135,7 +135,7 @@ const buildAction = function ( name, account ) {
   const action = actions[ name ];
 
   return async function ({ parameters={}, body } = {}) {
-    console.log( "requesting...", name, parameters );
+    console.log( "GOBO Request:", name, parameters );
 
     // Determine URL
     const template = parseTemplate( action.template );

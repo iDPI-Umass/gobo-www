@@ -54,7 +54,6 @@ const createStore = function () {
 
   const write = function ( data ) {
     LS.write( "gobo-draft", data );
-    // console.log(data);
     return data;
   };
   
