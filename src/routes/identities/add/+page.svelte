@@ -77,8 +77,8 @@
   <h2>Select a Platform</h2>
   
   <p>
-    Select a platform below. You'll need to grant Gobo consent to establish an
-    identity. The identities you establish allow Gobo to construct feeds you control.
+    Select a platform below. You'll need to grant GOBO consent to establish an
+    identity. The identities you establish allow GOBO to construct feeds you control.
   </p>
 
   <sl-select

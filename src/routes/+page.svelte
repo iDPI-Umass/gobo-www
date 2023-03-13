@@ -15,7 +15,7 @@
 <PlainHeader></PlainHeader>
 <LeftRight>
   <section slot="left" class="outer-section">
-    <h1>Gobo Public Homepage</h1>
+    <h1>GOBO Public Homepage</h1>
     <section class="button-column">
       <sl-button
         variant="primary"

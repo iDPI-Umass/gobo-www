@@ -275,7 +275,7 @@
   <section class="panel">
     <h2>Write Text</h2>
     <p>
-      If your post contains text, you can compose it here. Gobo will submit
+      If your post contains text, you can compose it here. GOBO will submit
       this to each platform on your behalf.
     </p>
 
@@ -294,7 +294,7 @@
   <section class="panel">
     <h2>Attach Media</h2>
     <p>
-      Attach media files to be associated with this post. Gobo will submit
+      Attach media files to be associated with this post. GOBO will submit
       these to each platform on your behalf.
     </p>
 
@@ -355,7 +355,7 @@
   <section class="panel">
     <h2>Choose Identities</h2>
     <p>
-      Select the identities below you'd like to use to create this post. Gobo
+      Select the identities below you'd like to use to create this post. GOBO
       will submit posts to these platforms on your behalf.
     </p>
 
@@ -387,14 +387,14 @@
     <h2>Set Options</h2>
     <p>
       Below are some options to configure your post. They will be applied as
-      appropriate when Gobo submits to each platform.
+      appropriate when GOBO submits to each platform.
     </p>
 
     <sl-select
       on:sl-change={handleOptionVisibility}
       value={options.visibility}
       label="Post Visibility"
-      help-text="This tells Gobo how public your post should be when it submits it to each platform."
+      help-text="This tells GOBO how public your post should be when it submits it to each platform."
       size="medium">
       <sl-option value="public">Public</sl-option>
       <sl-option value="followers">Followers Only</sl-option>
@@ -429,7 +429,7 @@
         on:sl-input={handleOptionSubreddit}
         value={options.subreddit}
         label="Target Subreddit"
-        help-text="This is the subreddit where Gobo will submit your post."
+        help-text="This is the subreddit where GOBO will submit your post."
         size="medium">
       </sl-input>
     {/if}
@@ -477,7 +477,7 @@
   <section class="panel">
     <h2>Publish</h2>
     <p>
-      Publish your post. Gobo will issue requests to each of the platforms 
+      Publish your post. GOBO will issue requests to each of the platforms 
       you specified.
     </p>
 

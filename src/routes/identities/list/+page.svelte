@@ -20,7 +20,7 @@
       console.error( error );
       return;
     }
-    console.log( identities );
+
     for ( const identity of identities ) {
       if ( identity.base_url === "twitter.com" ) {
         twitters.push( identity );
@@ -31,7 +31,6 @@
       }
     }
 
-    console.log({ mastodons, reddits, twitters });
   };
 </script>
   

@@ -44,7 +44,7 @@
 <PlainHeader></PlainHeader>
 <Center>
   <form bind:this={form} class="gobo-form">
-    <h1>Welcome to Gobo!</h1>
+    <h1>Welcome to GOBO!</h1>
   
     <h2>TBD Tagline</h2>
     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor

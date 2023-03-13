@@ -27,5 +27,6 @@
     margin: 0 1rem;
     margin-top: 1rem;
     overflow-y: scroll;
+    padding: 4px;
   }
 </style>

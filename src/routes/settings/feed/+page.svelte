@@ -31,7 +31,7 @@
 
 
   
-  let keywordForm, keywords, keywordButton;
+  let keywordForm, keywordCategory, keywords, keywordButton;
 
   const loadKeywords = async function () {
     const client = await getGOBOClient();
@@ -51,7 +51,8 @@
       });
 
       keywords = [ ...keywords, { category, word } ];
-
+      keywordForm.reset();
+      keywordCategory.value = "source";
     
     } catch ( error ) {
       // TODO: Visually represent an error here.
@@ -149,7 +150,7 @@
     <h2>Blocked Keywords</h2>
     <p>
       Control which words and phrases you would like to exclude from your 
-      Gobo feed. You can add phrases below or delete any listed in the table.
+      GOBO feed. You can add phrases below or delete any listed in the table.
     </p>
     
     {#await loadKeywords()}
@@ -158,8 +159,10 @@
       <div class="keyword-table">
         {#each keywords as keyword, index (`${keyword.category}${keyword.word}`)}
           <div class="table-row">
-            <span>{ keyword.category }</span>
-            <span>{ keyword.word }</span>
+            <span class="keyword">
+              <span>{ keyword.category }</span>
+            </span>
+            <span class="phrase">{ keyword.word }</span>
             <sl-icon-button
               on:click={removeKeyword({ ...keyword, index })}
               on:keypress={removeKeyword({ ...keyword, index })}
@@ -173,8 +176,10 @@
 
     <form bind:this={keywordForm} class="gobo-form">
       <sl-select
+        bind:this={keywordCategory}
         name="category"
         value="source"
+        label="Block Category"
         size="medium">
         <sl-option value="source">Source</sl-option>
         <sl-option value="username">Username</sl-option>
@@ -184,6 +189,9 @@
       
       <sl-input
         name="word"
+        label="Block Pattern"
+        help-text="GOBO will match against this text to block targeted content from your feed."
+        autocomplete="off"
         size="medium">
       </sl-input>
 
@@ -224,7 +232,7 @@
     <h2>Display Engagement</h2>
     <p>
       Control whether you'd like to see engagement feedback values on posts
-      displayed in Gobo.
+      displayed in GOBO.
     </p>
     
 
@@ -241,7 +249,7 @@
   <section class="panel">
     <h2>Prioritized Accounts</h2>
     <p>
-      Control which accounts you would like Gobo to emphasize when preparing
+      Control which accounts you would like GOBO to emphasize when preparing
       your feed. You can add accounts below or delete any listed in the table.
     </p>
     

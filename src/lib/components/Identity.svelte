@@ -1,13 +1,12 @@
 <script>
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
-  import "@shoelace-style/shoelace/dist/components/button/button.js";
+  import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import { getGOBOClient } from "$lib/helpers/account.js";
-  import { goto } from "$app/navigation";
-  import { invalidate } from '$app/navigation';
  
   export let type;
   export let base_url;
+  export let profile_url;
   export let display_name;
   export let identity_id;
   export let profile_image;
@@ -23,6 +22,20 @@
 
   let logo = `/icons/${ type }.svg`;
   let brandColor = colors[ type ];
+
+  let fullName, url;
+  switch ( type ) {
+    case "twitter":
+      fullName = `@${ username }`;
+      break;
+    case "reddit":
+      fullName = `u/${ username }`;
+      break;
+    case "mastodon":
+      url = new URL(  base_url );
+      fullName = `@${ username }@${ url.hostname }`;
+      break;
+  }
 
   const deleteIdentity = async function ( event ) {
     event.preventDefault();
@@ -42,20 +55,22 @@
   <header>
     <sl-icon src={logo} style="color: {brandColor};"></sl-icon>
     <h2>{type}</h2>
-  </header>
-  <sl-divider></sl-divider>
-  <p>{ username }</p>
-  <footer>
-    <sl-button
+    <sl-icon-button
       bind:this={button}
       variant="danger"
       on:click={deleteIdentity}
       on:keypress={deleteIdentity}
-      size="medium">
-      <sl-icon src="/icons/trash.svg" slot="prefix"></sl-icon>
-      Delete
-    </sl-button>
-  </footer>
+      size="medium"
+      src="/icons/trash.svg">
+    </sl-icon-button>
+  </header>
+  <sl-divider></sl-divider>
+  <span class="profile-display">
+    {#if profile_image != null}
+    <img src={profile_image} alt="profile picture for {username}">
+    {/if}
+    <a href="{profile_url}">{ fullName }</a>
+  </span>
 </section>
 
 <style>
@@ -92,28 +107,43 @@
     margin: 0.5rem 0 0.5rem 0;
   }
 
+  section > header > sl-icon-button {
+    margin-right: 1rem;
+  }
+
+  section > header > sl-icon-button::part(base),
+  section > header > sl-icon-button::part(base):hover {
+    color: var(--sl-color-danger-500);
+  }
+
   sl-divider {
     --width: 1px;
     --color: var(--sl-color-neutral-400);
     margin: 0 1rem 0 1rem;
   }
 
-  p {
-    margin: 1rem 0 1rem 2rem;
-    font-size: var(--sl-font-size-large);
-  }
-
-  section > footer {
+  .profile-display {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
+    justify-content: flex-start;
     align-items: center;
-    justify-content: flex-end;
+    margin: 1rem;
   }
 
-  section > footer > sl-button {
-    flex: 0 0 auto;
-    margin: 0.5rem 1rem 0.5rem 1rem;
+  .profile-display > img {
+    height: 3rem;
+    width: 3rem;
+    border-radius: var(--sl-border-radius-circle);
+    margin-right: 1rem;
+  }
+
+  .profile-display > a {
+    font-size: var(--sl-font-size-large);
+  }
+
+  .profile-display > a:focus {
+    margin: -2px;
   }
 
 </style>

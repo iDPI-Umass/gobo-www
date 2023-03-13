@@ -5,8 +5,9 @@
   import BackLink from "$lib/components/primitives/BackLink.svelte";
   import { profileStore } from "$lib/stores/profile";
   import { getGOBOClient } from "$lib/helpers/account";
-  import { onMount } from "svelte";
-  let form, button;
+  import { onDestroy, onMount } from "svelte";
+  let form, button, nameInput;
+  let currentName, unsubscribeProfileStore;
 
   const validate = function() {
     return form.reportValidity();  
@@ -28,14 +29,13 @@
     const isValid = validate();
     if ( isValid === true ) {
       await issueRequest();
-      form.reset();
       button.loading = false;
     } else {
       button.loading = false;
     }
   };
 
-  onMount(() => {
+  onMount( function () {
     form.addEventListener('submit', function(event) {
       event.preventDefault();
       if ( button.loading !== true ) {
@@ -43,6 +43,16 @@
         submit();
       }
     });
+
+    unsubscribeProfileStore = profileStore.subscribe( function ( profile ) {
+      console.log("settting", profile.display_name);
+      nameInput.value = profile.display_name;
+      console.log(nameInput.value)
+    });
+  });
+
+  onDestroy( function () {
+    unsubscribeProfileStore();
   });
 
 </script>
@@ -57,12 +67,12 @@
 
   <section class="panel">
     <form bind:this={form} class="gobo-form">
-      <h2>Update Profile Name</h2>
+      <h2>Update Profile</h2>
       
-      <sl-input 
+      <sl-input
+        bind:this={nameInput}
         name="name" 
         label="Profile Name"
-        help-text="You can control how you appear to others."
         inputmode="text"
         autocomplete="off"
         maxlength=32
