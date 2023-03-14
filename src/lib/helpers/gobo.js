@@ -1,6 +1,7 @@
-import { PUBLIC_GOBO_API } from '$env/static/public';
 import { parseTemplate } from 'url-template';
 import * as Type from "@dashkite/joy/type";
+import { PUBLIC_GOBO_API } from '$env/static/public';
+
 
 const actions = {
   addIdentity: {
@@ -148,7 +149,8 @@ const buildAction = function ( name, account ) {
       mode: "cors",
       redirect: "follow",
       headers: {
-        Authorization: `Bearer ${ account.token.access_token }`
+        Authorization: `Bearer ${ account.token.access_token }`,
+        "Content-Security-Policy": `default-src ${ PUBLIC_GOBO_API }`
       }
     };
 

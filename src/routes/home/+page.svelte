@@ -56,11 +56,11 @@
       href="/settings/feed">
     </sl-icon-button>
 
-    <sl-icon-button
+    <!-- <sl-icon-button
       on:click={loadFeed}
       on:keypress={loadFeed}
       src="/icons/twitter.svg">
-    </sl-icon-button>
+    </sl-icon-button> -->
   </div>
   
   <sl-select

@@ -145,7 +145,8 @@ Resources:
           - Id: {{{ domain }}}
             DomainName: {{{ domain }}}
             CustomOriginConfig:
-              HTTPSPort: 443
+              HTTPSPort: {{ custom.httpsPort }}
+              HTTPPort: {{ custom.httpPort }}
               OriginKeepaliveTimeout: 60
               {{#if custom.https }}
               OriginProtocolPolicy: "https-only"

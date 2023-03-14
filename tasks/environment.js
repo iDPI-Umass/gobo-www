@@ -14,6 +14,11 @@ const checkEnvironment = async function () {
   }
   config.environment = args.environment;
   config.args = args;
+
+  if ( config.buckets == null ) {
+    config.buckets = [];
+  }
+
   return config;
 };
 

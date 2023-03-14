@@ -1,4 +1,4 @@
-development:
+production-www:
   namespace: gobo
   buckets:
     - name: gobo.social
@@ -12,8 +12,8 @@ development:
     certificate:
       verification: gobo.social
     origins:
-      - type: s3 website
-        domain: gobo.social.s3-website-us-east-1.amazonaws.com
+      - domain: gobo.social.s3-website-us-east-1.amazonaws.com
+        protocol: http     
     aliases:
       - gobo.social
       - www.gobo.social
@@ -21,3 +21,23 @@ development:
       default: 0
       min: 0
       max: 31536000 # 1 year
+
+production-api:
+  namespace: gobo
+  edge:
+    name: api
+    certificate:
+      verification: gobo.social
+    origins:
+      - domain: api-direct.gobo.social
+        protocol: http
+        port: 5000
+    aliases:
+      - api.gobo.social
+    ttl:
+      default: 0
+      min: 0
+      max: 31536000 # 1 year
+    headers:
+      - Host
+      - Authorization

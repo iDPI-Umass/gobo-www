@@ -1,5 +1,5 @@
 <script>
-  import MainHeader from "$lib/components/headers/MainHeader.svelte"
+  import PlainHeader from "$lib/components/headers/PlainHeader.svelte"
   import FooterNav from "$lib/components/headers/FooterNav.svelte";
   import LeftRight from "$lib/components/layouts/LeftRight.svelte"
   import Fascinator from "$lib/components/primitives/Fascinator.svelte"
@@ -14,7 +14,7 @@
 
 </script>
 
-<MainHeader></MainHeader>
+<PlainHeader></PlainHeader>
 <LeftRight>
   <section slot="left" class="gobo-copy">
     <h1>GOBO Is In Closed Beta</h1>

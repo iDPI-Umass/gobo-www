@@ -56,13 +56,16 @@ const getOrigins = function ( origins ) {
   for ( const origin of origins ) {
     const _origin = {
       domain: origin.domain,
-      custom: {
-        https: true
-      }
+      custom: {}
     };
 
-    if ( origin.type === "s3 website" ) {
-      _origin.custom.https = false
+    _origin.custom.httpPort = origin.httpPort || origin.port || 80;
+    _origin.custom.httpsPort = origin.httpsPort || origin.port || 443;
+
+    if ( origin.protocol === "http" ) {
+      _origin.custom.https = false;
+    } else {
+      _origin.custom.https = true;
     }
 
     results.push( _origin );
@@ -98,7 +101,10 @@ const getDNSEntries = async function ( aliases ) {
   return Object.values( result );
 };
 
-const getCache = function ( ttl = {} ) {
+const getCache = function ( edge ) {
+  const ttl = edge.ttl || {};
+  const headers = edge.headers || [ "Authorization", "Host" ];
+
   const options = {
     ttl: {
       default: 0,
@@ -106,10 +112,7 @@ const getCache = function ( ttl = {} ) {
       max: 31536000 // One year
     },
     compress: true,
-    headers: [
-      "Authorization",
-      "Host"
-    ],
+    headers: headers,
     queries: "all"
   };
 
@@ -152,7 +155,7 @@ const deployEdge = async function ( config ) {
     environment: environment,
     aliases: aliases,
     dns: await getDNSEntries( aliases ),
-    cache: getCache( edge.ttl ),
+    cache: getCache( edge ),
     certificate: {
       verification: edge.certificate.verification,
       aliases: getCertificateAliases( aliases )
