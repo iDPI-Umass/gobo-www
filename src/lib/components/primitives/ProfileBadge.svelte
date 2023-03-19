@@ -16,27 +16,18 @@
   });
 </script>
 
-<a href="/settings" class="profile-badge">
+<span class="profile-badge">
   {name}
-</a>
+</span>
 
 <style>
   .profile-badge {
     min-width: max-content;
-    padding: 0.5rem 1rem 0.5rem 1rem;
-    border-radius: var(--sl-border-radius-pill);
-    font-size: var(--sl-font-size-small);
-    font-weight: var(--sl-font-weight-bold);
-    font-family: var(--sl-font-sans);
-    background-color: var(--sl-color-primary-600);
-    color: var(--sl-color-neutral-0);
+    font-size: 0.9375rem;
+    font-weight: var(--gobo-font-weight-bold);
+    color: var(--gobo-color-text);
     text-decoration: none;
-    margin: 1rem;
+    margin-right: 3.5rem;
     flex: 1 0 0%;
-  }
-
-  .profile-badge:focus {
-    margin: calc(1rem - 2px);
-    border: 2px solid var(--sl-color-neutral-1000);
   }
 </style>

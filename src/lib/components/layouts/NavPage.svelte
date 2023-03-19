@@ -24,7 +24,7 @@
 
   main {
     flex: 1 1 100%;
-    margin: 0 1rem;
+    margin: var(--gobo-height-spacer) var(--gobo-width-spacer) 0 var(--gobo-width-spacer);
     margin-top: 1rem;
     overflow-y: scroll;
     padding: 4px;

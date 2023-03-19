@@ -1,83 +1,142 @@
 <script>
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
+  export let current;
+
+  current = "home"
+
 </script>
 
 <nav>
   <sl-button
-    variant="text"
+    class="home {current === 'home' ? "current" : ""}"
+    pill
     href="/home">
-    <sl-icon src="/icons/house.svg" slot="prefix"></sl-icon>
+    <sl-icon src="/icons/home.svg" slot="prefix"></sl-icon>
     <span>Home</span>
   </sl-button>
 
   <sl-button
-    variant="text"
-    href="/home/search">
-    <sl-icon src="/icons/search.svg" slot="prefix"></sl-icon>
-    <span>Search</span>
-  </sl-button>
-
-  <sl-button
-    variant="text"
-    href="/home/new-post">
-    <sl-icon src="/icons/pencil-square.svg" slot="prefix"></sl-icon>
-    <span>New Post</span>
-  </sl-button>
-
-  <sl-button
-    variant="text"
+    class="identities {current === "identities" ? "current" : ""}"
+    pill
     href="/identities">
-    <sl-icon src="/icons/people.svg" slot="prefix"></sl-icon>
+    <sl-icon src="/icons/identities.svg" slot="prefix"></sl-icon>
     <span>Identities</span>
   </sl-button>
 
   <sl-button
-    variant="text"
+    class="settings {current === "settings" ? "current" : ""}"
+    pill
     href="/settings">
-    <sl-icon src="/icons/list.svg" slot="prefix"></sl-icon>
+    <sl-icon src="/icons/gear.svg" slot="prefix"></sl-icon>
     <span>Settings</span>
   </sl-button>
 
+  <sl-button
+    class="cta"
+    pill
+    href="/home/new-post">
+    <span>New Post</span>
+  </sl-button>
 </nav>
 
 <style>
   nav {
     display: none;
-    background: var(--sl-color-neutral-50);
-    border-right: 1px solid var(--sl-color-neutral-700);
+    background: var(--gobo-color-panel);
+    border-right: var(--gobo-border-panel);
     flex-direction: column;
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: flex-start;
     margin: 0;
-    width: 16rem;
+    padding: var(--gobo-width-spacer);
+    min-width: 16.125rem;
   }
 
   nav > sl-button {
-    margin: 5px 0 5px 10px;
-    padding: 5px 10px 5px 0;
-    border-radius: var(--sl-border-radius-medium);
-  }
-
-  nav > sl-button:hover {
-    background: var(--sl-color-neutral-200);
+    width: 100%;
+    margin-bottom: var(--gobo-height-spacer);
   }
 
   nav > sl-button::part(base) {
+    height: 2.375rem;
     padding: 0;
-    align-items: center !important;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    background: var(--gobo-color-panel);
+    color: var(--gobo-color-text-menu);
+    border: none;
   }
 
   nav > sl-button::part(label) {
-    color: var(--sl-color-neutral-1000);
-    font-size: 20px;
+    padding-left: 0;
+    font-size: var(--gobo-font-size-large);
+    font-weight: var(--gobo-font-weight-medium);
   }
 
-  nav > sl-button > sl-icon {
-    font-size: 26px;
-    margin: 12px;
-    color: var(--sl-color-neutral-1000);
+  nav > sl-button::part(prefix) {
+    width: 1.625rem;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    margin-right: calc( var(--gobo-width-spacer) / 2 );
+    margin-left: 0.75rem;
+  }
+
+  nav > .home::part(prefix) {
+    font-size: 1.25rem; 
+  }
+
+  nav > .identities::part(prefix) {
+    font-size: 1.625rem; 
+  }
+
+  nav > .settings::part(prefix) {
+    font-size: 1.25rem; 
+  }
+
+  nav > .cta::part(base) {
+    background: var(--gobo-color-primary);
+    border: 1px solid var(--gobo-color-primary);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+  }
+
+  nav > .cta::part(prefix) {
+    width: 0;
+  }
+
+  nav > .cta::part(label) {
+    color: #FFFFFF;
+    font-weight: var(--gobo-font-weight-black);
+  }
+
+  nav > .current::part(base) {
+    background: var(--gobo-color-null);
+  }
+
+  nav > .current::part(label) {
+    position: relative;
+    font-weight: var(--gobo-font-weight-black);
+  }
+
+  nav > .current::before {
+    content: "";
+    position: absolute;
+    left: -8px;
+    top: 10%;
+    width: 4px;
+    height: 80%;
+    border-radius: 4px;
+    background: var(--gobo-color-primary);
   }
 
   @media ( min-width: 750px ) {

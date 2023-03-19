@@ -9,7 +9,9 @@
 
 <header class="desktop">
   <nav>
-    <a class="logo" href="/home">GOBO</a>
+    <a class="logo" href="/home">
+      <img src="/images/gobo-logo.svg" alt="Main logo for the GOBO application">
+    </a>
     <div class="spacer" aria-hidden=true ></div>
     <ProfileBadge></ProfileBadge>
   </nav>
@@ -25,9 +27,10 @@
   header {
     flex-direction: row;
     flex-wrap: nowrap;
-    background: var(--sl-color-neutral-50);
-    border-bottom: 1px solid var(--sl-color-neutral-700);
-    height: 5rem;
+    background: var(--gobo-color-panel);
+    color: var(--gobo-color-text);
+    border-bottom: var(--gobo-border-panel);
+    height: 4.625rem;
   }
 
 
@@ -39,30 +42,28 @@
     align-items: center;
   }
 
-  header > nav > a.logo {
+  header > nav > .logo {
     font-family: var(--sl-font-sans);
     font-size: var(--sl-font-size-2x-large);
     text-decoration: none;
     color: initial;
-    margin: 0;
+    margin: 4px;
+    padding: calc( 1rem - 4px ); 
+    flex: 0 0 auto;
+  }
+
+  header > nav > .logo:focus {
+    font-family: var(--sl-font-sans);
+    font-size: var(--sl-font-size-2x-large);
+    text-decoration: none;
+    color: initial;
+    margin: 4px;
+    padding: calc( 1rem - 6px ); 
     flex: 0 0 auto;
   }
 
   header > nav > .spacer {
     flex: 1 1 100%;
-  }
-
-  header > nav > a {
-    font-family: var(--sl-font-sans);
-    font-size: var(--sl-font-size-medium);
-    text-decoration: none;
-    color: initial;
-    padding: 1rem;
-    flex: 1 0 0%;
-  }
-
-  header > nav > a:focus {
-    padding: calc( 1rem - 2px );
   }
 
   .desktop {

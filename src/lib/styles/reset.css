@@ -6,6 +6,8 @@
 }
 html, body {
   height: 100vh;
+  background: var(--gobo-color-null);
+  color: var(--gobo-color-text);
 }
 img, picture, video, canvas, svg {
   display: block;
@@ -26,7 +28,7 @@ p, h1, h2, h3, h4, h5, h6 {
 }
 
 body {
-  font-family: var(--sl-font-sans);
+  font-family: var(--gobo-font-family);
   line-height: var(--sl-line-height-dense);
   letter-spacing: var(--sl-letter-spacing-normal);
   -webkit-font-smoothing: antialiased;
@@ -66,10 +68,10 @@ p {
 }
 
 a, a:hover, a:visited {
-  display: var(--color-link-display, inline-block);
-  text-decoration: var(--color-link-decoration, underline);
-  font-weight: var(--color-link-weight, var(--sl-font-weight-normal));
-  color: var(--color-link, var(--sl-color-primary-700));
+  display: inline-block;
+  text-decoration: underline;
+  font-weight: var(--sl-font-weight-normal);
+  color: var(--gobo-color-link);
 }
 
 p > a, p > a:hover, p > a:visited {
@@ -78,14 +80,14 @@ p > a, p > a:hover, p > a:visited {
 
 a:focus {
   outline: none;
-  border: 2px solid var(--sl-color-primary-600);
-  border-radius: var(--sl-border-radius-small);
+  border: 2px solid var(--gobo-color-primary);
+  border-radius: var(--sl-border-radius-medium);
 }
 
 p > a:focus {
   outline: none;
-  border: 2px solid var(--sl-color-primary-600);
-  border-radius: var(--sl-border-radius-small);
+  border: 2px solid var(--gobo-color-primary);
+  border-radius: var(--sl-border-radius-medium);
   margin: -2px;
 }
 

@@ -23,7 +23,7 @@
   let logo = `/icons/${ type }.svg`;
   let brandColor = colors[ type ];
 
-  let fullName, url;
+  let fullName, hostname;
   switch ( type ) {
     case "twitter":
       fullName = `@${ username }`;
@@ -32,8 +32,15 @@
       fullName = `u/${ username }`;
       break;
     case "mastodon":
-      url = new URL(  base_url );
-      fullName = `@${ username }@${ url.hostname }`;
+      // We just want the hostname to form a fully specified Mastodon reference.
+      if ( base_url.startsWith( "https://" ) === true ) {
+        let url = new URL( base_url );
+        hostname = url.hostname;
+      } else {
+        hostname = base_url;
+      }
+      
+      fullName = `@${ username }@${ hostname }`;
       break;
   }
 
