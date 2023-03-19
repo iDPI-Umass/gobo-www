@@ -59,7 +59,7 @@
 
   <sl-divider></sl-divider>
 
-  <div class="viewheader">
+  <!-- <div class="viewheader">
     <sl-button
       class="identities-button"
       pill>
@@ -75,7 +75,7 @@
       <sl-icon slot="prefix" src="/icons/filter.svg"></sl-icon>
       <sl-badge pill>3</sl-badge>
     </sl-button>
-  </div>
+  </div> -->
   
 
   {#each posts as post (post.id)}
@@ -112,7 +112,7 @@
     max-width: var(--gobo-max-width-primary);
   }
 
-  .viewheader {
+  /* .viewheader {
     margin: var(--gobo-height-spacer) 0;
     max-width: var(--gobo-max-width-primary);
     display: flex;
@@ -158,7 +158,7 @@
     background-color: var(--gobo-color-background-badge);
     color: var(--gobo-color-badge);
     border: none;
-  }
+  } */
 
 
   section {

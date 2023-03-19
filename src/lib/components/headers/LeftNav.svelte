@@ -85,7 +85,7 @@
     flex-wrap: nowrap;
     justify-content: center;
     align-items: center;
-    margin-right: calc( var(--gobo-width-spacer) / 2 );
+    margin-right: var(--gobo-width-spacer-half);
     margin-left: 0.75rem;
   }
 

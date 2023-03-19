@@ -1,8 +1,9 @@
-/* Default to light mode */
+/* Overrides Shoelace theme tokens */
 :root {
   --sl-focus-ring-color: #E73F9C;
 }
 
+/* Default to light mode */
 html {
   --gobo-color-null: #F0F2F5;
   --gobo-color-panel: #FFFFFF;
@@ -24,7 +25,10 @@ html {
   
   --gobo-max-width-primary: 41rem;
   --gobo-width-spacer: 1.5625rem;
+  --gobo-width-spacer-half: calc(0.5 * var(--gobo-width-spacer));
   --gobo-height-spacer: 1.3125rem;
+  --gobo-height-spacer-half: calc(0.5 * var(--gobo-height-spacer));
+  --gobo-border-radius: 0.625rem;
 
 
   --gobo-font-family: "Roboto";

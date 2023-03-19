@@ -64,7 +64,8 @@ h6 {
 }
 
 p {
-  font-size: var(--sl-font-size-medium);
+  font-size: var(--gobo-font-size-copy);
+  margin-bottom: 0.5rem;
 }
 
 a, a:hover, a:visited {

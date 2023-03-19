@@ -23,6 +23,7 @@ export default [{
     "i see noise around airtable and webflow and zapier..but in reality have no clue on " +
     "how to start building on my ideas. any help is greatly appreciated.</p>",
   author: "u/ProjectOlio",
+  authorName: "r/nocode",
   authorURL: "https://www.reddit.com/user/ProjectOlio/",
   created: "2023-01-19T18:30:39.569Z"
 },{
@@ -33,7 +34,9 @@ export default [{
   content: "<p>That's the other bit of news: Web3 is Going Just Great just surpassed 1,000 posts.</p> " +
     "<p>855 of them are from this year.</p>",
   author: "@molly0xfff@hachyderm.io",
+  authorName: "Molly White",
   authorURL: "https://hachyderm.io/@molly0xfff",
+  avatar: "https://media.hachyderm.io/accounts/avatars/109/332/059/958/892/971/original/fd426ab1db47d795.jpeg",
   created: "2023-01-01T05:10:32.660Z"
 },{
   id: 3,
@@ -45,7 +48,9 @@ export default [{
     "write a queer love story that didn't end in tragedy, and almost everyone said it was " +
     "the hardest prompt of the whole thing</p>",
   author: "@clairewillett",
+  authorName: "Claire Willett",
   authorURL: "https://twitter.com/clairewillett",
+  avatar: "https://pbs.twimg.com/profile_images/1324238313511739392/K8Vkqd_U_400x400.jpg",
   created: "2020-09-13T20:57:19.000Z"
 },{
   id: 4,
@@ -61,7 +66,9 @@ export default [{
     url: "https://pbs.twimg.com/media/FVelEIBVEAMcy7I?format=jpg&name=4096x4096"
   }],
   author: "@CaraSantaMaria",
+  authorName: "Cara Santa Maria",
   authorURL: "https://twitter.com/CaraSantaMaria",
+  avatar: "https://pbs.twimg.com/profile_images/1558961990973788160/o2lC9lo9_400x400.jpg",
   created: "2022-06-19T00:30:00.000Z"
 },{
   id: 5,
@@ -74,7 +81,9 @@ export default [{
     url: "https://pbs.twimg.com/media/FZLCX1jWYAMTSaQ?format=jpg&name=900x900"
   }],
   author: "@verface",
+  authorName: "VER / in the comic zone",
   authorURL: "https://twitter.com/verface",
+  avatar: "https://pbs.twimg.com/profile_images/1608407519117934592/tc_hRlXy_400x400.jpg",
   created: "2022-08-02T17:25:49.000Z"
 },{
   id: 6,
@@ -98,7 +107,9 @@ export default [{
     url: "https://pbs.twimg.com/media/Ff9svteXEAA80n-?format=jpg&name=small"
   }],
   author: "@meakoopa",
+  authorName: "Anthony Oliveria",
   authorURL: "https://twitter.com/meakoopa",
+  avatar: "https://pbs.twimg.com/profile_images/1629453162103881730/twY_5LGJ_400x400.jpg",
   created: "2022-10-26T03:04:55.000Z"
 },{
   id: 7,
@@ -111,7 +122,9 @@ export default [{
     url: "https://video.twimg.com/tweet_video/Fh42OLwaYAAkveV.mp4"
   }],
   author: "@jagarikin",
+  authorName: "じゃがりきん",
   authorURL: "https://twitter.com/jagarikin",
+  avatar: "https://pbs.twimg.com/profile_images/666406258451152896/ROaK4lhC_400x400.png",
   created: "2022-11-19T01:00:13.000Z"
 },{
   id: 8,
@@ -125,7 +138,9 @@ export default [{
     url: "https://video.twimg.com/tweet_video/FfDaoZ4VUAAHtnY.mp4"
   }],
   author: "@erikaishii",
+  authorName: "Erika Ishii",
   authorURL: "https://twitter.com/erikaishii",
+  avatar: "https://pbs.twimg.com/profile_images/1606368512804417537/MHcAWsP7_400x400.jpg",
   created: "2022-10-14T19:27:50.000Z"
 },{
   id: 9,
@@ -148,7 +163,9 @@ export default [{
     url: "https://pbs.twimg.com/media/Ff9svteXEAA80n-?format=jpg&name=small"
   }],
   author: "@erikaishii",
+  authorName: "Erika Ishii",
   authorURL: "https://twitter.com/erikaishii",
+  avatar: "https://pbs.twimg.com/profile_images/1606368512804417537/MHcAWsP7_400x400.jpg",
   created: "2022-10-14T19:27:50.000Z"
 },{
   id: 10,
@@ -164,7 +181,9 @@ export default [{
   ],
   total: 7871,
   author: "@nathanwpyle",
+  authorName: "Nathan W. Pyle",
   authorURL: "https://twitter.com/nathanwpyle",
+  avatar: "https://pbs.twimg.com/profile_images/1094356867906760704/SrZcPcOC_400x400.jpg",
   created: "2022-11-10T21:06:32.000Z"
 }];
 
