@@ -19,7 +19,9 @@
 
 <header class="mobile">
   <nav>
-    <a class="logo" href="/home">GOBO</a>
+    <a class="logo" href="/home">
+      <img src="/images/gobo-logo.svg" alt="Main logo for the GOBO application">
+    </a>
   </nav>
 </header>
 

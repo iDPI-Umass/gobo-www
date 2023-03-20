@@ -19,4 +19,8 @@
     margin: 0;
     max-width: 36rem;
   }
+
+  sl-divider {
+    --color: var(--gobo-color-text);
+  }
 </style>

@@ -1,4 +1,5 @@
-.gobo-divider {
-  --width: 1px;
-  --color: var(--sl-color-neutral-400);
+sl-divider {
+  --color: var(--gobo-color-border-hr);
+  max-width: var(--gobo-max-width-primary);
+  margin: 0;
 }

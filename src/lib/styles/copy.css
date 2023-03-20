@@ -1,7 +1,13 @@
 .gobo-copy {
-  max-width:  36rem;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  max-width: var(--gobo-max-width-primary);
   margin: 0;
-  padding: 0;
+  padding: var(--gobo-height-spacer) var(--gobo-width-spacer);
+  background: var(--gobo-color-panel);
+  border: var(--gobo-border-panel);
+  border-radius: var(--gobo-border-radius);
 }
 
 .gobo-copy > h1 {
@@ -22,4 +28,8 @@
 .gobo-copy > p {
   font-size: var(--sl-font-size-medium);
   margin-bottom: 1rem;
+}
+
+.gobo-copy > sl-divider {
+  --color: var(--gobo-color-border-panel);
 }

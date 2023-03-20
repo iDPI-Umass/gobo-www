@@ -22,6 +22,10 @@ html {
   --gobo-color-button-lens: #313751;
 
 
+  --gobo-color-danger: #D52828;
+  --gobo-color-active: #3a88e2;
+
+
   
   --gobo-max-width-primary: 41rem;
   --gobo-width-spacer: 1.5625rem;
@@ -46,6 +50,7 @@ html {
 html.gobo-theme-dark {
   --gobo-color-null: #454C6C;
   --gobo-color-panel: #313751;
+  --gobo-color-border-panel: #282D43;
   --gobo-color-panel-focus: #454C6C;
   --gobo-border-panel: 1px solid #282D43;
   --gobo-color-border-hr: #313751;

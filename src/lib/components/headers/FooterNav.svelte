@@ -5,24 +5,24 @@
 <footer>
   <nav>
     <sl-icon-button
-      src="/icons/house.svg"
+      src="/icons/home.svg"
       href="/home"></sl-icon-button>
 
-    <sl-icon-button
+    <!-- <sl-icon-button
       src="/icons/search.svg"
-      href="/home/search"></sl-icon-button>
+      href="/home/search"></sl-icon-button> -->
+
+    <sl-icon-button
+      src="/icons/identities.svg"
+      href="/identities"></sl-icon-button>
+
+    <sl-icon-button
+      src="/icons/gear.svg"
+      href="/settings"></sl-icon-button>
 
     <sl-icon-button
       src="/icons/pencil-square.svg"
       href="/home/new-post"></sl-icon-button>
-
-    <sl-icon-button
-      src="/icons/people.svg"
-      href="/identities"></sl-icon-button>
-
-    <sl-icon-button
-      src="/icons/list.svg"
-      href="/settings"></sl-icon-button>
   </nav>
 </footer>
 
@@ -36,8 +36,8 @@
     bottom: 0;
     left: 0;
     width: 100vw;
-    background: var(--sl-color-neutral-50);
-    border-top: 1px solid var(--sl-color-neutral-700);
+    background: var(--gobo-color-panel);
+    border-top: var(--gobo-border-panel);
   }
 
 
@@ -53,7 +53,7 @@
   footer > nav > sl-icon-button {
     margin: 12px;
     font-size: 26px;
-    color: var(--sl-color-neutral-1000);
+    color: var(--gobo-color-text);
   }
 
   @media ( min-width: 750px ) {

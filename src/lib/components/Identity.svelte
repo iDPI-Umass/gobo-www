@@ -23,13 +23,15 @@
   let logo = `/icons/${ type }.svg`;
   let brandColor = colors[ type ];
 
-  let fullName, hostname;
+  let nameSlot1 = display_name;
+  let nameSlot2;
+  let hostname;
   switch ( type ) {
     case "twitter":
-      fullName = `@${ username }`;
+      nameSlot2 = `@${ username }`;
       break;
     case "reddit":
-      fullName = `u/${ username }`;
+      nameSlot2 = `u/${ username }`;
       break;
     case "mastodon":
       // We just want the hostname to form a fully specified Mastodon reference.
@@ -40,7 +42,7 @@
         hostname = base_url;
       }
       
-      fullName = `@${ username }@${ hostname }`;
+      nameSlot2 = `@${ username }@${ hostname }`;
       break;
   }
 
@@ -59,9 +61,13 @@
 </script>
 
 <section>
+
   <header>
+    
     <sl-icon src={logo} style="color: {brandColor};"></sl-icon>
+    
     <h2>{type}</h2>
+    
     <sl-icon-button
       bind:this={button}
       variant="danger"
@@ -70,14 +76,24 @@
       size="medium"
       src="/icons/trash.svg">
     </sl-icon-button>
+  
   </header>
+  
   <sl-divider></sl-divider>
-  <span class="profile-display">
-    {#if profile_image != null}
+  
+  <div class="profile-display">
+    
     <img src={profile_image} alt="profile picture for {username}">
-    {/if}
-    <a href="{profile_url}">{ fullName }</a>
-  </span>
+    
+    <div class="names">
+      {#if nameSlot1 != null}
+        <div class="slot1">{ nameSlot1 }</div>
+      {/if}
+      <div class="slot2">{ nameSlot2 }</div>
+    </div>
+    
+  </div>
+
 </section>
 
 <style>
@@ -87,11 +103,11 @@
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: stretch;
-    margin: 1rem 0 1rem 0;
-    padding: 0;
-    max-width: 30rem;
-    border: 2px solid var(--sl-color-neutral-400);
-    border-radius: var(--sl-border-radius-medium);
+    margin-bottom: var(--gobo-height-spacer);
+    width: 100%;
+    background: var(--gobo-color-panel);
+    border: var(--gobo-border-panel);
+    border-radius: var(--gobo-border-radius);
   }
 
   section > header {
@@ -99,58 +115,67 @@
     flex-direction: row;
     flex-wrap: nowrap;
     align-items: center;
+    margin: var(--gobo-height-spacer) var(--gobo-width-spacer);
   }
 
   section > header > sl-icon {
     flex: 0 0 auto;
-    font-size: var(--sl-font-size-x-large);
-    margin: 0.5rem 0.5rem 0.5rem 1rem;
+    font-size: 1.5625rem;
+    margin: 0 0.5rem 0 0;
   }
 
   section > header > h2 {
     flex: 1 1 auto;
-    font-size: var(--sl-font-size-large);
+    font-size: 1.1875rem;
     text-transform: capitalize;
-    margin: 0.5rem 0 0.5rem 0;
-  }
-
-  section > header > sl-icon-button {
-    margin-right: 1rem;
   }
 
   section > header > sl-icon-button::part(base),
   section > header > sl-icon-button::part(base):hover {
-    color: var(--sl-color-danger-500);
+    color: var(--gobo-color-danger);
   }
 
-  sl-divider {
-    --width: 1px;
-    --color: var(--sl-color-neutral-400);
-    margin: 0 1rem 0 1rem;
+
+
+  section > sl-divider {
+    margin: 0;
+    --color: var(--gobo-color-border-panel);
   }
+
 
   .profile-display {
+    margin: var(--gobo-height-spacer) var(--gobo-width-spacer);
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: center;
-    margin: 1rem;
   }
 
   .profile-display > img {
-    height: 3rem;
-    width: 3rem;
+    height: 3.125rem;
+    width: 3.125rem;
     border-radius: var(--sl-border-radius-circle);
-    margin-right: 1rem;
+    margin-right: var(--gobo-width-spacer);
   }
 
-  .profile-display > a {
-    font-size: var(--sl-font-size-large);
+  .names {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
   }
 
-  .profile-display > a:focus {
-    margin: -2px;
+  .names .slot1 {
+    font-size: var(--gobo-font-size-copy);
+    font-weight: var(--gobo-font-weight-bold);
+    text-transform: capitalize;
+  }
+
+  .names .slot2 {
+    font-size: var(--gobo-font-size-copy);
+    font-weight: var(--gobo-font-weight-regular);
   }
 
 </style>

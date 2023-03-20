@@ -2,8 +2,9 @@
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
+  import PostMedia from "$lib/components/PostMedia.svelte";
+  import PostPoll from "$lib/components/PostPoll.svelte";
   import { humanize } from "$lib/helpers/humanize";
-  import { isImage, isVideo } from "$lib/helpers/type.js";
 
   export let id;
   export let type;
@@ -76,26 +77,11 @@
       break;
   }
 
-  
-  const handleSingleLoad = function ( event ) {
-    let previewWidth = event.target.width;
-    let naturalWidth = event.target.naturalWidth || event.target.videoWidth;
-    let naturalHeight = event.target.naturalHeight || event.target.videoHeight;
-    let ratio = naturalHeight / naturalWidth;
-    let previewHeight = Math.round( previewWidth * ratio );
-
-
-    if ( previewHeight > 512 ) {
-      event.target.style.height = "512px";
-    } else {
-      event.target.style.height = "unset";
-    }    
-  }
 </script>
 
 <article class="outer-frame">
   <!-- svelte-ignore a11y-missing-content -->
-  <a class="card-link" href={`home/article/${id}`}></a>
+  <a class="card-link" href={`/home/article/${id}`} aria-label="expand post"></a>
 
   <section class="inner-frame">
     <section class="gutter">
@@ -119,6 +105,18 @@
 
         {@html content}
       </section>
+
+      {#if media.length > 0}
+        <div class="media">
+          <PostMedia {id} {media}></PostMedia>
+        </div>
+      {/if}
+
+      {#if results.length > 0}
+        <div class="poll">
+          <PostPoll {results} {total}></PostPoll>
+        </div>
+      {/if}
 
     </section>
 
@@ -148,6 +146,7 @@
 
 <style>
   .outer-frame {
+    position: relative;
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
@@ -160,6 +159,25 @@
     border: var(--gobo-border-panel);
     border-radius: var(--gobo-border-radius);
     margin-bottom: var(--gobo-height-spacer);
+  }
+
+  .outer-frame .card-link::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-radius: var(--gobo-border-radius);
+    z-index: 1;
+  }
+
+  .outer-frame .card-link:focus {
+    border: none;
+  }
+
+  .outer-frame .card-link:focus::after {
+    border: 2px solid var(--gobo-color-primary);
   }
 
   .outer-frame .inner-frame {
@@ -182,6 +200,16 @@
     width: 2.8125rem;
     border-radius: var(--sl-border-radius-circle);
     margin-right: var(--gobo-width-spacer);
+    border: var(--gobo-border-panel);
+  }
+
+  .outer-frame .inner-frame .main {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: stretch;
   }
 
   .outer-frame .inner-frame .main header {  
@@ -245,14 +273,30 @@
     margin-bottom: 0.5rem;
   }
 
-  .outer-frame .inner-frame .main .content h2 {
+  .outer-frame .inner-frame .main .content :global(h2) {
     font-size: var(--gobo-font-size-x-large);
     font-weight: var(--gobo-font-weight-bold);
   }
 
-  .outer-frame .inner-frame .main .content > p {
+  .outer-frame .inner-frame .main .content :global(p) {
     font-size: var(--gobo-font-size-copy);
     font-weight: var(--gobo-font-weight-regular);
+  }
+
+  .outer-frame .inner-frame .main .content :global(a) {
+    position: relative;
+    z-index: 2;
+  }
+
+
+  .outer-frame .inner-frame .main .media,
+  .outer-frame .inner-frame .main .poll {
+    margin-bottom: var(--gobo-height-spacer);
+  }
+
+  .outer-frame .inner-frame .main .media :global(a) {
+    position: relative;
+    z-index: 2;
   }
 
 
@@ -276,6 +320,7 @@
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: center;
+    z-index: 2;
   }
 
   .outer-frame footer a {

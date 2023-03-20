@@ -27,14 +27,14 @@
   }
 
   div > h1 {
-    font-size: var(--sl-font-size-large);
-    font-weight: var(--sl-font-weight-bold);
-    color: var(--sl-color-neutral-1000);
+    font-size: var(--gobo-font-size-2x-large);
+    font-weight: var(--gobo-font-weight-black);
+    color: var(--gobo-color-text);
   }
 
   sl-icon-button {
     font-size: 20px;
-    color: var(--sl-color-neutral-1000);
+    color: var(--gobo-color-text);
     margin-right: 2rem;
   }
 </style>

@@ -107,11 +107,6 @@
     color: var(--gobo-color-text-muted);
   }
 
-  sl-divider {
-    --color: var(--gobo-color-border-hr);
-    max-width: var(--gobo-max-width-primary);
-  }
-
   /* .viewheader {
     margin: var(--gobo-height-spacer) 0;
     max-width: var(--gobo-max-width-primary);

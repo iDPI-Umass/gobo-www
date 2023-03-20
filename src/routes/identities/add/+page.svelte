@@ -67,12 +67,12 @@
 </script>
 
 
-<form class="gobo-form" bind:this={form}>
+<BackLink
+  href="/identities"
+  heading="Add Identity">
+</BackLink>
 
-  <BackLink
-    href="/identities"
-    heading="Add Identity">
-  </BackLink>
+<form class="gobo-form" bind:this={form}>
 
   <h2>Select a Platform</h2>
   
@@ -106,9 +106,10 @@
 
   <sl-button
     bind:this={button}
+    class="submit"
     type="submit"
-    variant="primary"
-    size="medium">
+    size="medium"
+    pill>
     Add Identity
   </sl-button>
 </form>

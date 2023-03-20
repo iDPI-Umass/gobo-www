@@ -5,7 +5,7 @@
   export let action = function () {};
 </script>
 
-<sl-divider class="gobo-divider"></sl-divider>
+<sl-divider></sl-divider>
 
 <a class="nav-link" href={href} on:click={ action }>
   <slot></slot>
@@ -15,9 +15,9 @@
 
 <style>
   .nav-link {
-    font-size: var(--sl-font-size-medium);
+    font-size: var(--sl-font-size-copy);
     text-decoration: none;
-    color: var(--sl-color-neutral-1000);
+    color: var(--gobo-color-text);
     margin: 0;
     padding: 1rem;
     display: flex;
@@ -34,6 +34,10 @@
 
   sl-icon {
     font-size: 20px;
-    color: var(--sl-color-neutral-1000);
+    color: var(--gobo-color-text);
+  }
+
+  sl-divider {
+    --color: var(--gobo-color-text);
   }
 </style>

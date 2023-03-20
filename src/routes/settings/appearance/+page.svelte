@@ -3,7 +3,7 @@
   import "@shoelace-style/shoelace/dist/components/switch/switch.js";
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import "@shoelace-style/shoelace/dist/components/radio-group/radio-group.js";
-  import "@shoelace-style/shoelace/dist/components/radio-button/radio-button.js";
+  import "@shoelace-style/shoelace/dist/components/radio/radio.js";
   import BackLink from "$lib/components/primitives/BackLink.svelte";
   import { onMount, onDestroy } from "svelte";
   import { browser } from "$app/environment";
@@ -40,51 +40,44 @@
 </script>
 
 
-<section class="gobo-config-frame">
-  <BackLink
-    href="/settings"
-    heading="Appearance">
-  </BackLink>
+<BackLink
+  href="/settings"
+  heading="Appearance">
+</BackLink>
 
-  <section class="panel dark-mode">
-    <h2>Dark Mode</h2>
-    <p>
-      Dark Mode is GOBO's light-on-dark color scheme. By default, GOBO tries
-      to respect the preference set in your operating system, but you can
-      configure it directly here.
-    </p>
-    
-
-    <sl-switch
-      bind:this={darkModeSwitch}
-      checked={darkModeState}
-      size="medium">
-      Dark Mode
-    </sl-switch>
-  </section>
+<form class="gobo-form">
+  <h2>Dark Mode</h2>
+  <p>
+    Dark Mode is GOBO's light-on-dark color scheme. By default, GOBO tries
+    to respect the preference set in your operating system, but you can
+    configure it directly here.
+  </p>
   
-  <sl-divider class="gobo-divider"></sl-divider>
 
-  <section class="panel dark-mode">
-    <h2>Text Size</h2>
-    <p>
-      Adjust the text size according to your preference. Changes will be
-      applied throughout the GOBO interface.
-    </p>
-    
-
-    <sl-radio-group bind:this={fontSizeGroup} name="fontSize" value="{fontSizeState}">
-      <sl-radio-button value="1" size="medium">Smallest</sl-radio-button>
-      <sl-radio-button value="2" size="medium">Samller</sl-radio-button>
-      <sl-radio-button value="3" size="medium">Medium</sl-radio-button>
-      <sl-radio-button value="4" size="medium">Larger</sl-radio-button>
-      <sl-radio-button value="5" size="medium">Largest</sl-radio-button>
-    </sl-radio-group>
-  </section>
+  <sl-switch
+    bind:this={darkModeSwitch}
+    checked={darkModeState}
+    size="medium">
+    Dark Mode
+  </sl-switch>
+</form>
   
-  <sl-divider class="gobo-divider"></sl-divider>
+<form class="gobo-form">
+  <h2>Text Size</h2>
+  <p>
+    Adjust the text size according to your preference. Changes will be
+    applied throughout the GOBO interface.
+  </p>
+  
 
-</section>
+  <sl-radio-group bind:this={fontSizeGroup} name="fontSize" value="{fontSizeState}">
+    <sl-radio value="1" size="medium">Smallest</sl-radio>
+    <sl-radio value="2" size="medium">Samller</sl-radio>
+    <sl-radio value="3" size="medium">Medium</sl-radio>
+    <sl-radio value="4" size="medium">Larger</sl-radio>
+    <sl-radio value="5" size="medium">Largest</sl-radio>
+  </sl-radio-group>
+</form>
 
 
 <style>

@@ -45,27 +45,14 @@ h1,h2,h3,h4,h5,h6 {
 }
 
 h1 {
-  font-size: var(--sl-font-size-2x-large);
+  font-size: var(--gobo-font-size-x-large);
 }
-h2 {
-  font-size: var(--sl-font-size-x-large);
-}
-h3 {
-  font-size: var(--sl-font-size-large);
-}
-h4 {
-  font-size: var(--sl-font-size-large);
-}
-h5 {
-  font-size: var(--sl-font-size-large);
-}
-h6 {
-  font-size: var(--sl-font-size-large);
+h2, h3, h4, h5, h6 {
+  font-size: var(--gobo-font-size-large);
 }
 
 p {
   font-size: var(--gobo-font-size-copy);
-  margin-bottom: 0.5rem;
 }
 
 a, a:hover, a:visited {

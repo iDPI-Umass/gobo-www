@@ -1,5 +1,7 @@
 <header>
-  <a href="/">GOBO</a>
+  <a class="logo" href="/">
+    <img src="/images/gobo-logo.svg" alt="Main logo for the GOBO application">
+  </a>
 </header>
 
 <style>

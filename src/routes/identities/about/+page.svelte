@@ -2,12 +2,12 @@
   import BackLink from "$lib/components/primitives/BackLink.svelte";
 </script>
 
-<section class="gobo-copy">
-  <BackLink
-    href="/identities"
-    heading="About Identities">
-  </BackLink>
+<BackLink
+  href="/identities"
+  heading="About Identities">
+</BackLink>
 
+<section class="gobo-copy">
   <p>
     Explain that GOBO is a place where the user aggregates
     their feeds across platforms and they can control their own algorithms.

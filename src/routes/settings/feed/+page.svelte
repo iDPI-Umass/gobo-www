@@ -12,25 +12,9 @@
   import BackLink from "$lib/components/primitives/BackLink.svelte";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
   import { onDestroy, onMount } from "svelte";
-  import { scrollStore } from "$lib/stores/scroll.js";
   import { browser } from "$app/environment";
   import { getGOBOClient } from "$lib/helpers/account";
-  let configFrame, unsubscribeScroll;
 
-  if ( browser ) {
-    onMount( function () {
-      unsubscribeScroll = scrollStore.subscribe( function ({ deltaY }) {
-        configFrame.scrollBy( 0, deltaY );
-      });
-    });
-
-    onDestroy( function () {
-      unsubscribeScroll();
-    });
-  }
-
-
-  
   let keywordForm, keywordCategory, keywords, keywordButton;
 
   const loadKeywords = async function () {
@@ -140,73 +124,69 @@
   // ]
 </script>
 
-<section class="gobo-config-frame" bind:this={configFrame}>
-  <BackLink
-    href="/settings"
-    heading="Feed Settings">
-  </BackLink>
+<BackLink
+  href="/settings"
+  heading="Feed Settings">
+</BackLink>
 
-  <section class="panel">
-    <h2>Blocked Keywords</h2>
-    <p>
-      Control which words and phrases you would like to exclude from your 
-      GOBO feed. You can add phrases below or delete any listed in the table.
-    </p>
-    
-    {#await loadKeywords()}
-      <Spinner></Spinner>
-    {:then}
-      <div class="keyword-table">
-        {#each keywords as keyword, index (`${keyword.category}${keyword.word}`)}
-          <div class="table-row">
-            <span class="keyword">
-              <span>{ keyword.category }</span>
-            </span>
-            <span class="phrase">{ keyword.word }</span>
-            <sl-icon-button
-              on:click={removeKeyword({ ...keyword, index })}
-              on:keypress={removeKeyword({ ...keyword, index })}
-              class="danger"
-              label="Delete Keyword" 
-              src="/icons/trash.svg"></sl-icon-button>
-          </div>
-        {/each}
-      </div>
-    {/await}
+<form class="gobo-form" bind:this={keywordForm}>
+  <h2>Blocked Keywords</h2>
+  <p>
+    Control which words and phrases you would like to exclude from your 
+    GOBO feed. You can add phrases below or delete any listed in the table.
+  </p>
+  
+  {#await loadKeywords()}
+    <Spinner></Spinner>
+  {:then}
+    <div class="keyword-table">
+      {#each keywords as keyword, index (`${keyword.category}${keyword.word}`)}
+        <div class="table-row">
+          <span class="keyword">
+            <span>{ keyword.category }</span>
+          </span>
+          <span class="phrase">{ keyword.word }</span>
+          <sl-icon-button
+            on:click={removeKeyword({ ...keyword, index })}
+            on:keypress={removeKeyword({ ...keyword, index })}
+            label="Delete Keyword" 
+            src="/icons/trash.svg"></sl-icon-button>
+        </div>
+      {/each}
+    </div>
+  {/await}
 
-    <form bind:this={keywordForm} class="gobo-form">
-      <sl-select
-        bind:this={keywordCategory}
-        name="category"
-        value="source"
-        label="Block Category"
-        size="medium">
-        <sl-option value="source">Source</sl-option>
-        <sl-option value="username">Username</sl-option>
-        <sl-option value="keyword">Keyword</sl-option>
-        <sl-option value="url">URL</sl-option>
-      </sl-select>
-      
-      <sl-input
-        name="word"
-        label="Block Pattern"
-        help-text="GOBO will match against this text to block targeted content from your feed."
-        autocomplete="off"
-        size="medium">
-      </sl-input>
+  <sl-select
+    bind:this={keywordCategory}
+    name="category"
+    value="source"
+    label="Block Category"
+    size="medium">
+    <sl-option value="source">Source</sl-option>
+    <sl-option value="username">Username</sl-option>
+    <sl-option value="keyword">Keyword</sl-option>
+    <sl-option value="url">URL</sl-option>
+  </sl-select>
+  
+  <sl-input
+    name="word"
+    label="Block Pattern"
+    help-text="GOBO will match against this text to block targeted content from your feed."
+    autocomplete="off"
+    size="medium">
+  </sl-input>
 
-      <sl-button
-        bind:this={keywordButton}
-        type="submit"
-        variant="primary"
-        size="medium">
-        Add Keyword
-      </sl-button>
-    </form>
-  </section>
-
-  <sl-divider class="gobo-divider"></sl-divider>
-
+  <sl-button
+    bind:this={keywordButton}
+    type="submit"
+    class="submit"
+    variant="primary"
+    size="medium"
+    pill>
+    Add Keyword
+  </sl-button>
+</form>
+ 
   <!-- <section class="panel">
     <h2>Default Sorting</h2>
     <p>
@@ -295,8 +275,13 @@
   </section>
 
   <sl-divider class="gobo-divider"></sl-divider> -->
-</section>
 
 <style>
+  .keyword-table sl-icon-button {
+    color: var(--gobo-color-danger);
+  }
 
+  .keyword-table .keyword span {
+    background: var(--gobo-color-active);
+  }
 </style>

@@ -58,40 +58,35 @@
 </script>
 
 
-<section class="gobo-config-frame">
-  <BackLink
-    href="/settings"
-    heading="Your Profile">
-  </BackLink>
+<BackLink
+  href="/settings"
+  heading="Your Profile">
+</BackLink>
   
 
-  <section class="panel">
-    <form bind:this={form} class="gobo-form">
-      <h2>Update Profile</h2>
-      
-      <sl-input
-        bind:this={nameInput}
-        name="name" 
-        label="Profile Name"
-        inputmode="text"
-        autocomplete="off"
-        maxlength=32
-        size="medium">
-      </sl-input>
+<form bind:this={form} class="gobo-form">
+  <h2>Update Profile</h2>
+  
+  <sl-input
+    bind:this={nameInput}
+    name="name" 
+    label="Profile Name"
+    inputmode="text"
+    autocomplete="off"
+    maxlength=32
+    size="medium">
+  </sl-input>
 
-      <sl-button
-        bind:this={button}
-        type="submit"
-        variant="primary"
-        size="medium">
-        Update Profile
-      </sl-button>
-    </form>
-  </section>
-  
-  <sl-divider class="gobo-divider"></sl-divider>
-</section>
-  
+  <sl-button
+    bind:this={button}
+    class="submit"
+    type="submit"
+    variant="primary"
+    size="medium"
+    pill>
+    Update Profile
+  </sl-button>
+</form>
 
 
 <style>
