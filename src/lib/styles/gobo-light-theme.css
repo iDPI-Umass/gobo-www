@@ -380,7 +380,7 @@
   --sl-input-border-radius-medium: var(--sl-border-radius-medium);
   --sl-input-border-radius-large: var(--sl-border-radius-medium);
 
-  --sl-input-font-family: var(--sl-font-sans);
+  --sl-input-font-family: var(--gobo-font-family);
   --sl-input-font-weight: var(--sl-font-weight-normal);
   --sl-input-font-size-small: var(--sl-font-size-small);
   --sl-input-font-size-medium: var(--sl-font-size-medium);
@@ -435,7 +435,7 @@
   --sl-tooltip-border-radius: var(--sl-border-radius-medium);
   --sl-tooltip-background-color: var(--sl-color-neutral-800);
   --sl-tooltip-color: var(--sl-color-neutral-0);
-  --sl-tooltip-font-family: var(--sl-font-sans);
+  --sl-tooltip-font-family: var(--gobo-font-family);
   --sl-tooltip-font-weight: var(--sl-font-weight-normal);
   --sl-tooltip-font-size: var(--sl-font-size-small);
   --sl-tooltip-line-height: var(--sl-line-height-dense);

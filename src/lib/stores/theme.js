@@ -56,6 +56,20 @@ const createStore = function () {
         return theme; 
       });
     },
+    setArial: function () {
+      update( function ( theme ) {
+        theme.arial = true;
+        LS.write( "gobo-theme", theme );
+        return theme;
+      });
+    },
+    setRoboto: function () {
+      update( function ( theme ) {
+        theme.arial = false;
+        LS.write( "gobo-theme", theme );
+        return theme;
+      });
+    },
     setFontSize: function ( size ) {
       update( function ( theme ) {
         theme.fontSize = size;

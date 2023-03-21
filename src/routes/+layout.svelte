@@ -35,6 +35,12 @@
           html.classList.remove( "gobo-theme-dark", "sl-theme-dark" );
         }
 
+        if ( config.arial === true ) {
+          html.classList.add( "gobo-font-arial" );
+        } else {
+          html.classList.remove( "gobo-font-arial" );
+        }
+
         switch( config.fontSize ) {
           case "1":
             html.style.fontSize = "12px";

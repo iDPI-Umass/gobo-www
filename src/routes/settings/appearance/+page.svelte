@@ -9,6 +9,7 @@
   import { browser } from "$app/environment";
   import { themeStore } from "$lib/stores/theme";
   let darkModeSwitch, darkModeState, unsubscribeTheme;
+  let fontSwitch, fontState;
   let fontSizeGroup, fontSizeState;
 
   if ( browser ) {
@@ -16,6 +17,7 @@
       unsubscribeTheme = themeStore.subscribe( function ( config ) {
         darkModeState = config.dark;
         fontSizeState = config.fontSize;
+        fontState = config.arial
       });
 
       darkModeSwitch.addEventListener( "sl-change", function ( event ) {
@@ -23,6 +25,14 @@
           themeStore.setDark();
         } else {
           themeStore.setLight();
+        }
+      });
+
+      fontSwitch.addEventListener( "sl-change", function ( event ) {
+        if ( event.target.checked === true ) {
+          themeStore.setArial();
+        } else {
+          themeStore.setRoboto();
         }
       });
 
@@ -59,6 +69,20 @@
     checked={darkModeState}
     size="medium">
     Dark Mode
+  </sl-switch>
+</form>
+
+<form class="gobo-form">
+  <h2>System Font</h2>
+  <p>
+    Use Arial instead of Roboto.
+  </p>
+  
+  <sl-switch
+    bind:this={fontSwitch}
+    checked={fontState}
+    size="medium">
+    System Font
   </sl-switch>
 </form>
   

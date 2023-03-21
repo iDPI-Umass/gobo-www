@@ -35,7 +35,6 @@ html {
   --gobo-height-spacer-half: calc(0.5 * var(--gobo-height-spacer));
   --gobo-border-radius: 0.625rem;
 
-
   --gobo-font-family: "Roboto";
   --gobo-font-weight-black: 900;
   --gobo-font-weight-bold: 700;
@@ -66,4 +65,8 @@ html.gobo-theme-dark {
 
 
   --gobo-color-sl-panel-background: #131620;
+}
+
+html.gobo-font-arial {
+  --gobo-font-family: "Arial";
 }
