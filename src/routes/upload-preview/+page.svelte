@@ -25,14 +25,12 @@
 
 </script>
 
-<GuardFrame>
-  <div class="frame">
-    <img
-      bind:this={previewImage}
-      src="#"
-      alt="preview of upload">
-  </div>
-</GuardFrame>
+<div class="frame">
+  <img
+    bind:this={previewImage}
+    src="#"
+    alt="preview of upload">
+</div>
 
 <style>
   .frame {

@@ -11,6 +11,9 @@
 <LeftRight>
   <section slot="left" class="gobo-copy">
     <h1>Why Am I Seeing This?</h1>
+
+    <p>This page is pending.</p>
+
     <p>
       Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
       tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim 
@@ -27,15 +30,17 @@
 
     <div class="button-panel">
       <sl-button
-        variant="primary"
+        class="action"
         size="medium"
-        href="/settings/feed">
+        href="/settings/feed"
+        pill>
         Edit Filters
       </sl-button>
       <sl-button
-        variant="primary"
+        class="submit"
         size="medium"
-        href="/home">
+        href="/home"
+        pill>
         Return to Feed
       </sl-button>
     </div>

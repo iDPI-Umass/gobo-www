@@ -7,7 +7,7 @@
 
 <GuardFrame>
   <MainHeader></MainHeader>
-  <NavPage current="identities">
+  <NavPage current="search">
     <slot></slot>
   </NavPage>
   <FooterNav></FooterNav>

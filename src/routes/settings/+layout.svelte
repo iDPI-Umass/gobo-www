@@ -7,7 +7,7 @@
 
 <GuardFrame>
   <MainHeader></MainHeader>
-  <NavPage>
+  <NavPage current="settings">
     <slot></slot>
   </NavPage>
   <FooterNav></FooterNav>

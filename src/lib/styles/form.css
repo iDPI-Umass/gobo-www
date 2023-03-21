@@ -10,56 +10,106 @@
   border-radius: var(--gobo-border-radius);
 }
 
-.gobo-form > h1 {
+.gobo-form h1 {
   font-size: var(--sl-font-size-x-large);
   margin-bottom: 2rem;
 }
 
-.gobo-form > h2 {
+.gobo-form h2 {
   font-size: var(--sl-font-size-medium);
   font-weight: var(--sl-font-weight-bold);
   margin-bottom: 1rem;
 }
 
-.gobo-form > * {
-  margin-bottom: 2rem;
+.gobo-form * {
+  margin-bottom: var(--gobo-height-spacer);
 }
 
-.gobo-form > *:last-child {
+.gobo-form *:last-child {
   margin-bottom: 0;
 }
 
-.gobo-form > sl-divider {
+.gobo-form a {
+  text-decoration: none;
+}
+
+.gobo-form sl-divider {
   margin-bottom: 1rem;
 }
 
-.gobo-form > sl-button {
+.gobo-form sl-button {
   align-self: flex-end;
 }
 
-.gobo-form > sl-input::part(form-control-help-text),
-.gobo-form > sl-select::part(form-control-help-text) {
-  color: var(--gobo-color-text-muted);
+.gobo-form sl-input::part(base) {
+  border-radius: var(--gobo-border-radius);
 }
 
-.gobo-form > sl-divider {
+.gobo-form sl-select::part(combobox) {
+  font-weight: var(--gobo-font-weight-medium);
+}
+
+.gobo-form sl-divider {
   --color: var(--gobo-color-border-panel);
 }
 
-form > sl-button.submit::part(base) {
+
+
+.gobo-form sl-button.submit::part(base) {
   background: var(--gobo-color-primary);
   border: none;
 }
 
-form > sl-button.submit:hover::part(base) {
+.gobo-form sl-button.submit:hover::part(base) {
   background: var(--gobo-color-primary);
   border: none;
 }
 
-form > sl-button.submit::part(label) {
-  color: var(--gobo-color-text);
+.gobo-form sl-button.submit::part(label) {
+  color: var(--gobo-color-primary-text);
+  font-weight: var(--gobo-font-weight-bold);
 }
 
-form > sl-button.submit:hover::part(label) {
-  color: var(--gobo-color-text);
+.gobo-form sl-button.submit:hover::part(label) {
+  color: var(--gobo-color-primary-text);
+}
+
+
+.gobo-form sl-button.cancel::part(base) {
+  background: var(--gobo-color-cancel);
+  border: 1px solid var(--gobo-color-cancel-text);
+}
+
+.gobo-form sl-button.cancel:hover::part(base) {
+  background: var(--gobo-color-cancel);
+  border: 1px solid var(--gobo-color-cancel-text);
+}
+
+.gobo-form sl-button.cancel::part(label) {
+  color: var(--gobo-color-cancel-text);
+  font-weight: var(--gobo-font-weight-bold);
+}
+
+.gobo-form sl-button.cancel:hover::part(label) {
+  color: var(--gobo-color-cancel-text);
+}
+
+
+.gobo-form sl-button.action::part(base) {
+  background: var(--gobo-color-active);
+  border: none;
+}
+
+.gobo-form sl-button.action:hover::part(base) {
+  background: var(--gobo-color-active);
+  border: none;
+}
+
+.gobo-form sl-button.action::part(label) {
+  color: var(--gobo-color-active-text);
+  font-weight: var(--gobo-font-weight-bold);
+}
+
+.gobo-form sl-button.action:hover::part(label) {
+  color: var(--gobo-color-active-text);
 }

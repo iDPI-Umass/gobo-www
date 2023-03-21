@@ -22,12 +22,6 @@
   export let total = 0;
   export let fullPage = false;
 
-  let colors = {
-    mastodon: "#6364FF",
-    reddit: "#ff4500",
-    twitter: "#1d9bf0"
-  };
-
   if ( avatar == null ) {
     switch ( platform ) {
       case "mastodon":
@@ -59,8 +53,6 @@
 
 
   let logo = `/icons/${ platform }.svg`;
-  let brandColor = colors[ platform ];
-
   let headingSlot1, headingSlot2;
   switch ( platform ) {
     case "mastodon":
@@ -80,8 +72,10 @@
 </script>
 
 <article class="outer-frame">
-  <!-- svelte-ignore a11y-missing-content -->
-  <a class="card-link" href={`/home/article/${id}`} aria-label="expand post"></a>
+  {#if fullPage !== true}
+    <!-- svelte-ignore a11y-missing-content -->
+    <a class="card-link" href={`/post/${id}`} aria-label="expand post"></a>
+  {/if}
 
   <section class="inner-frame">
     <section class="gutter">
@@ -136,7 +130,7 @@
       href="{url}"
       target="_blank" 
       rel="noopener noreferrer nofollow">
-      <sl-icon src="{logo}" style="--color:{brandColor};"></sl-icon>
+      <sl-icon src="{logo}" class="{platform}"></sl-icon>
       {sourceCopy}      
     </a>
    
@@ -267,6 +261,7 @@
     max-height: 12rem;
     overflow-y: hidden;
     margin-bottom: var(--gobo-height-spacer);
+    z-index: 2;
   }
 
   .outer-frame .inner-frame .main .content > * {
@@ -339,7 +334,6 @@
 
   .outer-frame footer a sl-icon {
     font-size: 1rem;
-    color: var(--color);
     margin-right: 0.5rem;
   }
 

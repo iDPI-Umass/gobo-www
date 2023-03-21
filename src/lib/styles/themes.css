@@ -1,8 +1,3 @@
-/* Overrides Shoelace theme tokens */
-:root {
-  --sl-focus-ring-color: #E73F9C;
-}
-
 /* Default to light mode */
 html {
   --gobo-color-null: #F0F2F5;
@@ -21,9 +16,15 @@ html {
   --gobo-color-badge: #FFFFFF;
   --gobo-color-button-lens: #313751;
 
+  --gobo-color-sl-panel-background: #FBFBFB;
 
-  --gobo-color-danger: #D52828;
+
+  --gobo-color-primary-text: #FFFFFF;
   --gobo-color-active: #3a88e2;
+  --gobo-color-active-text: #FFFFFF;
+  --gobo-color-cancel: var(--gobo-color-panel);
+  --gobo-color-cancel-text: var(--gobo-color-text);
+  --gobo-color-danger: #D52828;
 
 
   
@@ -62,4 +63,7 @@ html.gobo-theme-dark {
   --gobo-color-background-badge: #9EACC8;
   --gobo-color-badge: #313751;
   --gobo-color-button-lens: #9EACC8;
+
+
+  --gobo-color-sl-panel-background: #131620;
 }

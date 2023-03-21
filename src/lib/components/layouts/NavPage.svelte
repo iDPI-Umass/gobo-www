@@ -1,10 +1,10 @@
 <script>
   import LeftNav from "$lib/components/headers/LeftNav.svelte";
-  
+  export let current;
 </script>
 
 <div class="panels">
-  <LeftNav></LeftNav>
+  <LeftNav {current} ></LeftNav>
   
   <main class="main">
     <slot></slot>

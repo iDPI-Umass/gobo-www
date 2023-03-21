@@ -2,9 +2,6 @@
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   export let current;
-
-  current = "home"
-
 </script>
 
 <nav>
@@ -35,7 +32,7 @@
   <sl-button
     class="cta"
     pill
-    href="/home/new-post">
+    href="/new-post">
     <span>New Post</span>
   </sl-button>
 </nav>

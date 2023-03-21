@@ -46,6 +46,8 @@
   if ( browser ) {
     onMount( async function () {
       form.addEventListener( "submit", async function( event ) {
+        // We don't prevent default, automatically adjusting the location to
+        // include the search query.
         await submit();
       });
 
@@ -75,17 +77,21 @@
     inputmode="text"
     placeholder="Search"
     size="medium"
-    autocomplete="off"
-    >></sl-input>
+    autocomplete="off">
+  </sl-input>
+
+  <sl-divider class="gobo-divider"></sl-divider>
 
   <sl-button
     bind:this={button}
+    class="submit"
     type="submit"
     variant="primary"
-    size="medium">
+    size="medium"
+    pill>
     Search
   </sl-button>
-  <sl-divider class="gobo-divider"></sl-divider>
+  
 </form>
 
 {#if loading === true}
@@ -94,11 +100,16 @@
   </div>
 {:else}
   {#if results.length !== 0 }
-    <section bind:this={resultsSection}>
+    <section class="results" bind:this={resultsSection}>
+    
       <h2>Results</h2>
+    
+      <sl-divider></sl-divider>
+      
       {#each results as result (result.id)}
         <Post {...result}></Post>
       {/each}
+    
     </section>
   {/if}
 {/if}
@@ -114,6 +125,11 @@
 
   .spinner-box > sl-spinner {
     font-size: 3rem;
+  }
+
+  .results sl-divider {
+    margin-top: 0.5rem;
+    margin-bottom: var(--gobo-height-spacer); 
   }
 </style>
 

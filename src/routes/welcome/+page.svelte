@@ -4,9 +4,10 @@
   import "@shoelace-style/shoelace/dist/components/input/input.js";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
+  import { profileStore } from "$lib/stores/profile";
+  import { getGOBOClient } from "$lib/helpers/account";
   import { onMount } from "svelte";
   import { goto } from '$app/navigation';
-  import { sleep } from "@dashkite/joy/time";
   let form, button;
 
   const validate = function() {
@@ -14,8 +15,15 @@
   };
 
   const issueRequest = async function () {
-    console.log( "HTTP request goes here..." );
-    await sleep( 500 );
+    const client = await getGOBOClient();
+    const data = new FormData( form );
+    const display_name = data.get( "name" );
+
+    await client.updateProfile({
+      parameters: { display_name }
+    });
+
+    profileStore.updateProfile({ display_name });
   };
 
   const submit = async function () {
@@ -59,9 +67,9 @@
     <sl-input 
       name="name" 
       label="Profile Name"
-      help-text="You can control how you appear to others with this custom profile name."
       inputmode="text"
       autocomplete="off"
+      maxlength=32
       size="medium">
     </sl-input>
   
@@ -69,19 +77,20 @@
   
     <section class="buttons">
       <sl-button      
-        variant="text"
-        href="/home"
+        href="/identities"
+        class="cancel"
         size="medium"
-        width="100%">
+        width="100%"
+        pill>
         SKIP
       </sl-button>
   
       <sl-button
         bind:this={button}
         type="submit"
-        variant="primary"
+        class="submit"
         size="medium"
-        width="100%">
+        pill>
         Save and Continue
       </sl-button>
     </section>
@@ -93,7 +102,7 @@
 
 <style>
   form {
-    max-width: 36rem;
+    margin-top: var(--gobo-height-spacer);
   }
 
   form > section.buttons {

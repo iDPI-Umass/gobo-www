@@ -161,7 +161,8 @@
     name="category"
     value="source"
     label="Block Category"
-    size="medium">
+    size="medium"
+    pill>
     <sl-option value="source">Source</sl-option>
     <sl-option value="username">Username</sl-option>
     <sl-option value="keyword">Keyword</sl-option>
@@ -283,5 +284,10 @@
 
   .keyword-table .keyword span {
     background: var(--gobo-color-active);
+  }
+
+  .gobo-form sl-select {
+    align-self: flex-start;
+    width: 10rem;
   }
 </style>

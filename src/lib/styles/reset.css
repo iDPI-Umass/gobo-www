@@ -41,7 +41,7 @@ body {
 }
 
 h1,h2,h3,h4,h5,h6 {
-  font-weight: var(--sl-font-weight-bold);
+  font-weight: var(--gobo-font-weight-black);
 }
 
 h1 {
@@ -85,4 +85,8 @@ p > a:focus {
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
+}
+
+.hidden {
+  display: none;
 }

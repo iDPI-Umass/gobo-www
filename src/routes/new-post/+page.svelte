@@ -8,25 +8,79 @@
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/textarea/textarea.js";
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
+  import "@shoelace-style/shoelace/dist/components/icon/icon.js";
+  import Spinner from "$lib/components/primitives/Spinner.svelte";
   import MastodonPreview from "$lib/components/MastodonPreview.svelte";
   import RedditPreview from "$lib/components/RedditPreview.svelte";
   import TwitterPreview from "$lib/components/TwitterPreview.svelte";
-  import { onDestroy, onMount } from "svelte";
-  import { browser } from "$app/environment";
-  import { goto } from "$app/navigation";
   import { scrollStore } from "$lib/stores/scroll.js";
   import { draftStore } from "$lib/stores/post-draft.js";
   import { previewStore } from "$lib/stores/image-preview.js";
+  import { getGOBOClient } from "$lib/helpers/account.js";
+  import { sort } from "$lib/helpers/identity.js";
+  import { onDestroy, onMount } from "svelte";
+  import { browser } from "$app/environment";
+  import { goto } from "$app/navigation";
+
 
   let configFrame, unsubscribeScroll;
   let draftData, unsubscribeDraft;
   let identities = [];
+  let allEmpty;
   let identitySwitches = {};
   let options = {};
   let targets = {};
   let content = null;
   let files = [];
   let fileInput;
+
+
+  const loadIdentities = async function () {
+    const client = await getGOBOClient();
+    let _identities;
+    try {
+      let body = await client.identityInfo();
+      _identities = body.identities;
+    } catch ( error ) {
+      console.error( error );
+      return;
+    }
+
+    if ( _identities.length === 0 ) {
+      allEmpty = true;
+    } else {
+      allEmpty = false;
+    }
+
+    _identities = sort( _identities );
+    
+    // Sync the draft store with data from the GOBO API.
+
+    // Remove any stored identities that GOBO doesn't know about.
+    for ( const key in draftData.identities ) {
+      const identity = draftData.identities[ key ]
+      const match = _identities.find( x => x.key === Number( key ) );
+      
+      if ( match == null ) {
+        delete draftData.identities[ key ];
+      } else {
+        // Allow stored active flag to take precedence.
+        match.active = identity.active; 
+      }
+    }
+
+    // Add any identities that the store doesn't know about.
+    for ( const identity of _identities ) {
+      let match = draftData.identities[ identity.key ];
+      if ( match == null ) {
+        draftData.identities[ identity.key ] = identity;
+      } 
+    }
+    
+    // Update both this component and the draft store.
+    identities = _identities;
+    draftStore.update({ identities: draftData.identities });
+  };
   
 
   const nullEmpty = function ( value ) {
@@ -42,35 +96,11 @@
   }
 
 
-  const setIdentities = function () {
-    for ( const key in draftData.identities ) {
-      const identity = draftData.identities[ key ];
-      const match = identities.find( i => i.key === identity.key );
-
-      if ( match == null ) {
-        identities.push( identity );
-      } else {
-        match.active = identity.active;
-      }
-    }
-
-    identities.sort( function ( A, B ) {
-      if ( A.key < B.key ) {
-        return -1;
-      } else {
-        return 1;
-      }
-    });
-
-    identities = identities;
-  };
-
   const setTargets = function () {
     const _targets = {}
-
     for ( const identity of identities ) {
       if ( identity.active === true ) {
-        _targets[ identity.platform ] = true;
+        _targets[ identity.type ] = true;
       }
     }
 
@@ -108,12 +138,8 @@
 
   const handleIdentitySwitch = function ( identity ) {
     return function ( event ) {
-      draftStore.updateIdentity({
-        [ identity.key ]: { 
-          ...identity, 
-          active: event.target.checked 
-        }
-      });
+      identity.active = event.target.checked;
+      draftStore.updateIdentity({ [ identity.key ]: identity });
     }
   };
 
@@ -236,7 +262,6 @@
 
       unsubscribeDraft = draftStore.subscribe( function ( draft ) {
         draftData = draft;
-        setIdentities();
         setOptions();
         setTargets();
         setContent();
@@ -252,13 +277,6 @@
           fileInput.value = null;
         }
       });
-
-      // Pull in registered identities.
-      draftStore.seed([
-        { platform: "mastodon", account: "@username@instance.com", name: "Username" },
-        { platform: "reddit", account: "u/username", name: "Username" },
-        { platform: "twitter", account: "@username", name: "Username" }
-      ]);
     });;
 
     onDestroy( function () {
@@ -269,34 +287,38 @@
 
 </script>
 
-<section class="gobo-config-frame" bind:this={configFrame}>
-  <h1>New Post</h1>
 
-  <section class="panel">
-    <h2>Write Text</h2>
-    <p>
-      If your post contains text, you can compose it here. GOBO will submit
-      this to each platform on your behalf.
-    </p>
+<h1>New Post</h1>
+
+<sl-divider></sl-divider>
+
+<form class="gobo-form" bind:this={configFrame}>
+
+  <section class="panel body">
+    <sl-select
+      on:sl-change={handleOptionVisibility}
+      name="visibility"
+      value={options.visibility}
+      size="medium"
+      pill>
+      <sl-option value="public">Public</sl-option>
+      <sl-option value="followers">Followers Only</sl-option>
+      <sl-option value="private">Private</sl-option>
+    </sl-select>
 
     <sl-textarea
       on:sl-input={handleContent}
       value={content}
+      placeholder="Compose your post here."
       size="medium"
-      rows=12>
+      resize="none"
+      rows=4>
     </sl-textarea>
   </section>
 
-  <sl-divider class="gobo-divider"></sl-divider>
 
-
-
-  <section class="panel">
+  <section class="panel media">
     <h2>Attach Media</h2>
-    <p>
-      Attach media files to be associated with this post. GOBO will submit
-      these to each platform on your behalf.
-    </p>
 
     <sl-checkbox
       on:sl-change={handleOptionSensitive}
@@ -330,117 +352,129 @@
       {/each}
     </div>
 
-    <sl-button
-      on:click={handleFileChrome}
-      on:keypress={handleFileChromeKey}
-      variant="primary"
-      size="medium">
-      <sl-icon slot="prefix" src="/icons/file-earmark-plus.svg"></sl-icon>
-      Add Attachment
-    </sl-button>
-
     <input 
       bind:this={fileInput}
       type="file"
       multiple=true
       class="hidden">
+
+    <sl-button
+      on:click={handleFileChrome}
+      on:keypress={handleFileChromeKey}
+      size="medium"
+      class="submit"
+      pill>
+      Add Attachment
+    </sl-button>
+
   </section>
 
-  <sl-divider class="gobo-divider"></sl-divider>
 
-
-
-
-
-  <section class="panel">
+  <section class="panel identities">
     <h2>Choose Identities</h2>
+    
     <p>
       Select the identities below you'd like to use to create this post. GOBO
       will submit posts to these platforms on your behalf.
     </p>
 
-    {#each identities as identity (identity.key)}
-      <div class="identity">
-        <sl-switch
-          bind:this={identitySwitches[ identity.key ]}
-          checked={identity.active}
-          on:sl-change={handleIdentitySwitch( identity )}
-          size="medium">
-        </sl-switch>
-        <sl-icon 
-          src="/icons/{identity.platform}.svg" 
-          style="color:var(--gobo-{identity.platform});"
-          size="medium">
-        </sl-icon>
-        {identity.account}
-      </div>
-    {/each}
+
+    {#await loadIdentities()}
+  
+      <Spinner></Spinner>
+  
+    {:then}
+      
+      {#each identities as identity (identity.key)}
+        <div class="identity">
+          
+          <div class="label">
+            <sl-icon 
+              src="/icons/{identity.type}.svg" 
+              class="{identity.type}"
+              size="medium">
+            </sl-icon>
+            {identity.fullUsername}
+          </div>
+
+          <sl-switch
+            bind:this={identitySwitches[ identity.key ]}
+            checked={identity.active}
+            on:sl-change={handleIdentitySwitch( identity )}
+            size="medium">
+          </sl-switch>
+          
+        </div>
+      {/each}
+    
+    {/await}
    
   </section>
 
-  <sl-divider class="gobo-divider"></sl-divider>
+
+  {#if (targets.mastodon === true) || (targets.reddit === true) }
+    <section class="panel options">
+      <h2>Identity Specific Options</h2>
+      <p>
+        Below are some options to configure your post. They will be applied as
+        appropriate when GOBO submits to each platform.
+      </p>
+    </section>
 
 
-
-
-  <section class="panel">
-    <h2>Set Options</h2>
-    <p>
-      Below are some options to configure your post. They will be applied as
-      appropriate when GOBO submits to each platform.
-    </p>
-
-    <sl-select
-      on:sl-change={handleOptionVisibility}
-      value={options.visibility}
-      label="Post Visibility"
-      help-text="This tells GOBO how public your post should be when it submits it to each platform."
-      size="medium">
-      <sl-option value="public">Public</sl-option>
-      <sl-option value="followers">Followers Only</sl-option>
-      <sl-option value="private">Private</sl-option>
-    </sl-select>
 
     {#if targets.mastodon === true }
-      <h3>Mastodon</h3>
+      <section class="panel options">
+        <div class="subheading">
+          <sl-icon 
+            src="/icons/mastodon.svg"
+            class="mastodon">
+          </sl-icon>
+          <h3>Mastodon</h3>
+        </div>
 
-      <sl-input
-        on:sl-input={handleOptionSpoilerText}
-        value={options.spoilerText}
-        label="Spoiler Text"
-        help-text="Provide text that will contextualize content behind warning."
-        autocomplete="off"
-        size="medium">
-      </sl-input>
+        <sl-input
+          on:sl-input={handleOptionSpoilerText}
+          value={options.spoilerText}
+          label="Spoiler Text"
+          help-text="Provide text that will contextualize content behind warning."
+          autocomplete="off"
+          size="medium">
+        </sl-input>
+      </section>
     {/if}
 
     {#if targets.reddit === true }
-      <h3>Reddit</h3>
+      <section class="panel options">
+        <div class="subheading">
+          <sl-icon 
+            src="/icons/reddit.svg"
+            class="reddit">
+          </sl-icon>
+          <h3>Reddit</h3>
+        </div>
 
-      <sl-input
-        on:sl-input={handleOptionTitle}
-        value={options.title}
-        label="Post Title"
-        help-text="Provide a title that will appear in your Reddit post."
-        size="medium">
-      </sl-input>
-    
-      <sl-input
-        on:sl-input={handleOptionSubreddit}
-        value={options.subreddit}
-        label="Target Subreddit"
-        help-text="This is the subreddit where GOBO will submit your post."
-        size="medium">
-      </sl-input>
+        <sl-input
+          on:sl-input={handleOptionTitle}
+          value={options.title}
+          label="Post Title"
+          help-text="Provide a title that will appear in your Reddit post."
+          size="medium">
+        </sl-input>
+      
+        <sl-input
+          on:sl-input={handleOptionSubreddit}
+          value={options.subreddit}
+          label="Target Subreddit"
+          help-text="This is the subreddit where GOBO will submit your post."
+          size="medium">
+        </sl-input>
+      </section>
     {/if}
-  </section>
-
-  <sl-divider class="gobo-divider"></sl-divider>
+  {/if}
 
 
-
-
-  <section class="panel">
+  <section class="panel preview">
     <h2>Preview</h2>
     <p>
       This section provides an approximation of how your posts will appear on
@@ -469,12 +503,8 @@
     
   </section>
 
-  <sl-divider class="gobo-divider"></sl-divider>
 
-
-
-
-  <section class="panel">
+  <section class="panel publish">
     <h2>Publish</h2>
     <p>
       Publish your post. GOBO will issue requests to each of the platforms 
@@ -483,70 +513,164 @@
 
     <div class="buttons">
       <sl-button
-        class="discard-button"
-        variant="danger"
-        size="medium">
-        Discard Draft
+        class="cancel"
+        size="medium"
+        pill>
+        Discard
       </sl-button>
 
       <sl-button
-        class="publish-button"
-        variant="primary"
-        size="medium">
+        class="submit"
+        size="medium"
+        pill>
         Publish
       </sl-button>
     </div>
    
   </section>
 
-  <sl-divider class="gobo-divider"></sl-divider>
-</section>
+</form>
 
 <style>
-  .panel.extra-wide {
-    max-width: unset;
+  h1 {
+    margin-bottom: var(--gobo-height-spacer-half);
   }
 
-  .identity {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: center;
-    height: 3rem;
+  sl-divider {
+    margin-bottom: var(--gobo-height-spacer);
   }
 
-  .identity > sl-switch {
-    margin-left: 0.25rem;
-    margin-right: 0.5rem;
+  .gobo-form {
+    margin-top: 0;
+    padding: 0;
   }
 
-  .identity > sl-icon {
-    font-size: 1.5rem;
-    margin-right: 0.5rem;
+  .gobo-form .panel > * {
+    margin-bottom: 1rem;
   }
 
-  .panel > .identity {
+  .gobo-form .panel > :last-child {
     margin-bottom: 0;
   }
 
-  .hidden {
-    display: none;
+  .gobo-form .panel {
+    padding: 0 var(--gobo-width-spacer) var(--gobo-height-spacer) var(--gobo-width-spacer);
+    border-bottom: var(--gobo-border-panel);
   }
 
-  sl-button {
-    align-self: flex-end;
+  .gobo-form .panel:first-child {
+    padding-top: var(--gobo-height-spacer);
   }
 
-  .buttons {
+  .gobo-form .panel:last-child {
+    border-bottom: var(--gobo-height-spacer);
+  }
+
+  .gobo-form .panel h2 {
+    font-size: var(--gobo-font-size-x-large);
+    font-weight: var(--gobo-font-weight-medium);
+  }
+
+  .gobo-form .panel h3 {
+    font-size: var(--gobo-font-size-large);
+    font-weight: var(--gobo-font-weight-black);
+  }
+
+
+
+  .panel.body sl-select {
+    align-self: flex-start;
+    width: 12rem;
+  }
+
+  .panel.body sl-select::part(combobox) {
+    font-weight: var(--gobo-font-weight-medium);
+  }
+
+  .panel.body sl-textarea::part(base) {
+    font-size: 1.125rem;
+    /* height: 7rem; */
+    border-radius: var(--gobo-border-radius)
+  }
+
+  .panel.body sl-textarea::part(textarea) {
+    padding: 1rem;
+  }
+
+
+
+  .panel.identities .identity {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: space-between;
     align-items: center;
+    height: 4rem;
+    margin-bottom: 0;
+    border-radius: var(--gobo-border-radius);
+    border: var(--gobo-border-panel);
+    margin-bottom: var(--gobo-height-spacer-half);
+    padding: var(--gobo-height-spacer) var(--gobo-width-spacer);
   }
 
-  h3 {
-    margin-bottom: 0.5rem;
+  .panel.identities .identity:last-child {
+    margin-bottom: 0;
   }
+
+  .panel.identities .identity > * {
+    margin-bottom: 0;
+  }
+
+  .panel.identities .identity .label {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  .panel.identities .identity sl-switch {
+    margin-left: 0.25rem;
+    margin-right: 0.5rem;
+  }
+  
+  .panel.identities .identity sl-icon {
+    font-size: 1.5rem;
+    margin-right: 0.5rem;
+  }
+
+  .panel.options .subheading {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+  }
+
+  .panel.options .subheading sl-icon {
+    font-size: 1.25rem;
+    margin-right: var(--gobo-width-spacer-half);
+    margin-bottom: 0;
+  }
+
+
+  .panel.publish p {
+    margin: 0;
+  }
+
+  .panel.publish .buttons {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
+  }
+
+  .panel.publish .buttons sl-button {
+    margin-bottom: 0;
+    width: 10rem;
+  }
+
 </style>
 

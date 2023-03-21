@@ -4,39 +4,29 @@
   import Identity from "$lib/components/Identity.svelte";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
   import { getGOBOClient } from "$lib/helpers/account.js";
+  import { sort } from "$lib/helpers/identity";
 
-  let mastodons = [];
-  let reddits = [];
-  let twitters = [];
+  let identities = [];
   let allEmpty = false;
 
   const loadIdentities = async function () {
     const client = await getGOBOClient();
-    let identities;
+    let _identities;
     try {
       let body = await client.identityInfo();
-      identities = body.identities;
+      _identities = body.identities;
     } catch ( error ) {
       console.error( error );
       return;
     }
 
-    if ( identities.length === 0 ) {
+    if ( _identities.length === 0 ) {
       allEmpty = true;
     } else {
       allEmpty = false;
     }
 
-    for ( const identity of identities ) {
-      if ( identity.base_url === "twitter.com" ) {
-        twitters.push( identity );
-      } else if ( identity.base_url === "www.reddit.com" ) {
-        reddits.push( identity );
-      } else {
-        mastodons.push( identity );
-      }
-    }
-
+    identities = sort( _identities );
   };
 </script>
   
@@ -69,17 +59,10 @@
         <p>No identities currently registered.</p>
       {/if}
 
-      {#each mastodons as mastodon}  
-        <Identity type="mastodon" {...mastodon}></Identity>
-      {/each}
-      
-      {#each reddits as reddit}  
-        <Identity type="reddit" {...reddit}></Identity>
+      {#each identities as identity (identity.key)}  
+        <Identity {identity}></Identity>
       {/each}
 
-      {#each twitters as twitter}  
-        <Identity type="twitter" {...twitter}></Identity>
-      {/each}
     </section>
 
   {/await}

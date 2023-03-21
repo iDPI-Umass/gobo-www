@@ -3,55 +3,22 @@
   import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import { getGOBOClient } from "$lib/helpers/account.js";
- 
-  export let type;
-  export let base_url;
-  export let profile_url;
-  export let display_name;
-  export let identity_id;
-  export let profile_image;
-  export let username;
+
+  
+  export let identity;  
   
   let button;
+  let logo = `/icons/${ identity.type }.svg`;
+  let nameSlot1 = identity.display_name;
+  let nameSlot2 = identity.fullUsername;
 
-  let colors = {
-    mastodon: "#6364FF",
-    reddit: "#ff4500",
-    twitter: "#1d9bf0"
-  };
-
-  let logo = `/icons/${ type }.svg`;
-  let brandColor = colors[ type ];
-
-  let nameSlot1 = display_name;
-  let nameSlot2;
-  let hostname;
-  switch ( type ) {
-    case "twitter":
-      nameSlot2 = `@${ username }`;
-      break;
-    case "reddit":
-      nameSlot2 = `u/${ username }`;
-      break;
-    case "mastodon":
-      // We just want the hostname to form a fully specified Mastodon reference.
-      if ( base_url.startsWith( "https://" ) === true ) {
-        let url = new URL( base_url );
-        hostname = url.hostname;
-      } else {
-        hostname = base_url;
-      }
-      
-      nameSlot2 = `@${ username }@${ hostname }`;
-      break;
-  }
 
   const deleteIdentity = async function ( event ) {
     event.preventDefault();
     button.loading = true;
     const client = await getGOBOClient();
     await client.removeIdentity({
-      parameters: { base_url, identity_id }
+      parameters: identity
     });
 
     // TODO: Figure out how to do this in svelte. I keep getting search results
@@ -64,9 +31,9 @@
 
   <header>
     
-    <sl-icon src={logo} style="color: {brandColor};"></sl-icon>
+    <sl-icon src={logo} class="{identity.type}"></sl-icon>
     
-    <h2>{type}</h2>
+    <h2>{identity.type}</h2>
     
     <sl-icon-button
       bind:this={button}
@@ -83,7 +50,9 @@
   
   <div class="profile-display">
     
-    <img src={profile_image} alt="profile picture for {username}">
+    <img 
+      src={identity.profile_image} 
+      alt="profile picture for {identity.fullUsername}">
     
     <div class="names">
       {#if nameSlot1 != null}

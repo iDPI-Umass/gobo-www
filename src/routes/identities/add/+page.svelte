@@ -73,20 +73,27 @@
 </BackLink>
 
 <form class="gobo-form" bind:this={form}>
-
-  <h2>Select a Platform</h2>
   
+  <h2>Select Platform</h2>
+
   <p>
-    Select a platform below. You'll need to grant GOBO consent to establish an
-    identity. The identities you establish allow GOBO to construct feeds you control.
+    GOBO can connect an identity for you once you grant consent. When you 
+    press "Add Identity" below, you will be sent to the social media platform
+    that hosts the identity. Once there, please sign in and authorize GOBO to
+    connect your new identity.
+  </p>
+    
+  <p>
+    If you would like to learn more about identies,
+    please see <a href="/identities/about">About Identities</a>.
   </p>
 
   <sl-select
     bind:this={select}
     name="platform"
     value="mastodon"
-    help-text="Select a social media platform. You'll be sent to that platform to sign in."
-    size="medium">
+    size="medium"
+    pill>
     <sl-option value="mastodon">Mastodon</sl-option>
     <sl-option value="reddit">Reddit</sl-option>
     <sl-option value="twitter">Twitter</sl-option>
@@ -115,7 +122,12 @@
 </form>
 
 <style>
-  form > sl-divider {
+  .gobo-form sl-select {
+    width: 10rem;
+    align-self: flex-start;
+  }
+
+  .gobo-form sl-divider {
     margin-bottom: 1rem;
   }
 </style>

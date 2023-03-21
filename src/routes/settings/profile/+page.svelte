@@ -7,7 +7,7 @@
   import { getGOBOClient } from "$lib/helpers/account";
   import { onDestroy, onMount } from "svelte";
   let form, button, nameInput;
-  let currentName, unsubscribeProfileStore;
+  let unsubscribeProfileStore;
 
   const validate = function() {
     return form.reportValidity();  

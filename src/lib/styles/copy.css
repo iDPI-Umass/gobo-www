@@ -10,26 +10,93 @@
   border-radius: var(--gobo-border-radius);
 }
 
-.gobo-copy > h1 {
+.gobo-copy h1 {
   font-size: var(--sl-font-size-x-large);
   margin-bottom: 2rem;
 }
 
-.gobo-copy > h2 {
+.gobo-copy h2 {
   font-size: var(--sl-font-size-large);
   margin-bottom: 1rem;
 }
 
-.gobo-copy > p + h2 {
+.gobo-copy p + h2 {
   font-size: var(--sl-font-size-large);
   margin-top: 2rem;
 }
 
-.gobo-copy > p {
+.gobo-copy p {
   font-size: var(--sl-font-size-medium);
   margin-bottom: 1rem;
 }
 
-.gobo-copy > sl-divider {
+.gobo-copy a {
+  text-decoration: none;
+}
+
+.gobo-copy sl-divider {
   --color: var(--gobo-color-border-panel);
+}
+
+
+
+
+
+.gobo-copy sl-button.submit::part(base) {
+  background: var(--gobo-color-primary);
+  border: none;
+}
+
+.gobo-copy sl-button.submit:hover::part(base) {
+  background: var(--gobo-color-primary);
+  border: none;
+}
+
+.gobo-copy sl-button.submit::part(label) {
+  color: var(--gobo-color-primary-text);
+  font-weight: var(--gobo-font-weight-bold);
+}
+
+.gobo-copy sl-button.submit:hover::part(label) {
+  color: var(--gobo-color-primary-text);
+}
+
+
+.gobo-copy sl-button.cancel::part(base) {
+  background: var(--gobo-color-cancel);
+  border: 1px solid var(--gobo-color-cancel-text);
+}
+
+.gobo-copy sl-button.cancel:hover::part(base) {
+  background: var(--gobo-color-cancel);
+  border: 1px solid var(--gobo-color-cancel-text);
+}
+
+.gobo-copy sl-button.cancel::part(label) {
+  color: var(--gobo-color-cancel-text);
+  font-weight: var(--gobo-font-weight-bold);
+}
+
+.gobo-copy sl-button.cancel:hover::part(label) {
+  color: var(--gobo-color-cancel-text);
+}
+
+
+.gobo-copy sl-button.action::part(base) {
+  background: var(--gobo-color-active);
+  border: none;
+}
+
+.gobo-copy sl-button.action:hover::part(base) {
+  background: var(--gobo-color-active);
+  border: none;
+}
+
+.gobo-copy sl-button.action::part(label) {
+  color: var(--gobo-color-active-text);
+  font-weight: var(--gobo-font-weight-bold);
+}
+
+.gobo-copy sl-button.action:hover::part(label) {
+  color: var(--gobo-color-active-text);
 }

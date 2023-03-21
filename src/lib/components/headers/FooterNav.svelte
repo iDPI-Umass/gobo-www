@@ -10,7 +10,7 @@
 
     <!-- <sl-icon-button
       src="/icons/search.svg"
-      href="/home/search"></sl-icon-button> -->
+      href="/search"></sl-icon-button> -->
 
     <sl-icon-button
       src="/icons/identities.svg"
@@ -22,7 +22,7 @@
 
     <sl-icon-button
       src="/icons/pencil-square.svg"
-      href="/home/new-post"></sl-icon-button>
+      href="/new-post"></sl-icon-button>
   </nav>
 </footer>
 

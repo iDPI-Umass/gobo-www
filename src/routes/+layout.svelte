@@ -1,10 +1,11 @@
 <script>
-  // Start with third-party CSS.
-  import "@shoelace-style/shoelace/dist/themes/light.css";
+  // Base themes and fonts for project.
+  import "$lib/styles/themes.css";
+  import "$lib/styles/gobo-light-theme.css";
+  import "$lib/styles/gobo-dark-theme.css";
   import "$lib/styles/fonts.css";
 
-  // Add in classes created for this project.
-  import "$lib/styles/themes.css";
+  // Pull in more application specific CSS stylings.
   import "$lib/styles/reset.css";
   import "$lib/styles/config-panel.css";
   import "$lib/styles/copy.css";
@@ -29,9 +30,9 @@
 
         const html = document.querySelector( "html" )
         if ( config.dark === true ) {
-          html.classList.add( "gobo-theme-dark" );
+          html.classList.add( "gobo-theme-dark", "sl-theme-dark" );
         } else {
-          html.classList.remove( "gobo-theme-dark" );
+          html.classList.remove( "gobo-theme-dark", "sl-theme-dark" );
         }
 
         switch( config.fontSize ) {

@@ -85,22 +85,6 @@ const createStore = function () {
         Object.assign( draft.options, data );
         return write( draft );
       });
-    },
-    seed: function ( list ) {
-      update( function ( draft ) {
-        for ( const identity of list ) {
-          const key = buildKey( identity );
-          identity.key = key;
-          if ( draft.identities[ key ] == null ) {
-            Object.assign( draft.identities, {
-              [ key ]: identity 
-            });
-          }
-        }
-
-        return write( draft );
-      })
-      
     }
   };
 };

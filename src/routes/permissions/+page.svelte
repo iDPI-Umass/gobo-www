@@ -40,10 +40,11 @@
 
     <div class="button-panel">
       <sl-button
-        variant="primary"
         on:click={logout}
         on:keypress={logout}
-        size="medium">
+        class="submit"
+        size="medium"
+        pill>
         Logout
       </sl-button>
     </div>
