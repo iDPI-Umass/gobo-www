@@ -5,6 +5,7 @@
   import PostMedia from "$lib/components/PostMedia.svelte";
   import PostPoll from "$lib/components/PostPoll.svelte";
   import { humanize } from "$lib/helpers/humanize";
+  import { goto } from "$app/navigation";
 
   export let id;
   export let type;
@@ -69,27 +70,78 @@
       break;
   }
 
+  // Trace DOM parents until we get to overall post article.
+  const hasLinkParent = function ( element ) {
+    if ( element.parentNode.tagName === "A" ) {
+      return true;
+    } else if ( element.parentNode.tagName === "ARTICLE" ) {
+      return false;
+    } else {
+      return hasLinkParent( element.parentNode );
+    }
+  }
+
+  const isLink = function ( element ) {
+    if ( element.tagName === "A" ) {
+      return true;
+    } else if ( element.tagName === "ARTICLE" ) {
+      return false;
+    } else {
+      return hasLinkParent( element )
+    }
+  }
+
+  const handleClick = function ( event ) {
+    // Bail if this is a non-Enter key press event.
+    if ( (event.type === "keydown") && (event.key !== "Enter") ) {
+      return;
+    }
+
+    // Bail if this is already the post's main page.
+    if ( fullPage === true ) {
+      return;
+    }
+
+    // Bail if agent clicked a legit link.
+    if ( isLink( event.target ) ) {
+      return;
+    }
+
+    // Bail if the agent is trying to highlight text for non-link purposes.
+    if ( window.getSelection().toString().length > 0 ) {
+      return;
+    }
+
+    // Go to the post's main page.
+    goto( `/post/${ id }`);
+  }
+
 </script>
 
-<article class="outer-frame">
-  {#if fullPage !== true}
-    <!-- svelte-ignore a11y-missing-content -->
-    <a class="card-link" href={`/post/${id}`} aria-label="expand post"></a>
-  {/if}
+<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+<article 
+  class="outer-frame" 
+  tabindex={fullPage ? undefined : "0"} 
+  aria-label={fullPage ? undefined : "gobo-post"}
+  role={fullPage ? undefined : "link"}
+  style="--cursor:{fullPage ? "inherit" : "pointer"};"
+  on:click={handleClick}
+  on:keydown={handleClick}>
 
-  <section class="inner-frame">
-    <section class="gutter">
-      <img src="{avatar}" alt="profile avatar for this post">
-    </section>
 
-    <section class="main">
+  <div class="inner-frame">
+    <aside class="gutter">
+      <img src="{avatar}" alt={`avatar for ${ headingSlot1 }`}>
+    </aside>
+
+    <div class="main">
       
       <header>
         <span class="names">
           <span class="slot1">{ headingSlot1 }</span>
           <span class="slot2">{ headingSlot2 }</span>
         </span>
-        <span class="timestamp">{ humanize( created ) }</span>
+        <time datetime="created">{ humanize( created ) }</time>
       </header>
 
       <section class="content" style={fullPage === true ? "max-height:unset" : ""}>
@@ -112,9 +164,9 @@
         </div>
       {/if}
 
-    </section>
+    </div>
 
-  </section>
+  </div>
 
 
   <footer>
@@ -122,7 +174,7 @@
     <a
       class="why"
       href="/why-am-i-seeing-this">
-      <span>Why am I seeing this?</span>
+      Why am I seeing this?
     </a>
     
     <a
@@ -146,32 +198,23 @@
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: stretch;
-    margin: 1rem 0 1rem 0;
-    padding: 0;
     max-width: var(--gobo-max-width-primary);
     background: var(--gobo-color-panel);
     border: var(--gobo-border-panel);
     border-radius: var(--gobo-border-radius);
     margin-bottom: var(--gobo-height-spacer);
+    box-sizing: border-box;
+    cursor: var(--cursor);
   }
 
-  .outer-frame .card-link::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    border-radius: var(--gobo-border-radius);
-    z-index: 1;
+  .outer-frame:focus-visible {
+    outline: 2px solid var(--gobo-color-primary);
   }
 
-  .outer-frame .card-link:focus {
-    border: none;
-  }
-
-  .outer-frame .card-link:focus::after {
-    border: 2px solid var(--gobo-color-primary);
+  @supports not selector(:focus-visible) {
+    .outer-frame:focus {
+      outline: 2px solid var(--gobo-color-primary);
+    }
   }
 
   .outer-frame .inner-frame {
@@ -243,7 +286,7 @@
     flex: 1 2 40%;
   }
 
-  .outer-frame .inner-frame .main header .timestamp {
+  .outer-frame .inner-frame .main header time {
     font-size: var(--gobo-font-size-detail);
     font-weight: var(--gobo-font-weight-regular);
     color: var(--gobo-color-text-muted);
@@ -261,7 +304,6 @@
     max-height: 12rem;
     overflow-y: hidden;
     margin-bottom: var(--gobo-height-spacer);
-    z-index: 2;
   }
 
   .outer-frame .inner-frame .main .content > * {
@@ -280,7 +322,6 @@
 
   .outer-frame .inner-frame .main .content :global(a) {
     position: relative;
-    z-index: 2;
   }
 
 
@@ -291,7 +332,6 @@
 
   .outer-frame .inner-frame .main .media :global(a) {
     position: relative;
-    z-index: 2;
   }
 
 
@@ -315,7 +355,6 @@
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: center;
-    z-index: 2;
   }
 
   .outer-frame footer a {
@@ -328,9 +367,6 @@
     font-size: var(--gobo-font-size-detail);
   }
 
-  .outer-frame footer a:focus {
-    margin: -2px;
-  }
 
   .outer-frame footer a sl-icon {
     font-size: 1rem;

@@ -27,11 +27,6 @@
     align-items: center;
   }
 
-  .nav-link:focus {
-    margin: 0;
-    padding: calc( 1rem - 2px );
-  }
-
   sl-icon {
     font-size: 20px;
     color: var(--gobo-color-text);

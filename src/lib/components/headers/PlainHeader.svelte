@@ -30,18 +30,8 @@
     font-size: var(--sl-font-size-2x-large);
     text-decoration: none;
     color: initial;
-    margin: 4px;
-    padding: calc( 1rem - 4px ); 
+    padding: 1rem; 
     flex: 0 0 auto;
   }
 
-  header > nav > .logo:focus {
-    font-family: var(--sl-font-sans);
-    font-size: var(--sl-font-size-2x-large);
-    text-decoration: none;
-    color: initial;
-    margin: 4px;
-    padding: calc( 1rem - 6px ); 
-    flex: 0 0 auto;
-  }
 </style>

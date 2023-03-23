@@ -48,7 +48,7 @@
 </script>
 
 
-<section bind:this={feed} role="feed">
+<section bind:this={feed} role="feed" class="feed">
   <div class="subheader">
     <h1>Home</h1>
     <sl-icon-button 
@@ -84,6 +84,14 @@
 </section>
 
 <style>
+  .feed {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    padding: var(--gobo-height-spacer) 0 0 var(--gobo-width-spacer);
+  }
+
   .subheader {
     display: flex;
     flex-direction: row;
@@ -105,6 +113,10 @@
 
   .subheader > sl-icon-button::part(base) {
     color: var(--gobo-color-text-muted);
+  }
+
+  sl-divider {
+    margin-bottom: var(--gobo-height-spacer);
   }
 
   /* .viewheader {

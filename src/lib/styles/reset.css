@@ -66,17 +66,28 @@ p > a, p > a:hover, p > a:visited {
   display: inline;
 }
 
-a:focus {
-  outline: none;
-  border: 2px solid var(--gobo-color-primary);
+a:focus-visible {
+  outline: 2px solid var(--gobo-color-primary);
   border-radius: var(--sl-border-radius-medium);
 }
 
-p > a:focus {
-  outline: none;
-  border: 2px solid var(--gobo-color-primary);
+@supports not selector(:focus-visible) {
+  a:focus {
+    outline: 2px solid var(--gobo-color-primary);
+    border-radius: var(--sl-border-radius-medium);
+  }
+}
+
+p > a:focus-visible {
+  outline: 2px solid var(--gobo-color-primary);
   border-radius: var(--sl-border-radius-medium);
-  margin: -2px;
+}
+
+@supports not selector(:focus-visible) {
+  p > a:focus {
+    outline: 2px solid var(--gobo-color-primary);
+    border-radius: var(--sl-border-radius-medium);
+  }
 }
 
 .page-wrapper {

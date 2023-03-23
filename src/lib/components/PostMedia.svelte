@@ -22,128 +22,33 @@
 
 
   {#if media.length === 1}
-    <a class="media-single" href="{`/display/${id}/0`}">
-      {#if isImage( media[0] )}
-        <img 
-          src={media[0].url}
-          alt="uploaded"
-          on:load={handleSingleLoad}>
-      {:else if isVideo( media[0] )}
-        <!-- svelte-ignore a11y-media-has-caption -->
-        <video 
-          loop 
-          controls
-          on:loadedmetadata={handleSingleLoad}>
-          <source 
+    <a href="{`/display/${id}/0`}">
+      <figure>
+        {#if isImage( media[0] )}
+          <img 
             src={media[0].url}
-            type={media[0].type}>
-        </video>
+            alt="uploaded"
+            on:load={handleSingleLoad}>
+        {:else if isVideo( media[0] )}
+          <!-- svelte-ignore a11y-media-has-caption -->
+          <video 
+            loop 
+            controls
+            on:loadedmetadata={handleSingleLoad}>
+            <source 
+              src={media[0].url}
+              type={media[0].type}>
+          </video>
       {/if}
+      </figure>
+      
     </a>
 
   {:else if media.length === 2}
     <div class="media">
       <div class="left">
-        <a class="media-single" href="{`/display/${id}/0`}">
-          {#if isImage( media[0] )}
-            <img 
-              src={media[0].url}
-              alt="uploaded">
-          {:else if isVideo( media[0] )}
-            <!-- svelte-ignore a11y-media-has-caption -->
-            <video loop controls>
-              <source 
-                src={media[0].url}
-                type={media[0].type}
-                on:load={media}>
-            </video>
-          {/if}
-        </a>
-      </div>
-
-      <div class="right">
-        <a class="media-single" href="{`/display/${id}/1`}">
-          {#if isImage( media[1] )}
-            <img 
-              src={media[1].url}
-              alt="uploaded">
-          {:else if isVideo( media[1] )}
-            <!-- svelte-ignore a11y-media-has-caption -->
-            <video loop controls>
-              <source 
-                src={media[1].url}
-                type={media[1].type}
-                on:load={media}>
-            </video>
-          {/if}
-        </a>
-      </div>
-    </div>
-
-  {:else if media.length === 3}
-    <div class="media">
-      <div class="left">
-        <a class="media-single" href="{`/display/${id}/0`}">
-          {#if isImage( media[0] )}
-            <img 
-              src={media[0].url}
-              alt="uploaded">
-          {:else if isVideo( media[0] )}
-            <!-- svelte-ignore a11y-media-has-caption -->
-            <video loop controls>
-              <source 
-                src={media[0].url}
-                type={media[0].type}
-                on:load={media}>
-            </video>
-          {/if}
-        </a>
-      </div>
-
-      <div class="right">
-        <div class="top">
-          <a class="media-single" href="{`/display/${id}/1`}">
-            {#if isImage( media[1] )}
-              <img 
-                src={media[1].url}
-                alt="uploaded">
-            {:else if isVideo( media[1] )}
-              <!-- svelte-ignore a11y-media-has-caption -->
-              <video loop controls>
-                <source 
-                  src={media[1].url}
-                  type={media[1].type}
-                  on:load={media}>
-              </video>
-            {/if}
-          </a>
-        </div>
-
-        <div class="bottom">
-          <a class="media-single" href="{`/display/${id}/2`}">
-            {#if isImage( media[2] )}
-              <img 
-                src={media[2].url}
-                alt="uploaded">
-            {:else if isVideo( media[2] )}
-              <!-- svelte-ignore a11y-media-has-caption -->
-              <video loop controls>
-                <source 
-                  src={media[2].url}
-                  type={media[2].type}
-                  on:load={media}>
-              </video>
-            {/if}
-          </a>
-        </div>
-      </div>
-    </div>
-
-  {:else if media.length === 4}
-    <div class="media">
-      <div class="left">
-        <div class="top">
-          <a class="media-single" href="{`/display/${id}/0`}">
+        <a href="{`/display/${id}/0`}">
+          <figure>
             {#if isImage( media[0] )}
               <img 
                 src={media[0].url}
@@ -157,31 +62,13 @@
                   on:load={media}>
               </video>
             {/if}
-          </a>
-        </div>
-
-        <div class="bottom">
-          <a class="media-single" href="{`/display/${id}/2`}">
-            {#if isImage( media[2] )}
-              <img 
-                src={media[2].url}
-                alt="uploaded">
-            {:else if isVideo( media[2] )}
-              <!-- svelte-ignore a11y-media-has-caption -->
-              <video loop controls>
-                <source 
-                  src={media[2].url}
-                  type={media[2].type}
-                  on:load={media}>
-              </video>
-            {/if}
-          </a>
-        </div>
+          </figure>
+        </a>
       </div>
 
       <div class="right">
-        <div class="top">
-          <a class="media-single" href="{`/display/${id}/1`}">
+        <a href="{`/display/${id}/1`}">
+          <figure>
             {#if isImage( media[1] )}
               <img 
                 src={media[1].url}
@@ -195,24 +82,158 @@
                   on:load={media}>
               </video>
             {/if}
+          </figure>
+        </a>
+      </div>
+    </div>
+
+  {:else if media.length === 3}
+    <div class="media">
+      <div class="left">
+        <a href="{`/display/${id}/0`}">
+          <figure>
+            {#if isImage( media[0] )}
+              <img 
+                src={media[0].url}
+                alt="uploaded">
+            {:else if isVideo( media[0] )}
+              <!-- svelte-ignore a11y-media-has-caption -->
+              <video loop controls>
+                <source 
+                  src={media[0].url}
+                  type={media[0].type}
+                  on:load={media}>
+              </video>
+            {/if}
+          </figure>
+        </a>
+      </div>
+
+      <div class="right">
+        <div class="top">
+          <a href="{`/display/${id}/1`}">
+            <figure>
+              {#if isImage( media[1] )}
+                <img 
+                  src={media[1].url}
+                  alt="uploaded">
+              {:else if isVideo( media[1] )}
+                <!-- svelte-ignore a11y-media-has-caption -->
+                <video loop controls>
+                  <source 
+                    src={media[1].url}
+                    type={media[1].type}
+                    on:load={media}>
+                </video>
+              {/if}
+            </figure>
           </a>
         </div>
 
         <div class="bottom">
-          <a class="media-single" href="{`/display/${id}/3`}">
-            {#if isImage( media[3] )}
-              <img 
-                src={media[3].url}
-                alt="uploaded">
-            {:else if isVideo( media[3] )}
-              <!-- svelte-ignore a11y-media-has-caption -->
-              <video loop controls>
-                <source 
+          <a href="{`/display/${id}/2`}">
+            <figure>
+              {#if isImage( media[2] )}
+                <img 
+                  src={media[2].url}
+                  alt="uploaded">
+              {:else if isVideo( media[2] )}
+                <!-- svelte-ignore a11y-media-has-caption -->
+                <video loop controls>
+                  <source 
+                    src={media[2].url}
+                    type={media[2].type}
+                    on:load={media}>
+                </video>
+              {/if}
+            </figure>
+          </a>
+        </div>
+      </div>
+    </div>
+
+  {:else if media.length === 4}
+    <div class="media">
+      <div class="left">
+        <div class="top">
+          <a href="{`/display/${id}/0`}">
+            <figure>
+              {#if isImage( media[0] )}
+                <img 
+                  src={media[0].url}
+                  alt="uploaded">
+              {:else if isVideo( media[0] )}
+                <!-- svelte-ignore a11y-media-has-caption -->
+                <video loop controls>
+                  <source 
+                    src={media[0].url}
+                    type={media[0].type}
+                    on:load={media}>
+                </video>
+              {/if}
+            </figure>
+          </a>
+        </div>
+
+        <div class="bottom">
+          <a href="{`/display/${id}/2`}">
+            <figure>
+              {#if isImage( media[2] )}
+                <img 
+                  src={media[2].url}
+                  alt="uploaded">
+              {:else if isVideo( media[2] )}
+                <!-- svelte-ignore a11y-media-has-caption -->
+                <video loop controls>
+                  <source 
+                    src={media[2].url}
+                    type={media[2].type}
+                    on:load={media}>
+                </video>
+              {/if}
+            </figure>
+          </a>
+        </div>
+      </div>
+
+      <div class="right">
+        <div class="top">
+          <a href="{`/display/${id}/1`}">
+            <figure>
+              {#if isImage( media[1] )}
+                <img 
+                  src={media[1].url}
+                  alt="uploaded">
+              {:else if isVideo( media[1] )}
+                <!-- svelte-ignore a11y-media-has-caption -->
+                <video loop controls>
+                  <source 
+                    src={media[1].url}
+                    type={media[1].type}
+                    on:load={media}>
+                </video>
+              {/if}
+            </figure>
+          </a>
+        </div>
+
+        <div class="bottom">
+          <a href="{`/display/${id}/3`}">
+            <figure>
+              {#if isImage( media[3] )}
+                <img 
                   src={media[3].url}
-                  type={media[3].type}
-                  on:load={media}>
-              </video>
-            {/if}
+                  alt="uploaded">
+              {:else if isVideo( media[3] )}
+                <!-- svelte-ignore a11y-media-has-caption -->
+                <video loop controls>
+                  <source 
+                    src={media[3].url}
+                    type={media[3].type}
+                    on:load={media}>
+                </video>
+              {/if}
+            </figure>
           </a>
         </div>
       </div>
@@ -228,7 +249,7 @@
     --gap: 10px;
   }
 
-  .media-single {
+  figure {
     margin: 0;
     padding: 0;
     max-width: 36rem;
@@ -236,17 +257,13 @@
     justify-content: center;
   }
 
-  .media-single:focus {
-    margin: -2px;
-  }
-
-  .media-single > img {
+  figure > img {
     object-fit: contain;
     border-radius: var(--gobo-border-radius);
     border: var(--gobo-border-panel);
   }
 
-  .media-single > video {
+  figure > video {
     width: 100%;
     object-fit: contain;
     object-position: center center;
@@ -292,15 +309,14 @@
     margin-bottom: var(--gap);
   }
 
-  .media .media-single {
+  .media a,
+  .media figure {
     height: 100%;
     width: 100%;
     border-radius: var(--gobo-border-radius);
-    /* Allows the focus outline to appear without visual wiggle. */
-    box-sizing: content-box;
   }
 
-  .media .media-single > img {
+  .media figure > img {
     height: 100%;
     width: 100%;
     object-fit: cover;
@@ -308,7 +324,7 @@
     border-radius: var(--gobo-border-radius);
   }
 
-  .media .media-single > video {
+  .media figure > video {
     height: 100%;
     width: 100%;
     object-fit: contain;
