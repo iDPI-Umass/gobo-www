@@ -70,6 +70,22 @@
       break;
   }
 
+  const styles = {}
+  if ( fullPage === true ) {
+    styles.cursor = "inherit";
+  } else {
+    styles.cursor = "pointer";
+  }
+  
+  styles.maxHeight = "15rem";
+  styles.gradientStop = "10rem";
+  if ( fullPage === true ) {
+    styles.gradient = "none"
+  } else {
+    styles.gradient = "linear-gradient( 180deg, #000 var(--gradient-stop), transparent )"
+  }
+
+
   // Trace DOM parents until we get to overall post article.
   const hasLinkParent = function ( element ) {
     if ( element.parentNode.tagName === "A" ) {
@@ -124,7 +140,10 @@
   tabindex={fullPage ? undefined : "0"} 
   aria-label={fullPage ? undefined : "gobo-post"}
   role={fullPage ? undefined : "link"}
-  style="--cursor:{fullPage ? "inherit" : "pointer"};"
+  style:--cursor="{styles.cursor}"
+  style:--max-height="{styles.maxHeight}"
+  style:--gradient-stop="{styles.gradientStop}"
+  style:--gradient="{styles.gradient}" 
   on:click={handleClick}
   on:keydown={handleClick}>
 
@@ -301,9 +320,11 @@
 
 
   .outer-frame .inner-frame .main .content {
-    max-height: 12rem;
+    max-height: var(--max-height);
     overflow-y: hidden;
     margin-bottom: var(--gobo-height-spacer);
+    mask-image: var(--gradient);
+    -webkit-mask-image: var(--gradient)
   }
 
   .outer-frame .inner-frame .main .content > * {
