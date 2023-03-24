@@ -30,11 +30,12 @@
   };
 </script>
   
-<section>
-  <h1>Identities</h1>
-  <sl-divider></sl-divider>
-
-  <div class="subheader">
+<div class="main-child">
+  <header>
+    <h1>Identities</h1>
+  </header>
+  
+  <nav>
     <sl-button 
       href="/identities/about"
       pill>
@@ -46,7 +47,7 @@
       pill>
       Add Identity
     </sl-button>
-  </div>
+  </nav>
 
   {#await loadIdentities()}
   
@@ -68,29 +69,11 @@
   {/await}
 
   
-</section>
+</div>
 
 <style>
-  section {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    align-items: stretch;
-    margin: 0;
-    max-width: 40rem;
-  }
-
-  section > h1 {
-    margin-bottom: 0.5rem;
-  }
-
-  section > sl-divider {
-    margin: 0;
-  }
-
-  .subheader {
-    margin: var(--gobo-height-spacer) 0;
+  nav {
+    margin-bottom: 1rem;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -98,26 +81,22 @@
     align-items: center;
   }
 
-  .subheader > sl-button:first-child {
-    margin-right: var(--gobo-width-spacer);
+  nav > sl-button:first-child {
+    margin-right: var(--gobo-width-spacer-flex);
   }
 
-  .subheader sl-button::part(base) {
+  nav sl-button::part(base) {
     height: 2.1875rem;
     background-color: var(--gobo-color-panel);
     border: var(--gobo-border-panel);
     color: var(--gobo-color-button-lens);
   }
 
-  .subheader sl-button::part(label) {
+  nav sl-button::part(label) {
     font-size: var(--gobo-font-size-detail);
     font-weight: var(--gobo-font-weight-medium);
     display: flex;
     flex-direction: column;
     justify-content: center;
-  }
-
-  .identities {
-    max-width: var(--gobo-max-width-primary);
   }
 </style>

@@ -48,20 +48,20 @@
   
   <sl-divider></sl-divider>
   
-  <div class="profile-display">
+  <figure>
     
     <img 
       src={identity.profile_image} 
       alt="profile picture for {identity.fullUsername}">
     
-    <div class="names">
+    <figcaption>
       {#if nameSlot1 != null}
-        <div class="slot1">{ nameSlot1 }</div>
+        <p class="slot1">{ nameSlot1 }</p>
       {/if}
-      <div class="slot2">{ nameSlot2 }</div>
-    </div>
+      <p class="slot2">{ nameSlot2 }</p>
+    </figcaption>
     
-  </div>
+  </figure>
 
 </section>
 
@@ -84,7 +84,7 @@
     flex-direction: row;
     flex-wrap: nowrap;
     align-items: center;
-    margin: var(--gobo-height-spacer) var(--gobo-width-spacer);
+    margin: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex);
   }
 
   section > header > sl-icon {
@@ -112,8 +112,8 @@
   }
 
 
-  .profile-display {
-    margin: var(--gobo-height-spacer) var(--gobo-width-spacer);
+  figure {
+    margin: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex);
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -121,14 +121,14 @@
     align-items: center;
   }
 
-  .profile-display > img {
+  figure > img {
     height: 3.125rem;
     width: 3.125rem;
     border-radius: var(--sl-border-radius-circle);
-    margin-right: var(--gobo-width-spacer);
+    margin-right: var(--gobo-width-spacer-flex);
   }
 
-  .names {
+  figcaption {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
@@ -136,13 +136,13 @@
     align-items: flex-start;
   }
 
-  .names .slot1 {
+  figcaption .slot1 {
     font-size: var(--gobo-font-size-copy);
     font-weight: var(--gobo-font-weight-bold);
     text-transform: capitalize;
   }
 
-  .names .slot2 {
+  figcaption .slot2 {
     font-size: var(--gobo-font-size-copy);
     font-weight: var(--gobo-font-weight-regular);
   }

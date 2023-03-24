@@ -53,6 +53,7 @@ h2, h3, h4, h5, h6 {
 
 p {
   font-size: var(--gobo-font-size-copy);
+  overflow-wrap: anywhere;
 }
 
 a, a:hover, a:visited {

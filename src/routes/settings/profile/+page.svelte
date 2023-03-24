@@ -3,6 +3,7 @@
   import "@shoelace-style/shoelace/dist/components/input/input.js";
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import BackLink from "$lib/components/primitives/BackLink.svelte";
+  import "$lib/styles/buttons.css";
   import { profileStore } from "$lib/stores/profile";
   import { getGOBOClient } from "$lib/helpers/account";
   import { onDestroy, onMount } from "svelte";
@@ -57,37 +58,45 @@
 
 </script>
 
+<div class="main-child">
+  <BackLink
+    href="/settings"
+    heading="Your Profile">
+  </BackLink>
+    
 
-<BackLink
-  href="/settings"
-  heading="Your Profile">
-</BackLink>
-  
+  <form bind:this={form} class="gobo-form">
+    <h2>Update Profile</h2>
+    
+    <sl-input
+      bind:this={nameInput}
+      name="name" 
+      label="Profile Name"
+      inputmode="text"
+      autocomplete="off"
+      maxlength=32
+      size="medium">
+    </sl-input>
 
-<form bind:this={form} class="gobo-form">
-  <h2>Update Profile</h2>
-  
-  <sl-input
-    bind:this={nameInput}
-    name="name" 
-    label="Profile Name"
-    inputmode="text"
-    autocomplete="off"
-    maxlength=32
-    size="medium">
-  </sl-input>
+    <div class="buttons">
+      <sl-button
+        bind:this={button}
+        class="submit"
+        type="submit"
+        variant="primary"
+        size="medium"
+        pill>
+        Update Profile
+      </sl-button>
+    </div>
+   
+  </form>
 
-  <sl-button
-    bind:this={button}
-    class="submit"
-    type="submit"
-    variant="primary"
-    size="medium"
-    pill>
-    Update Profile
-  </sl-button>
-</form>
+</div>
 
 
 <style>
+  sl-input {
+    margin-bottom: 0;
+  }
 </style>

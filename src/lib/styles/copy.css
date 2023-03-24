@@ -4,7 +4,7 @@
   align-items: stretch;
   max-width: var(--gobo-max-width-primary);
   margin: 0;
-  padding: var(--gobo-height-spacer) var(--gobo-width-spacer);
+  padding: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex);
   background: var(--gobo-color-panel);
   border: var(--gobo-border-panel);
   border-radius: var(--gobo-border-radius);
@@ -30,6 +30,10 @@
   margin-bottom: 1rem;
 }
 
+.gobo-copy p:last-of-type {
+  margin-bottom: 0;
+}
+
 .gobo-copy a {
   text-decoration: none;
 }
@@ -40,63 +44,23 @@
 
 
 
-
-
-.gobo-copy sl-button.submit::part(base) {
-  background: var(--gobo-color-primary);
-  border: none;
+.gobo-copy nav {
+  width: 100%;
+  margin-top: 2rem;
+  padding-top: var(--gobo-height-spacer);
+  border-top: var(--gobo-border-panel);
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  margin-bottom: 0;
 }
 
-.gobo-copy sl-button.submit:hover::part(base) {
-  background: var(--gobo-color-primary);
-  border: none;
+/* TODO: We can do better than this once Firefox supports :has by default. */
+.gobo-copy nav.two-button {
+  justify-content: space-between;
 }
 
-.gobo-copy sl-button.submit::part(label) {
-  color: var(--gobo-color-primary-text);
-  font-weight: var(--gobo-font-weight-bold);
-}
-
-.gobo-copy sl-button.submit:hover::part(label) {
-  color: var(--gobo-color-primary-text);
-}
-
-
-.gobo-copy sl-button.cancel::part(base) {
-  background: var(--gobo-color-cancel);
-  border: 1px solid var(--gobo-color-cancel-text);
-}
-
-.gobo-copy sl-button.cancel:hover::part(base) {
-  background: var(--gobo-color-cancel);
-  border: 1px solid var(--gobo-color-cancel-text);
-}
-
-.gobo-copy sl-button.cancel::part(label) {
-  color: var(--gobo-color-cancel-text);
-  font-weight: var(--gobo-font-weight-bold);
-}
-
-.gobo-copy sl-button.cancel:hover::part(label) {
-  color: var(--gobo-color-cancel-text);
-}
-
-
-.gobo-copy sl-button.action::part(base) {
-  background: var(--gobo-color-active);
-  border: none;
-}
-
-.gobo-copy sl-button.action:hover::part(base) {
-  background: var(--gobo-color-active);
-  border: none;
-}
-
-.gobo-copy sl-button.action::part(label) {
-  color: var(--gobo-color-active-text);
-  font-weight: var(--gobo-font-weight-bold);
-}
-
-.gobo-copy sl-button.action:hover::part(label) {
-  color: var(--gobo-color-active-text);
+.gobo-copy nav sl-button {
+  margin-bottom: 0;
 }

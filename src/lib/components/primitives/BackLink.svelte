@@ -4,7 +4,7 @@
   export let heading;
 </script>
 
-<div>
+<header>
   
   <sl-icon-button 
     href={href}
@@ -13,10 +13,10 @@
   
   <h1>{heading}</h1>
 
-</div>
+</header>
 
 <style>
-  div {
+  header {
     margin: 0;
     display: flex;
     flex-direction: row;
@@ -24,12 +24,13 @@
     justify-content: flex-start;
     align-items: center;
     margin-bottom: 2rem;
+    border-bottom: var(--gobo-border-hr);
   }
 
-  div > h1 {
-    font-size: var(--gobo-font-size-2x-large);
+  header > h1 {
+    font-size: var(--gobo-font-size-x-large);
     font-weight: var(--gobo-font-weight-black);
-    color: var(--gobo-color-text);
+    color: var(--gobo-color-text-menu);
   }
 
   sl-icon-button {
@@ -37,4 +38,15 @@
     color: var(--gobo-color-text);
     margin-right: 2rem;
   }
+
+  sl-icon-button:focus-visible {
+    color: var(--gobo-color-text);
+  }
+
+  @supports not selector(:focus-visible) {
+    sl-icon-button:focus {
+      color: var(--gobo-color-text);
+    }
+  }
+
 </style>

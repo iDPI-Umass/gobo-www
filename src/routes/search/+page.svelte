@@ -4,6 +4,7 @@
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/spinner/spinner.js";
   import Post from "$lib/components/Post.svelte"
+  import "$lib/styles/buttons.css";
   import { onDestroy, onMount } from "svelte";
   import { browser } from "$app/environment";
   import { sleep } from "@dashkite/joy/time";
@@ -69,50 +70,57 @@
 
 </script>
 
-<form class="gobo-form" bind:this={form}>
-  <h1>Search</h1>
-  <sl-input
-    name="search"
-    value="{searchTerm}"
-    inputmode="text"
-    placeholder="Search"
-    size="medium"
-    autocomplete="off">
-  </sl-input>
+<div class="main-child">
+  <header>
+    <h1>Search</h1>
+  </header>
 
-  <sl-divider class="gobo-divider"></sl-divider>
-
-  <sl-button
-    bind:this={button}
-    class="submit"
-    type="submit"
-    variant="primary"
-    size="medium"
-    pill>
-    Search
-  </sl-button>
+  <form class="gobo-form" bind:this={form}>
+    
+    <sl-input
+      name="search"
+      value="{searchTerm}"
+      inputmode="text"
+      placeholder="Search"
+      size="medium"
+      autocomplete="off">
+    </sl-input>
   
-</form>
-
-{#if loading === true}
-  <div class="spinner-box">
-    <sl-spinner></sl-spinner>
-  </div>
-{:else}
-  {#if results.length !== 0 }
-    <section class="results" bind:this={resultsSection}>
+    <div class="buttons">
+      <sl-button
+        bind:this={button}
+        class="submit"
+        type="submit"
+        variant="primary"
+        size="medium"
+        pill>
+        Search
+      </sl-button>
+    </div>
     
-      <h2>Results</h2>
-    
-      <sl-divider></sl-divider>
+  </form>
+  
+  {#if loading === true}
+    <div class="spinner-box">
+      <sl-spinner></sl-spinner>
+    </div>
+  {:else}
+    {#if results.length !== 0 }
+      <section class="results" bind:this={resultsSection}>
+        <header>
+          <h2>Results</h2>
+        </header>
+        
+        {#each results as result (result.id)}
+          <Post {...result}></Post>
+        {/each}
       
-      {#each results as result (result.id)}
-        <Post {...result}></Post>
-      {/each}
-    
-    </section>
+      </section>
+    {/if}
   {/if}
-{/if}
+</div>
+
+
 
 
 <style>
@@ -127,9 +135,19 @@
     font-size: 3rem;
   }
 
-  .results sl-divider {
+  form sl-input {
+    margin-bottom: 0;
+  }
+
+  .buttons {
+    border: none;
+    margin: 0;
+  }
+
+  .results header {
     margin-top: 0.5rem;
-    margin-bottom: var(--gobo-height-spacer); 
+    margin-bottom: var(--gobo-height-spacer-flex);
+    border-bottom: var(--gobo-border-hr);
   }
 </style>
 

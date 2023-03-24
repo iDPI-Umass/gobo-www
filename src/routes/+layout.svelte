@@ -7,6 +7,7 @@
 
   // Pull in more application specific CSS stylings.
   import "$lib/styles/reset.css";
+  import "$lib/styles/main-child.css";
   import "$lib/styles/config-panel.css";
   import "$lib/styles/copy.css";
   import "$lib/styles/divider.css";

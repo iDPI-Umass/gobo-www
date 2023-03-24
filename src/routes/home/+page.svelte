@@ -4,7 +4,6 @@
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
-  import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import '@shoelace-style/shoelace/dist/components/badge/badge.js';
   import Post from "$lib/components/Post.svelte";
   import posts from "$lib/stores/posts.js";
@@ -47,128 +46,27 @@
   }
 </script>
 
-
-<section bind:this={feed} role="feed" class="feed">
-  <div class="subheader">
+<div class="main-child">
+  <header>
     <h1>Home</h1>
     <sl-icon-button 
       src="/icons/gear.svg"
       href="/settings/feed">
     </sl-icon-button>
-  </div>
+  </header>
+    
+  <!-- TODO: Feed a11y with proper labeling -->
+  <section bind:this={feed}>
+    {#each posts as post (post.id)}
+      <Post {...post}></Post>
+    {/each}
+  </section>
+</div>
 
-  <sl-divider></sl-divider>
-
-  <!-- <div class="viewheader">
-    <sl-button
-      class="identities-button"
-      pill>
-      Identities
-      <sl-icon slot="prefix" src="/icons/identities.svg"></sl-icon>
-      <sl-badge pill>3</sl-badge>
-    </sl-button>
-
-    <sl-button
-      class="lenses-button"
-      pill>
-      Lenses
-      <sl-icon slot="prefix" src="/icons/filter.svg"></sl-icon>
-      <sl-badge pill>3</sl-badge>
-    </sl-button>
-  </div> -->
-  
-
-  {#each posts as post (post.id)}
-    <Post {...post}></Post>
-  {/each}
-</section>
 
 <style>
-  .feed {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    padding: var(--gobo-height-spacer) 0 0 var(--gobo-width-spacer);
-  }
-
-  .subheader {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: space-between;
-    padding-top: 4px;
-    max-width: var(--gobo-max-width-primary);
-  }
-
-  .subheader > h1 {
-    font-size: var(--gobo-font-size-x-large);
-    font-weight: var(--gobo-font-weight-black);
-    color: var(--gobo-color-text-menu);
-  }
-
-  .subheader > sl-icon-button {
-    font-size: 1.25rem;
-  }
-
-  .subheader > sl-icon-button::part(base) {
-    color: var(--gobo-color-text-muted);
-  }
-
-  sl-divider {
-    margin-bottom: var(--gobo-height-spacer);
-  }
-
-  /* .viewheader {
-    margin: var(--gobo-height-spacer) 0;
-    max-width: var(--gobo-max-width-primary);
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: flex-end;
-  }
-
-  .viewheader sl-button::part(base) {
-    height: 2.1875rem;
-    background-color: var(--gobo-color-panel);
-    border: var(--gobo-border-panel);
-    color: var(--gobo-color-button-lens);
-  }
-
-  .viewheader sl-button::part(label) {
-    font-size: var(--gobo-font-size-detail);
-    font-weight: var(--gobo-font-weight-medium);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  .viewheader > .identities-button {
-    margin-right: 1rem;
-  }
-
-  
-  .viewheader .identities-button sl-icon {
-    width: 1.25rem;
-  }
-
-  .viewheader .lenses-button sl-icon {
-    width: 0.75rem;
-  }
-
-  .viewheader sl-button sl-badge {
-    translate: 30% -30%;
-    border-radius: var(--sl-border-radius-pill);
-  }
-
-  .viewheader sl-button sl-badge::part(base) {
-    background-color: var(--gobo-color-background-badge);
-    color: var(--gobo-color-badge);
-    border: none;
-  } */
-
-
   section {
     overflow-y: scroll;
+    padding: 2px;
   }
 </style>

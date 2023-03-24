@@ -5,7 +5,11 @@
 
 <PlainHeader></PlainHeader>
 <Center>
-  <p>There was a problem processing this request.</p>
+  <div class="main-child">
+    <section class="gobo-copy">
+      <p>There was a problem processing this request.</p>
+    </section>
+  </div>
 </Center>
 
 

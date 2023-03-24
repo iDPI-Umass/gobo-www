@@ -210,6 +210,7 @@
 </article>
 
 <style>
+
   .outer-frame {
     position: relative;
     display: flex;
@@ -242,12 +243,11 @@
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: stretch;
-    margin: var(--gobo-height-spacer) var(--gobo-width-spacer) 0 var(--gobo-width-spacer);
+    margin: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex) 0 var(--gobo-width-spacer-flex);
   }
 
   .outer-frame .inner-frame .gutter {
     min-width: max-content;
-    flex: 0 0 10%;
   }
 
 
@@ -255,7 +255,7 @@
     height: 2.8125rem;
     width: 2.8125rem;
     border-radius: var(--sl-border-radius-circle);
-    margin-right: var(--gobo-width-spacer);
+    margin-right: var(--gobo-width-spacer-flex);
     border: var(--gobo-border-panel);
   }
 
@@ -327,28 +327,38 @@
     -webkit-mask-image: var(--gradient)
   }
 
-  .outer-frame .inner-frame .main .content > * {
+  .outer-frame .inner-frame .main .content :global(h2) {
+    font-size: 1.125rem;
+    font-weight: var(--gobo-font-weight-black);
+    overflow-wrap: anywhere;
     margin-bottom: 0.5rem;
   }
 
-  .outer-frame .inner-frame .main .content :global(h2) {
-    font-size: var(--gobo-font-size-x-large);
-    font-weight: var(--gobo-font-weight-bold);
+  .outer-frame .inner-frame .main .content :global(h3) {
+    font-size: 1rem;
+    font-weight: var(--gobo-font-weight-black);
+    overflow-wrap: anywhere;
+    margin-bottom: 1rem;
   }
 
   .outer-frame .inner-frame .main .content :global(p) {
     font-size: var(--gobo-font-size-copy);
     font-weight: var(--gobo-font-weight-regular);
+    margin-bottom: 1rem;
   }
 
   .outer-frame .inner-frame .main .content :global(a) {
     position: relative;
   }
 
+  .outer-frame .inner-frame .main .content :global(:last-child) {
+    margin-bottom: 0;
+  }
+
 
   .outer-frame .inner-frame .main .media,
   .outer-frame .inner-frame .main .poll {
-    margin-bottom: var(--gobo-height-spacer);
+    margin-bottom: 1rem;
   }
 
   .outer-frame .inner-frame .main .media :global(a) {
@@ -361,6 +371,7 @@
 
   .outer-frame footer {
     width: 100%;
+    height: 2.5rem;
     padding: 0.5rem var(--gobo-width-spacer);
     border-top: var(--gobo-border-panel);
     display: flex;
@@ -397,7 +408,6 @@
   .outer-frame footer a.source-link {
     color: var(--gobo-color-text-muted);
   }
-
 
 
 </style>

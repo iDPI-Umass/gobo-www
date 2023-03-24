@@ -3,15 +3,14 @@
     <slot name="left"></slot>
   </main>
   
-  <div class="right-panel">
+  <aside class="right-panel">
     <slot name="right"></slot>
-  </div>
+  </aside>
 </div>
 
 <style>
   .panels {
-    flex: 1 1 0;
-    min-height: 0;
+    height: 100%;
     margin: 0;
     display: flex;
     flex-direction: row;
@@ -24,25 +23,25 @@
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
+    justify-content: flex-start;
     align-items: center;
-    margin: 1rem;
+    margin: 0;
+    padding: 4px;
   }
 
   .right-panel {
     flex: 1 1 50%;
     display: none;
     flex-direction: column;
-    margin: 0rem 1rem 1rem 1rem;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    padding: 4px;
   }
 
-  @media ( min-width: 680px ) {
-    .left-panel {
-      margin: 1rem;
-    }
-
+  @media ( min-width: 750px ) {
     .right-panel {
       display: flex;
-      margin: 1rem;
     }
   }  
 </style>

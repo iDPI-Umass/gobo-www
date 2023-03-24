@@ -66,60 +66,62 @@
   });
 </script>
 
+<div class="main-child">
+  <BackLink
+    href="/identities"
+    heading="Add Identity">
+  </BackLink>
 
-<BackLink
-  href="/identities"
-  heading="Add Identity">
-</BackLink>
-
-<form class="gobo-form" bind:this={form}>
-  
-  <h2>Select Platform</h2>
-
-  <p>
-    GOBO can connect an identity for you once you grant consent. When you 
-    press "Add Identity" below, you will be sent to the social media platform
-    that hosts the identity. Once there, please sign in and authorize GOBO to
-    connect your new identity.
-  </p>
+  <form class="gobo-form" bind:this={form}>
     
-  <p>
-    If you would like to learn more about identies,
-    please see <a href="/identities/about">About Identities</a>.
-  </p>
+    <h2>Select Platform</h2>
 
-  <sl-select
-    bind:this={select}
-    name="platform"
-    value="mastodon"
-    size="medium"
-    pill>
-    <sl-option value="mastodon">Mastodon</sl-option>
-    <sl-option value="reddit">Reddit</sl-option>
-    <sl-option value="twitter">Twitter</sl-option>
-  </sl-select>
+    <p>
+      GOBO can connect an identity for you once you grant consent. When you 
+      press "Add Identity" below, you will be sent to the social media platform
+      that hosts the identity. Once there, please sign in and authorize GOBO to
+      connect your new identity.
+    </p>
+      
+    <p>
+      If you would like to learn more about identies,
+      please see <a href="/identities/about">About Identities</a>.
+    </p>
 
-  {#if targetingMastodon === true}
-    <sl-input
-      name="mastodonURL"
-      label="Mastodon URL"
-      help-text="This is the URL of your Mastodon server."
-      autocomplete="off"
-      size="medium">
-    </sl-input>
-  {/if}
+    <sl-select
+      bind:this={select}
+      name="platform"
+      value="mastodon"
+      size="medium"
+      pill>
+      <sl-option value="mastodon">Mastodon</sl-option>
+      <sl-option value="reddit">Reddit</sl-option>
+      <sl-option value="twitter">Twitter</sl-option>
+    </sl-select>
 
-  <sl-divider class="gobo-divider"></sl-divider>
+    {#if targetingMastodon === true}
+      <sl-input
+        name="mastodonURL"
+        label="Mastodon URL"
+        help-text="This is the URL of your Mastodon server."
+        autocomplete="off"
+        size="medium">
+      </sl-input>
+    {/if}
 
-  <sl-button
-    bind:this={button}
-    class="submit"
-    type="submit"
-    size="medium"
-    pill>
-    Add Identity
-  </sl-button>
-</form>
+    <sl-divider class="gobo-divider"></sl-divider>
+
+    <sl-button
+      bind:this={button}
+      class="submit"
+      type="submit"
+      size="medium"
+      pill>
+      Add Identity
+    </sl-button>
+  </form>
+</div>
+
 
 <style>
   .gobo-form sl-select {

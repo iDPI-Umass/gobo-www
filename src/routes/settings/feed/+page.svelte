@@ -124,158 +124,75 @@
   // ]
 </script>
 
-<BackLink
-  href="/settings"
-  heading="Feed Settings">
-</BackLink>
+<div class="main-child">
+  <BackLink
+    href="/settings"
+    heading="Feed Settings">
+  </BackLink>
 
-<form class="gobo-form" bind:this={keywordForm}>
-  <h2>Blocked Keywords</h2>
-  <p>
-    Control which words and phrases you would like to exclude from your 
-    GOBO feed. You can add phrases below or delete any listed in the table.
-  </p>
-  
-  {#await loadKeywords()}
-    <Spinner></Spinner>
-  {:then}
-    <div class="keyword-table">
-      {#each keywords as keyword, index (`${keyword.category}${keyword.word}`)}
-        <div class="table-row">
-          <span class="keyword">
-            <span>{ keyword.category }</span>
-          </span>
-          <span class="phrase">{ keyword.word }</span>
-          <sl-icon-button
-            on:click={removeKeyword({ ...keyword, index })}
-            on:keypress={removeKeyword({ ...keyword, index })}
-            label="Delete Keyword" 
-            src="/icons/trash.svg"></sl-icon-button>
-        </div>
-      {/each}
-    </div>
-  {/await}
-
-  <sl-select
-    bind:this={keywordCategory}
-    name="category"
-    value="source"
-    label="Block Category"
-    size="medium"
-    pill>
-    <sl-option value="source">Source</sl-option>
-    <sl-option value="username">Username</sl-option>
-    <sl-option value="keyword">Keyword</sl-option>
-    <sl-option value="url">URL</sl-option>
-  </sl-select>
-  
-  <sl-input
-    name="word"
-    label="Block Pattern"
-    help-text="GOBO will match against this text to block targeted content from your feed."
-    autocomplete="off"
-    size="medium">
-  </sl-input>
-
-  <sl-button
-    bind:this={keywordButton}
-    type="submit"
-    class="submit"
-    variant="primary"
-    size="medium"
-    pill>
-    Add Keyword
-  </sl-button>
-</form>
- 
-  <!-- <section class="panel">
-    <h2>Default Sorting</h2>
+  <form class="gobo-form" bind:this={keywordForm}>
+    <h2>Blocked Keywords</h2>
     <p>
-      Set the default sort behavior for your Home Feed.
+      Control which words and phrases you would like to exclude from your 
+      GOBO feed. You can add phrases below or delete any listed in the table.
     </p>
     
+    {#await loadKeywords()}
+      <Spinner></Spinner>
+    {:then}
+      <div class="keyword-table">
+        {#each keywords as keyword, index (`${keyword.category}${keyword.word}`)}
+          <div class="table-row">
+            <span class="keyword">
+              <span>{ keyword.category }</span>
+            </span>
+            <span class="phrase">{ keyword.word }</span>
+            <sl-icon-button
+              on:click={removeKeyword({ ...keyword, index })}
+              on:keypress={removeKeyword({ ...keyword, index })}
+              label="Delete Keyword" 
+              src="/icons/trash.svg"></sl-icon-button>
+          </div>
+        {/each}
+      </div>
+    {/await}
 
     <sl-select
-      bind:this={sortSelect}  
-      name="feed-sort"
-      value="{defaultFeedSort}"
-      size="medium">
-      <sl-option value="chronological-descending">Newest to Oldest</sl-option>
-      <sl-option value="chronological-ascending">Oldest to Newest</sl-option>
-      <sl-option value="popular-descending">Most Popular</sl-option>
-      <sl-option value="by-platform">Prioritized By Platform</sl-option>
+      bind:this={keywordCategory}
+      name="category"
+      value="source"
+      label="Block Category"
+      size="medium"
+      pill>
+      <sl-option value="source">Source</sl-option>
+      <sl-option value="username">Username</sl-option>
+      <sl-option value="keyword">Keyword</sl-option>
+      <sl-option value="url">URL</sl-option>
     </sl-select>
-  </section>
-
-  <sl-divider class="gobo-divider"></sl-divider>
-
-  <section class="panel">
-    <h2>Display Engagement</h2>
-    <p>
-      Control whether you'd like to see engagement feedback values on posts
-      displayed in GOBO.
-    </p>
     
-
-    <sl-switch
-      bind:this={engagementSwitch}
-      checked={displayEngagement}
+    <sl-input
+      name="word"
+      label="Block Pattern"
+      help-text="GOBO will match against this text to block targeted content from your feed."
+      autocomplete="off"
       size="medium">
-      Display Engagement Metrics
-    </sl-switch>
-  </section>
+    </sl-input>
 
-  <sl-divider class="gobo-divider"></sl-divider>
-
-  <section class="panel">
-    <h2>Prioritized Accounts</h2>
-    <p>
-      Control which accounts you would like GOBO to emphasize when preparing
-      your feed. You can add accounts below or delete any listed in the table.
-    </p>
-    
-    <div class="keyword-table">
-      {#each accounts as account (account.account)}
-        <div class="table-row">
-          <sl-icon 
-            src="/icons/{ account.platform }.svg" 
-            style="color: var(--gobo-{account.platform});">
-          </sl-icon>
-          <span>{ account.account }</span>
-          <sl-icon-button
-            class="danger"
-            label="Delete Keyword" 
-            src="/icons/trash.svg"></sl-icon-button>
-        </div>
-      {/each}
-    </div>
-
-    <form bind:this={keywordForm} class="gobo-form">
-      <sl-select
-        name="prioritized-account-platform"
-        label="Platform"
-        value="mastodon"
-        size="medium">
-        <sl-option value="mastodon">Mastodon</sl-option>
-        <sl-option value="reddit">Reddit</sl-option>
-        <sl-option value="twitter">Twitter</sl-option>
-      </sl-select>
-
-      <sl-input
-        name="prioritized-account"
-        label="Account"
-        size="medium"></sl-input>
-
+    <div class="buttons">
       <sl-button
+        bind:this={keywordButton}
         type="submit"
+        class="submit"
         variant="primary"
-        size="medium">
-        Add Account
-      </sl-button>
-    </form>
-  </section>
+        size="medium"
+        pill>
+        Add Keyword
+      </sl-button>  
+    </div>
+    
+  </form>
+</div>
 
-  <sl-divider class="gobo-divider"></sl-divider> -->
 
 <style>
   .keyword-table sl-icon-button {

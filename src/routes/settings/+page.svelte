@@ -9,19 +9,28 @@
   };
 </script>
 
-<h1>Settings</h1>
+<div class="main-child" >
+  <header>
+    <h1>Settings</h1>
+  </header>
+  
 
-<VerticalNav slot="left">
-  <NavLink href="/settings/profile">Profile</NavLink>
-  <NavLink href="/settings/appearance">Apperance</NavLink>
-  <NavLink href="/settings/feed">Feed</NavLink>
-  <NavLink href="#" action={logout}>Logout</NavLink>
-</VerticalNav>
+  <VerticalNav slot="left">
+    <NavLink href="/settings/profile">Profile</NavLink>
+    <NavLink href="/settings/appearance">Apperance</NavLink>
+    <NavLink href="/settings/feed">Feed</NavLink>
+    <NavLink href="#" action={logout}>Logout</NavLink>
+  </VerticalNav>
+</div>
+
 
 <style>
   h1 {
     font-size: var(--sl-font-size-x-large);
     font-weight: var(--sl-font-weight-bold);
+  }
+
+  header {
     margin-bottom: 2rem;
   }
 </style>
