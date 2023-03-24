@@ -10,5 +10,5 @@
   <NavPage current="identities">
     <slot></slot>
   </NavPage>
-  <FooterNav></FooterNav>
+  <FooterNav current="identities"></FooterNav>
 </GuardFrame>

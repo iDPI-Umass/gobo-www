@@ -287,249 +287,251 @@
 
 </script>
 
+<div class="main-child">
+  <h1>New Post</h1>
 
-<h1>New Post</h1>
-
-<sl-divider></sl-divider>
-
-<form class="gobo-form" bind:this={configFrame}>
-
-  <section class="panel body">
-    <sl-select
-      on:sl-change={handleOptionVisibility}
-      name="visibility"
-      value={options.visibility}
-      size="medium"
-      pill>
-      <sl-option value="public">Public</sl-option>
-      <sl-option value="followers">Followers Only</sl-option>
-      <sl-option value="private">Private</sl-option>
-    </sl-select>
-
-    <sl-textarea
-      on:sl-input={handleContent}
-      value={content}
-      placeholder="Compose your post here."
-      size="medium"
-      resize="none"
-      rows=4>
-    </sl-textarea>
-  </section>
-
-
-  <section class="panel media">
-    <h2>Attach Media</h2>
-
-    <sl-checkbox
-      on:sl-change={handleOptionSensitive}
-      checked={options.sensitive}
-      size="medium">
-      Mark Media as Sensitive
-    </sl-checkbox>
-
-    <div 
-      class="keyword-table" 
-      ondragover="return false" 
-      on:dragenter={handleDragEnter}
-      on:dragleave={handleDragLeave}
-      on:drop={handleDrop}>
-      {#each files as file (file.name)}
-        <div class="table-row">
-          <a
-            href="/upload-preview"
-            on:click={handlePreview( file )}
-            on:keypress={handlePreview( file )}>
-            { file.name }
-          </a>
-          <sl-icon-button
-            class="danger"
-            label="Delete File" 
-            src="/icons/trash.svg"
-            on:click={handleDelete( file )}
-            on:keypress={handleDelete( file )}>>
-          </sl-icon-button>
-        </div>
-      {/each}
-    </div>
-
-    <input 
-      bind:this={fileInput}
-      type="file"
-      multiple=true
-      class="hidden">
-
-    <sl-button
-      on:click={handleFileChrome}
-      on:keypress={handleFileChromeKey}
-      size="medium"
-      class="submit"
-      pill>
-      Add Attachment
-    </sl-button>
-
-  </section>
-
-
-  <section class="panel identities">
-    <h2>Choose Identities</h2>
-    
-    <p>
-      Select the identities below you'd like to use to create this post. GOBO
-      will submit posts to these platforms on your behalf.
-    </p>
-
-
-    {#await loadIdentities()}
+  <sl-divider></sl-divider>
   
-      <Spinner></Spinner>
+  <form class="gobo-form" bind:this={configFrame}>
   
-    {:then}
-      
-      {#each identities as identity (identity.key)}
-        <div class="identity">
-          
-          <div class="label">
-            <sl-icon 
-              src="/icons/{identity.type}.svg" 
-              class="{identity.type}"
-              size="medium">
-            </sl-icon>
-            {identity.fullUsername}
+    <section class="panel body">
+      <sl-select
+        on:sl-change={handleOptionVisibility}
+        name="visibility"
+        value={options.visibility}
+        size="medium"
+        pill>
+        <sl-option value="public">Public</sl-option>
+        <sl-option value="followers">Followers Only</sl-option>
+        <sl-option value="private">Private</sl-option>
+      </sl-select>
+  
+      <sl-textarea
+        on:sl-input={handleContent}
+        value={content}
+        placeholder="Compose your post here."
+        size="medium"
+        resize="none"
+        rows=4>
+      </sl-textarea>
+    </section>
+  
+  
+    <section class="panel media">
+      <h2>Attach Media</h2>
+  
+      <sl-checkbox
+        on:sl-change={handleOptionSensitive}
+        checked={options.sensitive}
+        size="medium">
+        Mark Media as Sensitive
+      </sl-checkbox>
+  
+      <div 
+        class="keyword-table" 
+        ondragover="return false" 
+        on:dragenter={handleDragEnter}
+        on:dragleave={handleDragLeave}
+        on:drop={handleDrop}>
+        {#each files as file (file.name)}
+          <div class="table-row">
+            <a
+              href="/upload-preview"
+              on:click={handlePreview( file )}
+              on:keypress={handlePreview( file )}>
+              { file.name }
+            </a>
+            <sl-icon-button
+              class="danger"
+              label="Delete File" 
+              src="/icons/trash.svg"
+              on:click={handleDelete( file )}
+              on:keypress={handleDelete( file )}>>
+            </sl-icon-button>
           </div>
-
-          <sl-switch
-            bind:this={identitySwitches[ identity.key ]}
-            checked={identity.active}
-            on:sl-change={handleIdentitySwitch( identity )}
-            size="medium">
-          </sl-switch>
-          
-        </div>
-      {/each}
-    
-    {/await}
-   
-  </section>
-
-
-  {#if (targets.mastodon === true) || (targets.reddit === true) }
-    <section class="panel options">
-      <h2>Identity Specific Options</h2>
+        {/each}
+      </div>
+  
+      <input 
+        bind:this={fileInput}
+        type="file"
+        multiple=true
+        class="hidden">
+  
+      <sl-button
+        on:click={handleFileChrome}
+        on:keypress={handleFileChromeKey}
+        size="medium"
+        class="submit"
+        pill>
+        Add Attachment
+      </sl-button>
+  
+    </section>
+  
+  
+    <section class="panel identities">
+      <h2>Choose Identities</h2>
+      
       <p>
-        Below are some options to configure your post. They will be applied as
-        appropriate when GOBO submits to each platform.
+        Select the identities below you'd like to use to create this post. GOBO
+        will submit posts to these platforms on your behalf.
+      </p>
+  
+  
+      {#await loadIdentities()}
+    
+        <Spinner></Spinner>
+    
+      {:then}
+        
+        {#each identities as identity (identity.key)}
+          <div class="identity">
+            
+            <div class="label">
+              <sl-icon 
+                src="/icons/{identity.type}.svg" 
+                class="{identity.type}"
+                size="medium">
+              </sl-icon>
+              {identity.fullUsername}
+            </div>
+  
+            <sl-switch
+              bind:this={identitySwitches[ identity.key ]}
+              checked={identity.active}
+              on:sl-change={handleIdentitySwitch( identity )}
+              size="medium">
+            </sl-switch>
+            
+          </div>
+        {/each}
+      
+      {/await}
+     
+    </section>
+  
+  
+    {#if (targets.mastodon === true) || (targets.reddit === true) }
+      <section class="panel options">
+        <h2>Identity Specific Options</h2>
+        <p>
+          Below are some options to configure your post. They will be applied as
+          appropriate when GOBO submits to each platform.
+        </p>
+      </section>
+  
+  
+  
+      {#if targets.mastodon === true }
+        <section class="panel options">
+          <div class="subheading">
+            <sl-icon 
+              src="/icons/mastodon.svg"
+              class="mastodon">
+            </sl-icon>
+            <h3>Mastodon</h3>
+          </div>
+  
+          <sl-input
+            on:sl-input={handleOptionSpoilerText}
+            value={options.spoilerText}
+            label="Spoiler Text"
+            help-text="Provide text that will contextualize content behind warning."
+            autocomplete="off"
+            size="medium">
+          </sl-input>
+        </section>
+      {/if}
+  
+      {#if targets.reddit === true }
+        <section class="panel options">
+          <div class="subheading">
+            <sl-icon 
+              src="/icons/reddit.svg"
+              class="reddit">
+            </sl-icon>
+            <h3>Reddit</h3>
+          </div>
+  
+          <sl-input
+            on:sl-input={handleOptionTitle}
+            value={options.title}
+            label="Post Title"
+            help-text="Provide a title that will appear in your Reddit post."
+            size="medium">
+          </sl-input>
+        
+          <sl-input
+            on:sl-input={handleOptionSubreddit}
+            value={options.subreddit}
+            label="Target Subreddit"
+            help-text="This is the subreddit where GOBO will submit your post."
+            size="medium">
+          </sl-input>
+        </section>
+      {/if}
+    {/if}
+  
+  
+    <section class="panel preview">
+      <h2>Preview</h2>
+      <p>
+        This section provides an approximation of how your posts will appear on
+        on each platform once submitted. As you edit your post above, you can
+        checkout these previews for feedback before publishing.
       </p>
     </section>
-
-
-
-    {#if targets.mastodon === true }
-      <section class="panel options">
-        <div class="subheading">
-          <sl-icon 
-            src="/icons/mastodon.svg"
-            class="mastodon">
-          </sl-icon>
-          <h3>Mastodon</h3>
-        </div>
-
-        <sl-input
-          on:sl-input={handleOptionSpoilerText}
-          value={options.spoilerText}
-          label="Spoiler Text"
-          help-text="Provide text that will contextualize content behind warning."
-          autocomplete="off"
-          size="medium">
-        </sl-input>
-      </section>
-    {/if}
-
-    {#if targets.reddit === true }
-      <section class="panel options">
-        <div class="subheading">
-          <sl-icon 
-            src="/icons/reddit.svg"
-            class="reddit">
-          </sl-icon>
-          <h3>Reddit</h3>
-        </div>
-
-        <sl-input
-          on:sl-input={handleOptionTitle}
-          value={options.title}
-          label="Post Title"
-          help-text="Provide a title that will appear in your Reddit post."
-          size="medium">
-        </sl-input>
+  
+  
+  
+    <section class="panel extra-wide">
+      {#if targets.mastodon === true}
+        <h3 class="preview-header">Mastodon</h3>
+        <MastodonPreview></MastodonPreview>
+      {/if}
+  
+      {#if targets.reddit === true}
+      <h3 class="preview-header">Reddit</h3>
+        <RedditPreview></RedditPreview>
+      {/if}
+  
+      {#if targets.twitter === true}
+      <h3 class="preview-header">Twitter</h3>
+        <TwitterPreview></TwitterPreview>
+      {/if}
       
-        <sl-input
-          on:sl-input={handleOptionSubreddit}
-          value={options.subreddit}
-          label="Target Subreddit"
-          help-text="This is the subreddit where GOBO will submit your post."
-          size="medium">
-        </sl-input>
-      </section>
-    {/if}
-  {/if}
+    </section>
+  
+  
+    <section class="panel publish">
+      <h2>Publish</h2>
+      <p>
+        Publish your post. GOBO will issue requests to each of the platforms 
+        you specified.
+      </p>
+  
+      <div class="buttons">
+        <sl-button
+          class="cancel"
+          size="medium"
+          pill>
+          Discard Draft
+        </sl-button>
+  
+        <sl-button
+          class="submit"
+          size="medium"
+          pill>
+          Publish
+        </sl-button>
+      </div>
+     
+    </section>
+  
+  </form>
+</div>
 
-
-  <section class="panel preview">
-    <h2>Preview</h2>
-    <p>
-      This section provides an approximation of how your posts will appear on
-      on each platform once submitted. As you edit your post above, you can
-      checkout these previews for feedback before publishing.
-    </p>
-  </section>
-
-
-
-  <section class="panel extra-wide">
-    {#if targets.mastodon === true}
-      <h3 class="preview-header">Mastodon</h3>
-      <MastodonPreview></MastodonPreview>
-    {/if}
-
-    {#if targets.reddit === true}
-    <h3 class="preview-header">Reddit</h3>
-      <RedditPreview></RedditPreview>
-    {/if}
-
-    {#if targets.twitter === true}
-    <h3 class="preview-header">Twitter</h3>
-      <TwitterPreview></TwitterPreview>
-    {/if}
-    
-  </section>
-
-
-  <section class="panel publish">
-    <h2>Publish</h2>
-    <p>
-      Publish your post. GOBO will issue requests to each of the platforms 
-      you specified.
-    </p>
-
-    <div class="buttons">
-      <sl-button
-        class="cancel"
-        size="medium"
-        pill>
-        Discard
-      </sl-button>
-
-      <sl-button
-        class="submit"
-        size="medium"
-        pill>
-        Publish
-      </sl-button>
-    </div>
-   
-  </section>
-
-</form>
 
 <style>
   h1 {

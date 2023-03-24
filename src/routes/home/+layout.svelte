@@ -22,5 +22,5 @@
   <NavPage current="home">
     <slot></slot>
   </NavPage>
-  <FooterNav></FooterNav>
+  <FooterNav current="home"></FooterNav>
 </GuardFrame>

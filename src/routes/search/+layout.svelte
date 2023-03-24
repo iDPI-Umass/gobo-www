@@ -10,5 +10,5 @@
   <NavPage current="search">
     <slot></slot>
   </NavPage>
-  <FooterNav></FooterNav>
+  <FooterNav current="search"></FooterNav>
 </GuardFrame>

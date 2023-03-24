@@ -10,5 +10,5 @@
   <NavPage current="settings">
     <slot></slot>
   </NavPage>
-  <FooterNav></FooterNav>
+  <FooterNav current="settings"></FooterNav>
 </GuardFrame>

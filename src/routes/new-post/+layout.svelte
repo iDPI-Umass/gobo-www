@@ -11,5 +11,5 @@
   <NavPage current="new post">
     <slot></slot>
   </NavPage>
-  <FooterNav></FooterNav>
+  <FooterNav current="new post"></FooterNav>
 </GuardFrame>
