@@ -1,37 +1,42 @@
 <script>
-  import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
+  import "@shoelace-style/shoelace/dist/components/button/button.js";
+  import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   export let current;
 </script>
 
 <footer>
   <nav>
-    <sl-icon-button
-      src="/icons/home.svg"
+    <sl-button
+      pill
       href="/home"
       class="{current === "home" ? "current" : ""}">
-    </sl-icon-button>
+      <sl-icon slot="prefix" src="/icons/home.svg"></sl-icon>
+    </sl-button>
 
-    <!-- <sl-icon-button
-      src="/icons/search.svg"
-      href="/search"></sl-icon-button> -->
+    <!-- <sl-button
+      <sl-icon slot="prefix" src="/icons/search.svg"></sl-icon>
+      href="/search"></sl-button> -->
 
-    <sl-icon-button
-      src="/icons/identities.svg"
+    <sl-button
+      pill
       href="/identities"
       class="{current === "identities" ? "current" : ""}">
-    </sl-icon-button>
+      <sl-icon slot="prefix" src="/icons/identities.svg"></sl-icon>
+    </sl-button>
 
-    <sl-icon-button
-      src="/icons/gear.svg"
+    <sl-button
+      pill
       href="/settings"
       class="{current === "settings" ? "current" : ""}">
-    </sl-icon-button>
+      <sl-icon slot="prefix" src="/icons/gear.svg"></sl-icon>
+    </sl-button>
 
-    <sl-icon-button
-      src="/icons/pencil-square.svg"
+    <sl-button
+      pill
       href="/new-post"
       class="{current === "new post" ? "current" : ""}">
-    </sl-icon-button>
+      <sl-icon slot="prefix" src="/icons/pencil-square.svg"></sl-icon>
+    </sl-button>
 
   </nav>
 </footer>
@@ -60,23 +65,53 @@
     justify-content: space-between;
   }
 
-  footer > nav > sl-icon-button {
+  footer > nav > sl-button {
     margin: 12px;
+    margin-top: 2px;
     font-size: 26px;
     color: var(--gobo-color-text);
   }
 
-  footer > nav > sl-icon-button::part(base):hover,
-  footer > nav > sl-icon-button::part(base):focus {
+  footer > nav > sl-button::part(base):hover,
+  footer > nav > sl-button::part(base):focus {
     color: var(--gobo-color-text);
   }
 
+
+  nav > sl-button::part(base) {
+    height: 2.375rem;
+    padding: 0.333rem 1rem;
+    height: 100%;
+    background: var(--gobo-color-panel);
+    color: var(--gobo-color-text-menu);
+    border: none;
+  }
+
+  nav > sl-button::part(label) {
+    padding-left: 0;
+    font-size: var(--gobo-font-size-large);
+    font-weight: var(--gobo-font-weight-medium);
+  }
+
+  nav > sl-button::part(prefix) {
+    width: 1.625rem;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    margin-right: 0;
+  }
+
+  nav > sl-button::part(prefix) {
+    font-size: 1.625rem; 
+  }
 
   nav > .current::part(base) {
     background: var(--gobo-color-null);
   }
 
-  nav > .current::part(base) {
+  nav > .current::part(label) {
     position: relative;
     font-weight: var(--gobo-font-weight-black);
   }
