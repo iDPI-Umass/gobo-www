@@ -363,7 +363,7 @@
   --sl-input-height-medium: 2.5rem;
   --sl-input-height-large: 3.125rem; 
 
-  --sl-input-background-color: var(--gobo-color-sl-panel-background);
+  --sl-input-background-color: var(--gobo-color-null);
   --sl-input-background-color-hover: var(--sl-input-background-color);
   --sl-input-background-color-focus: var(--sl-input-background-color);
   --sl-input-background-color-disabled: var(--sl-color-neutral-100);
@@ -387,9 +387,9 @@
   --sl-input-font-size-large: var(--sl-font-size-large);
   --sl-input-letter-spacing: var(--sl-letter-spacing-normal);
 
-  --sl-input-color: var(--sl-color-neutral-700);
-  --sl-input-color-hover: var(--sl-color-neutral-700);
-  --sl-input-color-focus: var(--sl-color-neutral-700);
+  --sl-input-color: var(--sl-color-text);
+  --sl-input-color-hover: var(--sl-color-text);
+  --sl-input-color-focus: var(--sl-color-text);
   --sl-input-color-disabled: var(--sl-color-neutral-900);
   --sl-input-icon-color: var(--sl-color-neutral-500);
   --sl-input-icon-color-hover: var(--sl-color-neutral-600);
@@ -428,7 +428,7 @@
 
   --sl-overlay-background-color: hsl(0 0% 0% / 43%);
 
-  --sl-panel-background-color: var(--gobo-color-sl-panel-background);
+  --sl-panel-background-color: var(--gobo-color-null);
   --sl-panel-border-color: var(--sl-color-neutral-200);
   --sl-panel-border-width: 1px;
 

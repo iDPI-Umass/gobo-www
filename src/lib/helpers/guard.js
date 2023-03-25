@@ -1,6 +1,6 @@
 import { goto } from "$app/navigation";
 import { browser } from "$app/environment";
-import { getAccount, refreshProfile } from "$lib/helpers/account.js";
+import { getAccount, logout, refreshProfile } from "$lib/helpers/account.js";
 import { getAuth0Client } from "$lib/helpers/auth0.js";
 
 
@@ -22,9 +22,10 @@ export async function guard() {
       await refreshProfile();
     
     } catch ( error ) {
-      // TODO: We need an error page here for internal authentication errors.
+      // TODO: We to spec out what we'd like to happen here. This logs the person
+      //   out so they can be sent to the public homepage and safely reset their space.
       console.error( error );
-      return goto( "/" );
+      return await logout();
     }
   }
 }

@@ -3,30 +3,19 @@
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import Identity from "$lib/components/Identity.svelte";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
-  import { getGOBOClient } from "$lib/helpers/account.js";
-  import { sort } from "$lib/helpers/identity";
+  import { getIdentities } from "$lib/helpers/identity";
 
   let identities = [];
-  let allEmpty = false;
+  let allEmpty = true;
 
   const loadIdentities = async function () {
-    const client = await getGOBOClient();
-    let _identities;
-    try {
-      let body = await client.identityInfo();
-      _identities = body.identities;
-    } catch ( error ) {
-      console.error( error );
-      return;
-    }
-
-    if ( _identities.length === 0 ) {
+    identities = await getIdentities()
+    
+    if ( identities.length === 0 ) {
       allEmpty = true;
     } else {
       allEmpty = false;
     }
-
-    identities = sort( _identities );
   };
 </script>
   

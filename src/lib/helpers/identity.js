@@ -1,3 +1,5 @@
+import { getGOBOClient } from "./account.js";
+
 
 const categorize = function ( identity ) {
   identity.key = identity.identity_id;
@@ -69,11 +71,27 @@ const sort = function ( identities ) {
   return [ ...mastodons, ...reddits, ...twitters ];
 };
 
+const getIdentities = async function () {
+  const client = await getGOBOClient();
+  let identities;
+  
+  try {
+    let body = await client.identityInfo();
+    identities = body.identities;
+  } catch ( error ) {
+    console.error( error );
+    return [];
+  }
+
+  return sort( identities );
+};
+
 
 
 export {
   categorize,
   getUsername,
   addUsername,
-  sort
+  sort,
+  getIdentities
 }

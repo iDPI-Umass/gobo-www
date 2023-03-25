@@ -24,6 +24,26 @@ const handleCallbackError = async function () {
 };
 
 
+// TODO: We need to be careful this doesn't create a routing infinite loop with
+//   the guard redirect functionality.
+const handleRootRedirect = async function () {
+  const client = await getAuth0Client();
+  if ( await client.isAuthenticated() !== true ) {
+    // We can stop here. Allow the passthrough to the public homepage.
+    return;
+  }
+
+  const account = await Account.getAccount();
+  if ( account.permissions.has("general") ) {
+    // This person is allowed access to application feature. Redirect them home.
+    return goto( "/home" );
+  }
+
+  // No further checks. Allow passthrough to the public homepage.
+  return;
+}
+
+
 const handleAuthCallback = async function ( query ) {
   console.log( "Starting primary authentication callback", query );
   const { state, code, error } = query;
@@ -72,17 +92,17 @@ const handleAddIdentityCallback = async function ( query ) {
         state: query.state
       }
     });
-    return goto( "/identities/list" );
+    return goto( "/identities" );
   } else {
     // Passthrough if we've marked the base_url as missing.
-    return goto( "/identities/list" );
+    return goto( "/identities" );
   }
 };
 
 
 
-// Figure out what type of callback we're dealing with.
-const handleCallbacks = async function () {
+// Detect and handle any redirect or callback.
+const handleRedirect = async function () {
   if ( !browser ) {
     return null;
   }
@@ -92,6 +112,10 @@ const handleCallbacks = async function () {
     const query = extractQuery( url );
     
     switch ( url.pathname ) {
+      case "/":
+        // Logged in people need to be sent Home
+        await handleRootRedirect();
+        break;
       case "/auth-callback":
         // Callback from Auth0, primary application authentication
         await handleAuthCallback( query );
@@ -101,7 +125,7 @@ const handleCallbacks = async function () {
         await handleAddIdentityCallback( query );
         break;
       default:
-        // Non-callback passthrough
+        // No-op passthrough
         return null;        
     }
   } catch ( error ) {
@@ -110,4 +134,4 @@ const handleCallbacks = async function () {
   }
 };
 
-export { handleCallbacks }
+export { handleRedirect }

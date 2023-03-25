@@ -1,0 +1,69 @@
+<script>
+  import "@shoelace-style/shoelace/dist/components/divider/divider.js";
+  import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
+  import "@shoelace-style/shoelace/dist/components/icon/icon.js";
+  import Spinner from "$lib/components/primitives/Spinner.svelte";
+  import IdentityMini from "$lib/components/IdentityMini.svelte";
+  import { getIdentities } from "$lib/helpers/identity";
+
+  let identities = [];
+  let allEmpty = true;
+
+  const loadIdentities = async function () {
+    identities = await getIdentities()
+    
+    if ( identities.length === 0 ) {
+      allEmpty = true;
+    } else {
+      allEmpty = false;
+    }
+  };
+</script>
+
+<section>
+
+
+  {#await loadIdentities()}
+  
+    <Spinner></Spinner>
+  
+  {:then}
+
+    <section class="outer-frame">
+      <header>
+        <h2>Identities</h2>
+      </header>
+
+      <section class="inner-frame">
+        {#if allEmpty === true}
+          <p>No identities currently registered.</p>
+        {/if}
+
+        {#each identities as identity (identity.key)}  
+          <IdentityMini {identity}></IdentityMini>
+        {/each}
+      </section>
+
+    </section>
+
+  {/await}
+
+</section>
+
+<style>
+  .outer-frame {
+    background: var(--gobo-color-panel);
+    border: var(--gobo-border-panel);
+    border-radius: var(--gobo-border-radius);
+    max-width: 20rem;
+  }
+
+  header {
+    padding: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex);
+    border-bottom: var(--gobo-border-panel);
+  }
+
+  .inner-frame {
+    margin: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex);
+  }
+</style>

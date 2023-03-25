@@ -1,21 +1,24 @@
 <script>
-  import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
+  import "@shoelace-style/shoelace/dist/components/switch/switch.js";
   import { getGOBOClient } from "$lib/helpers/account.js";
+  import { onMount } from "svelte";
 
   
-  export let identity;  
+  export let identity;
   
-  let button;
+  let deleteButton, activeSwitch, activeState;
   let logo = `/icons/${ identity.type }.svg`;
   let nameSlot1 = identity.display_name;
   let nameSlot2 = identity.fullUsername;
 
+  activeState = true;
+
 
   const deleteIdentity = async function ( event ) {
     event.preventDefault();
-    button.loading = true;
+    deleteButton.loading = true;
     const client = await getGOBOClient();
     await client.removeIdentity({
       parameters: identity
@@ -25,29 +28,40 @@
     // for invalidate, but I don't think it's what we need.
     location.reload();
   };
+
+  onMount( function () {
+    activeSwitch.addEventListener( "sl-change", function ( event ) {
+      if ( event.target.checked === true ) {
+        console.log( "TBD activate identity" );
+      } else {
+        console.log( "TBD deactivate identity" );
+      }
+    });
+  });
 </script>
 
 <section>
+  
+  <section>
+    <sl-switch
+      bind:this={activeSwitch}
+      checked={activeState}
+      size="medium">
+      Active
+    </sl-switch>
 
-  <header>
-    
-    <sl-icon src={logo} class="{identity.type}"></sl-icon>
-    
-    <h2>{identity.type}</h2>
-    
+
     <sl-icon-button
-      bind:this={button}
+      bind:this={deleteButton}
       variant="danger"
       on:click={deleteIdentity}
       on:keypress={deleteIdentity}
       size="medium"
       src="/icons/trash.svg">
     </sl-icon-button>
-  
-  </header>
-  
-  <sl-divider></sl-divider>
-  
+
+  </section>
+
   <figure>
     
     <img 
@@ -55,13 +69,21 @@
       alt="profile picture for {identity.fullUsername}">
     
     <figcaption>
+      <h2>
+        <sl-icon src={logo} class="{identity.type}"></sl-icon>
+        { identity.type }
+      </h2>
+
       {#if nameSlot1 != null}
         <p class="slot1">{ nameSlot1 }</p>
       {/if}
+
       <p class="slot2">{ nameSlot2 }</p>
     </figcaption>
     
   </figure>
+
+
 
 </section>
 
@@ -78,39 +100,6 @@
     border: var(--gobo-border-panel);
     border-radius: var(--gobo-border-radius);
   }
-
-  section > header {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: center;
-    margin: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex);
-  }
-
-  section > header > sl-icon {
-    flex: 0 0 auto;
-    font-size: 1.5625rem;
-    margin: 0 0.5rem 0 0;
-  }
-
-  section > header > h2 {
-    flex: 1 1 auto;
-    font-size: 1.1875rem;
-    text-transform: capitalize;
-  }
-
-  section > header > sl-icon-button::part(base),
-  section > header > sl-icon-button::part(base):hover {
-    color: var(--gobo-color-danger);
-  }
-
-
-
-  section > sl-divider {
-    margin: 0;
-    --color: var(--gobo-color-border-panel);
-  }
-
 
   figure {
     margin: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex);
@@ -136,6 +125,25 @@
     align-items: flex-start;
   }
 
+  figcaption h2 {
+    flex: 1 1 auto;
+    font-size: 1rem;
+    font-weight: var(--gobo-font-weight-black);
+    text-transform: capitalize;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 0.25rem;
+  }
+
+  figcaption h2 sl-icon {
+    font-size: 1.25rem;
+    margin-right: 0.5rem;
+  }
+
+
   figcaption .slot1 {
     font-size: var(--gobo-font-size-copy);
     font-weight: var(--gobo-font-weight-bold);
@@ -145,6 +153,34 @@
   figcaption .slot2 {
     font-size: var(--gobo-font-size-copy);
     font-weight: var(--gobo-font-weight-regular);
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+  }
+
+
+  section > section {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--gobo-height-spacer-half) var(--gobo-width-spacer-flex);
+    margin-bottom: 0;
+    border: none;
+    border-bottom: var(--gobo-border-panel);
+    border-radius: var(--gobo-border-radius) var(--gobo-border-radius) 0 0;
+  }
+
+  section > section > sl-switch {
+    margin-bottom: 0;
+    /* Allow switch to have better alignment with below image. */
+    margin-left: 0.25rem
+  }
+
+  section > section > sl-icon-button::part(base),
+  section > section > sl-icon-button::part(base):hover {
+    color: var(--gobo-color-danger);
   }
 
 </style>
