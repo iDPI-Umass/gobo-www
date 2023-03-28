@@ -4,13 +4,13 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
   import IdentityMini from "$lib/components/IdentityMini.svelte";
-  import { getIdentities } from "$lib/helpers/identity";
+  import * as Identity from "$lib/resources/identity.js";
 
   let identities = [];
   let allEmpty = true;
 
   const loadIdentities = async function () {
-    identities = await getIdentities()
+    identities = await Identity.list();
     
     if ( identities.length === 0 ) {
       allEmpty = true;
@@ -20,8 +20,11 @@
   };
 </script>
 
-<section>
+<section class="outer-frame">
 
+  <header>
+    <h2>Identities</h2>
+  </header>
 
   {#await loadIdentities()}
   
@@ -29,21 +32,14 @@
   
   {:then}
 
-    <section class="outer-frame">
-      <header>
-        <h2>Identities</h2>
-      </header>
+    <section class="inner-frame">
+      {#if allEmpty === true}
+        <p>No identities currently registered.</p>
+      {/if}
 
-      <section class="inner-frame">
-        {#if allEmpty === true}
-          <p>No identities currently registered.</p>
-        {/if}
-
-        {#each identities as identity (identity.key)}  
-          <IdentityMini {identity}></IdentityMini>
-        {/each}
-      </section>
-
+      {#each identities as identity (identity.key)}  
+        <IdentityMini {identity}></IdentityMini>
+      {/each}
     </section>
 
   {/await}
@@ -56,11 +52,19 @@
     border: var(--gobo-border-panel);
     border-radius: var(--gobo-border-radius);
     max-width: 20rem;
+    margin-bottom: var(--gobo-height-spacer);
   }
 
   header {
-    padding: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex);
+    padding: 0.75rem var(--gobo-width-spacer);
     border-bottom: var(--gobo-border-panel);
+    margin-bottom: var(--gobo-height-spacer-flex);
+  }
+
+  h2 {
+    font-weight: var(--gobo-font-weight-black);
+    font-size: 1.25rem;
+    text-transform: capitalize;
   }
 
   .inner-frame {

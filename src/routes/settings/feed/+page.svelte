@@ -11,58 +11,42 @@
   import  "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import BackLink from "$lib/components/primitives/BackLink.svelte";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
-  import { onDestroy, onMount } from "svelte";
-  import { browser } from "$app/environment";
-  import { getGOBOClient } from "$lib/helpers/account";
+  import * as Keyword from "$lib/resources/keyword.js";
+  import { onMount } from "svelte";
+
 
   let keywordForm, keywordCategory, keywords, keywordButton;
 
   const loadKeywords = async function () {
-    const client = await getGOBOClient();
-    const result = await client.getBlockedKeywords();
-    keywords = result.keywords;
-    // keywords = [];
+    keywords = await Keyword.list()
   };
 
   const addKeyword = async function () {
-    const client = await getGOBOClient();
     const data = new FormData( keywordForm );
-    const category = data.get( "category");
+    const category = data.get( "category" );
     const word = data.get( "word" );
     
     try {
-      await client.addBlockedKeyword({
-        parameters: { category, word }
-      });
-
-      keywords = [ ...keywords, { category, word } ];
+      const keyword = await Keyword.add({ category, word });
+      keywords = Keyword.sort([ ...keywords, keyword ]);
       keywordForm.reset();
-      keywordCategory.value = "source";
+      keywordCategory.value = "keyword";
     
     } catch ( error ) {
       // TODO: Visually represent an error here.
       console.error( error );
     }
 
-    
     keywordButton.loading = false;
   };
 
   const removeKeyword = function ( keyword ) {
     return async function () {
-      const client = await getGOBOClient();
-
       try {
-        await client.deleteBlockedKeyword({
-          parameters: {
-            category: keyword.category,
-            word: keyword.word
-          }
-        });
-
-        keywords.splice( keyword.index, 1 );
+        await Keyword.remove( keyword );
+        const index = keywords.findIndex( k => k.key === keyword.key );
+        keywords.splice( index, 1 );
         keywords = keywords;
-      
       } catch ( error ) {
         // TODO: Visually represent an error here.
         console.error( error );
@@ -70,17 +54,15 @@
     };
   }
 
-  if ( browser ) {
-    onMount( function () {
-      keywordForm.addEventListener( "submit", async function ( event ) {
-        event.preventDefault();
-        if ( keywordButton.loading !== true ) {
-          keywordButton.loading = true;
-          await addKeyword();
-        }
-      });
+  onMount( function () {
+    keywordForm.addEventListener( "submit", async function ( event ) {
+      event.preventDefault();
+      if ( keywordButton.loading !== true ) {
+        keywordButton.loading = true;
+        await addKeyword();
+      }
     });
-  }
+  });
 </script>
 
 <div class="main-child">
@@ -91,7 +73,7 @@
 
   <section class="gobo-copy">
     <header>
-      <h2>Blocked Keywords</h2>
+      <h2>Keyword Blocking</h2>
       <p>
         Control which words and phrases you would like to exclude from your 
         GOBO feed. You can add phrases below or delete any listed in the table.
@@ -109,15 +91,15 @@
         </section>
       {:else}
         <section class="keyword-table">
-          {#each keywords as keyword, index (`${keyword.category}${keyword.word}`)}
+          {#each keywords as keyword (keyword.key)}
             <section class="table-row">
               <span class="keyword">
                 <span>{ keyword.category }</span>
               </span>
               <span class="phrase">{ keyword.word }</span>
               <sl-icon-button
-                on:click={removeKeyword({ ...keyword, index })}
-                on:keypress={removeKeyword({ ...keyword, index })}
+                on:click={removeKeyword({ ...keyword })}
+                on:keypress={removeKeyword({ ...keyword })}
                 label="Delete Keyword" 
                 src="/icons/trash.svg"></sl-icon-button>
             </section>
@@ -128,13 +110,11 @@
   </section>
 
   <form class="gobo-form" bind:this={keywordForm}>
-    <h2></h2>
-
     <sl-select
       bind:this={keywordCategory}
       name="category"
       value="keyword"
-      label="Block Category"
+      label="Category"
       size="medium"
       pill>
       <sl-option value="keyword">Keyword</sl-option>
@@ -145,7 +125,7 @@
     
     <sl-input
       name="word"
-      label="Block Pattern"
+      label="Pattern"
       help-text="GOBO will match against this text to block targeted content from your feed."
       autocomplete="off"
       size="medium">
@@ -178,5 +158,9 @@
 
   .keyword-table .keyword span {
     background: var(--gobo-color-active);
+  }
+
+  sl-select {
+    max-width: 12rem;
   }
 </style>

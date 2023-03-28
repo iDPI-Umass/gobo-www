@@ -17,7 +17,7 @@
   import { draftStore } from "$lib/stores/post-draft.js";
   import { previewStore } from "$lib/stores/image-preview.js";
   import { getGOBOClient } from "$lib/helpers/account.js";
-  import { sort } from "$lib/helpers/identity.js";
+  import { sort } from "$lib/resources/identity.js";
   import { onDestroy, onMount } from "svelte";
   import { browser } from "$app/environment";
   import { goto } from "$app/navigation";

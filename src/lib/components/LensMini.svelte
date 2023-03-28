@@ -3,10 +3,9 @@
   import "@shoelace-style/shoelace/dist/components/switch/switch.js";
   import { onMount } from "svelte";
 
-  export let identity;
+  export let lens;
   
   let activeSwitch, activeState;
-  let logo = `/icons/${ identity.type }.svg`;
 
   activeState = true;
 
@@ -14,9 +13,9 @@
   onMount( function () {
     activeSwitch.addEventListener( "sl-change", function ( event ) {
       if ( event.target.checked === true ) {
-        console.log( "TBD activate identity" );
+        console.log( "TBD activate lens" );
       } else {
-        console.log( "TBD deactivate identity" );
+        console.log( "TBD deactivate lens" );
       }
     });
   });
@@ -24,55 +23,51 @@
 
 <section>
 
-  <span>
-    <sl-icon src={logo} class="{identity.type}"></sl-icon>
-    <p>{ identity.fullUsername }</p>
-  </span>
+  <header>
+    <h3>{ lens.name }</h3>
+    <sl-switch
+      bind:this={activeSwitch}
+      checked={activeState}
+      size="medium">
+    </sl-switch>
+  </header>
 
-  <sl-switch
-    bind:this={activeSwitch}
-    checked={activeState}
-    size="medium">
-  </sl-switch>
+  <p>{ lens.description }</p>
 
 </section>
 
 <style>
   section {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     flex-wrap: nowrap;
     justify-content: space-between;
-    align-items: center;
+    align-items: stretch;
     width: 100%;
     margin-bottom: var(--gobo-height-spacer-flex);
   }
 
-  section > span {
+  section > header {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: space-between;
-    align-items: center;
-    margin-right: 0.5rem;
+    align-items: flex-start;
+    margin-bottom: var(--gobo-height-spacer-flex);
   }
 
-  section > span > p {
-    font-size: var(--gobo-font-size-detail);
-    max-width: 11rem;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+  sl-switch {
+    align-self: flex-start;
   }
 
-  sl-icon {
-    font-size: 1.25rem;
-    margin-right: 0.5rem;
+  h3 {
+    font-weight: var(--gobo-font-weight-black);
+    font-size: 1.125rem;
+    text-transform: capitalize;
   }
-
 
   p {
-    font-size: var(--gobo-font-size-copy);
+    font-size: var(--gobo-font-size-detail);
     font-weight: var(--gobo-font-weight-regular);
     color: var(--gobo-color-text-muted);
   }

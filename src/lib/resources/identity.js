@@ -1,4 +1,4 @@
-import { getGOBOClient } from "./account.js";
+import { getGOBOClient } from "$lib/helpers/account.js";
 
 
 const categorize = function ( identity ) {
@@ -71,7 +71,7 @@ const sort = function ( identities ) {
   return [ ...mastodons, ...reddits, ...twitters ];
 };
 
-const getIdentities = async function () {
+const list = async function () {
   const client = await getGOBOClient();
   let identities;
   
@@ -86,6 +86,13 @@ const getIdentities = async function () {
   return sort( identities );
 };
 
+const remove = async function ( identity ) {
+  const client = await getGOBOClient();
+  await client.removeIdentity({
+    parameters: identity
+  });
+};
+
 
 
 export {
@@ -93,5 +100,6 @@ export {
   getUsername,
   addUsername,
   sort,
-  getIdentities
+  list,
+  remove
 }

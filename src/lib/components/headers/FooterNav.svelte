@@ -67,7 +67,6 @@
 
   footer > nav > sl-button {
     margin: 12px;
-    margin-top: 2px;
     font-size: 26px;
     color: var(--gobo-color-text);
   }

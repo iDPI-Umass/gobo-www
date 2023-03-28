@@ -2,7 +2,7 @@
   import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/switch/switch.js";
-  import { getGOBOClient } from "$lib/helpers/account.js";
+  import * as Identity from "$lib/resources/identity.js";
   import { onMount } from "svelte";
 
   
@@ -19,10 +19,7 @@
   const deleteIdentity = async function ( event ) {
     event.preventDefault();
     deleteButton.loading = true;
-    const client = await getGOBOClient();
-    await client.removeIdentity({
-      parameters: identity
-    });
+    await Identity.remove( identity );
 
     // TODO: Figure out how to do this in svelte. I keep getting search results
     // for invalidate, but I don't think it's what we need.
@@ -63,16 +60,17 @@
   </section>
 
   <figure>
+    <h2>
+      <sl-icon src={logo} class="{identity.type}"></sl-icon>
+      { identity.type }
+    </h2>
+
     
     <img 
       src={identity.profile_image} 
       alt="profile picture for {identity.fullUsername}">
     
     <figcaption>
-      <h2>
-        <sl-icon src={logo} class="{identity.type}"></sl-icon>
-        { identity.type }
-      </h2>
 
       {#if nameSlot1 != null}
         <p class="slot1">{ nameSlot1 }</p>
@@ -105,7 +103,7 @@
     margin: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex);
     display: flex;
     flex-direction: row;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     justify-content: flex-start;
     align-items: center;
   }
@@ -125,8 +123,8 @@
     align-items: flex-start;
   }
 
-  figcaption h2 {
-    flex: 1 1 auto;
+  figure h2 {
+    flex: 1 0 100%;
     font-size: 1rem;
     font-weight: var(--gobo-font-weight-black);
     text-transform: capitalize;
@@ -135,10 +133,10 @@
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: center;
-    margin-bottom: 0.25rem;
+    margin-bottom: var(--gobo-height-spacer-flex);
   }
 
-  figcaption h2 sl-icon {
+  figure h2 sl-icon {
     font-size: 1.25rem;
     margin-right: 0.5rem;
   }

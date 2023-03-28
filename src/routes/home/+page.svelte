@@ -69,4 +69,8 @@
     overflow-y: scroll;
     padding: 2px;
   }
+
+  .main-child {
+    max-width: unset;
+  }
 </style>

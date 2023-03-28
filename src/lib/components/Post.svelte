@@ -156,10 +156,10 @@
     <div class="main">
       
       <header>
-        <span class="names">
-          <span class="slot1">{ headingSlot1 }</span>
-          <span class="slot2">{ headingSlot2 }</span>
-        </span>
+        <div class="names">
+          <div class="slot1">{ headingSlot1 }</div>
+          <div class="slot2">{ headingSlot2 }</div>
+        </div>
         <time datetime="created">{ humanize( created ) }</time>
       </header>
 
@@ -202,7 +202,7 @@
       target="_blank" 
       rel="noopener noreferrer nofollow">
       <sl-icon src="{logo}" class="{platform}"></sl-icon>
-      {sourceCopy}      
+      <span>{sourceCopy}</span>     
     </a>
    
   </footer>
@@ -266,6 +266,7 @@
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: stretch;
+    min-width: 0;
   }
 
   .outer-frame .inner-frame .main header {  
@@ -278,12 +279,10 @@
   }
 
   .outer-frame .inner-frame .main header .names {
-    flex: 1 1 80%;
+    flex: 1;
     display: flex;
-    flex-direction: row;
     flex-wrap: wrap;
-    justify-content: flex-start;
-    align-items: center;
+    min-width: 0;
   }
 
   .outer-frame .inner-frame .main header .slot1 {
@@ -292,7 +291,7 @@
     color: var(--gobo-color-text);
     white-space: nowrap;
     text-overflow: ellipsis;
-    flex: 0 1 auto;
+    overflow: hidden;
     margin-right: 0.75rem;
   }
 
@@ -302,18 +301,16 @@
     color: var(--gobo-color-text-muted);
     white-space: nowrap;
     text-overflow: ellipsis;
-    flex: 1 2 40%;
+    overflow: hidden;
   }
 
   .outer-frame .inner-frame .main header time {
+    flex-shrink: 0;
     font-size: var(--gobo-font-size-detail);
     font-weight: var(--gobo-font-weight-regular);
     color: var(--gobo-color-text-muted);
     min-width: max-content;
-    flex: 0 0 10%;
-    /* Allows graceful internal spacing while wrapped */
-    margin-bottom: calc(0.5 * var(--gobo-height-spacer-half));
-    margin-left: 0.5rem;
+    margin-left: 0.75rem;
   }
 
 
@@ -372,7 +369,7 @@
   .outer-frame footer {
     width: 100%;
     height: 2.5rem;
-    padding: 0.5rem var(--gobo-width-spacer);
+    padding: 0.5rem var(--gobo-width-spacer-flex);
     border-top: var(--gobo-border-panel);
     display: flex;
     flex-direction: row;
@@ -402,12 +399,29 @@
 
   .outer-frame footer a sl-icon {
     font-size: 1rem;
-    margin-right: 0.5rem;
+    margin-right: 0;
   }
 
   .outer-frame footer a.source-link {
     color: var(--gobo-color-text-muted);
   }
+
+  .outer-frame footer a.source-link span {
+    display: none;
+  }
+
+  @media ( min-width: 425px ) {
+    .outer-frame footer a.source-link sl-icon {
+      margin-right: 0.5rem;
+    }
+
+    .outer-frame footer a.source-link span {
+      display: inline;
+    }
+  }
+
+
+
 
 
 </style>

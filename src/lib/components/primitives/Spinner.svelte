@@ -12,7 +12,7 @@
     max-width:  36rem;
     display: flex;
     justify-content: center;
-    margin-top: 2rem;
+    margin: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex);
   }
 
   .spinner-box > sl-spinner {

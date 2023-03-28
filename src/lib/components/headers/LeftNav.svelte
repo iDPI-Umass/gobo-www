@@ -2,6 +2,7 @@
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   export let current;
+  export let fold;
 </script>
 
 <nav>
@@ -10,7 +11,7 @@
     pill
     href="/home">
     <sl-icon src="/icons/home.svg" slot="prefix"></sl-icon>
-    <span>Home</span>
+    Home
   </sl-button>
 
   <sl-button
@@ -18,7 +19,7 @@
     pill
     href="/identities">
     <sl-icon src="/icons/identities.svg" slot="prefix"></sl-icon>
-    <span>Identities</span>
+    Identities
   </sl-button>
 
   <sl-button
@@ -26,14 +27,15 @@
     pill
     href="/settings">
     <sl-icon src="/icons/gear.svg" slot="prefix"></sl-icon>
-    <span>Settings</span>
+    Settings
   </sl-button>
 
   <sl-button
     class="cta"
     pill
     href="/new-post">
-    <span>New Post</span>
+    <sl-icon slot="prefix" src="/icons/pencil-square.svg"></sl-icon>
+    New Post
   </sl-button>
 </nav>
 
@@ -48,7 +50,6 @@
     align-items: flex-start;
     margin: 0;
     padding: var(--gobo-width-spacer);
-    min-width: 16.125rem;
   }
 
   nav > sl-button {
@@ -70,9 +71,7 @@
   }
 
   nav > sl-button::part(label) {
-    padding-left: 0;
-    font-size: var(--gobo-font-size-large);
-    font-weight: var(--gobo-font-weight-medium);
+    display: none;
   }
 
   nav > sl-button::part(prefix) {
@@ -108,7 +107,7 @@
   }
 
   nav > .cta::part(prefix) {
-    width: 0;
+    font-size: 1.25rem;
   }
 
   nav > .cta::part(label) {
@@ -134,6 +133,24 @@
     height: 80%;
     border-radius: 4px;
     background: var(--gobo-color-primary);
+  }
+
+  @media ( min-width: 1300px ) {
+    nav {
+      min-width: 16.125rem;
+    }
+
+    nav > sl-button::part(label) {
+      display: block;
+      padding-left: 0;
+      font-size: var(--gobo-font-size-large);
+      font-weight: var(--gobo-font-weight-medium);
+    }
+
+    nav > .cta::part(prefix) {
+      display: none;
+      width: 0;
+    }
   }
 
   @media ( min-width: 750px ) {

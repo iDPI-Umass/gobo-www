@@ -3,13 +3,13 @@
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import Identity from "$lib/components/Identity.svelte";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
-  import { getIdentities } from "$lib/helpers/identity";
+  import * as ID from "$lib/resources/identity.js";
 
   let identities = [];
   let allEmpty = true;
 
   const loadIdentities = async function () {
-    identities = await getIdentities()
+    identities = await ID.list()
     
     if ( identities.length === 0 ) {
       allEmpty = true;
