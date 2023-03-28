@@ -2,7 +2,6 @@
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   export let current;
-  export let fold;
 </script>
 
 <nav>
@@ -113,6 +112,7 @@
   nav > .cta::part(label) {
     color: #FFFFFF;
     font-weight: var(--gobo-font-weight-black);
+    padding-right: 0;
   }
 
   nav > .current::part(base) {

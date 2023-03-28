@@ -3,7 +3,7 @@ import { getGOBOClient } from "$lib/helpers/account.js";
 
 const categorize = function ( identity ) {
   identity.key = identity.identity_id;
-  identity.active = false;
+  identity.active = true;
   
   switch ( identity.base_url ) {
     case "twitter.com":

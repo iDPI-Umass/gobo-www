@@ -13,6 +13,7 @@
   import MastodonPreview from "$lib/components/MastodonPreview.svelte";
   import RedditPreview from "$lib/components/RedditPreview.svelte";
   import TwitterPreview from "$lib/components/TwitterPreview.svelte";
+  import "$lib/styles/buttons.css";
   import { scrollStore } from "$lib/stores/scroll.js";
   import { draftStore } from "$lib/stores/post-draft.js";
   import { previewStore } from "$lib/stores/image-preview.js";
@@ -358,14 +359,17 @@
         multiple=true
         class="hidden">
   
-      <sl-button
-        on:click={handleFileChrome}
-        on:keypress={handleFileChromeKey}
-        size="medium"
-        class="submit"
-        pill>
-        Add Attachment
-      </sl-button>
+
+      <div class="buttons">
+        <sl-button
+          on:click={handleFileChrome}
+          on:keypress={handleFileChromeKey}
+          size="medium"
+          class="submit"
+          pill>
+          Add Attachment
+        </sl-button>
+      </div>      
   
     </section>
   
@@ -597,6 +601,13 @@
 
   .panel.body sl-textarea::part(textarea) {
     padding: 1rem;
+  }
+
+
+
+
+  .panel.media .keyword-table {
+    height: 20rem;
   }
 
 

@@ -4,7 +4,7 @@
 </script>
 
 <div class="panels">
-  <LeftNav {current} fold="1300px"></LeftNav>
+  <LeftNav {current}></LeftNav>
   
   <main class="main">
     <slot name="main"></slot>

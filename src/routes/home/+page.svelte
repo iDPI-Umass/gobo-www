@@ -5,6 +5,7 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
   import '@shoelace-style/shoelace/dist/components/badge/badge.js';
+  import MobileFilters from "$lib/components/MobileFilters.svelte";
   import Post from "$lib/components/Post.svelte";
   import posts from "$lib/stores/posts.js";
 
@@ -54,6 +55,8 @@
       href="/settings/feed">
     </sl-icon-button>
   </header>
+
+  <MobileFilters></MobileFilters>
     
   <!-- TODO: Feed a11y with proper labeling -->
   <section bind:this={feed}>

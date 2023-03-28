@@ -3,7 +3,7 @@ import { getGOBOClient } from "$lib/helpers/account";
 
 const categorize = function ( lens ) {
   lens.key = `${ lens.type }:${ lens.name }`;
-  lens.active = false;
+  lens.active = true;
 };
 
 const sort = function ( lenses ) {
