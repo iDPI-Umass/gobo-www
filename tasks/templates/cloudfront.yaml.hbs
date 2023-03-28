@@ -84,10 +84,9 @@ Resources:
         SecurityHeadersConfig: 
           ContentSecurityPolicy: 
             ContentSecurityPolicy: >-
-              default-src https: ;
+              default-src https: data: ;
               script-src https: blob: 'unsafe-inline' 'unsafe-eval' ;
               style-src https: 'unsafe-inline' ;
-              img-src 'self' data: ;
             Override: false
           ContentTypeOptions: 
             Override: true

@@ -18,9 +18,30 @@ npm run dev -- --open
 To create a production version of your app:
 
 ```bash
-npm run build
+npm run build --production
 ```
 
 You can preview the production build with `npm run preview`.
 
 > To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+
+
+## Deploying Infrastructure
+
+> NOTE: you only need to do this once per environment or if infrastructure itself changes.
+
+### Wesite S3 + CloudFront Distribution
+```bash
+AWS_PROFILE=idpi npx gulp deploy --environment=production-www
+```
+
+### CloudFront Distribution for GOBO API
+```bash
+AWS_PROFILE=idpi npx gulp deploy --environment=production-api
+```
+
+
+## Publish Code Changes
+```bash
+AWS_PROFILE=idpi npx gulp publish --environment=production-api
+```
