@@ -87,7 +87,7 @@
   }
 
   nav > sl-button::part(label) {
-    padding-left: 0;
+    padding: 0;
     font-size: var(--gobo-font-size-large);
     font-weight: var(--gobo-font-weight-medium);
   }

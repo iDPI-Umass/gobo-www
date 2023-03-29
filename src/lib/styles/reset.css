@@ -9,6 +9,9 @@ html, body {
   background: var(--gobo-color-null);
   color: var(--gobo-color-text);
 }
+html {
+  background: var(--gobo-color-primary);
+}
 img, picture, video, canvas, svg {
   display: block;
   max-width: 100%;
@@ -31,6 +34,7 @@ body {
   font-family: var(--gobo-font-family);
   line-height: var(--sl-line-height-dense);
   letter-spacing: var(--sl-letter-spacing-normal);
+  -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   -moz-font-feature-settings: "kern" 1; 
   -ms-font-feature-settings: "kern" 1; 
