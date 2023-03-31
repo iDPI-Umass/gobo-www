@@ -6,7 +6,7 @@ import YAML from "js-yaml";
 
 const args = yargs( hideBin( process.argv )).argv;
 
-const checkEnvironment = async function () {
+const check = async function () {
   const environments = YAML.load( await FS.readFile( Path.resolve( "gobo.yaml" )));
   const config = environments[ args.environment ];
   if ( config == null ) {
@@ -23,5 +23,5 @@ const checkEnvironment = async function () {
 };
 
 export {
-  checkEnvironment
+  check
 }

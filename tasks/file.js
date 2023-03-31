@@ -1,7 +1,6 @@
 import * as FS from "./fs.js";
 
-const getLocalFiles = async function () {
-  const root = "build";
+const read = async function ( root ) {
   const files = await FS.glob( "**/*", root );
 
   for ( const file of files ) {
@@ -13,5 +12,5 @@ const getLocalFiles = async function () {
 };
 
 export {
-  getLocalFiles
+  read
 }

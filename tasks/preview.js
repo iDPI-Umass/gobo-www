@@ -2,7 +2,7 @@ import Path from "node:path";
 import express from "express";
 
 
-const preview = function () {
+const run = function () {
   let port = 4173;
   let app = express();
   app.use( express.static( Path.resolve( "build" ),
@@ -19,5 +19,5 @@ const preview = function () {
 };
 
 export {
-  preview
+  run
 }

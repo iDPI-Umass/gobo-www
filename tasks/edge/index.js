@@ -132,8 +132,8 @@ const getCache = function ( edge ) {
 };
 
 
-const deployEdge = async function ( config ) {
-  const templates = Templates.create( Path.resolve( "tasks", "templates" ));
+const deploy = async function ( config ) {
+  const templates = Templates.create( Path.resolve( "tasks", "edge", "templates" ));
   templates._.h.registerHelper({ awsCase });
 
   let name, namespace, environment, edge, aliases, origins;
@@ -168,13 +168,13 @@ const deployEdge = async function ( config ) {
   await CF.deployStack( getStackName(config), yaml );
 };
 
-const teardownEdge = async function ( config ) {
+const teardown = async function ( config ) {
   const name = getStackName( config );
   await CF.deleteStack( name );
 };
 
 
-const invalidateCache = async function ( config ) {
+const invalidate = async function ( config ) {
   await Distro.invalidatePaths({
     domain: config.edge.aliases[0],
     paths: [ "/*" ]
@@ -182,7 +182,7 @@ const invalidateCache = async function ( config ) {
 }
 
 export {
-  deployEdge,
-  teardownEdge,
-  invalidateCache
+  deploy,
+  teardown,
+  invalidate
 }

@@ -41,3 +41,18 @@ production-api:
     headers:
       - Host
       - Authorization
+
+production-login:
+  namespace: gobo
+  auth0Login:
+    bundle: gobo-auth0-backend-production
+  secrets:
+    - name: gobo-auth0-backend-production
+      type: bundle
+      bundle:
+        - name: tenant
+          type: prompt
+        - name: client
+          type: prompt
+        - name: secret
+          type: prompt
