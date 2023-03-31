@@ -1,3 +1,4 @@
+import Path from "node:path";
 import * as Task from "./tasks/index.js";
 
 
@@ -5,21 +6,29 @@ const preview = function() {
   Task.Preview.run();
 };
 
+const build = async function () {
+  await Task.Shell.run( "vite build" );
+  await Task.Directory.copy({
+    source: Path.resolve( "src", "lib", "styles" ),
+    destination: Path.resolve( "build", "_styles" )
+  });
+};
+
 const deploy = async function () {
   const config = await Task.Environment.check();
   await Task.Bucket.deploy( config );
   await Task.Edge.deploy( config );
-}
+};
 
 const teardown = async function () {
   const config = await Task.Environment.check();
   await Task.Edge.teardown( config );
   await Task.Bucket.teardown( config );
-}
+};
 
 const publish = async function () {
   const config = await Task.Environment.check();
-  const files = await Task.File.read( "build" );
+  const files = await Task.Directory.read( "build" );
   await Task.Bucket.check( config );
   await Task.Bucket.sync( config, files );
 
@@ -34,7 +43,7 @@ const publish = async function () {
 const updateLogin = async function () {
   const config = await Task.Environment.check();
   await Task.Auth0.updateLogin( config );
-}
+};
 
 
 
@@ -62,7 +71,7 @@ const getSecret = async function () {
 const removeSecret = async function () {
   const config = await Task.Environment.check();
   await Task.Secret.remove( config );
-}
+};
 
 
 
@@ -71,6 +80,7 @@ const removeSecret = async function () {
 
 export {
   preview,
+  build,
 
   deploy,
   teardown,

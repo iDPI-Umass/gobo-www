@@ -57,6 +57,15 @@ const hash = function ( file ) {
   return file;
 }
 
+const exists = async function ( path ) {
+  try {
+    await FS.stat( path );
+    return true;
+  } catch ( error ) {
+    return false;
+  }
+};
+
 
 
 
@@ -66,5 +75,6 @@ export {
   readText,
   readBinary,
   computeHash,
-  hash
+  hash,
+  exists
 };
