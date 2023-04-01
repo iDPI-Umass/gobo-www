@@ -15,10 +15,10 @@ npm run dev -- --open
 
 ## Building
 
-To create a production version of your app:
+To build assets of the application to publish, use:
 
 ```bash
-npm run build --production
+npx gulp build
 ```
 
 You can preview the production build with `npm run preview`.

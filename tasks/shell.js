@@ -5,14 +5,8 @@ const run = function ( command ) {
   const [ main, ...args ] = command.split( /\s+/ );
 
   return new Promise( function ( resolve ) {
-    const spawnObject = Child.spawn( main, args );
-
-    spawnObject.stdout.on( "data", function ( data ) {
-      console.log( data.toString( "utf8" ) );
-    });
-    
-    spawnObject.stderr.on( "data", function ( data ) {
-      console.log( data.toString( "utf8" ) );
+    const spawnObject = Child.spawn( main, args, { 
+      stdio: [ "ignore", "inherit", "inherit" ]
     });
     
     spawnObject.on( "close", function ( code ) {
