@@ -74,6 +74,14 @@ const handleAuthCallback = async function ( query ) {
 // Handles callbacks from third-party platforms. We need to hold onto the 
 const handleAddIdentityCallback = async function ( query ) {
   console.log( "Starting add identity callback", query );
+  // console.log({
+  //   base_url: baseURL,
+  //   oauth_token: query.oauth_token,
+  //   oauth_verifier: query.oauth_verifier,
+  //   code: query.code,
+  //   state: query.state
+  // });
+  // return goto( "/identities" );
 
   // We hold onto the base_url in local storage before redirecting. We need to
   // provide this information to GOBO, but POST aren't idempotent, so we need to

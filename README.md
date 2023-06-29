@@ -43,5 +43,5 @@ AWS_PROFILE=idpi npx gulp deploy --environment=production-api
 
 ## Publish Code Changes
 ```bash
-AWS_PROFILE=idpi npx gulp publish --environment=production-api
+AWS_PROFILE=idpi npx gulp publish --environment=production-www
 ```

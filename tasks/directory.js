@@ -4,9 +4,6 @@ import * as _FS from "./fs.js";
 
 const read = async function ( root ) {
   const files = await _FS.glob( "**/*", root );
-  console.log( files );
-  process.exit();
-
 
   for ( const file of files ) {
     await _FS.readBinary( file );

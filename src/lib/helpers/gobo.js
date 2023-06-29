@@ -149,8 +149,7 @@ const buildAction = function ( name, account ) {
       mode: "cors",
       redirect: "follow",
       headers: {
-        Authorization: `Bearer ${ account.token.access_token }`,
-        "Content-Security-Policy": `default-src ${ PUBLIC_GOBO_API }`
+        Authorization: `Bearer ${ account.token.access_token }`
       }
     };
 
