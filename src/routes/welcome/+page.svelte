@@ -17,14 +17,12 @@
 
   const issueRequest = async function () {
     const client = await getGOBOClient();
+    const profile = client.me.get();
     const data = new FormData( form );
-    const display_name = data.get( "name" );
+    profile.name = data.get( "name" );
 
-    await client.updateProfile({
-      parameters: { display_name }
-    });
-
-    profileStore.updateProfile({ display_name });
+    await client.person.put(profile);
+    profileStore.updateProfile(profile);
   };
 
   const submit = async function () {

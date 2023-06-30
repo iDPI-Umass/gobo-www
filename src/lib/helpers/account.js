@@ -1,11 +1,14 @@
 import * as Bake from "@dashkite/bake";
+import setupGOBOClient from "gobo-client";
 import * as Cache from "$lib/helpers/cache.js";
 import { getAuth0Client } from "$lib/helpers/auth0.js";
-import { buildGOBOClient } from "$lib/helpers/gobo.js";
 import { profileStore } from "$lib/stores/profile.js";
-import { PUBLIC_AUTH_LOGOUT_URL } from '$env/static/public';
+import { 
+  PUBLIC_AUTH_LOGOUT_URL,
+  PUBLIC_GOBO_API
+} from '$env/static/public';
 
-let account, goboClient, profile;
+let account, goboClient;
 
 const extractPermissions = function ( account ) {
   const encoded = account?.token?.access_token.split(".")[1];
@@ -37,29 +40,40 @@ const getGOBOClient = async function () {
     return goboClient;
   }
 
-  goboClient = buildGOBOClient({ account: await getAccount() });
+  let account = await getAccount();
+
+  goboClient = setupGOBOClient({
+    base: PUBLIC_GOBO_API,
+    debug: 1,
+    token: account.token.access_token
+  })
+
   return goboClient;
 };
 
-const setProfile = async function () {
+const fetchProfile = async function () {
   const client = await getGOBOClient();
-  profile = await client.getProfile();
+  const profile = await client.me.get();
   
-  if ( profile.display_name == "" ) {
-    profile.display_name = account.email;
+  let { name } = profile;
+  if ( name == null || name == "" ) {
+    profile.name = account.email;
   }
 
   profileStore.setProfile( profile );
+  return profile;
 };
 
-const refreshProfile = async function () {
+const getProfile = async function () {
   const now = new Date().toISOString();
-  const match = Cache.read( "profile" );
+  let match = Cache.read( "profile" );
 
   if ( ( match == null ) || ( match.expires < now ) ) {
-    await setProfile();
-    Cache.write( "profile", 86400, profile );
+    const profile = await fetchProfile();
+    match = Cache.write( "profile", 86400, profile );
   }
+
+  return match.value;
 };
 
 const logout = async function () {
@@ -82,8 +96,7 @@ const isLoggedOut = function () {
 export { 
   getAccount,
   getGOBOClient,
-  setProfile,
-  refreshProfile,
+  getProfile,
   logout,
   isLoggedOut
 }

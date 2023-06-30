@@ -26,7 +26,7 @@
 
   <span>
     <sl-icon src={logo} class="{identity.type}"></sl-icon>
-    <p>{ identity.fullUsername }</p>
+    <p>{ identity.prettyName }</p>
   </span>
 
   <sl-switch

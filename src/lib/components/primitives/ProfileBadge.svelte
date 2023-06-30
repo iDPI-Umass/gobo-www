@@ -7,7 +7,7 @@
 
   onMount( function () {
     unsubscribeProfileStore = profileStore.subscribe( function ( profile ) {
-      name = profile.display_name;
+      name = profile.name;
     });
   });
 

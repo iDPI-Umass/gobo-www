@@ -10,8 +10,8 @@
   
   let deleteButton, activeSwitch, activeState;
   let logo = `/icons/${ identity.type }.svg`;
-  let nameSlot1 = identity.display_name;
-  let nameSlot2 = identity.fullUsername;
+  let nameSlot1 = identity.name;
+  let nameSlot2 = identity.prettyName;
 
   activeState = true;
 
@@ -68,7 +68,7 @@
     
     <img 
       src={identity.profile_image} 
-      alt="profile picture for {identity.fullUsername}">
+      alt="profile picture for {identity.prettyName}">
     
     <figcaption>
 

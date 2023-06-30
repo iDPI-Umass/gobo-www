@@ -38,6 +38,7 @@
 		"@dashkite/joy": "^0.3.16",
 		"@shoelace-style/shoelace": "2.3.0",
 		"dayjs": "^1.11.7",
+    "gobo-client": "file:../gobo-client",
 		"url-template": "^3.1.0"
 	}
 }

@@ -398,7 +398,7 @@
                 class="{identity.type}"
                 size="medium">
               </sl-icon>
-              {identity.fullUsername}
+              {identity.prettyName}
             </div>
   
             <sl-switch

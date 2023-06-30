@@ -109,7 +109,7 @@ export default [{
   author: "@meakoopa",
   authorName: "Anthony Oliveria",
   authorURL: "https://twitter.com/meakoopa",
-  avatar: "https://pbs.twimg.com/profile_images/1629453162103881730/twY_5LGJ_400x400.jpg",
+  avatar: "https://pbs.twimg.com/media/Ff9svteXEAA80n-?format=jpg&name=small",
   created: "2022-10-26T03:04:55.000Z"
 },{
   id: 7,

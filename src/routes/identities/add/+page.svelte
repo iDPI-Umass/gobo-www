@@ -25,10 +25,10 @@
           baseURL = data.get( "mastodonURL" );
           break;
         case "reddit":
-          baseURL = "www.reddit.com";
+          baseURL = "https://www.reddit.com";
           break;
         case "twitter":
-          baseURL = "twitter.com";
+          baseURL = "https://twitter.com";
           break;
         default:
           throw new Error( "unknown platform specified" );
@@ -36,13 +36,13 @@
 
       LS.write( "gobo-baseURL", baseURL );
       
-      const result = await client.addIdentity({
-        parameters: {
-          base_url: baseURL
-        }
-      });
+      const result = await client.actionOnboardIdentityStart.post({ content: {
+        base_url: baseURL
+      }});
 
-      window.location = result.redirectURL;
+      console.log(result);
+
+      window.location = result.redirect_url;
     } catch ( error ) {
       // TODO: Figure out how we'd like to represent an error visually here.
       console.error( error );

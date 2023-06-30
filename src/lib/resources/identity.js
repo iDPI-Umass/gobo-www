@@ -1,36 +1,26 @@
-import { getGOBOClient } from "$lib/helpers/account.js";
+import { getGOBOClient, getProfile } from "$lib/helpers/account.js";
 
 
-const categorize = function ( identity ) {
-  identity.key = identity.identity_id;
-  identity.active = true;
-  
+const getType = function ( identity ) {
   switch ( identity.base_url ) {
-    case "twitter.com":
-      identity.type = "twitter";
-      break;
-    case "www.reddit.com":
-      identity.type = "reddit";
-      break;
+    case "https://twitter.com":
+      return "twitter";
+    case "https://www.reddit.com":
+      return "reddit";
     default:
-      identity.type = "mastodon"; 
+      return "mastodon"; 
   }
+}
 
-  return addUsername( identity );
-};
-
-
-const getUsername = function ( identity ) {
+const getPrettyName = function ( identity ) {
   let hostname;
   const { username, type, base_url } = identity;
 
   switch ( type ) {
     case "twitter":
       return `@${ username }`;
-      break;
     case "reddit":
       return `u/${ username }`;
-      break;
     case "mastodon":
       // We just want the hostname to form a fully specified Mastodon reference.
       if ( base_url.startsWith( "https://" ) === true ) {
@@ -38,16 +28,17 @@ const getUsername = function ( identity ) {
         hostname = url.hostname;
       } else {
         hostname = base_url;
-      }
-      
+      }      
       return `@${ username }@${ hostname }`;
-      break;
   }
 };
 
-const addUsername = function ( identity ) {
-  identity.fullUsername = getUsername( identity );
-  return identity;
+const categorize = function ( identity ) {
+  identity.key = identity.id;
+  identity.active = true;
+  identity.type = getType( identity );
+  identity.prettyName = getPrettyName( identity );
+  return identity;  
 };
 
 
@@ -71,35 +62,28 @@ const sort = function ( identities ) {
   return [ ...mastodons, ...reddits, ...twitters ];
 };
 
-const list = async function () {
-  const client = await getGOBOClient();
-  let identities;
-  
+const list = async function () {  
   try {
-    let body = await client.identityInfo();
-    identities = body.identities;
+    const client = await getGOBOClient();
+    const profile = await getProfile();
+    const identities = await client.personIdentities.get({ 
+      person_id: profile.id
+    });
+    return sort( identities );
   } catch ( error ) {
     console.error( error );
     return [];
   }
-
-  return sort( identities );
 };
 
 const remove = async function ( identity ) {
   const client = await getGOBOClient();
-  await client.removeIdentity({
-    parameters: identity
-  });
+  await client.personIdentity.delete( identity );
 };
 
 
 
 export {
-  categorize,
-  getUsername,
-  addUsername,
-  sort,
   list,
   remove
 }

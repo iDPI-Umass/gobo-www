@@ -37,7 +37,7 @@
         <p>No identities currently registered.</p>
       {/if}
 
-      {#each identities as identity (identity.key)}  
+      {#each identities as identity (identity.id)}  
         <IdentityMini {identity}></IdentityMini>
       {/each}
     </section>

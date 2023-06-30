@@ -7,6 +7,7 @@
   import { profileStore } from "$lib/stores/profile";
   import { getGOBOClient } from "$lib/helpers/account";
   import { onDestroy, onMount } from "svelte";
+  let profile;
   let form, button, nameInput;
   let unsubscribeProfileStore;
 
@@ -17,13 +18,10 @@
   const issueRequest = async function () {
     const client = await getGOBOClient();
     const data = new FormData( form );
-    const display_name = data.get( "name" );
+    profile.name = data.get( "name" );
 
-    await client.updateProfile({
-      parameters: { display_name }
-    });
-
-    profileStore.updateProfile({ display_name });
+    await client.person.put( profile );
+    profileStore.updateProfile( profile );
   };
 
   const submit = async function () {
@@ -45,10 +43,9 @@
       }
     });
 
-    unsubscribeProfileStore = profileStore.subscribe( function ( profile ) {
-      console.log("settting", profile.display_name);
-      nameInput.value = profile.display_name;
-      console.log(nameInput.value)
+    unsubscribeProfileStore = profileStore.subscribe( function ( _profile ) {
+      profile = _profile
+      nameInput.value = profile.name;
     });
   });
 

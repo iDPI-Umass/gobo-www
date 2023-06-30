@@ -91,15 +91,13 @@ const handleAddIdentityCallback = async function ( query ) {
   
   if ( baseURL != null ) {
     const client = await Account.getGOBOClient();
-    await client.addIdentityCallback({
-      parameters: {
-        base_url: baseURL,
-        oauth_token: query.oauth_token,
-        oauth_verifier: query.oauth_verifier,
-        code: query.code,
-        state: query.state
-      }
-    });
+    await client.actionOnboardIdentityCallback.post({ content: {
+      base_url: baseURL,
+      oauth_token: query.oauth_token,
+      oauth_verifier: query.oauth_verifier,
+      code: query.code,
+      state: query.state
+    }});
     return goto( "/identities" );
   } else {
     // Passthrough if we've marked the base_url as missing.
