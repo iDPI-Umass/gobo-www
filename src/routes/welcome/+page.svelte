@@ -6,7 +6,7 @@
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import "$lib/styles/buttons.css";
   import { profileStore } from "$lib/stores/profile";
-  import { getGOBOClient } from "$lib/helpers/account";
+  import { getGOBOClient, getProfile } from "$lib/helpers/account";
   import { onMount } from "svelte";
   import { goto } from '$app/navigation';
   let form, button;
@@ -17,7 +17,7 @@
 
   const issueRequest = async function () {
     const client = await getGOBOClient();
-    const profile = client.me.get();
+    const profile = await getProfile();
     const data = new FormData( form );
     profile.name = data.get( "name" );
 

@@ -20,12 +20,11 @@ const sort = function ( lenses ) {
   });
 }
 
-// TODO: There's not currently an HTTP resource associated with lenses, but
-//   it's presence is strongly implied, so I'm going to pretend that it follows
-//   the pattern of the others for maintaining state.
+
 const list = async function () {
-  // const client = await getGOBOClient();
-  // const result = await client.getBlockedKeywords();
+  const client = await getGOBOClient();
+  const results = await client.personLenses.get({ person_id: client.id });
+  console.log({results});
 
   const lenses = [{
     type: "default",

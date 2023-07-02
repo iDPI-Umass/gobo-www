@@ -8,7 +8,6 @@ import {
   PUBLIC_GOBO_API
 } from '$env/static/public';
 
-let account, goboClient;
 
 const extractPermissions = function ( account ) {
   const encoded = account?.token?.access_token.split(".")[1];
@@ -24,31 +23,37 @@ const extractPermissions = function ( account ) {
 
 
 const getAccount = async function() {
-  if ( account != null ) {
-    return account;
+  const now = new Date().toISOString();
+  let match = Cache.read( "account" );
+
+  if ( (match == null) || (match.expires < now) ) {
+    const client = await getAuth0Client();
+    const account = await client.getUser();
+    account.token = await client.getTokenSilently({ detailedResponse: true });
+    account.permissions = extractPermissions( account );
+    match = Cache.write( "account", 43200, account );
   }
 
-  const client = await getAuth0Client();
-  account = await client.getUser();
-  account.token = await client.getTokenSilently({ detailedResponse: true });
-  account.permissions = extractPermissions( account );
-  return account;
+  return match.value;
 };
 
 const getGOBOClient = async function () {
-  if ( goboClient != null ) {
-    return goboClient;
+  const now = new Date().toISOString();
+  let match = Cache.read( "gobo-client" );
+
+  if ( (match == null) || (match.expires < now) ) {
+    const account = await getAccount();
+    const client = await setupGOBOClient({
+      base: PUBLIC_GOBO_API,
+      debug: 1,
+      token: account.token.access_token
+    });
+    const profile = await client.me.get();
+    client.setProfile( profile );
+    match = Cache.write( "gobo-client", 43200, client );
   }
 
-  let account = await getAccount();
-
-  goboClient = setupGOBOClient({
-    base: PUBLIC_GOBO_API,
-    debug: 1,
-    token: account.token.access_token
-  })
-
-  return goboClient;
+  return match.value;
 };
 
 const fetchProfile = async function () {
@@ -56,7 +61,7 @@ const fetchProfile = async function () {
   const profile = await client.me.get();
   
   let { name } = profile;
-  if ( name == null || name == "" ) {
+  if ( (name == null) || (name == "") ) {
     profile.name = account.email;
   }
 
@@ -68,9 +73,9 @@ const getProfile = async function () {
   const now = new Date().toISOString();
   let match = Cache.read( "profile" );
 
-  if ( ( match == null ) || ( match.expires < now ) ) {
+  if ( (match == null) || (match.expires < now) ) {
     const profile = await fetchProfile();
-    match = Cache.write( "profile", 86400, profile );
+    match = Cache.write( "profile", 43200, profile );
   }
 
   return match.value;
