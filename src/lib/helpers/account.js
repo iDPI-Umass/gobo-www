@@ -82,8 +82,9 @@ const getProfile = async function () {
 };
 
 const logout = async function () {
-  account = null;
-  goboClient = null;
+  Cache.remove( "account" );
+  Cache.remove( "profile" );
+  Cache.remove( "gobo-client" );
   profileStore.logout();
 
   const client = await getAuth0Client();
@@ -95,7 +96,7 @@ const logout = async function () {
 };
 
 const isLoggedOut = function () {
-  return account == null;
+  return Cache.read( "account" ) == null;
 };
 
 export { 

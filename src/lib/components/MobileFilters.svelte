@@ -12,7 +12,7 @@
   const loadFilters = async function () {
     identities = ( await ID.list() )
       .filter( i => i.active === true );
-    lenses = ( await Lens.list() )
+    lenses = ( await Lens.listBlocks() )
       .filter( i => i.active === true );
 
     console.log({ identities, lenses });
@@ -61,7 +61,7 @@
       </sl-icon>
 
       {#each lenses as lens (lens.key)}
-        <span> { lens.name } </span>
+        <span> { lens.key } </span>
       {/each}
     </sl-button>
   

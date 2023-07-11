@@ -11,24 +11,24 @@
   import  "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import BackLink from "$lib/components/primitives/BackLink.svelte";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
-  import * as Keyword from "$lib/resources/keyword.js";
+  import * as Lens from "$lib/resources/lens.js";
   import { onMount } from "svelte";
 
 
   let keywordForm, keywordCategory, keywords, keywordButton;
 
   const loadKeywords = async function () {
-    keywords = await Keyword.list()
+    keywords = await Lens.listBlocks();
   };
 
   const addKeyword = async function () {
     const data = new FormData( keywordForm );
-    const category = data.get( "category" );
-    const word = data.get( "word" );
+    const type = data.get( "category" );
+    const value = data.get( "word" );
     
     try {
-      const keyword = await Keyword.add({ category, word });
-      keywords = Keyword.sort([ ...keywords, keyword ]);
+      const keyword = await Lens.addBlock({ type, value });
+      keywords = Lens.sort([ ...keywords, keyword ]);
       keywordForm.reset();
       keywordCategory.value = "keyword";
     
@@ -43,7 +43,7 @@
   const removeKeyword = function ( keyword ) {
     return async function () {
       try {
-        await Keyword.remove( keyword );
+        await Lens.removeBlock( keyword );
         const index = keywords.findIndex( k => k.key === keyword.key );
         keywords.splice( index, 1 );
         keywords = keywords;
@@ -94,9 +94,9 @@
           {#each keywords as keyword (keyword.key)}
             <section class="table-row">
               <span class="keyword">
-                <span>{ keyword.category }</span>
+                <span>{ keyword.configuration.type }</span>
               </span>
-              <span class="phrase">{ keyword.word }</span>
+              <span class="phrase">{ keyword.configuration.value }</span>
               <sl-icon-button
                 on:click={removeKeyword({ ...keyword })}
                 on:keypress={removeKeyword({ ...keyword })}

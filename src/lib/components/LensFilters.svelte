@@ -4,13 +4,11 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
   import LensMini from "$lib/components/LensMini.svelte";
-  import * as Lens from "$lib/resources/lens.js";
 
-  let lenses = [];
-
-  const loadLenses = async function () {
-    lenses = await Lens.list();
-  };
+  let lenses = [{
+    name: "Keyword Blocking",
+    description: "This control toggles your block lenses, filtering targeted keywords."
+  }];
 
 </script>
 
@@ -20,22 +18,11 @@
     <h2>Lenses</h2>
   </header>
 
-  {#await loadLenses()}
-  
-    <Spinner></Spinner>
-  
-  {:then}
-
-      
-
-    <section class="inner-frame">
-      {#each lenses as lens (lens.key)}  
-        <LensMini {lens}></LensMini>
-      {/each}
-      
-    </section>
-  
-  {/await}
+  <section class="inner-frame">
+    {#each lenses as lens (lens.key)}  
+      <LensMini {lens}></LensMini>
+    {/each}
+  </section>
 
 </section>
 
