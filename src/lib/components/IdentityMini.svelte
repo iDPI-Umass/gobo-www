@@ -2,6 +2,7 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/switch/switch.js";
   import { onMount } from "svelte";
+  import { feedStore } from "$lib/stores/feed-config.js";
 
   export let identity;
   

@@ -5,44 +5,41 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
   import '@shoelace-style/shoelace/dist/components/badge/badge.js';
+  import Spinner from "$lib/components/primitives/Spinner.svelte";
   import MobileFilters from "$lib/components/MobileFilters.svelte";
   import Post from "$lib/components/Post.svelte";
-  import posts from "$lib/stores/posts.js";
 
   import { onDestroy, onMount } from "svelte";
   import { browser } from "$app/environment";
+
+  import * as Identity from "$lib/resources/identity.js";
+  import { Feed } from "$lib/resources/feed.js";
   import { feedStore } from "$lib/stores/feed-config.js";
-  import { scrollStore } from "$lib/stores/scroll.js";
-  import { getGOBOClient } from "$lib/helpers/account";
-  let feed;
-  let feedSortSelect, feedSort;
-  let unsubscribeConfig, unsubscribeScroll;
+
+  let feed, engine;
+  let posts = [];
+  let unsubscribeScroll;
 
   const loadFeed = async function () {
-    const client = await getGOBOClient();
-    const result = await client.freshFeed();
-    console.log( result );
+    const identities = await Identity.list()
+    engine = await Feed.create({ identities });
+    for ( let i = 0; i < 20; i++ ) {
+      const post = await engine.next();
+      if ( post != null ) {
+        posts.push( post );
+      }
+    }
   };
   
   if ( browser ) {
     onMount( function () {
-      unsubscribeConfig = feedStore.subscribe( function ( config ) {
-        feedSort = config.defaultFeedSort;
-      });
-
-      // feed.scroll({
-      //   top: config.position,
-      //   behavior: "smooth"
-      // });
-
-      unsubscribeScroll = scrollStore.subscribe( function ({ deltaY }) {
-        feed.scrollBy( 0, deltaY );
+      feed.addEventListener( "click", function ( event ) {
+        console.log(event)
       });
     });
 
     onDestroy( function () {
-      unsubscribeConfig();
-      unsubscribeScroll();
+      // unsubscribeScroll();
     });
   }
 </script>
@@ -58,12 +55,21 @@
 
   <MobileFilters></MobileFilters>
     
-  <!-- TODO: Feed a11y with proper labeling -->
+
   <section bind:this={feed}>
-    {#each posts as post (post.id)}
-      <Post {...post}></Post>
-    {/each}
+    {#await loadFeed()}
+    
+      <Spinner></Spinner>
+    
+    {:then}
+
+      {#each posts as post (post.id)}
+        <Post {...post}></Post>
+      {/each}
+  
+    {/await}
   </section>
+
 </div>
 
 

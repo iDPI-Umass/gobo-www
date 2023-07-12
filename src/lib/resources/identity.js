@@ -1,4 +1,4 @@
-import { getGOBOClient, getProfile } from "$lib/helpers/account.js";
+import { getGOBOClient, handleUnauthorized } from "$lib/helpers/account.js";
 
 
 const getType = function ( identity ) {
@@ -62,24 +62,23 @@ const sort = function ( identities ) {
   return [ ...mastodons, ...reddits, ...twitters ];
 };
 
-const list = async function () {  
+const list = handleUnauthorized( async function () {  
   try {
     const client = await getGOBOClient();
-    const profile = await getProfile();
     const identities = await client.personIdentities.get({ 
-      person_id: profile.id
+      person_id: client.id
     });
     return sort( identities );
   } catch ( error ) {
     console.error( error );
     return [];
   }
-};
+});
 
-const remove = async function ( identity ) {
+const remove = handleUnauthorized( async function ( identity ) {
   const client = await getGOBOClient();
   await client.personIdentity.delete( identity );
-};
+});
 
 
 

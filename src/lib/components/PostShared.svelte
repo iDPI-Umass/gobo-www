@@ -4,7 +4,6 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import PostMedia from "$lib/components/PostMedia.svelte";
   import PostPoll from "$lib/components/PostPoll.svelte";
-  import PostShared from "$lib/components/PostShared.svelte";
   import { humanize } from "$lib/helpers/humanize";
   import { goto } from "$app/navigation";
   import { Cache } from "$lib/resources/feed.js";
@@ -27,7 +26,7 @@
 
   export let fullPage = false;
 
-  let unused = [ platform_id, visibility, created, updated ];
+  let unused = [ platform_id, visibility, created, updated, url ];
 
   
   let platform;
@@ -42,26 +41,23 @@
 
   let source = Cache.getSource( source_id );
   let avatar = source.icon_url;
-  let avatarFallback;
-  switch ( platform ) {
-    case "mastodon":
-      avatarFallback = "https://mastodon.social/avatars/original/missing.png";
-      break;
-    case "reddit":
-      avatarFallback = "https://www.redditstatic.com/avatars/defaults/v2/avatar_default_6.png";
-      break;
-    case "twitter":
-      avatarFallback = "https://abs.twimg.com/sticky/default_profile_images/default_profile_normal.png";
-      break;
-  }
-
   if ( avatar == null ) {
-    avatar = avatarFallback;
+    switch ( platform ) {
+      case "mastodon":
+        avatar = "https://mastodon.social/avatars/original/missing.png";
+        break;
+      case "reddit":
+        avatar = "https://www.redditstatic.com/avatars/defaults/v2/avatar_default_6.png";
+        break;
+      case "twitter":
+        avatar = "https://abs.twimg.com/sticky/default_profile_images/default_profile_normal.png";
+        break;
+    }
   }
 
   let sharedPosts = [];
-  for ( const id of shares ) {
-    sharedPosts.push( Cache.getPost(id) );
+  for ( const id in shares ) {
+    sharedPosts.push( Cache.getPost( id ) );
   }
 
   let sourceCopy;
@@ -176,11 +172,7 @@
 
   <div class="inner-frame">
     <aside class="gutter">
-      <img 
-        src="{avatar}" 
-        alt={`avatar for ${ headingSlot1 }`}
-        onerror="this.onerror=null;this.src='{avatarFallback}'"
-      >
+      <img src="{avatar}" alt={`avatar for ${ headingSlot1 }`}>
     </aside>
 
     <div class="main">
@@ -215,33 +207,9 @@
         </div>
       {/if}
 
-      {#each sharedPosts as post}
-        <PostShared {...post}></PostShared>
-      {/each}
-
     </div>
 
   </div>
-
-
-  <footer>
-    
-    <a
-      class="why"
-      href="/why-am-i-seeing-this">
-      Why am I seeing this?
-    </a>
-    
-    <a
-      class="source-link"
-      href="{url}"
-      target="_blank" 
-      rel="noopener noreferrer nofollow">
-      <sl-icon src="{logo}" class="{platform}"></sl-icon>
-      <span>{sourceCopy}</span>     
-    </a>
-   
-  </footer>
 
 </article>
 
@@ -397,69 +365,6 @@
   .outer-frame .inner-frame .main .media :global(a) {
     position: relative;
   }
-
-
-
-
-
-  .outer-frame footer {
-    width: 100%;
-    height: 2.5rem;
-    padding: 0.5rem var(--gobo-width-spacer-flex);
-    border-top: var(--gobo-border-panel);
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: space-between;
-  }
-
-  .outer-frame footer a {
-    text-decoration: none;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    align-items: center;
-  }
-
-  .outer-frame footer a {
-    text-decoration: none;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    align-items: center;
-    font-size: var(--gobo-font-size-detail);
-  }
-
-
-  .outer-frame footer a sl-icon {
-    font-size: 1rem;
-    margin-right: 0;
-  }
-
-  .outer-frame footer a.source-link {
-    color: var(--gobo-color-text-muted);
-  }
-
-  .outer-frame footer a.source-link span {
-    display: none;
-  }
-
-  @media ( min-width: 425px ) {
-    .outer-frame footer a.source-link sl-icon {
-      margin-right: 0.5rem;
-    }
-
-    .outer-frame footer a.source-link span {
-      display: inline;
-    }
-  }
-
-
-
-
-
 </style>
 
 

@@ -1,4 +1,4 @@
-import { getGOBOClient } from "$lib/helpers/account";
+import { getGOBOClient, handleUnauthorized } from "$lib/helpers/account";
 
 
 const label = function ( lens ) {
@@ -22,7 +22,7 @@ const sort = function ( lenses ) {
   return lenses;
 }
 
-const pullLenses = async function () {
+const pullLenses = handleUnauthorized( async function () {
   const client = await getGOBOClient();
 
   const lenses = [];
@@ -44,16 +44,16 @@ const pullLenses = async function () {
   }
 
   return lenses;
-};
+});
 
-const listBlocks = async function () {
+const listBlocks = handleUnauthorized( async function () {
   let blocks = ( await pullLenses() )
     .filter( l => l.category === "block" );
   
   return sort( blocks );
-};
+});
 
-const addBlock = async function ( configuration ) {
+const addBlock = handleUnauthorized( async function ( configuration ) {
   const client = await getGOBOClient();
   const block = await client.personLenses.post({
     parameters: {
@@ -67,16 +67,16 @@ const addBlock = async function ( configuration ) {
     }
   });
   return block;
-};
+});
 
-const removeBlock = async function ( block ) {
+const removeBlock = handleUnauthorized( async function ( block ) {
   const client = await getGOBOClient();
   await client.personLens.delete({
     person_id: client.id,
     id: block.id
   });
   return null;
-}
+});
 
 
 export {

@@ -12,7 +12,8 @@ const createStore = function () {
     if ( config == null ) {
       config = {
         defaultFeedSort: "chronological-descending",
-        displayEngagement: false 
+        displayEngagement: false,
+        identities: []
       };
       LS.write( "gobo-config", config );
     }
@@ -37,6 +38,11 @@ const createStore = function () {
     },
     setDisplayEngagement: function ( value ) {
       config.displayEngagement = value;
+      LS.write( "gobo-config", config );
+      return config;
+    },
+    setIdentities: function ( value ) {
+      config.identities = value;
       LS.write( "gobo-config", config );
       return config;
     }

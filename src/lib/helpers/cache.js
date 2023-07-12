@@ -6,11 +6,18 @@ const setTTL = function ( ttl ) {
   return date.toISOString();
 };
 
-export const read = function ( key ) {
-  return cache.get( key );
+const read = function ( key ) {
+  const match = cache.get( key );
+  const now = (new Date).toISOString();
+
+  if ( match == null || match.expires < now ) {
+    return null;
+  } else {
+    return match;
+  }
 };
 
-export const write = function ( key, ttl, value ) {
+const write = function ( key, ttl, value ) {
   const entry = {
     expires: setTTL( ttl ),
     value: value
@@ -20,6 +27,12 @@ export const write = function ( key, ttl, value ) {
   return entry;
 };
 
-export const remove = function ( key ) {
+const remove = function ( key ) {
   cache.delete( key );
+}
+
+export {
+  read,
+  write,
+  remove
 }

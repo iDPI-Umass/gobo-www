@@ -1,6 +1,12 @@
 <script>
-  export let results = [];
-  export let total = 0;
+  export let poll = {};
+
+  let total = poll.total ?? 0;
+  let results = poll.options ?? [];
+
+  for ( const result of results ) {
+    result.value = 100 * result.count / total;
+  }
 </script>
 
 <section class="question-container">

@@ -26,7 +26,7 @@ const getAccount = async function() {
   const now = new Date().toISOString();
   let match = Cache.read( "account" );
 
-  if ( (match == null) || (match.expires < now) ) {
+  if ( match == null ) {
     const client = await getAuth0Client();
     const account = await client.getUser();
     account.token = await client.getTokenSilently({ detailedResponse: true });
@@ -41,7 +41,7 @@ const getGOBOClient = async function () {
   const now = new Date().toISOString();
   let match = Cache.read( "gobo-client" );
 
-  if ( (match == null) || (match.expires < now) ) {
+  if ( match == null ) {
     const account = await getAccount();
     const client = await setupGOBOClient({
       base: PUBLIC_GOBO_API,
@@ -50,7 +50,7 @@ const getGOBOClient = async function () {
     });
     const profile = await client.me.get();
     client.setProfile( profile );
-    match = Cache.write( "gobo-client", 43200, client );
+    match = Cache.write( "gobo-client", 3600, client );
   }
 
   return match.value;
@@ -73,7 +73,7 @@ const getProfile = async function () {
   const now = new Date().toISOString();
   let match = Cache.read( "profile" );
 
-  if ( (match == null) || (match.expires < now) ) {
+  if ( match == null ) {
     const profile = await fetchProfile();
     match = Cache.write( "profile", 43200, profile );
   }
@@ -95,6 +95,23 @@ const logout = async function () {
   })
 };
 
+// Temporary solution to deal with token expiration not being handled by main
+// account helpers during fetch.
+const handleUnauthorized = function ( f ) {
+  return async function ( ...args ) {
+    try {
+      return await f( ...args );
+    } catch ( error ) {
+      if ( error.status === 401 ) {
+        await logout();
+        return null;
+      } else {
+        throw error
+      }
+    }
+  }
+};
+
 const isLoggedOut = function () {
   return Cache.read( "account" ) == null;
 };
@@ -104,7 +121,8 @@ export {
   getGOBOClient,
   getProfile,
   logout,
-  isLoggedOut
+  isLoggedOut,
+  handleUnauthorized
 }
 
 

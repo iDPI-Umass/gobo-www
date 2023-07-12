@@ -5,6 +5,7 @@
   import Spinner from "$lib/components/primitives/Spinner.svelte";
   import * as ID from "$lib/resources/identity.js";
   import * as Lens from "$lib/resources/lens.js";
+  import { feedStore } from "$lib/stores/feed-config.js";
 
   let identities = [];
   let lenses = []
@@ -14,6 +15,8 @@
       .filter( i => i.active === true );
     lenses = ( await Lens.listBlocks() )
       .filter( i => i.active === true );
+
+    feedStore.setIdentities(identities);
 
     console.log({ identities, lenses });
   };
