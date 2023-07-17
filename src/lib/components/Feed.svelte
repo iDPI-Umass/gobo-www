@@ -13,7 +13,9 @@
 
   const pull = async function ( count, marker ) {
     const current = await engine.pull( count, marker );
-    posts = [ ...posts, ...current ];
+    if ( current.length > 0 ) {
+      posts = [ ...posts, ...current ];
+    }
   };
 
   const loadFeed = async function () {
@@ -22,7 +24,7 @@
   };  
   
   onMount( function () {
-    const listener = function () {
+    const listener = function ( event ) {
       pull( 25 );
     };
     feed.addEventListener( "gobo-smooth-scroll", listener );

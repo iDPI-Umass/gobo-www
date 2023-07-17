@@ -1,14 +1,23 @@
 <script>
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
+  import { feedStore } from "$lib/stores/feed.js";
   export let current;
+
+  const handleHomeReset = function () {
+    if ( current === "home" ) {
+      feedStore.push({ command: "reset" });
+    }
+  };
 </script>
 
 <nav>
   <sl-button
     class="home {current === 'home' ? "current" : ""}"
     pill
-    href="/home">
+    href="/home"
+    on:click={handleHomeReset}
+    on:keypress={handleHomeReset}>
     <sl-icon src="/icons/home.svg" slot="prefix"></sl-icon>
     Home
   </sl-button>

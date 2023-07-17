@@ -41,18 +41,17 @@
 
   let source = Cache.getSource( source_id );
   let avatar = source.icon_url;
-  if ( avatar == null ) {
-    switch ( platform ) {
-      case "mastodon":
-        avatar = "https://mastodon.social/avatars/original/missing.png";
-        break;
-      case "reddit":
-        avatar = "https://www.redditstatic.com/avatars/defaults/v2/avatar_default_6.png";
-        break;
-      case "twitter":
-        avatar = "https://abs.twimg.com/sticky/default_profile_images/default_profile_normal.png";
-        break;
-    }
+  let avatarFallback;
+  switch ( platform ) {
+    case "mastodon":
+      avatarFallback = "https://mastodon.social/avatars/original/missing.png";
+      break;
+    case "reddit":
+      avatarFallback = "https://www.redditstatic.com/avatars/defaults/v2/avatar_default_6.png";
+      break;
+    case "twitter":
+      avatarFallback = "https://abs.twimg.com/sticky/default_profile_images/default_profile_normal.png";
+      break;
   }
 
   let sharedPosts = [];
@@ -171,13 +170,14 @@
 
 
   <div class="inner-frame">
-    <aside class="gutter">
-      <img src="{avatar}" alt={`avatar for ${ headingSlot1 }`}>
-    </aside>
-
     <div class="main">
       
       <header>
+        <img 
+          src="{avatar}" 
+          alt={`avatar for ${ headingSlot1 }`}
+          onerror="this.onerror=null;this.src='{avatarFallback}'"
+        >
         <div class="names">
           <div class="slot1">{ headingSlot1 }</div>
           {#if headingSlot2}
@@ -250,16 +250,12 @@
     margin: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex) 0 var(--gobo-width-spacer-flex);
   }
 
-  .outer-frame .inner-frame .gutter {
-    min-width: max-content;
-  }
 
-
-  .outer-frame .inner-frame .gutter img {
+  .outer-frame .inner-frame img {
     height: 2.8125rem;
     width: 2.8125rem;
     border-radius: var(--sl-border-radius-circle);
-    margin-right: var(--gobo-width-spacer-flex);
+    margin-right: var(--gobo-width-spacer-half);
     border: var(--gobo-border-panel);
   }
 
@@ -287,6 +283,7 @@
     display: flex;
     flex-wrap: wrap;
     min-width: 0;
+    align-self: flex-start;
   }
 
   .outer-frame .inner-frame .main header .slot1 {
@@ -315,6 +312,7 @@
     color: var(--gobo-color-text-muted);
     min-width: max-content;
     margin-left: 0.75rem;
+    align-self: flex-start;
   }
 
 

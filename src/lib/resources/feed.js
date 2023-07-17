@@ -34,7 +34,7 @@ class Reader {
     this.head = null;
     this.tail = null;
     this.queue = [];
-    this.lock = null;
+    this.unlocksAt = null;
   }
 
   static async create ({ identity, per_page }) {
@@ -87,21 +87,21 @@ class Reader {
 
   lock () {
     const date = new Date();
-    date.setUTCSeconds( date.setUTCSeconds + 60 );
-    this.lock = date.toISOString();
+    date.setUTCSeconds( date.getUTCSeconds() + 60 );
+    this.unlocksAt = date.toISOString();
   }
 
   isLocked () {
-    return this.lock != null;
+    return this.unlocksAt != null;
   }
   
   isLockExpired () {
-    if ( this.lock == null ) {
+    if ( this.unlocksAt == null ) {
       throw new Error("reader lock expiration is undefined when reader lock is undefined")
     }
 
     const now = (new Date).toISOString();
-    if ( now > this.lock ) {
+    if ( now > this.unlocksAt ) {
       return true;
     } else {
       return false;
@@ -109,7 +109,7 @@ class Reader {
   }
 
   unlock () {
-    this.lock = null;
+    this.unlocksAt = null;
   }
 
   isEmpty () {
@@ -120,7 +120,7 @@ class Reader {
   // We avoid spamming the API with a throttling lock.
   async checkQueue () {
     if ( this.isLocked() ) {
-      if ( this.isLockExpired ) {
+      if ( this.isLockExpired() ) {
         this.unlock();
       } else {
         return;

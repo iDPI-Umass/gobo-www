@@ -4,6 +4,8 @@
   export let id;
   export let attachments = [];
 
+  const mediaFallback = "/images/gobo-media-fallback.png";
+
   const handleSingleLoad = function ( event ) {
     let previewWidth = event.target.width;
     let naturalWidth = event.target.naturalWidth || event.target.videoWidth;
@@ -28,7 +30,8 @@
           <img 
             src={attachments[0].url}
             alt="uploaded"
-            on:load={handleSingleLoad}>
+            on:load={handleSingleLoad}
+            onerror="this.onerror=null;this.src='{mediaFallback}'">
         {:else if isVideo( attachments[0] )}
           <!-- svelte-ignore a11y-media-has-caption -->
           <video 
@@ -38,6 +41,7 @@
             <source 
               src={attachments[0].url}
               type={attachments[0].type}>
+            <img src={mediaFallback} alt="video failed to load" />
           </video>
       {/if}
       </figure>
@@ -52,7 +56,8 @@
             {#if isImage( attachments[0] )}
               <img 
                 src={attachments[0].url}
-                alt="uploaded">
+                alt="uploaded"
+                onerror="this.onerror=null;this.src='{mediaFallback}'">
             {:else if isVideo( attachments[0] )}
               <!-- svelte-ignore a11y-media-has-caption -->
               <video loop controls>
@@ -60,6 +65,7 @@
                   src={attachments[0].url}
                   type={attachments[0].type}
                   on:load={attachments}>
+                <img src={mediaFallback} alt="video failed to load" />
               </video>
             {/if}
           </figure>
@@ -72,7 +78,8 @@
             {#if isImage( attachments[1] )}
               <img 
                 src={attachments[1].url}
-                alt="uploaded">
+                alt="uploaded"
+                onerror="this.onerror=null;this.src='{mediaFallback}'">
             {:else if isVideo( attachments[1] )}
               <!-- svelte-ignore a11y-media-has-caption -->
               <video loop controls>
@@ -80,6 +87,7 @@
                   src={attachments[1].url}
                   type={attachments[1].type}
                   on:load={attachments}>
+                  <img src={mediaFallback} alt="video failed to load" />
               </video>
             {/if}
           </figure>
@@ -95,7 +103,8 @@
             {#if isImage( attachments[0] )}
               <img 
                 src={attachments[0].url}
-                alt="uploaded">
+                alt="uploaded"
+                onerror="this.onerror=null;this.src='{mediaFallback}'">
             {:else if isVideo( attachments[0] )}
               <!-- svelte-ignore a11y-media-has-caption -->
               <video loop controls>
@@ -103,6 +112,7 @@
                   src={attachments[0].url}
                   type={attachments[0].type}
                   on:load={attachments}>
+                <img src={mediaFallback} alt="video failed to load" />
               </video>
             {/if}
           </figure>
@@ -116,7 +126,8 @@
               {#if isImage( attachments[1] )}
                 <img 
                   src={attachments[1].url}
-                  alt="uploaded">
+                  alt="uploaded"
+                  onerror="this.onerror=null;this.src='{mediaFallback}'">
               {:else if isVideo( attachments[1] )}
                 <!-- svelte-ignore a11y-media-has-caption -->
                 <video loop controls>
@@ -124,6 +135,7 @@
                     src={attachments[1].url}
                     type={attachments[1].type}
                     on:load={attachments}>
+                  <img src={mediaFallback} alt="video failed to load" />
                 </video>
               {/if}
             </figure>
@@ -136,7 +148,8 @@
               {#if isImage( attachments[2] )}
                 <img 
                   src={attachments[2].url}
-                  alt="uploaded">
+                  alt="uploaded"
+                  onerror="this.onerror=null;this.src='{mediaFallback}'">
               {:else if isVideo( attachments[2] )}
                 <!-- svelte-ignore a11y-media-has-caption -->
                 <video loop controls>
@@ -144,6 +157,7 @@
                     src={attachments[2].url}
                     type={attachments[2].type}
                     on:load={attachments}>
+                  <img src={mediaFallback} alt="video failed to load" />
                 </video>
               {/if}
             </figure>
@@ -161,7 +175,8 @@
               {#if isImage( attachments[0] )}
                 <img 
                   src={attachments[0].url}
-                  alt="uploaded">
+                  alt="uploaded"
+                  onerror="this.onerror=null;this.src='{mediaFallback}'">
               {:else if isVideo( attachments[0] )}
                 <!-- svelte-ignore a11y-media-has-caption -->
                 <video loop controls>
@@ -169,6 +184,7 @@
                     src={attachments[0].url}
                     type={attachments[0].type}
                     on:load={attachments}>
+                  <img src={mediaFallback} alt="video failed to load" />
                 </video>
               {/if}
             </figure>
@@ -181,7 +197,8 @@
               {#if isImage( attachments[2] )}
                 <img 
                   src={attachments[2].url}
-                  alt="uploaded">
+                  alt="uploaded"
+                  onerror="this.onerror=null;this.src='{mediaFallback}'">
               {:else if isVideo( attachments[2] )}
                 <!-- svelte-ignore a11y-media-has-caption -->
                 <video loop controls>
@@ -189,6 +206,7 @@
                     src={attachments[2].url}
                     type={attachments[2].type}
                     on:load={attachments}>
+                  <img src={mediaFallback} alt="video failed to load" />
                 </video>
               {/if}
             </figure>
@@ -203,7 +221,8 @@
               {#if isImage( attachments[1] )}
                 <img 
                   src={attachments[1].url}
-                  alt="uploaded">
+                  alt="uploaded"
+                  onerror="this.onerror=null;this.src='{mediaFallback}'">
               {:else if isVideo( attachments[1] )}
                 <!-- svelte-ignore a11y-media-has-caption -->
                 <video loop controls>
@@ -211,6 +230,7 @@
                     src={attachments[1].url}
                     type={attachments[1].type}
                     on:load={attachments}>
+                  <img src={mediaFallback} alt="video failed to load" />
                 </video>
               {/if}
             </figure>
@@ -223,7 +243,8 @@
               {#if isImage( attachments[3] )}
                 <img 
                   src={attachments[3].url}
-                  alt="uploaded">
+                  alt="uploaded"
+                  onerror="this.onerror=null;this.src='{mediaFallback}'">
               {:else if isVideo( attachments[3] )}
                 <!-- svelte-ignore a11y-media-has-caption -->
                 <video loop controls>
@@ -231,6 +252,7 @@
                     src={attachments[3].url}
                     type={attachments[3].type}
                     on:load={attachments}>
+                  <img src={mediaFallback} alt="video failed to load" />
                 </video>
               {/if}
             </figure>
