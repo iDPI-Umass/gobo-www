@@ -3,22 +3,17 @@
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
-  import * as ID from "$lib/resources/identity.js";
+  import * as Feed from "$lib/helpers/feed.js";
   import * as Lens from "$lib/resources/lens.js";
-  import { feedStore } from "$lib/stores/feed-config.js";
 
   let identities = [];
   let lenses = []
 
   const loadFilters = async function () {
-    identities = ( await ID.list() )
-      .filter( i => i.active === true );
-    lenses = ( await Lens.listBlocks() )
-      .filter( i => i.active === true );
-
-    feedStore.setIdentities(identities);
-
-    console.log({ identities, lenses });
+    identities = await Feed.getActiveIdentities();
+    lenses = [{
+      key: "Keyword Blocking"
+    }];
   };
 
   const getLogo = function ( identity ) {

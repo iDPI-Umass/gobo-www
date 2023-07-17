@@ -5,7 +5,7 @@
   import "@shoelace-style/shoelace/dist/components/spinner/spinner.js";
   import Post from "$lib/components/Post.svelte"
   import "$lib/styles/buttons.css";
-  import { onDestroy, onMount } from "svelte";
+  import { onMount } from "svelte";
   import { browser } from "$app/environment";
   import { sleep } from "@dashkite/joy/time";
   import { scrollStore } from "$lib/stores/scroll.js";
@@ -16,7 +16,7 @@
   let results = [];
   let loading = false;
   let searchTerm = data.bindings.search || null;
-  let unsubscribeScroll, resultsSection;
+  let resultsSection;
 
   const isValidString = function ( string ) {
     return ( string != null ) && ( string.length > 0 );
@@ -46,25 +46,28 @@
 
   if ( browser ) {
     onMount( async function () {
-      form.addEventListener( "submit", async function( event ) {
+      const listener = async function( event ) {
         // We don't prevent default, automatically adjusting the location to
         // include the search query.
         await submit();
-      });
+      };
+
+      form.addEventListener( "submit", listener );
 
       if ( isValidString( searchTerm ) ) {
         await submit();
       }
 
-      unsubscribeScroll = scrollStore.subscribe( function ({ deltaY }) {
+      const unsubscribeScroll = scrollStore.subscribe( function ({ deltaY }) {
         if ( resultsSection != null ) {
           resultsSection.scrollBy( 0, deltaY );
         }
-      })
-    });
+      });
 
-    onDestroy( function() {
-      unsubscribeScroll();
+      return function () {
+        form.removeEventListener( "submit", listener );
+        unsubscribeScroll();
+      };
     });
   }
 

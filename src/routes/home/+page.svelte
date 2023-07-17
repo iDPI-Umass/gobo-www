@@ -5,43 +5,8 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
   import '@shoelace-style/shoelace/dist/components/badge/badge.js';
-  import Spinner from "$lib/components/primitives/Spinner.svelte";
   import MobileFilters from "$lib/components/MobileFilters.svelte";
-  import Post from "$lib/components/Post.svelte";
-
-  import { onDestroy, onMount } from "svelte";
-  import { browser } from "$app/environment";
-
-  import * as Identity from "$lib/resources/identity.js";
-  import { Feed } from "$lib/resources/feed.js";
-  import { feedStore } from "$lib/stores/feed-config.js";
-
-  let feed, engine;
-  let posts = [];
-  let unsubscribeScroll;
-
-  const loadFeed = async function () {
-    const identities = await Identity.list()
-    engine = await Feed.create({ identities });
-    for ( let i = 0; i < 20; i++ ) {
-      const post = await engine.next();
-      if ( post != null ) {
-        posts.push( post );
-      }
-    }
-  };
-  
-  if ( browser ) {
-    onMount( function () {
-      feed.addEventListener( "click", function ( event ) {
-        console.log(event)
-      });
-    });
-
-    onDestroy( function () {
-      // unsubscribeScroll();
-    });
-  }
+  import Feed from "$lib/components/Feed.svelte"
 </script>
 
 <div class="main-child">
@@ -54,32 +19,14 @@
   </header>
 
   <MobileFilters></MobileFilters>
-    
-
-  <section bind:this={feed}>
-    {#await loadFeed()}
-    
-      <Spinner></Spinner>
-    
-    {:then}
-
-      {#each posts as post (post.id)}
-        <Post {...post}></Post>
-      {/each}
-  
-    {/await}
-  </section>
+  <Feed></Feed>
 
 </div>
 
 
 <style>
-  section {
-    overflow-y: scroll;
-    padding: 2px;
-  }
-
   .main-child {
     max-width: unset;
+    max-height: 100%;
   }
 </style>

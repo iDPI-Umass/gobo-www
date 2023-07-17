@@ -38,13 +38,19 @@
   };
 
   onMount(() => {
-    form.addEventListener('submit', function(event) {
+    const listener = function(event) {
       event.preventDefault();
       if ( button.loading !== true ) {
         button.loading = true;
         submit();
       }
-    });
+    };
+
+    form.addEventListener( "submit", listener );
+
+    return function () {
+      form.removeEventListener( "sumbit", listener )
+    }
   });
 </script>
 

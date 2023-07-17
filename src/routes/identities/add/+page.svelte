@@ -52,17 +52,25 @@
   };
 
   onMount(() => {
-    form.addEventListener( "submit", function( event ) {
+    const submitListener = function( event ) {
       event.preventDefault();
       if ( button.loading !== true ) {
         button.loading = true;
         submit();
       }
-    });
+    };
 
-    select.addEventListener( "sl-change", function( event ) {
+    const changeListener = function( event ) {
       targetingMastodon = ( event.target.value === "mastodon" );
-    });
+    };
+
+    form.addEventListener( "submit", submitListener);
+    select.addEventListener( "sl-change", changeListener );
+
+    return function () {
+      form.removeEventListener( "submit", submitListener);
+      select.removeEventListener( "sl-change", changeListener );
+    };
   });
 </script>
 

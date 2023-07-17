@@ -2,24 +2,27 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/switch/switch.js";
   import { onMount } from "svelte";
-  import { feedStore } from "$lib/stores/feed-config.js";
+  import * as Feed from "$lib/helpers/feed.js";
+  import { feedStore } from "$lib/stores/feed.js";
+
 
   export let identity;
   
-  let activeSwitch, activeState;
+  let activeSwitch;
   let logo = `/icons/${ identity.type }.svg`;
-
-  activeState = true;
 
 
   onMount( function () {
-    activeSwitch.addEventListener( "sl-change", function ( event ) {
-      if ( event.target.checked === true ) {
-        console.log( "TBD activate identity" );
-      } else {
-        console.log( "TBD deactivate identity" );
-      }
-    });
+    const listener = async function ( event ) {
+      await Feed.setIdentityActive( identity, event.target.checked );
+      feedStore.push({ command: "reset" })
+    };
+
+    activeSwitch.addEventListener( "sl-change", listener );
+
+    return function () {
+      activeSwitch.removeEventListener( "sl-change", listener );
+    };
   });
 </script>
 
@@ -32,7 +35,7 @@
 
   <sl-switch
     bind:this={activeSwitch}
-    checked={activeState}
+    checked={identity.active}
     size="medium">
   </sl-switch>
 

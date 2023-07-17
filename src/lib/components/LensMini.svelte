@@ -11,13 +11,19 @@
 
 
   onMount( function () {
-    activeSwitch.addEventListener( "sl-change", function ( event ) {
+    const listener = function ( event ) {
       if ( event.target.checked === true ) {
         console.log( "TBD activate lens" );
       } else {
         console.log( "TBD deactivate lens" );
       }
-    });
+    };
+
+    activeSwitch.addEventListener( "sl-change", listener );
+
+    return function () {
+      activeSwitch.removeEventListener( "sl-change", listener );
+    };
   });
 </script>
 

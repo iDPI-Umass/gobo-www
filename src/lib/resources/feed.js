@@ -1,5 +1,11 @@
 import { getGOBOClient, logout } from "$lib/helpers/account";
 
+// The following classes play an HTTP intermediary role. They are focused on
+// RESTful composition that stablizes this client's request pattern to the GOBO
+// HTTP API while building an integrative layer that provides a unified feed as
+// a transparent interface.
+
+
 const cache = {
   posts: {},
   sources: {}
@@ -26,17 +32,15 @@ class Reader {
     this.per_page = per_page ?? 50;
     this.client = client;
     this.head = null;
-    this.tail = (new Date).toISOString();
+    this.tail = null;
     this.queue = [];
-    this.hold = null;
+    this.lock = null;
   }
 
   static async create ({ identity, per_page }) {
     const client = await getGOBOClient();
     per_page = per_page ?? 50;
-    const self = new Reader({ identity, per_page, client });
-    await self.page(); // Primes internal queue.
-    return self;
+    return new Reader({ identity, per_page, client });
   }
 
   async page () {
@@ -67,7 +71,7 @@ class Reader {
       }
 
       this.queue.push( ...feed );
-      this.head = this.queue[0]?.published
+      this.head = this.queue[0]?.published;
       this.tail = result.next;
       Object.assign( cache.posts, posts );
       Object.assign( cache.sources, sources );
@@ -81,31 +85,69 @@ class Reader {
     }
   }
 
-  setHold () {
+  lock () {
     const date = new Date();
     date.setUTCSeconds( date.setUTCSeconds + 60 );
-    this.hold = date.toISOString();
+    this.lock = date.toISOString();
   }
 
-  hasHold () {
+  isLocked () {
+    return this.lock != null;
+  }
+  
+  isLockExpired () {
+    if ( this.lock == null ) {
+      throw new Error("reader lock expiration is undefined when reader lock is undefined")
+    }
+
     const now = (new Date).toISOString();
-    if ( this.hold != null && this.hold > now ) {
+    if ( now > this.lock ) {
       return true;
     } else {
       return false;
     }
   }
 
+  unlock () {
+    this.lock = null;
+  }
 
-  async next () {
-    if ( this.queue.length === 0 && this.hasHold() === false ) {
-      await this.page();
-      if ( this.queue.length === 0 ) {
-        this.setHold();
-        return null;
+  isEmpty () {
+    return this.queue.length === 0;
+  }
+
+  // Ensures the queue is not empty by pulling the next page, if neccessary.
+  // We avoid spamming the API with a throttling lock.
+  async checkQueue () {
+    if ( this.isLocked() ) {
+      if ( this.isLockExpired ) {
+        this.unlock();
+      } else {
+        return;
       }
     }
 
+    if ( this.isEmpty() ) {
+      await this.page();
+    }
+
+    if ( this.isEmpty() ) {
+      this.lock();
+    }
+  }
+
+  async getHead () {
+    if ( this.head != null ) {
+      return this.head;
+    } else {
+      await this.checkQueue();
+      return this.head;
+    }
+  }
+
+  // Fetch the next highest post.
+  async next () {
+    await this.checkQueue()
     const post = this.queue.shift();
     this.head = this.queue[0]?.published;
     return post;
@@ -132,9 +174,22 @@ class Feed {
     return new Feed({ readers });
   }
 
-  get youngest () {
-    let match = null;
+  async getActiveReaders () {
+    const readers = [];
     for ( const reader of this.readers ) {
+      const head = await reader.getHead();
+      if ( head != null ) {
+        readers.push( reader );
+      }
+    }
+    return readers;
+  }
+
+  // Fetch the reader with the highest head.
+  async getNextReader () {
+    let match = null;
+    const readers = await this.getActiveReaders();
+    for ( const reader of readers ) {
       if ( match == null || reader.head > match.head ) {
         match = reader;
       }
@@ -142,9 +197,15 @@ class Feed {
     return match;
   }
 
+  // Fetch the next highest scoring post from the reader with the highest head.
   async next () {
-    const reader = this.youngest;
-    return await reader.next();
+    const reader = await this.getNextReader();
+    
+    if ( reader == null ) {
+      return null
+    } else {
+      return await reader.next();
+    }
   }
 }
 

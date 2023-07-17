@@ -55,13 +55,19 @@
   }
 
   onMount( function () {
-    keywordForm.addEventListener( "submit", async function ( event ) {
+    const listener = async function ( event ) {
       event.preventDefault();
       if ( keywordButton.loading !== true ) {
         keywordButton.loading = true;
         await addKeyword();
       }
-    });
+    };
+
+    keywordForm.addEventListener( "submit", listener );
+
+    return function () {
+      keywordForm.removeEventListener( "submit", listener );
+    };
   });
 </script>
 

@@ -5,44 +5,51 @@
   import "@shoelace-style/shoelace/dist/components/radio-group/radio-group.js";
   import "@shoelace-style/shoelace/dist/components/radio/radio.js";
   import BackLink from "$lib/components/primitives/BackLink.svelte";
-  import { onMount, onDestroy } from "svelte";
+  import { onMount } from "svelte";
   import { browser } from "$app/environment";
   import { themeStore } from "$lib/stores/theme";
-  let darkModeSwitch, darkModeState, unsubscribeTheme;
+  let darkModeSwitch, darkModeState;
   let fontSwitch, fontState;
   let fontSizeGroup, fontSizeState;
 
   if ( browser ) {
     onMount(() => {
-      unsubscribeTheme = themeStore.subscribe( function ( config ) {
+      const unsubscribeTheme = themeStore.subscribe( function ( config ) {
         darkModeState = config.dark;
         fontSizeState = config.fontSize;
         fontState = config.arial
       });
 
-      darkModeSwitch.addEventListener( "sl-change", function ( event ) {
+      const darkModeListener = function ( event ) {
         if ( event.target.checked === true ) {
           themeStore.setDark();
         } else {
           themeStore.setLight();
         }
-      });
+      };
 
-      fontSwitch.addEventListener( "sl-change", function ( event ) {
+      const fontListener = function ( event ) {
         if ( event.target.checked === true ) {
           themeStore.setArial();
         } else {
           themeStore.setRoboto();
         }
-      });
+      };
 
-      fontSizeGroup.addEventListener( "sl-change", function ( event ) {
+      const fontSizeListener = function ( event ) {
         themeStore.setFontSize( event.target.value );
-      });
-    });
+      };
 
-    onDestroy( function () {
-      unsubscribeTheme();
+      darkModeSwitch.addEventListener( "sl-change", darkModeListener );
+      fontSwitch.addEventListener( "sl-change", fontListener );
+      fontSizeGroup.addEventListener( "sl-change", fontSizeListener );
+
+      return function () {
+        unsubscribeTheme();
+        darkModeSwitch.removeEventListener( "sl-change", darkModeListener );
+        fontSwitch.removeEventListener( "sl-change", fontListener );
+        fontSizeGroup.removeEventListener( "sl-change", fontSizeListener );
+      };
     });
   }
   

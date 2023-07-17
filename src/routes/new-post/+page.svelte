@@ -19,13 +19,12 @@
   import { previewStore } from "$lib/stores/image-preview.js";
   import { getGOBOClient } from "$lib/helpers/account.js";
   import { sort } from "$lib/resources/identity.js";
-  import { onDestroy, onMount } from "svelte";
+  import { onMount } from "svelte";
   import { browser } from "$app/environment";
   import { goto } from "$app/navigation";
 
 
-  let configFrame, unsubscribeScroll;
-  let draftData, unsubscribeDraft;
+  let configFrame, draftData;
   let identities = [];
   let allEmpty;
   let identitySwitches = {};
@@ -257,11 +256,11 @@
 
   if ( browser ) {
     onMount( function () {
-      unsubscribeScroll = scrollStore.subscribe( function ({ deltaY }) {
+      const unsubscribeScroll = scrollStore.subscribe( function ({ deltaY }) {
         configFrame.scrollBy( 0, deltaY );
       });
 
-      unsubscribeDraft = draftStore.subscribe( function ( draft ) {
+      const unsubscribeDraft = draftStore.subscribe( function ( draft ) {
         draftData = draft;
         setOptions();
         setTargets();
@@ -269,7 +268,7 @@
         setFiles();
       });
 
-      fileInput.addEventListener( "change", function () {
+      const listener = function () {
         const _files = fileInput.files;
         if ( _files.length > 0 ) {
           for ( const file of _files ) {
@@ -277,12 +276,15 @@
           }
           fileInput.value = null;
         }
-      });
-    });;
+      };
 
-    onDestroy( function () {
-      unsubscribeScroll();
-      unsubscribeDraft();
+      fileInput.addEventListener( "change", listener );
+
+      return function () {
+        unsubscribeScroll();
+        unsubscribeDraft();
+        fileInput.removeEventListener( "change", listener );
+      };
     });
   }
 

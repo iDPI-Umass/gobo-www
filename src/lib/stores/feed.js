@@ -8,9 +8,6 @@ const createStore = function () {
   return {
     subscribe,
     push: function ( value ) {
-      if ( value == null ) {
-        return;
-      }
       update( function () {
         return value;
       });
@@ -19,4 +16,4 @@ const createStore = function () {
 };
 
 
-export const scrollStore = createStore();
+export const feedStore = createStore();

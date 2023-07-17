@@ -6,10 +6,9 @@
   import "$lib/styles/buttons.css";
   import { profileStore } from "$lib/stores/profile";
   import { getGOBOClient } from "$lib/helpers/account";
-  import { onDestroy, onMount } from "svelte";
+  import { onMount } from "svelte";
   let profile;
   let form, button, nameInput;
-  let unsubscribeProfileStore;
 
   const validate = function() {
     return form.reportValidity();  
@@ -35,24 +34,26 @@
   };
 
   onMount( function () {
-    form.addEventListener('submit', function(event) {
+    const listener = function(event) {
       event.preventDefault();
       if ( button.loading !== true ) {
         button.loading = true;
         submit();
       }
-    });
+    }
 
-    unsubscribeProfileStore = profileStore.subscribe( function ( _profile ) {
+    form.addEventListener('submit', listener );
+
+    const unsubscribeProfileStore = profileStore.subscribe( function ( _profile ) {
       profile = _profile
       nameInput.value = profile.name;
     });
-  });
 
-  onDestroy( function () {
-    unsubscribeProfileStore();
+    return function () {
+      form.removeEventListener( "submit", listener );
+      unsubscribeProfileStore()
+    }
   });
-
 </script>
 
 <div class="main-child">

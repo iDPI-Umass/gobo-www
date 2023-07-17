@@ -3,22 +3,26 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/switch/switch.js";
   import * as Identity from "$lib/resources/identity.js";
+  import * as Feed from "$lib/helpers/feed.js";
   import { onMount } from "svelte";
 
-  
+
   export let identity;
   
-  let deleteButton, activeSwitch, activeState;
+  let deleteButton, activeSwitch;
   let logo = `/icons/${ identity.type }.svg`;
   let nameSlot1 = identity.name;
   let nameSlot2 = identity.prettyName;
 
-  activeState = true;
-
 
   const deleteIdentity = async function ( event ) {
     event.preventDefault();
+    if ( deleteButton.loading === true ) {
+      return;
+    }
+
     deleteButton.loading = true;
+    await Feed.removeIdentity( identity );
     await Identity.remove( identity );
 
     // TODO: Figure out how to do this in svelte. I keep getting search results
@@ -27,13 +31,15 @@
   };
 
   onMount( function () {
-    activeSwitch.addEventListener( "sl-change", function ( event ) {
-      if ( event.target.checked === true ) {
-        console.log( "TBD activate identity" );
-      } else {
-        console.log( "TBD deactivate identity" );
-      }
-    });
+    const listener = async function ( event ) {
+      await Feed.setIdentityActive( identity, event.target.checked );
+    };
+
+    activeSwitch.addEventListener( "sl-change", listener );
+
+    return function () {
+      activeSwitch.removeEventListener( "sl-change", listener );
+    };
   });
 </script>
 
@@ -42,7 +48,7 @@
   <section>
     <sl-switch
       bind:this={activeSwitch}
-      checked={activeState}
+      checked={identity.active}
       size="medium">
       Active
     </sl-switch>
