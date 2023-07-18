@@ -1,5 +1,4 @@
 <script>
-  import posts from "$lib/stores/posts.js";
   import Post from "$lib/components/Post.svelte"
   import BackLink from "$lib/components/primitives/BackLink.svelte";
   import Spinner from "$lib/components/primitives/Spinner.svelte";

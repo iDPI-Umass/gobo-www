@@ -1,35 +1,44 @@
 <script>
-  import posts from "$lib/stores/posts.js";
   import { isImage, isVideo } from "$lib/helpers/type.js";
   import GuardFrame from "$lib/components/GuardFrame.svelte";
-  export let data;
-
-  let id = Number( data.bindings.post );
-  const post = posts.find( post => post.id === id );
+  import Spinner from "$lib/components/primitives/Spinner.svelte";
+  import { getPost } from "$lib/resources/post.js";
   
-  id = Number( data.bindings.media ); 
-  let media = post?.media[ id ];
+  export let data;
+  
+  let post, media;
 
-  if ( media == null ) {
-    media = {};
-  }
+  const loadMedia = async function () {
+    post = await getPost( data.bindings.post );
+    media = post?.attachments[ Number(data.bindings.media) ];
+    if ( media == null ) {
+      media = {};
+    }
+  };
+
 </script>
 
 <GuardFrame>
-  <div class="frame">
-    {#if isImage( media ) }
-      <img 
-        src="{media.url}"
-        alt="full size">
-    {:else if isVideo( media ) }
-      <!-- svelte-ignore a11y-media-has-caption -->
-      <video loop controls>
-        <source 
-          src={media.url}
-          type={media.type}>
-      </video>
-    {/if}
-  </div>
+  {#await loadMedia()}
+    <Spinner></Spinner>
+  {:then}
+
+    <div class="frame">
+      {#if isImage( media ) }
+        <img 
+          src="{media.url}"
+          alt="full size">
+      {:else if isVideo( media ) }
+        <!-- svelte-ignore a11y-media-has-caption -->
+        <video loop controls>
+          <source 
+            src={media.url}
+            type={media.type}>
+        </video>
+      {/if}
+    </div>
+
+  {/await}
 </GuardFrame>
 
 <style>
