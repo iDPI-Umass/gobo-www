@@ -2,16 +2,19 @@
   import posts from "$lib/stores/posts.js";
   import Post from "$lib/components/Post.svelte"
   import BackLink from "$lib/components/primitives/BackLink.svelte";
+  import Spinner from "$lib/components/primitives/Spinner.svelte";
   import { guard } from "$lib/helpers/guard";
+  import { getPost } from "$lib/resources/post.js";
+  
   export let data;
-  let fullPage = true;
+  
+  const fullPage = true;
+  let post;
 
-  const id = Number( data.bindings.id );
-  let post = posts.find( post => post.id === id );
-  if ( post == null ) {
-    post = {};
-  }
-
+  const loadPost = async function () {
+    post = await getPost( data.bindings.id );
+  };
+  
   guard();
 </script>
 
@@ -21,5 +24,10 @@
     heading="Post">
   </BackLink>
 
-  <Post {...post} {fullPage}></Post>
+  {#await loadPost()}
+    <Spinner></Spinner>
+  {:then}
+    <Post {...post} {fullPage}></Post>
+  {/await}
+  
 </div>

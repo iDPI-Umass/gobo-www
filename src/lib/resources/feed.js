@@ -1,28 +1,10 @@
 import { getGOBOClient, logout } from "$lib/helpers/account";
+import { cache } from "$lib/resources/cache.js";
 
 // The following classes play an HTTP intermediary role. They are focused on
 // RESTful composition that stablizes this client's request pattern to the GOBO
 // HTTP API while building an integrative layer that provides a unified feed as
 // a transparent interface.
-
-
-const cache = {
-  posts: {},
-  sources: {}
-};
-
-
-
-class Cache {
-  static getPost ( id ) {
-    return cache.posts[ id ];
-  }
-
-  static getSource ( id ) {
-    return cache.sources[ id ];
-  }
-}
-
 
 
 class Reader {
@@ -212,6 +194,5 @@ class Feed {
 
 
 export {
-  Feed,
-  Cache
+  Feed
 }

@@ -1,9 +1,9 @@
 <script>
   import Spinner from "$lib/components/primitives/Spinner.svelte";
   import Post from "$lib/components/Post.svelte";
-  import { onMount } from "svelte";
+  import { onMount, tick } from "svelte";
 
-  import { FeedEngine } from "$lib/helpers/feed.js";
+  import * as FeedSaver from "$lib/helpers/scroll-restoration.js";
   import { ScrollSmoother } from "$lib/helpers/infinite-scroll.js";
   import { scrollStore } from "$lib/stores/scroll.js";
   import { feedStore } from "$lib/stores/feed.js";
@@ -14,18 +14,25 @@
   const pull = async function ( count, marker ) {
     const current = await engine.pull( count, marker );
     if ( current.length > 0 ) {
-      posts = [ ...posts, ...current ];
+      const _posts = [ ...posts, ...current ];
+      FeedSaver.setFeed( _posts );
+      posts = _posts;
     }
   };
 
   const loadFeed = async function () {
-    engine = await FeedEngine.create();
-    await pull( 25 );
+    engine = await FeedSaver.getEngine();
+    posts = FeedSaver.getFeed();
+    if ( posts.length === 0 ) {
+      await pull( 25 );
+    }
+    await tick();
+    feed.scrollTo( 0, FeedSaver.getScrollPosition() );
   };  
   
   onMount( function () {
-    const listener = function ( event ) {
-      pull( 25 );
+    const listener = async function ( event ) {
+      await pull( 25 );
     };
     feed.addEventListener( "gobo-smooth-scroll", listener );
 
@@ -37,10 +44,12 @@
         return;
       }
       feed.scrollBy( 0, event.deltaY );
+      FeedSaver.setScrollPosition( feed.scrollTop );
       smoother.update( event );
+      scrollStore.push(null); // We're using store as message queue, clear out old message.
     });
 
-    const unsubscribeFeed = feedStore.subscribe( function ( event ) {
+    const unsubscribeFeed = feedStore.subscribe( async function ( event ) {
       const command = event?.command;
       if ( command == null ) {
         return;
@@ -48,12 +57,15 @@
 
       switch ( command ) {
         case "reset":
-          posts = [];
-          feed.scrollTo(0, 0);
-          loadFeed();
+          await FeedSaver.reset();
+          await loadFeed();
+          feedStore.push({}); // We're using store as message queue, clear out old message.
           break;
       }
+
     });
+
+    loadFeed();
 
     return function () {
       feed.removeEventListener( "gobo-change", listener );
@@ -66,23 +78,13 @@
 </script>
 
 <section bind:this={feed}>
-  {#await loadFeed()}
-  
+  {#if posts}
+    {#each posts as post }
+      <Post {...post}></Post>
+    {/each}
+  {:else}
     <Spinner></Spinner>
-  
-  {:then}
-
-    {#if posts}
-      {#each posts as post }
-        <Post {...post}></Post>
-      {/each}
-    {:else}
-      <Spinner></Spinner>
-    {/if}
-
-    
-
-  {/await}
+  {/if}
 </section>
 
 <style>

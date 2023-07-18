@@ -6,7 +6,7 @@
   import PostPoll from "$lib/components/PostPoll.svelte";
   import { humanize } from "$lib/helpers/humanize";
   import { goto } from "$app/navigation";
-  import { Cache } from "$lib/resources/feed.js";
+  import { Cache } from "$lib/resources/cache.js";
 
   export let id;
   export let source_id;
