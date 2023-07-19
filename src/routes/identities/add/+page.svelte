@@ -23,6 +23,9 @@
       switch ( platform ) {
         case "mastodon":
           baseURL = data.get( "mastodonURL" );
+          if ( !baseURL.startsWith("https://") ) {
+            baseURL = `https://${baseURL}`;
+          }
           break;
         case "reddit":
           baseURL = "https://www.reddit.com";
