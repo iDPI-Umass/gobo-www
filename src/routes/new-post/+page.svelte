@@ -18,10 +18,12 @@
   import { draftStore } from "$lib/stores/post-draft.js";
   import { previewStore } from "$lib/stores/image-preview.js";
   import { getGOBOClient } from "$lib/helpers/account.js";
-  import { sort } from "$lib/resources/identity.js";
   import { onMount } from "svelte";
   import { browser } from "$app/environment";
   import { goto } from "$app/navigation";
+
+  // TODO: replace this placeholder. sort function import was orphaned by API refactor.
+  const sort = function () {}
 
 
   let configFrame, draftData;

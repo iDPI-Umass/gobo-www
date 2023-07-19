@@ -21,9 +21,10 @@ To build assets of the application to publish, use:
 npx gulp build
 ```
 
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+## Publish Code Changes
+```bash
+AWS_PROFILE=idpi npx gulp publish --environment=production-www
+```
 
 
 ## Deploying Infrastructure
@@ -41,7 +42,4 @@ AWS_PROFILE=idpi npx gulp deploy --environment=production-api
 ```
 
 
-## Publish Code Changes
-```bash
-AWS_PROFILE=idpi npx gulp publish --environment=production-www
-```
+
