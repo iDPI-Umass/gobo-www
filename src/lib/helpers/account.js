@@ -62,6 +62,7 @@ const fetchProfile = async function () {
   
   let { name } = profile;
   if ( (name == null) || (name == "") ) {
+    const account = await getAccount();
     profile.name = account.email;
   }
 
