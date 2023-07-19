@@ -119,12 +119,10 @@ class Reader {
   }
 
   async getHead () {
-    if ( this.head != null ) {
-      return this.head;
-    } else {
+    if ( this.head == null ) {
       await this.checkQueue();
-      return this.head;
     }
+    return this.head;
   }
 
   // Fetch the next highest post.
@@ -158,12 +156,21 @@ class Feed {
 
   async getActiveReaders () {
     const readers = [];
+
+    // If we need to make any requests to the API, make them in parallel.
+    const promises = [];
     for ( const reader of this.readers ) {
-      const head = await reader.getHead();
-      if ( head != null ) {
+      promises.push(reader.getHead());
+    }
+    await Promise.all( promises );
+    
+    // Now we can safely assume `.head` is an up-to-date value.
+    for ( const reader of this.readers ) {
+      if ( reader.head != null ) {
         readers.push( reader );
       }
     }
+
     return readers;
   }
 
