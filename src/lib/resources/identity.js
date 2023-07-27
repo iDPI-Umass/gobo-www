@@ -3,8 +3,8 @@ import { getGOBOClient, handleUnauthorized } from "$lib/helpers/account.js";
 
 const getType = function ( identity ) {
   switch ( identity.base_url ) {
-    case "https://twitter.com":
-      return "twitter";
+    case "https://bsky.app":
+        return "bluesky";
     case "https://www.reddit.com":
       return "reddit";
     default:
@@ -17,7 +17,7 @@ const getPrettyName = function ( identity ) {
   const { username, type, base_url } = identity;
 
   switch ( type ) {
-    case "twitter":
+    case "bluesky":
       return `@${ username }`;
     case "reddit":
       return `u/${ username }`;
@@ -45,13 +45,13 @@ const categorize = function ( identity ) {
 const sort = function ( identities ) {
   let mastodons = [];
   let reddits = [];
-  let twitters = [];
+  let blueskys = [];
 
   for ( let identity of identities ) {
     identity = categorize( identity ); 
 
-    if ( identity.type === "twitter" ) {
-      twitters.push( identity );
+    if ( identity.type === "bluesky" ) {
+      blueskys.push( identity );
     } else if ( identity.type === "reddit" ) {
       reddits.push( identity );
     } else if ( identity.type === "mastodon" ) {
@@ -59,7 +59,7 @@ const sort = function ( identities ) {
     }
   }
 
-  return [ ...mastodons, ...reddits, ...twitters ];
+  return [ ...blueskys, ...mastodons, ...reddits ];
 };
 
 const list = handleUnauthorized( async function () {  

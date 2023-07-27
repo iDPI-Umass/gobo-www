@@ -2,6 +2,7 @@
   import { isImage, isVideo } from "$lib/helpers/type.js";
   import GuardFrame from "$lib/components/GuardFrame.svelte";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
+  import BackLink from "$lib/components/primitives/BackLink.svelte";
   import { getPost } from "$lib/resources/post.js";
   
   export let data;
@@ -19,6 +20,15 @@
 </script>
 
 <GuardFrame>
+
+  <header>
+    <BackLink
+      href="/home"
+      heading="Image">
+    </BackLink>
+  </header>
+  
+
   {#await loadMedia()}
     <Spinner></Spinner>
   {:then}
@@ -42,8 +52,13 @@
 </GuardFrame>
 
 <style>
+  header {
+    height: 4rem;
+    padding: 1rem 1rem 0 1rem;
+  }
+
   .frame {
-    height: 100vh;
+    height: calc(100vh - 6rem);
     display: flex;
     justify-content: center;
     align-items: center;

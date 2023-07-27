@@ -15,6 +15,7 @@
   import "$lib/styles/brand.css";
   import "$lib/styles/keyword-table.css";
   import "$lib/styles/switches.css";
+  import "$lib/styles/buttons.css";
 
   // Now we can setup the store stuff with Svelte
   import Spinner from "$lib/components/primitives/Spinner.svelte";

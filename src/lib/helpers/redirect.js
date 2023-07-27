@@ -88,21 +88,26 @@ const handleAddIdentityCallback = async function ( query ) {
   // be careful about only applying this once.
   const baseURL = LS.read( "gobo-baseURL" );
   LS.remove( "gobo-baseURL" );
-  
-  if ( baseURL != null ) {
-    const client = await Account.getGOBOClient();
-    await client.actionOnboardIdentityCallback.post({ content: {
-      base_url: baseURL,
-      oauth_token: query.oauth_token,
-      oauth_verifier: query.oauth_verifier,
-      code: query.code,
-      state: query.state
-    }});
-    return goto( "/identities" );
-  } else {
-    // Passthrough if we've marked the base_url as missing.
-    return goto( "/identities" );
+  if ( baseURL == null ) {
+     // Passthrough if we've marked the base_url as missing.
+     return goto( "/identities" );
   }
+  
+  const client = await Account.getGOBOClient();
+  const login = LS.read( "gobo-bluesky-login" );
+  const secret = LS.read( "gobo-bluesky-secret" );
+  
+  await client.actionOnboardIdentityCallback.post({ content: {
+    base_url: baseURL,
+    oauth_token: query.oauth_token,
+    oauth_verifier: query.oauth_verifier,
+    code: query.code,
+    state: query.state,
+    bluesky_login: login,
+    bluesky_secret: secret
+  }});
+  
+  return goto( "/identities" );
 };
 
 

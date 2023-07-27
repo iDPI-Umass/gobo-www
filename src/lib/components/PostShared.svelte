@@ -30,8 +30,8 @@
 
   
   let platform;
-  if ( base_url == "https://twitter.com" ) {
-    platform = "twitter";
+  if ( base_url == "https://bsky.app" ) {
+    platform = "bluesky";
   } else if ( base_url == "https://www.reddit.com" ) {
     platform = "reddit";
   } else {
@@ -44,13 +44,11 @@
   let avatarFallback;
   switch ( platform ) {
     case "mastodon":
+    case "bluesky":
       avatarFallback = "https://mastodon.social/avatars/original/missing.png";
       break;
     case "reddit":
       avatarFallback = "https://www.redditstatic.com/avatars/defaults/v2/avatar_default_6.png";
-      break;
-    case "twitter":
-      avatarFallback = "https://abs.twimg.com/sticky/default_profile_images/default_profile_normal.png";
       break;
   }
 
@@ -61,15 +59,15 @@
 
   let sourceCopy;
   switch ( platform ) {
+    case "bluesky":
+      sourceCopy = "View on Bluesky";
+      break;
     case "mastodon":
       // Specialize this to name the server?
       sourceCopy = "View on Mastodon";
       break;
     case "reddit":
       sourceCopy = "View on Reddit";
-      break;
-    case "twitter":
-      sourceCopy = "View on Twitter";
       break;
   }
 
@@ -78,16 +76,16 @@
   let logo = `/icons/${ platform }.svg`;
   let headingSlot1, headingSlot2;
   switch ( platform ) {
+    case "bluesky":
+      headingSlot1 = source.name;
+      headingSlot2 = `@${source.username}`;
+      break;
     case "mastodon":
       headingSlot1 = source.name;
       headingSlot2 = `@${source.username}`;
       break;
     case "reddit":
       headingSlot1 = `r/${source.name}`;
-      break;
-    case "twitter":
-      headingSlot1 = source.name;
-      headingSlot2 = `@${source.username}`;
       break;
   }
 

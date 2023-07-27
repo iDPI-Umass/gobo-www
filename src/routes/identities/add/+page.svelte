@@ -10,7 +10,8 @@
   import * as LS from "$lib/helpers/local-storage.js";
   import { getGOBOClient } from "$lib/helpers/account.js";
   let form, select, button;
-  let targetingMastodon = true;
+  let targetingBluesky = true;
+  let targetingMastodon = false;
 
 
   const submit = async function () {
@@ -21,17 +22,17 @@
       const platform = data.get( "platform" );
 
       switch ( platform ) {
+        case "bluesky":
+          baseURL = "https://bsky.app";
+          break;
         case "mastodon":
           baseURL = data.get( "mastodonURL" );
           if ( !baseURL.startsWith("https://") ) {
-            baseURL = `https://${baseURL}`;
+            baseURL = `https://${ baseURL }`;
           }
           break;
         case "reddit":
           baseURL = "https://www.reddit.com";
-          break;
-        case "twitter":
-          baseURL = "https://twitter.com";
           break;
         default:
           throw new Error( "unknown platform specified" );
@@ -45,7 +46,21 @@
 
       console.log(result);
 
-      window.location = result.redirect_url;
+      if ( platform !== "bluesky" ) {
+        window.location = result.redirect_url;
+      } else {
+        let login = data.get( "blueskyLogin" );
+        if ( !login.endsWith(".bsky.social") ) {
+          login += ".bsky.social";
+        }
+        if ( login.startsWith("@") ) {
+          login = login.slice(1);
+        }
+
+        LS.write( "gobo-bluesky-login", login );
+        LS.write( "gobo-bluesky-secret", data.get( "blueskySecret" ));
+        window.location = `/add-identity-callback?state=${result.state}`;
+      }
     } catch ( error ) {
       // TODO: Figure out how we'd like to represent an error visually here.
       console.error( error );
@@ -65,6 +80,7 @@
 
     const changeListener = function( event ) {
       targetingMastodon = ( event.target.value === "mastodon" );
+      targetingBluesky = ( event.target.value === "bluesky" );
     };
 
     form.addEventListener( "submit", submitListener);
@@ -102,13 +118,33 @@
     <sl-select
       bind:this={select}
       name="platform"
-      value="mastodon"
+      value="bluesky"
       size="medium"
       pill>
+      <sl-option value="bluesky">Bluesky</sl-option>
       <sl-option value="mastodon">Mastodon</sl-option>
       <sl-option value="reddit">Reddit</sl-option>
-      <sl-option value="twitter">Twitter</sl-option>
     </sl-select>
+
+    {#if targetingBluesky === true}
+      <sl-input
+        name="blueskyLogin"
+        label="Bluesky Name"
+        help-text="Your full name, like gobo.bsky.social, or your abreviated name, like gobo"
+        autocomplete="off"
+        size="medium">
+      </sl-input>
+
+      <sl-input
+        name="blueskySecret"
+        label="Bluesky Secret"
+        help-text="This is an special secret you create just for GOBO."
+        autocomplete="off"
+        password
+        size="medium">
+      </sl-input>
+    {/if}
+
 
     {#if targetingMastodon === true}
       <sl-input
