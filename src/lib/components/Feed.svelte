@@ -78,7 +78,7 @@
 </script>
 
 <section bind:this={feed}>
-  {#if posts}
+  {#if posts.length > 0}
     {#each posts as post }
       <Post {...post}></Post>
     {/each}

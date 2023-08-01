@@ -24,7 +24,7 @@
   <header>
     <BackLink
       href="/home"
-      heading="Image">
+      heading="">
     </BackLink>
   </header>
   

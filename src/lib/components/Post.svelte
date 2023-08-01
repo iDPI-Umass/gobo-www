@@ -5,7 +5,8 @@
   import PostMedia from "$lib/components/PostMedia.svelte";
   import PostPoll from "$lib/components/PostPoll.svelte";
   import PostShared from "$lib/components/PostShared.svelte";
-  import { humanize } from "$lib/helpers/humanize";
+  import { humanize } from "$lib/helpers/humanize.js";
+  import { render } from "$lib/helpers/markdown.js";
   import { goto } from "$app/navigation";
   import { Cache } from "$lib/resources/cache.js";
 
@@ -93,6 +94,8 @@
       headingSlot1 = `r/${source.name}`;
       break;
   }
+
+  let renderedContent = render( content );
 
   const styles = {}
   if ( fullPage === true ) {
@@ -198,7 +201,9 @@
           <h2>{title}</h2>
         {/if}
 
-        {@html content}
+        {#if renderedContent}
+          {@html renderedContent}
+        {/if}
       </section>
 
       {#if attachments.length > 0}

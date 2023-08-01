@@ -129,7 +129,7 @@
     {#if targetingBluesky === true}
       <sl-input
         name="blueskyLogin"
-        label="Bluesky Name"
+        label="Bluesky Username"
         help-text="Your full name, like gobo.bsky.social, or your abreviated name, like gobo"
         autocomplete="off"
         size="medium">
@@ -138,7 +138,7 @@
       <sl-input
         name="blueskySecret"
         label="Bluesky Secret"
-        help-text="This is an special secret you create just for GOBO."
+        help-text='This is an special "App Password" you create just for GOBO. Do NOT use your regular password'
         autocomplete="off"
         password
         size="medium">
