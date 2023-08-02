@@ -1,5 +1,7 @@
 import * as Type from "@dashkite/joy/type";
 import Markdown from "markdown-it";
+import mila from "markdown-it-link-attributes";
+
 const md = new Markdown({
   html:         true,        // Enable HTML tags in source
   xhtmlOut:     true,        // Use '/' to close single tags (<br />).
@@ -23,6 +25,13 @@ const md = new Markdown({
   // or '' if the source string is not changed and should be escaped externally.
   // If result starts with <pre... internal wrapper is skipped.
   highlight: function (/*str, lang*/) { return ''; }
+});
+
+md.use( mila, {
+  attrs: {
+    target: "_blank",
+    rel: "noopener noreferrer nofollow",
+  },
 });
 
 // TODO: is it a meaningful improvement to has the content of the post and use

@@ -40,6 +40,7 @@
 		"dayjs": "^1.11.7",
 		"gobo-client": "file:../gobo-client",
 		"markdown-it": "^13.0.1",
+		"markdown-it-link-attributes": "^4.0.1",
 		"url-template": "^3.1.0"
 	}
 }
