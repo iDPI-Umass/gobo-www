@@ -196,15 +196,15 @@
         <time datetime="published">{ humanize( published ) }</time>
       </header>
 
-      <section class="content" style={fullPage === true ? "max-height:unset" : ""}>
-        {#if title != null}
-          <h2>{title}</h2>
-        {/if}
+      {#if renderedContent}
+        <section class="content" style={fullPage === true ? "max-height:unset" : ""}>
+          {#if title != null}
+            <h2>{title}</h2>
+          {/if}
 
-        {#if renderedContent}
-          {@html renderedContent}
-        {/if}
-      </section>
+          {@html renderedContent}          
+        </section>
+      {/if}
 
       {#if attachments.length > 0}
         <div class="media">

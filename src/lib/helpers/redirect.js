@@ -24,13 +24,19 @@ const handleCallbackError = async function () {
 };
 
 
+const toAuthenticationPage = async function () {
+  const client = await getAuth0Client();
+  await client.loginWithRedirect()
+};
+
+
 // TODO: We need to be careful this doesn't create a routing infinite loop with
 //   the guard redirect functionality.
 const handleRootRedirect = async function () {
   const client = await getAuth0Client();
   if ( await client.isAuthenticated() !== true ) {
-    // We can stop here. Allow the passthrough to the public homepage.
-    return;
+    // We can stop here. Send to login page.
+    await toAuthenticationPage();
   }
 
   const account = await Account.getAccount();
@@ -39,8 +45,8 @@ const handleRootRedirect = async function () {
     return goto( "/home" );
   }
 
-  // No further checks. Allow passthrough to the public homepage.
-  return;
+  // No further checks. Send to login page.
+  await toAuthenticationPage();
 }
 
 
