@@ -18,7 +18,8 @@
   export let url;
   export let published;
   export let attachments = [];
-  export let shares = []
+  export let shares = [];
+  export let reply = null;
   export let poll = null;
 
   export let platform_id;
@@ -59,8 +60,13 @@
   }
 
   let sharedPosts = [];
-  for ( const id of shares ) {
-    sharedPosts.push( Cache.getPost(id) );
+  for ( const item of shares ) {
+    const post = Cache.getPost( item );
+    if ( post == null ) {
+      console.error(`expected post ${item}, but it appears to be missing from graph`);
+    } else {
+      sharedPosts.push( post );
+    }
   }
 
   let sourceCopy;

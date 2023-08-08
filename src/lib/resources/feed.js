@@ -34,6 +34,8 @@ class Reader {
         start: this.tail
       });
 
+      console.log(result)
+
       const feed = [];
       const posts = {};
       const sources = {};
@@ -44,6 +46,9 @@ class Reader {
       for ( const share of result.shares ) {
         posts[ share[0] ].shares ??= [];
         posts[ share[0] ].shares.push( share[1] );
+      }
+      for ( const reply of result.replies ) {
+        posts[ reply[0] ].reply = reply[1];
       }
       for ( const source of result.sources ) {
         sources[ source.id ] = source;
