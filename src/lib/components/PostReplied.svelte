@@ -30,7 +30,7 @@
 
   export let fullPage = false;
 
-  let unused = [ platform_id, visibility, created, updated ];
+  let unused = [ platform_id, visibility, reply, url, created, updated ];
 
   
   let platform;
