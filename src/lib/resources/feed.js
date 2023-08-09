@@ -43,11 +43,11 @@ class Reader {
       for ( const post of result.posts ) {
         posts[ post.id ] = post;
       }
-      for ( const share of result.shares ) {
+      for ( const share of result.shares ?? [] ) {
         posts[ share[0] ].shares ??= [];
         posts[ share[0] ].shares.push( share[1] );
       }
-      for ( const reply of result.replies ) {
+      for ( const reply of result.replies ?? [] ) {
         posts[ reply[0] ].reply = reply[1];
       }
       for ( const source of result.sources ) {

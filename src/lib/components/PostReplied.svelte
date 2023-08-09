@@ -6,7 +6,6 @@
   import PostSyndication from "$lib/components/PostSyndication.svelte";
   import PostPoll from "$lib/components/PostPoll.svelte";
   import PostShared from "$lib/components/PostShared.svelte";
-  import PostReplied from "$lib/components/PostReplied.svelte";
   import { humanize } from "$lib/helpers/humanize.js";
   import { render } from "$lib/helpers/markdown.js";
   import { goto } from "$app/navigation";
@@ -68,16 +67,6 @@
       console.error(`expected post ${item}, but it appears to be missing from graph`);
     } else {
       sharedPosts.push( post );
-    }
-  }
-
-  let repliedPost = null;
-  if ( reply != null ) {
-    const post = Cache.getPost( reply );
-    if ( post == null ) {
-      console.error(`expected post ${reply}, but it appears to be missing from graph`);
-    } else {
-      repliedPost = post;
     }
   }
 
@@ -196,9 +185,6 @@
   on:click={handleClick}
   on:keydown={handleClick}>
 
-  {#if repliedPost}
-    <PostReplied {...repliedPost}></PostReplied>
-  {/if}
 
   <div class="inner-frame">
     <aside class="gutter">
@@ -207,6 +193,7 @@
         alt={`avatar for ${ headingSlot1 }`}
         onerror="this.onerror=null;this.src='{avatarFallback}'"
       >
+      <div class="spine"></div>
     </aside>
 
     <div class="main">
@@ -255,58 +242,11 @@
 
   </div>
 
-
-  <footer>
-    
-    <a
-      class="why"
-      href="/why-am-i-seeing-this">
-      Why am I seeing this?
-    </a>
-    
-    <a
-      class="source-link"
-      href="{url}"
-      target="_blank" 
-      rel="noopener noreferrer nofollow">
-      <sl-icon src="{logo}" class="{platform}"></sl-icon>
-      <span>{sourceCopy}</span>     
-    </a>
-   
-  </footer>
-
 </article>
 
 <style>
 
-  .outer-frame {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    align-items: stretch;
-    max-width: var(--gobo-max-width-primary);
-    background: var(--gobo-color-panel);
-    border: var(--gobo-border-panel);
-    border-radius: var(--gobo-border-radius);
-    margin-bottom: var(--gobo-height-spacer);
-    padding-top: var(--gobo-height-spacer-flex);
-    box-sizing: border-box;
-    cursor: var(--cursor);
-  }
-
-  .outer-frame:focus-visible {
-    outline: 2px solid var(--gobo-color-primary);
-  }
-
-  @supports not selector(:focus-visible) {
-    .outer-frame:focus {
-      outline: 2px solid var(--gobo-color-primary);
-    }
-  }
-
-  .outer-frame .inner-frame {
+  .inner-frame {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -315,12 +255,12 @@
     margin: 0 var(--gobo-width-spacer-flex) 0 var(--gobo-width-spacer-flex);
   }
 
-  .outer-frame .inner-frame .gutter {
+  .inner-frame .gutter {
     min-width: max-content;
   }
 
 
-  .outer-frame .inner-frame .gutter img {
+  .inner-frame .gutter img {
     height: 2.8125rem;
     width: 2.8125rem;
     border-radius: var(--sl-border-radius-circle);
@@ -328,7 +268,14 @@
     border: var(--gobo-border-panel);
   }
 
-  .outer-frame .inner-frame .main {
+  .inner-frame .gutter .spine {
+    height: calc(100% - 2.8125rem);
+    width: 4px;
+    background-color: var(--gobo-color-primary);
+    margin-left: calc((2.8125rem / 2) - 2px);
+  }
+
+  .inner-frame .main {
     flex: 1 1 auto;
     display: flex;
     flex-direction: column;
@@ -338,7 +285,7 @@
     min-width: 0;
   }
 
-  .outer-frame .inner-frame .main header {  
+  .inner-frame .main header {  
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -347,14 +294,14 @@
     margin-bottom: var(--gobo-height-spacer-half);
   }
 
-  .outer-frame .inner-frame .main header .names {
+  .inner-frame .main header .names {
     flex: 1;
     display: flex;
     flex-wrap: wrap;
     min-width: 0;
   }
 
-  .outer-frame .inner-frame .main header .slot1 {
+  .inner-frame .main header .slot1 {
     font-size: var(--gobo-font-size-copy);
     font-weight: var(--gobo-font-weight-bold);
     color: var(--gobo-color-text);
@@ -364,7 +311,7 @@
     margin-right: 0.75rem;
   }
 
-  .outer-frame .inner-frame .main header .slot2 {
+  .inner-frame .main header .slot2 {
     font-size: var(--gobo-font-size-copy);
     font-weight: var(--gobo-font-weight-regular);
     color: var(--gobo-color-text-muted);
@@ -373,7 +320,7 @@
     overflow: hidden;
   }
 
-  .outer-frame .inner-frame .main header time {
+  .inner-frame .main header time {
     flex-shrink: 0;
     font-size: var(--gobo-font-size-detail);
     font-weight: var(--gobo-font-weight-regular);
@@ -385,7 +332,7 @@
 
 
 
-  .outer-frame .inner-frame .main .content {
+  .inner-frame .main .content {
     max-height: var(--max-height);
     overflow-y: hidden;
     margin-bottom: var(--gobo-height-spacer);
@@ -393,106 +340,43 @@
     -webkit-mask-image: var(--gradient)
   }
 
-  .outer-frame .inner-frame .main .content :global(h2) {
+  .inner-frame .main .content :global(h2) {
     font-size: 1.125rem;
     font-weight: var(--gobo-font-weight-black);
     overflow-wrap: anywhere;
     margin-bottom: 0.5rem;
   }
 
-  .outer-frame .inner-frame .main .content :global(h3) {
+  .inner-frame .main .content :global(h3) {
     font-size: 1rem;
     font-weight: var(--gobo-font-weight-black);
     overflow-wrap: anywhere;
     margin-bottom: 1rem;
   }
 
-  .outer-frame .inner-frame .main .content :global(p) {
+  .inner-frame .main .content :global(p) {
     font-size: var(--gobo-font-size-copy);
     font-weight: var(--gobo-font-weight-regular);
     margin-bottom: 1rem;
   }
 
-  .outer-frame .inner-frame .main .content :global(a) {
+  .inner-frame .main .content :global(a) {
     position: relative;
   }
 
-  .outer-frame .inner-frame .main .content :global(:last-child) {
+  .inner-frame .main .content :global(:last-child) {
     margin-bottom: 0;
   }
 
 
-  .outer-frame .inner-frame .main .media,
-  .outer-frame .inner-frame .main .poll {
+  .inner-frame .main .media,
+  .inner-frame .main .poll {
     margin-bottom: 1rem;
   }
 
-  .outer-frame .inner-frame .main .media :global(a) {
+  .inner-frame .main .media :global(a) {
     position: relative;
   }
-
-
-
-
-
-  .outer-frame footer {
-    width: 100%;
-    height: 2.5rem;
-    padding: 0.5rem var(--gobo-width-spacer-flex);
-    border-top: var(--gobo-border-panel);
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: space-between;
-  }
-
-  .outer-frame footer a {
-    text-decoration: none;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    align-items: center;
-  }
-
-  .outer-frame footer a {
-    text-decoration: none;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    align-items: center;
-    font-size: var(--gobo-font-size-detail);
-  }
-
-
-  .outer-frame footer a sl-icon {
-    font-size: 1rem;
-    margin-right: 0;
-  }
-
-  .outer-frame footer a.source-link {
-    color: var(--gobo-color-text-muted);
-  }
-
-  .outer-frame footer a.source-link span {
-    display: none;
-  }
-
-  @media ( min-width: 425px ) {
-    .outer-frame footer a.source-link sl-icon {
-      margin-right: 0.5rem;
-    }
-
-    .outer-frame footer a.source-link span {
-      display: inline;
-    }
-  }
-
-
-
-
-
 </style>
 
 
