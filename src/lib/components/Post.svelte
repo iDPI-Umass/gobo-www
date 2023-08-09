@@ -3,6 +3,7 @@
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import PostMedia from "$lib/components/PostMedia.svelte";
+  import PostSyndication from "$lib/components/PostSyndication.svelte";
   import PostPoll from "$lib/components/PostPoll.svelte";
   import PostShared from "$lib/components/PostShared.svelte";
   import { humanize } from "$lib/helpers/humanize.js";
@@ -102,6 +103,10 @@
   }
 
   let renderedContent = render( content );
+
+  
+  let mediaEmbeds = attachments.filter( a => /^(image|video)\//.test(a.type) );
+  let textEmbeds = attachments.filter( a => /^application\/json/.test(a.type) );
 
   const styles = {}
   if ( fullPage === true ) {
@@ -212,9 +217,13 @@
         </section>
       {/if}
 
-      {#if attachments.length > 0}
+      {#if mediaEmbeds.length > 0}
         <div class="media">
-          <PostMedia {id} {attachments}></PostMedia>
+          <PostMedia {id} attachments={mediaEmbeds}></PostMedia>
+        </div>
+      {:else if textEmbeds.length > 0}
+        <div class="text-embed">
+          <PostSyndication attachments={textEmbeds}></PostSyndication>
         </div>
       {/if}
 
