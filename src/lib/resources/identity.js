@@ -34,7 +34,7 @@ const getPrettyName = function ( identity ) {
 };
 
 const categorize = function ( identity ) {
-  identity.key = identity.id;
+  identity.key = String( identity.id );
   identity.active = true;
   identity.type = getType( identity );
   identity.prettyName = getPrettyName( identity );

@@ -17,7 +17,7 @@
   const setIdentities = function () {
     for ( const key in draftData.identities ) {
       const value = draftData.identities[ key ];
-      if (( value.platform === "reddit" ) && ( value.active === true )) {
+      if (( value.type === "reddit" ) && ( value.active === true )) {
         identity = value;
         return;
       }
@@ -117,7 +117,7 @@
       <div class="pfp"></div>
       <span class="subreddit">{options.subreddit}</span>
       <span class="interpunct">·</span>
-      <span class="account">Posted by {identity.account}</span>
+      <span class="account">Posted by {identity.prettyName}</span>
       <span class="timestamp">just now</span>
     </header>
 

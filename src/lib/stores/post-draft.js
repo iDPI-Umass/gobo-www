@@ -26,12 +26,14 @@ const isVideo = function ( value ) {
 
 const emptyDraft = function () {
   return {
-    identities: {},
+    identities: [],
+    identitiesLoaded: false,
     files: [],
     options: {
+      spoiler: false,
+      spoilerText: null,
       sensitive: false,
       visibility: "public",
-      spoilerText: null,
       title: null,
       subreddit: null
     },

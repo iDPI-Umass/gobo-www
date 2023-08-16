@@ -16,7 +16,7 @@
   const setIdentities = function () {
     for ( const key in draftData.identities ) {
       const value = draftData.identities[ key ];
-      if (( value.platform === "mastodon" ) && ( value.active === true )) {
+      if (( value.type === "mastodon" ) && ( value.active === true )) {
         identity = value;
         return;
       }
@@ -62,7 +62,7 @@
     <div class="pfp"></div>
     <div class="id">
       <span>{identity.name}</span>
-      <span>{identity.account}</span>
+      <span>{identity.prettyName}</span>
     </div>   
     <p class="timestamp">1 s</p>
   </header>

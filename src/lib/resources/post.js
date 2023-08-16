@@ -42,6 +42,54 @@ const getPost = async function ( id ) {
   return posts[ result.feed[0] ];
 };
 
+const buildMetadata = function ( identity, options ) {
+  switch ( identity.type ) {
+    case "bluesky":
+      return {};
+    case "mastodon":
+      return {
+        sensitive: options.sensitive,
+        spoiler: options.spoilerText
+      }
+    case "reddit":
+      return {
+        title: options.title,
+        subreddit: options.subreddit,
+        nsfw: options.sensitive,
+        spoiler: options.spoiler
+      }
+    default:
+      throw new Error("unknown platform type");
+  }
+};
+
+const publish = async function ( draft ) {
+  const options = draft.options ?? {};
+
+  const post = {};
+  post.content = draft.content;
+  post.title = options.title;
+  // post.attachments = [];
+  // post.poll = {};
+
+  const targets = [];
+  for ( const identity of draft.identities ) {
+    targets.push({
+      identity: identity.id,
+      metadata: buildMetadata( identity, options )
+    });
+  }
+
+  const client = await getGOBOClient();
+  await client.personPosts.post({ 
+    parameters: {
+      person_id: client.id
+    },
+    content: { post, targets }   
+  });
+};
+
 export {
-  getPost
+  getPost,
+  publish
 }

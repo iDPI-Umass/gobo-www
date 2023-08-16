@@ -16,7 +16,7 @@
   const setIdentities = function () {
     for ( const key in draftData.identities ) {
       const value = draftData.identities[ key ];
-      if (( value.platform === "twitter" ) && ( value.active === true )) {
+      if (( value.type === "bluesky" ) && ( value.active === true )) {
         identity = value;
         return;
       }
@@ -82,13 +82,10 @@
   <div class="main">
     <header>
       <span class="name">{identity.name}</span>
-      <span class="account">{identity.account}</span>
+      <span class="account">{identity.prettyName}</span>
       <span class="interpunct">·</span>
       <span class="timestamp">1s</span>
       <div class="spacer"></div>
-      <sl-icon
-        src="/icons/three-dots.svg">
-      </sl-icon>
     </header>
 
 
@@ -403,11 +400,7 @@
       </sl-icon>
   
       <sl-icon
-        src="/icons/bar-chart.svg">
-      </sl-icon>
-  
-      <sl-icon
-        src="/icons/upload.svg">
+        src="/icons/three-dots.svg">
       </sl-icon>
     </footer>
   </div>

@@ -23,10 +23,6 @@
   border-bottom: var(--gobo-border-panel);
 }
 
-.keyword-table > .table-row:last-child {
-  border: none;
-}
-
 .keyword-table > .table-row > sl-icon-button {
   font-size: 1.25rem;
 }
