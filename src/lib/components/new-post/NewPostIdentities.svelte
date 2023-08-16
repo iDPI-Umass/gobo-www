@@ -33,6 +33,12 @@
 
   onMount( function () {
     const unsubscribeDraft = draftStore.subscribe( async function ( draft ) {
+      if ( draft.identitiesLoaded == null ) {
+        // Old draft stored in localStorage. Wipe it out and start over.
+        draftStore.clear();
+        return;
+      }
+      
       identities = draft.identities;
       if ( draft.identitiesLoaded === false ) {
         await loadIdentities();
