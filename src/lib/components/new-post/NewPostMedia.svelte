@@ -3,14 +3,15 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
-  import { draftStore } from "$lib/stores/post-draft.js";
-  import { previewStore } from "$lib/stores/image-preview.js";
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
-
+  import { draftStore } from "$lib/stores/post-draft.js";
+  import { previewStore } from "$lib/stores/image-preview.js";
+  import { altStore } from "$lib/stores/alt-store.js"
+  import * as DraftImage from "$lib/resources/draft-image";
 
   let options = {};
-  let files = [];
+  let attachments = [];
   let fileInput;
 
   const handleOptionSensitive = function ( event ) {
@@ -20,10 +21,20 @@
   };
 
   const addFile = function ( file ) {
-    let match = files.find( f => f.name === file.name );
+    const index = attachments.findIndex( a => a.file.name === file.name );
 
-    if ( match == null ) {
-      draftStore.update({ files: [ ...files, file ] });
+    if ( index < 0 ) {
+      altStore.set({ file, alt: null });
+      goto("/new-post/alt");
+      // draftStore.update({ attachments: [ ...attachments, attachment ] });
+    } else {
+      const match = attachments[ index ];
+      if ( file.lastModified !== match.file.lastModified ) {
+        altStore.set({ file, alt: match.alt });
+        attachments.splice( index, 1 );
+        draftStore.update({ attachments });
+        goto("/new-post/alt");
+      }
     }
   }
 
@@ -67,37 +78,52 @@
   };
 
 
-  const handlePreview = function( file ) {
+  const handlePreview = function( attachment ) {
     return function ( event ) {
       event.preventDefault();
-      previewStore.set( file );
+      previewStore.set( attachment );
       goto( "/upload-preview" );
     }
   };
 
-  const handleDelete = function ( file ) {
+  const handleDelete = function ( attachment ) {
     return function ( event ) {
       event.preventDefault();
-      const index = files.findIndex( f => f.name === file.name );
+      if ( event.type === "keypress" && event.key !== "Enter" ) {
+        return;
+      }
+
+      const index = attachments.findIndex( a => a.file.name === attachment.file.name );
 
       if ( index >= 0 ) {
-        files.splice( index, 1 );
-        draftStore.update({ files });
+        attachments.splice( index, 1 );
+        draftStore.update({ attachments });
       }
     }
   };
 
+  const handleEdit = function ( attachment ) {
+    return function ( event ) {
+      event.preventDefault();
+      if ( event.type === "keypress" && event.key !== "Enter" ) {
+        return;
+      }
+      altStore.set( attachment );
+      goto("/new-post/alt");
+    };
+  }
+
   onMount( function () {
     const unsubscribeDraft = draftStore.subscribe( function ( draft ) {
-      for ( const file of draft.files ) {
-        if ( ! draftStore.isFile( file ) ) {
-          files = [];
-          draftStore.update({ files });
+      for ( const attachment of draft.attachments ) {
+        if ( ! draftStore.isFile( attachment.file ) ) {
+          attachments = [];
+          draftStore.update({ attachments });
         }
       }
 
       options = draft.options;
-      files = draft.files;
+      attachments = draft.attachments;
     });
 
     const listener = function () {
@@ -135,20 +161,27 @@
   on:dragenter={handleDragEnter}
   on:dragleave={handleDragLeave}
   on:drop={handleDrop}>
-  {#each files as file (file.name)}
+  {#each attachments as attachment (attachment.file.name)}
     <div class="table-row">
       <a
         href="/upload-preview"
-        on:click={handlePreview( file )}
-        on:keypress={handlePreview( file )}>
-        { file.name }
+        on:click={handlePreview( attachment )}
+        on:keypress={handlePreview( attachment )}>
+        { attachment.file.name }
       </a>
       <sl-icon-button
         class="danger"
         label="Delete File" 
         src="/icons/trash.svg"
-        on:click={handleDelete( file )}
-        on:keypress={handleDelete( file )}>>
+        on:click={handleDelete( attachment )}
+        on:keypress={handleDelete( attachment )}>>
+      </sl-icon-button>
+      <sl-icon-button
+        class="warning"
+        label="Edit Alt" 
+        src="/icons/pencil-square.svg"
+        on:click={handleEdit( attachment )}
+        on:keypress={handleEdit( attachment )}>>
       </sl-icon-button>
     </div>
   {/each}
@@ -180,5 +213,9 @@
   .keyword-table {
     height: 20rem;
     margin-top: var(--gobo-height-spacer-flex);
+  }
+
+  .table-row sl-icon-button {
+    margin-left: 1rem;
   }
 </style>

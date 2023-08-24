@@ -4,14 +4,7 @@
   import { draftStore } from "$lib/stores/post-draft.js";
   import { onMount } from "svelte";
 
-  let options = {};
   let content = null;
-
-  const handleOptionSpoiler = function ( event ) {
-    draftStore.updateOption({ 
-      spoiler: event.target.checked 
-    });
-  }
 
   const handleContent = function ( event ) {
     draftStore.update({ content: event.target.value });
@@ -19,7 +12,6 @@
 
   onMount( function () {
     const unsubscribeDraft = draftStore.subscribe( function ( draft ) {
-      options = draft.options;
       content = draft.content;
     });
 
@@ -29,13 +21,6 @@
   });
 </script>
 
-
-<sl-checkbox
-  on:sl-change={handleOptionSpoiler}
-  checked={options.spoiler}
-  size="medium">
-  Mark Text as Containing Spoilers
-</sl-checkbox>
 
 <sl-textarea
   on:sl-input={handleContent}
@@ -47,10 +32,6 @@
 </sl-textarea>
 
 <style>
-  sl-checkbox {
-    margin-top: var(--gobo-height-spacer-flex);
-  }
-
   sl-textarea {
     margin-top: var(--gobo-height-spacer-flex);
   }

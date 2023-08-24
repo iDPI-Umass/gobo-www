@@ -2,18 +2,18 @@
   import { onDestroy, onMount } from "svelte";
   import { browser } from "$app/environment";
   import { previewStore } from "$lib/stores/image-preview.js";
-  import GuardFrame from "$lib/components/GuardFrame.svelte";
+  import BackLink from "$lib/components/primitives/BackLink.svelte";
 
   let previewImage, unsubscribePreview;
 
   if ( browser ) {
     onMount( function() {
-      unsubscribePreview = previewStore.subscribe( function ( file ) {
-        if ( file.name != null ) {
+      unsubscribePreview = previewStore.subscribe( function ( attachment ) {
+        if ( attachment.file.name != null ) {
           if ( previewImage.src !== "#" ) {
             URL.revokeObjectURL( previewImage.src );
           }
-          previewImage.src = URL.createObjectURL( file );
+          previewImage.src = URL.createObjectURL( attachment.file );
         }
       });
     });
@@ -26,6 +26,13 @@
 </script>
 
 <div class="frame">
+  <header>
+    <BackLink
+      href="/new-post"
+      heading="">
+    </BackLink>
+  </header>
+
   <img
     bind:this={previewImage}
     src="#"
@@ -42,8 +49,12 @@
     background: #333;
   }
 
+  header {
+    width: 95%;
+  }
+
   img {
-    height: 95%;
+    height: 90%;
     width: 95%;
     object-fit: contain;
   }

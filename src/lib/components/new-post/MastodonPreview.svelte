@@ -32,7 +32,11 @@
   };
 
   const setFiles = function () {
-    displayedFiles = draftData.files.slice( 0, 4 );
+    const _files = [];
+    for ( const attachment of draftData.attachments.slice( 0, 4 ) ) {
+      _files.push(attachment.file);
+    }
+    displayedFiles = _files;
   };
 
   const toggleSensitive = function () {

@@ -1,6 +1,7 @@
 <script>
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import { draftStore } from "$lib/stores/post-draft.js";
+  import { goto } from "$app/navigation";
   import { onMount } from "svelte";
   import * as Post from "$lib/resources/post.js";
 
@@ -30,6 +31,7 @@
     await Post.publish( draft );
     draftStore.clear();
     publishButton.loading = false;
+    goto("/home");
   };
 
 

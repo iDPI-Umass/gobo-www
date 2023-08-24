@@ -35,8 +35,11 @@
   const setFiles = function () {
     let hasVideo = false;
     const oldLength = displayedFiles.length;
-    let files = draftData.files.slice( 0, 20 );
-    
+    let files = [];
+    for ( const attachment of draftData.attachments.slice( 0, 20 ) ) {
+      files.push(attachment.file);
+    }
+
     let videoFile = files.find( f => draftStore.isVideo( f ) );
     if ( videoFile != null ) {
       displayedFiles = [ videoFile ];

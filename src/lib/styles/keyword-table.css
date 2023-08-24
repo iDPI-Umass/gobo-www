@@ -62,6 +62,14 @@
   color: var(--sl-color-danger-500);
 }
 
+.keyword-table > .table-row > .warning::part(base) {
+  color: var(--sl-color-warning-500);
+}
+
 .keyword-table > .table-row > .primary::part(base) {
   color: var(--sl-color-primary-500);
+}
+
+.keyword-table > .table-row > .action::part(base) {
+  color: var(--gobo-color-primary);
 }

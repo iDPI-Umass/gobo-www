@@ -1,15 +1,15 @@
 import { writable } from "svelte/store";
 
 const createStore = function () {
-  let file = {};
+  let attachment = {};
 
-  const { subscribe, update } = writable( file );
+  const { subscribe, update } = writable( attachment );
   
   return {
     subscribe,
-    set: function ( file ) {
+    set: function ( attachment ) {
       update( function () {
-        return file;
+        return attachment;
       });
     }
   };

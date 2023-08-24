@@ -1,5 +1,6 @@
 import { getGOBOClient, logout } from "$lib/helpers/account";
 import { cache, Cache } from "$lib/resources/cache.js";
+import * as Draft from "$lib/resources/draft-image.js";
 
 const getPost = async function ( id ) {
   let post = Cache.getPost( id );
@@ -63,13 +64,22 @@ const buildMetadata = function ( identity, options ) {
   }
 };
 
+const uploadAttachments = async function ( attachments ) {
+  const draftIDs = [];
+  for ( const attachment of attachments ) {
+    const draft = await Draft.create( attachment );
+    draftIDs.push( draft.id );
+  }
+  return draftIDs;
+};
+
 const publish = async function ( draft ) {
   const options = draft.options ?? {};
 
   const post = {};
   post.content = draft.content;
-  post.title = options.title;
-  // post.attachments = [];
+  post.title = options.title ?? undefined;
+  post.attachments = await uploadAttachments( draft.attachments );
   // post.poll = {};
 
   const targets = [];

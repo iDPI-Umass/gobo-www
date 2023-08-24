@@ -1,5 +1,4 @@
 import { writable } from "svelte/store";
-import { browser } from "$app/environment";
 import * as LS from "$lib/helpers/local-storage.js";
 import * as Type from "@dashkite/joy/type";
 
@@ -9,11 +8,7 @@ const buildKey = function ({ platform, account}) {
 }
 
 const isFile = function ( value ) {
-  if ( browser ) {
-    return Type.isType( File, value );
-  } else {
-    return false;
-  }
+  return Type.isType( File, value );
 };
 
 const isImage = function ( value ) {
@@ -28,7 +23,7 @@ const emptyDraft = function () {
   return {
     identities: [],
     identitiesLoaded: false,
-    files: [],
+    attachments: [],
     options: {
       spoiler: false,
       spoilerText: null,
@@ -42,15 +37,13 @@ const emptyDraft = function () {
 };
 
 const createStore = function () {
-  let draft;
-
-  if ( browser ) {
-    draft = LS.read( "gobo-draft" );
-  }
+  let draft = LS.read( "gobo-draft" );
 
   if ( draft == null ) {
     draft = emptyDraft();
   }
+  draft.identities ??= [];
+  draft.attachments ??= [];
 
   const { subscribe, update } = writable( draft );
 

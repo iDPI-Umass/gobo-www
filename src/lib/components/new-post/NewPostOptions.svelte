@@ -47,6 +47,12 @@
     });
   };
 
+  const handleOptionSpoiler = function ( event ) {
+    draftStore.updateOption({ 
+      spoiler: event.target.checked 
+    });
+  }
+
   onMount( function () {
     const unsubscribeDraft = draftStore.subscribe( async function ( draft ) {
       options = draft.options;
@@ -94,8 +100,8 @@
         size="medium"
         pill>
         <sl-option value="public">Public</sl-option>
-        <sl-option value="followers">Followers Only</sl-option>
-        <sl-option value="private">Private</sl-option>
+        <sl-option value="private">Followers Only</sl-option>
+        <sl-option value="direct">Mentioned Only</sl-option>
       </sl-select>
 
       <sl-input
@@ -135,6 +141,13 @@
         size="medium">
       </sl-input>
 
+      <sl-checkbox
+        on:sl-change={handleOptionSpoiler}
+        checked={options.spoiler}
+        size="medium">
+        Mark Text as Containing Spoilers
+      </sl-checkbox>
+
     </section>
   {/if}
 {/if}
@@ -170,5 +183,9 @@
 
   sl-select::part(combobox) {
     font-weight: var(--gobo-font-weight-medium);
+  }
+
+  sl-checkbox {
+    margin-top: var(--gobo-height-spacer-flex);
   }
 </style>
