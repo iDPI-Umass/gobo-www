@@ -24,7 +24,6 @@
     justify-content: flex-start;
     align-items: center;
     margin-bottom: 2rem;
-    border-bottom: var(--gobo-border-hr);
   }
 
   header > h1 {

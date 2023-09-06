@@ -38,7 +38,7 @@
       display: flex;
     }
   }
-  @media ( max-width: 680px ) {
+  @media ( max-width: 750px ) {
     .main-child {
       padding: 0;
     }

@@ -9,7 +9,7 @@
   import MastodonPreview from "$lib/components/new-post/MastodonPreview.svelte";
   import RedditPreview from "$lib/components/new-post/RedditPreview.svelte";
   import TwitterPreview from "$lib/components/new-post/BlueskyPreview.svelte";
-    import NewPostPreview from "$lib/components/new-post/NewPostPreview.svelte";
+  import NewPostPreview from "$lib/components/new-post/NewPostPreview.svelte";
 
 
 </script>

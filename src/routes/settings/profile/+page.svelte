@@ -59,12 +59,11 @@
 <div class="main-child">
   <BackLink
     href="/settings"
-    heading="Your Profile">
+    heading="Profile">
   </BackLink>
     
 
   <form bind:this={form} class="gobo-form">
-    <h2>Update Profile</h2>
     
     <sl-input
       bind:this={nameInput}

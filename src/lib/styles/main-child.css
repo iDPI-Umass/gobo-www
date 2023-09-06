@@ -23,7 +23,6 @@
   padding-top: 4px;
   max-width: var(--gobo-max-width-primary);
   padding-bottom: 0.25rem;
-  border-bottom: var(--gobo-border-hr);
   margin-bottom: var(--gobo-height-spacer);
 }
 
@@ -32,7 +31,9 @@
     padding-left: 0;
     padding-right: 0;
   }
+}
 
+@media ( max-width: 750px ) {
   .main-child > header {
     padding: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex) 0 var(--gobo-width-spacer-flex)
   }

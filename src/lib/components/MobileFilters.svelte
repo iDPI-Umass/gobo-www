@@ -77,7 +77,7 @@
     align-items: center;
   }
 
-  @media ( max-width: 680px ) {
+  @media ( max-width: 750px ) {
     nav {
       padding: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex) 0 var(--gobo-width-spacer-flex)
     }

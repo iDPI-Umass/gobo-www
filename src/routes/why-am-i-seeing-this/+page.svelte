@@ -1,16 +1,15 @@
 <script>
   import MainHeader from "$lib/components/headers/MainHeader.svelte"
   import FooterNav from "$lib/components/headers/FooterNav.svelte";
-  import LeftRight from "$lib/components/layouts/LeftRight.svelte"
-  import Fascinator from "$lib/components/primitives/Fascinator.svelte"
+  import Center from "$lib/components/layouts/Center.svelte"
   import "$lib/styles/buttons.css";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
 </script>
 
 <MainHeader></MainHeader>
-<LeftRight>
-  <div class="main-child" slot="left">
+<Center>
+  <div class="main-child">
     <header>
       <h1>Why Am I Seeing This?</h1>
     </header>
@@ -53,9 +52,7 @@
     </section>
   </div>
   
-  
-  <Fascinator slot="right"></Fascinator>
-</LeftRight>
+</Center>
 <FooterNav></FooterNav>
 
 

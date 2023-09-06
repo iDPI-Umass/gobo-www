@@ -54,7 +54,7 @@ html.gobo-font-arial {
 
 /* Spacings */
 html {
-  --gobo-max-width-primary: 41rem;
+  --gobo-max-width-primary: 43rem;
   --gobo-width-spacer: 1.5625rem;
   --gobo-width-spacer-half: calc(0.5 * var(--gobo-width-spacer));
   --gobo-height-spacer: 1.3125rem;
