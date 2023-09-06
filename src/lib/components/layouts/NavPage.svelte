@@ -28,4 +28,11 @@
     overflow-y: scroll;
     padding: 4px;
   }
+
+  @media ( max-width: 680px ) {
+    main {
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
 </style>

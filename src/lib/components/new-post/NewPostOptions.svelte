@@ -77,7 +77,7 @@
     <h2>Identity Specific Options</h2>
     <p>
       Below are some options to configure your post. They will be applied as
-      appropriate when GOBO submits to each platform.
+      appropriate when Gobo submits to each platform.
     </p>
   </section>
   
@@ -129,7 +129,7 @@
         on:sl-input={handleOptionSubreddit}
         value={options.subreddit}
         label="Target Subreddit"
-        help-text="This is the subreddit where GOBO will submit your post."
+        help-text="This is the subreddit where Gobo will submit your post."
         size="medium">
       </sl-input>
 

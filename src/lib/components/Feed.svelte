@@ -77,20 +77,34 @@
 
 </script>
 
-<section bind:this={feed}>
+<section class="feed" bind:this={feed}>
   {#if posts.length > 0}
     {#each posts as post }
       <Post {...post}></Post>
     {/each}
   {:else}
-    <Spinner></Spinner>
+    <section class="gobo-copy">
+      <p>
+        Your feed is empty! Add or activate an identity to get started.
+      </p> 
+    </section>
   {/if}
 </section>
 
 <style>
-  section {
+  section.feed {
     overflow-y: scroll;
     padding: 2px;
     max-height: 100%;
+  }
+
+  @media ( max-width: 680px ) {
+    section.feed {
+      padding: 0;
+    }
+    .gobo-copy {
+      margin-left: var(--gobo-width-spacer-flex);
+      margin-right: var(--gobo-width-spacer-flex);
+    }
   }
 </style>

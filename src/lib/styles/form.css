@@ -77,3 +77,11 @@
 .gobo-form .buttons sl-button {
   margin-bottom: 0;
 }
+
+@media ( max-width: 680px ) {
+  .gobo-form {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+}

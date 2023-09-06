@@ -21,22 +21,24 @@
   
 <div class="main-child">
   <header>
-    <h1>Identities</h1>
+    <div class="header-row">
+      <h1>Identities</h1>
+      <nav>
+        <sl-button
+          href="/identities/add"
+          pill>
+          Add Identity
+        </sl-button>
+      </nav>
+    </div>
+    <section class="gobo-copy">
+      <p>
+        Control which identities you would like to include in your Gobo feed. 
+        You can add identities from Mastodon, Bluesky, and Reddit.
+      </p> 
+    </section>
   </header>
   
-  <nav>
-    <sl-button 
-      href="/identities/about"
-      pill>
-      About Identities
-    </sl-button>
-
-    <sl-button
-      href="/identities/add"
-      pill>
-      Add Identity
-    </sl-button>
-  </nav>
 
   {#await loadIdentities()}
   
@@ -61,6 +63,19 @@
 </div>
 
 <style>
+
+  .gobo-copy {
+    margin-bottom: var(--gobo-height-spacer);
+  }
+
+  .main-child > header {
+    flex-direction: column;
+  }
+
+  header nav {
+    margin-bottom: 0;
+  }
+
   nav {
     margin-bottom: 1rem;
     display: flex;
@@ -72,6 +87,10 @@
 
   nav > sl-button:first-child {
     margin-right: var(--gobo-width-spacer-flex);
+  }
+
+  header nav > sl-button:first-child {
+    margin-right: 0;
   }
 
   nav sl-button::part(base) {

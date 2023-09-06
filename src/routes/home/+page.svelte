@@ -10,7 +10,7 @@
 </script>
 
 <div class="main-child">
-  <header>
+  <header class="desktop">
     <h1>Home</h1>
     <sl-icon-button 
       src="/icons/gear.svg"
@@ -29,4 +29,18 @@
     max-width: unset;
     max-height: 100%;
   }
+  .desktop {
+    display: none;
+  }
+
+  @media ( min-width: 680px ) {
+    .desktop {
+      display: flex;
+    }
+  }
+  @media ( max-width: 680px ) {
+    .main-child {
+      padding: 0;
+    }
+}
 </style>

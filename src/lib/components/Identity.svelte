@@ -105,6 +105,14 @@
     border-radius: var(--gobo-border-radius);
   }
 
+  @media ( max-width: 680px ) {
+    section {
+      border-radius: 0;
+      border-left: none;
+      border-right: none;
+    }
+  }
+
   figure {
     margin: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex);
     display: flex;

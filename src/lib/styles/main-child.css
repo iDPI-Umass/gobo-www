@@ -27,6 +27,26 @@
   margin-bottom: var(--gobo-height-spacer);
 }
 
+@media ( max-width: 680px ) {
+  .main-child {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .main-child > header {
+    padding: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex) 0 var(--gobo-width-spacer-flex)
+  }
+}
+
+.main-child > header > .header-row  {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  max-width: var(--gobo-max-width-primary);
+  margin-bottom: var(--gobo-height-spacer);
+}
+
 .main-child > header h1 {
   font-size: var(--gobo-font-size-x-large);
   font-weight: var(--gobo-font-weight-black);

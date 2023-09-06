@@ -29,8 +29,4 @@
     font-size: var(--sl-font-size-x-large);
     font-weight: var(--sl-font-weight-bold);
   }
-
-  header {
-    margin-bottom: 2rem;
-  }
 </style>

@@ -15,9 +15,9 @@
 </script>
 
 <div class="main-child">
-  <h1>New Post</h1>
-
-  <sl-divider></sl-divider>
+  <header>
+    <h1>New Post</h1>
+  </header>
   
   <form class="gobo-form">
   
@@ -52,13 +52,6 @@
 
 
 <style>
-  h1 {
-    margin-bottom: var(--gobo-height-spacer-half);
-  }
-
-  sl-divider {
-    margin-bottom: var(--gobo-height-spacer);
-  }
 
   .gobo-form {
     margin-top: 0;

@@ -22,6 +22,13 @@
       <sl-icon slot="prefix" src="/icons/home.svg"></sl-icon>
     </sl-button>
 
+    <sl-button
+      pill
+      href="/new-post"
+      class="{current === "new post" ? "current" : ""}">
+      <sl-icon slot="prefix" src="/icons/pencil-square.svg"></sl-icon>
+    </sl-button>
+
     <!-- <sl-button
       <sl-icon slot="prefix" src="/icons/search.svg"></sl-icon>
       href="/search"></sl-button> -->
@@ -29,7 +36,7 @@
     <sl-button
       pill
       href="/identities"
-      class="{current === "identities" ? "current" : ""}">
+      class="{current === "identities" ? "current" : ""} identities">
       <sl-icon slot="prefix" src="/icons/identities.svg"></sl-icon>
     </sl-button>
 
@@ -38,13 +45,6 @@
       href="/settings"
       class="{current === "settings" ? "current" : ""}">
       <sl-icon slot="prefix" src="/icons/gear.svg"></sl-icon>
-    </sl-button>
-
-    <sl-button
-      pill
-      href="/new-post"
-      class="{current === "new post" ? "current" : ""}">
-      <sl-icon slot="prefix" src="/icons/pencil-square.svg"></sl-icon>
     </sl-button>
 
   </nav>
@@ -78,6 +78,7 @@
     margin: 12px;
     font-size: 26px;
     color: var(--gobo-color-text);
+    margin-top: 6px;
   }
 
   footer > nav > sl-button::part(base):hover,
@@ -112,6 +113,10 @@
   }
 
   nav > sl-button::part(prefix) {
+    font-size: 1.25rem; 
+  }
+
+  nav > sl-button.identities::part(prefix) {
     font-size: 1.625rem; 
   }
 

@@ -82,7 +82,7 @@
       <h2>Keyword Blocking</h2>
       <p>
         Control which words and phrases you would like to exclude from your 
-        GOBO feed. You can add phrases below or delete any listed in the table.
+        Gobo feed. You can add phrases below or delete any listed in the table.
       </p>
     </header>
     
@@ -132,7 +132,7 @@
     <sl-input
       name="word"
       label="Pattern"
-      help-text="GOBO will match against this text to block targeted content from your feed."
+      help-text="Gobo will match against this text to block content from your feed"
       autocomplete="off"
       size="medium">
     </sl-input>
@@ -168,5 +168,13 @@
 
   sl-select {
     max-width: 12rem;
+  }
+
+  @media ( max-width: 680px ) {
+    .gobo-copy {
+      border-radius: 0;
+      border-left: none;
+      border-right: none;
+    }
   }
 </style>

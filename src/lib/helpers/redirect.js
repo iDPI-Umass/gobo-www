@@ -36,17 +36,17 @@ const handleRootRedirect = async function () {
   const client = await getAuth0Client();
   if ( await client.isAuthenticated() !== true ) {
     // We can stop here. Send to login page.
+    // await toAuthenticationPage();
+  } else {
+    const account = await Account.getAccount();
+    if ( account.permissions.has("general") ) {
+      // This person is allowed access to application features. Redirect them home.
+      return goto( "/home" );
+    }
+  
+    // No further checks. Send to login page.
     await toAuthenticationPage();
   }
-
-  const account = await Account.getAccount();
-  if ( account.permissions.has("general") ) {
-    // This person is allowed access to application feature. Redirect them home.
-    return goto( "/home" );
-  }
-
-  // No further checks. Send to login page.
-  await toAuthenticationPage();
 }
 
 

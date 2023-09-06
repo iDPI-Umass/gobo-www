@@ -51,6 +51,12 @@
     max-width: calc( var(--gobo-max-width-primary) + (2 * var(--gobo-width-spacer-flex)) );
   }
 
+  @media ( max-width: 680px ) {
+    main {
+      padding: 0;
+    }
+  }
+
   aside {
     display: none;
   }

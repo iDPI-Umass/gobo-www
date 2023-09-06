@@ -18,26 +18,15 @@
 <LeftRight>
   <div slot="left" class="main-child">
     <header>
-      <h1>GOBO Is In Closed Beta</h1>
+      <h1>Gobo is in a Closed Beta</h1>
     </header>
 
     <section class="gobo-copy">
       <p>
-        We need copy here to indicate that this person, who successfully authenticated,
-        does not have permissions associated with the closed testing phase.
-        Because the application will not function for them, we should not show
-        them dynamic pages that rely on API acccess.
-      </p>
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim 
-        veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea 
-        commodo consequat.
-      </p>
-      <p>
-        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum 
-        dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non 
-        proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+        We are currently testing Gobo with a small group of trusted friends and colleagues. 
+        We’ve saved your account information for when we open up Gobo to the public. 
+        If you think you should have access, please reach out to us. 
+        Thank you for your interest!
       </p>
 
       <nav>
@@ -59,5 +48,8 @@
 
 
 <style>
+  .gobo-copy nav {
+    justify-content: flex-start;
+  }
 
 </style>

@@ -53,7 +53,7 @@
 
 <h2>Publish</h2>
 <p>
-  Publish your post. GOBO will issue requests to each of the platforms 
+  Publish your post. Gobo will issue requests to each of the platforms 
   you specified.
 </p>
 

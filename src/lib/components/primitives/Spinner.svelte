@@ -12,6 +12,7 @@
     max-width:  36rem;
     display: flex;
     justify-content: center;
+    align-self: center;
     margin: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex);
   }
 

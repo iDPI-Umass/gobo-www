@@ -66,7 +66,7 @@
   <form class="gobo-form">
     <h2>Dark Mode</h2>
     <p>
-      Dark Mode is GOBO's light-on-dark color scheme. By default, GOBO tries
+      Dark Mode is Gobo's light-on-dark color scheme. By default, Gobo tries
       to respect the preference set in your operating system, but you can
       configure it directly here.
     </p>
@@ -98,13 +98,13 @@
     <h2>Text Size</h2>
     <p>
       Adjust the text size according to your preference. Changes will be
-      applied throughout the GOBO interface.
+      applied throughout the Gobo interface.
     </p>
     
 
     <sl-radio-group bind:this={fontSizeGroup} name="fontSize" value="{fontSizeState}">
       <sl-radio value="1" size="medium">Smallest</sl-radio>
-      <sl-radio value="2" size="medium">Samller</sl-radio>
+      <sl-radio value="2" size="medium">Smaller</sl-radio>
       <sl-radio value="3" size="medium">Medium</sl-radio>
       <sl-radio value="4" size="medium">Larger</sl-radio>
       <sl-radio value="5" size="medium">Largest</sl-radio>

@@ -77,6 +77,12 @@
     align-items: center;
   }
 
+  @media ( max-width: 680px ) {
+    nav {
+      padding: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex) 0 var(--gobo-width-spacer-flex)
+    }
+  }
+
   nav > sl-button {
     margin-right: var(--gobo-width-spacer-flex);
     margin-bottom: var(--gobo-height-spacer-flex);
@@ -100,7 +106,7 @@
   }
 
   nav sl-button sl-icon.identity-label {
-    font-size: 1.75rem;
+    font-size: 1.625rem;
   }
 
   nav sl-button sl-icon.lens-label {

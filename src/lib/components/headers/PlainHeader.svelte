@@ -1,7 +1,7 @@
 <header>
   <nav>
     <a class="logo" href="/">
-      <img src="/images/gobo-logo.svg" alt="Main logo for the GOBO application">
+      <img src="/images/gobo-logo.svg" alt="Main logo for the Gobo application">
     </a>
   </nav>
 </header>

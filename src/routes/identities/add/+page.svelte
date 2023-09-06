@@ -30,6 +30,9 @@
           if ( !baseURL.startsWith("https://") ) {
             baseURL = `https://${ baseURL }`;
           }
+          const domain = baseURL.replace("https://", "");
+          const domainComponents = domain.split("/");
+          baseURL = `https://${ domainComponents[0] }`
           break;
         case "reddit":
           baseURL = "https://www.reddit.com";
@@ -104,15 +107,9 @@
     <h2>Select Platform</h2>
 
     <p>
-      GOBO can connect an identity for you once you grant consent. When you 
-      press "Add Identity" below, you will be sent to the social media platform
-      that hosts the identity. Once there, please sign in and authorize GOBO to
-      connect your new identity.
-    </p>
-      
-    <p>
-      If you would like to learn more about identies,
-      please see <a href="/identities/about">About Identities</a>.
+      When you press "Add Identity" below, you will be sent to the social media platform
+      that hosts your identity. Once there, please authorize Gobo to
+      connect your identity.
     </p>
 
     <sl-select
@@ -130,7 +127,7 @@
       <sl-input
         name="blueskyLogin"
         label="Bluesky Username"
-        help-text="Your full name, like gobo.bsky.social, or your abreviated name, like gobo"
+        help-text="Your full name, like gobo.bsky.social, or your abbreviated name, like gobo"
         autocomplete="off"
         size="medium">
       </sl-input>
@@ -138,7 +135,7 @@
       <sl-input
         name="blueskySecret"
         label="Bluesky Secret"
-        help-text='This is an special "App Password" you create just for GOBO. Do NOT use your regular password'
+        help-text='On Bluesky, go to Settings > App Passwords and click "Add App Password" to get a secret for Gobo'
         autocomplete="off"
         password
         size="medium">
@@ -149,8 +146,8 @@
     {#if targetingMastodon === true}
       <sl-input
         name="mastodonURL"
-        label="Mastodon URL"
-        help-text="This is the URL of your Mastodon server."
+        label="Mastodon Server URL"
+        help-text="For example, https://mastodon.social"
         autocomplete="off"
         size="medium">
       </sl-input>

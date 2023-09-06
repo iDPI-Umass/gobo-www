@@ -1,5 +1,5 @@
 # gobo-www
-Web Client Frontend for the GOBO Project
+Web Client Frontend for the Gobo Project
 
 
 ## Developing
@@ -36,7 +36,7 @@ AWS_PROFILE=idpi npx gulp publish --environment=production-www
 AWS_PROFILE=idpi npx gulp deploy --environment=production-www
 ```
 
-### CloudFront Distribution for GOBO API
+### CloudFront Distribution for Gobo API
 ```bash
 AWS_PROFILE=idpi npx gulp deploy --environment=production-api
 ```

@@ -1,63 +1,58 @@
 <script>
   import PlainHeader from "$lib/components/headers/PlainHeader.svelte"
-  import LeftRight from "$lib/components/layouts/LeftRight.svelte"
-  import Fascinator from "$lib/components/primitives/Fascinator.svelte"
+  import CenterAlt from "$lib/components/layouts/CenterAlt.svelte"
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import { getAuth0Client } from "$lib/helpers/auth0.js";
 
-  const redirect = async function ( event ) {
+  const login = async function ( event ) {
     event.preventDefault();
     const client = await getAuth0Client();
-    client.loginWithRedirect()
+    client.loginWithRedirect();
+  };
+
+  const signup = async function ( event ) {
+    event.preventDefault();
+    const client = await getAuth0Client();
+    client.loginWithRedirect({ authorizationParams: { screen_hint: "signup" } });
   };
 </script>
 
 <PlainHeader></PlainHeader>
-<LeftRight>
-  <section slot="left" class="outer-section">
-    <h1>GOBO Public Homepage</h1>
-    <section class="button-column">
+<CenterAlt>
+  <section>
+    <h1>A loyal social media client</h1>
+    <section class="buttons">
       <sl-button
         variant="primary"
         size=medium
-        on:click={redirect}
-        on:keypress={redirect}>
-        Login
+        on:click={login}
+        on:keypress={login}>
+        Log in
       </sl-button>
 
       <sl-button
         variant="primary"
         size=medium
-        href="/home">
-        Home
+        on:click={signup}
+        on:keypress={signup}>
+        Sign up
       </sl-button>
     </section>
   </section>
   
-  <Fascinator slot="right"></Fascinator>
-</LeftRight>
+</CenterAlt>
 
 
 
 
 <style>
-  .outer-section {
-    max-width: 36rem;
-  }
-
-  .outer-section h1 {
-    margin-bottom: 2rem;
-  }
-
-  .outer-section .button-column {
+  .buttons {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     flex-wrap: nowrap;
-    justify-content: flex-start;
-    align-items: flex-start;
-  }
-
-  .outer-section .button-column sl-button {
-    margin: 0 0 1rem 0;
+    justify-content: center;
+    gap: 1rem;
+    align-items: center;
+    margin-top: 2rem;
   }
 </style>

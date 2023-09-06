@@ -3,14 +3,12 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import ProfileBadge from "$lib/components/primitives/ProfileBadge.svelte"
-  import VerticalNav from "$lib/components/primitives/VerticalNav.svelte";
-  import NavLink from "$lib/components/primitives/NavLink.svelte";
 </script>
 
 <header class="desktop">
   <nav>
     <a class="logo" href="/home">
-      <img src="/images/gobo-logo.svg" alt="Main logo for the GOBO application">
+      <img src="/images/gobo-logo.svg" alt="Main logo for the Gobo application">
     </a>
     <div class="spacer" aria-hidden=true ></div>
     <ProfileBadge></ProfileBadge>
@@ -20,7 +18,7 @@
 <header class="mobile">
   <nav>
     <a class="logo" href="/home">
-      <img src="/images/gobo-logo.svg" alt="Main logo for the GOBO application">
+      <img src="/images/gobo-logo.svg" alt="Main logo for the Gobo application">
     </a>
   </nav>
 </header>

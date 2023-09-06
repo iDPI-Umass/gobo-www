@@ -296,6 +296,15 @@
     cursor: var(--cursor);
   }
 
+  @media ( max-width: 680px ) {
+    .outer-frame {
+      border-radius: 0;
+      border-left: none;
+      border-right: none;
+      margin-bottom: calc(var(--gobo-height-spacer) / 2)
+    }
+  }
+
   .outer-frame:focus-visible {
     outline: 2px solid var(--gobo-color-primary);
   }

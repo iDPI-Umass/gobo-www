@@ -7,7 +7,9 @@
 
   onMount( function () {
     unsubscribeProfileStore = profileStore.subscribe( function ( profile ) {
-      name = profile.name;
+      if ( profile.name != null ) {
+        name = profile.name;
+      }
     });
   });
 
@@ -16,18 +18,32 @@
   });
 </script>
 
-<span class="profile-badge">
-  {name}
-</span>
+<nav>
+  <sl-button
+    href="/settings"
+    pill>
+    {name}
+  </sl-button>
+</nav>
 
 <style>
-  .profile-badge {
-    min-width: max-content;
-    font-size: 0.9375rem;
-    font-weight: var(--gobo-font-weight-bold);
-    color: var(--gobo-color-text);
-    text-decoration: none;
+  nav {
     margin-right: 3.5rem;
-    flex: 1 0 0%;
   }
+  
+  nav sl-button::part(base) {
+    height: 2.1875rem;
+    background-color: var(--gobo-color-panel);
+    border: var(--gobo-border-panel);
+    color: var(--gobo-color-button-lens);
+  }
+
+  nav sl-button::part(label) {
+    font-size: var(--gobo-font-size-detail);
+    font-weight: var(--gobo-font-weight-medium);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
 </style>
