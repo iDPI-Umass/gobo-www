@@ -106,12 +106,6 @@
     
     <h2>Select Platform</h2>
 
-    <p>
-      When you press "Add Identity" below, you will be sent to the social media platform
-      that hosts your identity. Once there, please authorize Gobo to
-      connect your identity.
-    </p>
-
     <sl-select
       bind:this={select}
       name="platform"
@@ -127,7 +121,7 @@
       <sl-input
         name="blueskyLogin"
         label="Bluesky Username"
-        help-text="Your full name, like gobo.bsky.social, or your abbreviated name, like gobo"
+        help-text="Your full username, like gobo.bsky.social, or your abbreviated username, like gobo"
         autocomplete="off"
         size="medium">
       </sl-input>
@@ -152,8 +146,6 @@
         size="medium">
       </sl-input>
     {/if}
-
-    <sl-divider class="gobo-divider"></sl-divider>
 
     <sl-button
       bind:this={button}

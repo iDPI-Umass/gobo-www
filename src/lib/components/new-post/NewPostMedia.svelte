@@ -218,4 +218,9 @@
   .table-row sl-icon-button {
     margin-left: 1rem;
   }
+
+  .buttons {
+    border-top: none;
+    padding-top: 0;
+  }
 </style>

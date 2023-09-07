@@ -10,6 +10,7 @@
 
   let feed, engine;
   let posts = [];
+  let loaded = false;
 
   const pull = async function ( count, marker ) {
     const current = await engine.pull( count, marker );
@@ -26,6 +27,7 @@
     if ( posts.length === 0 ) {
       await pull( 25 );
     }
+    loaded = true;
     await tick();
     feed.scrollTo( 0, FeedSaver.getScrollPosition() );
   };  
@@ -82,7 +84,7 @@
     {#each posts as post }
       <Post {...post}></Post>
     {/each}
-  {:else}
+  {:else if loaded && posts.length === 0 }
     <section class="gobo-copy">
       <p>
         Your feed is empty! Add or activate an identity to get started.

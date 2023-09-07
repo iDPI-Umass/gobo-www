@@ -75,10 +75,6 @@
 {#if hasMastodon || hasReddit }
   <section class="panel">
     <h2>Identity Specific Options</h2>
-    <p>
-      Below are some options to configure your post. They will be applied as
-      appropriate when Gobo submits to each platform.
-    </p>
   </section>
   
   
@@ -108,7 +104,7 @@
         on:sl-input={handleOptionSpoilerText}
         value={options.spoilerText}
         label="Spoiler Text"
-        help-text="Provide text that will contextualize content behind warning."
+        help-text="Provide text that contextualizes content behind warning."
         autocomplete="off"
         size="medium">
       </sl-input>

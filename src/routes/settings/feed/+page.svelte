@@ -82,7 +82,7 @@
       <h2>Keyword Blocking</h2>
       <p>
         Control which words and phrases you would like to exclude from your 
-        Gobo feed. You can add phrases below or delete any listed in the table.
+        Gobo feed. You can add keywords below or delete any listed in the table.
       </p>
     </header>
     

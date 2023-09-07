@@ -61,8 +61,7 @@
 <h2>Choose Identities</h2>
       
 <p>
-  Select the identities below you'd like to use to create this post. Gobo
-  will submit posts to these platforms on your behalf.
+  Select the identities you'd like to use to publish this post.
 </p>
 
 

@@ -53,8 +53,7 @@
 
 <h2>Publish</h2>
 <p>
-  Publish your post. Gobo will issue requests to each of the platforms 
-  you specified.
+  Gobo will issue requests to each of the identities you specified.
 </p>
 
 <div class="buttons">
@@ -90,6 +89,8 @@
     justify-content: space-between;
     align-items: center;
     margin-top: 2rem;
+    border-top: none;
+    padding-top: 0;
   }
 
   .buttons sl-button {
