@@ -164,8 +164,4 @@
     width: 10rem;
     align-self: flex-start;
   }
-
-  .gobo-form sl-divider {
-    margin-bottom: 1rem;
-  }
 </style>

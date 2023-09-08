@@ -34,7 +34,7 @@
     <section class="gobo-copy">
       <p>
         Control which identities you would like to include in your Gobo feed. 
-        You can add identities from Mastodon, Bluesky, and Reddit.
+        You can add identities from Bluesky, Mastodon, and Reddit.
       </p> 
     </section>
   </header>
@@ -48,7 +48,7 @@
 
     <section class="identities">
       {#if allEmpty === true}
-        <p>No identities currently registered.</p>
+        <p>Add an identity to get started!</p>
       {/if}
 
       {#each identities as identity (identity.key)}  
