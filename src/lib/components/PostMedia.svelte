@@ -45,8 +45,7 @@
           </video>
       {/if}
       </figure>
-      
-    </a>
+    </a>    
 
   {:else if attachments.length === 2}
     <div class="media">
@@ -266,11 +265,6 @@
 <style>
 
 
-  .media {
-    /* Must be an even number */
-    --gap: 10px;
-  }
-
   figure {
     margin: 0;
     padding: 0;
@@ -293,9 +287,9 @@
     border-radius: var(--gobo-border-radius);
   }
 
-
-
   .media {
+    /* Must be an even number */
+    --gap: 10px;
     position: relative;
     height: min( 40vw, 284px );
     max-width: 36rem;

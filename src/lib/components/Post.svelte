@@ -7,6 +7,7 @@
   import PostPoll from "$lib/components/PostPoll.svelte";
   import PostShared from "$lib/components/PostShared.svelte";
   import PostReplied from "$lib/components/PostReplied.svelte";
+  import PostActions from "$lib/components/PostActions.svelte";
   import { humanize } from "$lib/helpers/humanize.js";
   import { render } from "$lib/helpers/markdown.js";
   import { goto } from "$app/navigation";
@@ -30,6 +31,7 @@
   export let updated;
 
   export let fullPage = false;
+
 
   let unused = [ platform_id, visibility, created, updated ];
 
@@ -70,6 +72,13 @@
       sharedPosts.push( post );
     }
   }
+
+  // Correct errors in graph that produce multiple shares.
+  // TODO: Look for errors in either feed response constructor or feed intermediary constructor.
+  if ( sharedPosts.length > 1 ) {
+    sharedPosts = [ sharedPosts[0] ];
+  }
+
 
   let repliedPost = null;
   if ( reply != null ) {
@@ -248,8 +257,14 @@
       {/if}
 
       {#each sharedPosts as post}
-        <PostShared {...post}></PostShared>
+        <PostShared 
+          {...post}
+          marginTop={renderedContent ? "2rem" : "0"}
+          >
+        </PostShared>
       {/each}
+
+      <PostActions {platform}></PostActions>
 
     </div>
 
@@ -397,7 +412,7 @@
   .outer-frame .inner-frame .main .content {
     max-height: var(--max-height);
     overflow-y: hidden;
-    margin-bottom: var(--gobo-height-spacer);
+    margin-bottom: 0;
     mask-image: var(--gradient);
     -webkit-mask-image: var(--gradient)
   }
@@ -421,6 +436,9 @@
     font-weight: var(--gobo-font-weight-regular);
     margin-bottom: 1rem;
   }
+  .outer-frame .inner-frame .main .content :global(p:last-of-type) {
+    margin-bottom: 0;
+  }
 
   .outer-frame .inner-frame .main .content :global(a) {
     position: relative;
@@ -433,7 +451,8 @@
 
   .outer-frame .inner-frame .main .media,
   .outer-frame .inner-frame .main .poll {
-    margin-bottom: 1rem;
+    margin-bottom: 0;
+    margin-top: var(--gobo-height-spacer);
   }
 
   .outer-frame .inner-frame .main .media :global(a) {

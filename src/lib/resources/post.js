@@ -28,6 +28,9 @@ const getPost = async function ( id ) {
   for ( const post of result.posts ) {
     posts[ post.id ] = post;
   }
+  for ( const reply of result.replies ) {
+    posts[ reply[0] ].reply = reply[1];
+  }
   for ( const share of result.shares ) {
     posts[ share[0] ].shares ??= [];
     posts[ share[0] ].shares.push( share[1] );

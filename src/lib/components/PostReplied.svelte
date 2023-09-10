@@ -6,6 +6,7 @@
   import PostSyndication from "$lib/components/PostSyndication.svelte";
   import PostPoll from "$lib/components/PostPoll.svelte";
   import PostShared from "$lib/components/PostShared.svelte";
+  import PostActions from "$lib/components/PostActions.svelte";
   import { humanize } from "$lib/helpers/humanize.js";
   import { render } from "$lib/helpers/markdown.js";
   import { goto } from "$app/navigation";
@@ -70,6 +71,13 @@
     }
   }
 
+  // Correct errors in graph that produce multiple shares.
+  // TODO: Look for errors in either feed response constructor or feed intermediary constructor.
+  if ( sharedPosts.length > 1 ) {
+    sharedPosts = [ sharedPosts[0] ];
+  }
+
+  
   let sourceCopy;
   switch ( platform ) {
     case "bluesky":
@@ -235,8 +243,18 @@
       {/if}
 
       {#each sharedPosts as post}
-        <PostShared {...post}></PostShared>
+        <PostShared 
+          {...post}
+          marginTop={renderedContent ? "2rem" : "0"}
+          >
+        </PostShared>
       {/each}
+
+      <PostActions 
+        {platform}
+        marginBottom="1rem"
+        >
+      </PostActions>
 
     </div>
 
@@ -335,7 +353,7 @@
   .inner-frame .main .content {
     max-height: var(--max-height);
     overflow-y: hidden;
-    margin-bottom: var(--gobo-height-spacer);
+    margin-bottom: 0;
     mask-image: var(--gradient);
     -webkit-mask-image: var(--gradient)
   }

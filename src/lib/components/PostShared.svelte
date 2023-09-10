@@ -26,6 +26,8 @@
   export let visibility = null;
   export let created;
   export let updated;
+  export let marginTop = "0";
+  export let terminal = false;
 
   export let fullPage = false;
 
@@ -56,14 +58,24 @@
   }
 
   let sharedPosts = [];
-  for ( const item of shares ) {
-    const post = Cache.getPost( item );
-    if ( post == null ) {
-      console.error(`expected post ${item}, but it appears to be missing from graph`);
-    } else {
-      sharedPosts.push( post );
+  // Prevent graph sprawl in feed.
+  if ( terminal !== true ) {
+    for ( const item of shares ) {
+      const post = Cache.getPost( item );
+      if ( post == null ) {
+        console.error(`expected post ${item}, but it appears to be missing from graph`);
+      } else {
+        sharedPosts.push( post );
+      }
+    }
+
+    // Correct errors in graph that produce multiple shares.
+    // TODO: Look for errors in either feed response constructor or feed intermediary constructor.
+    if ( sharedPosts.length > 1 ) {
+      sharedPosts = [ sharedPosts[0] ];
     }
   }
+
 
   let sourceCopy;
   switch ( platform ) {
@@ -180,7 +192,7 @@
   on:keydown={handleClick}>
 
 
-  <div class="inner-frame">
+  <div class="inner-frame" style:--margin-top="{marginTop}">
     <div class="main">
       
       <header>
@@ -225,7 +237,7 @@
       {/if}
 
       {#each sharedPosts as post}
-        <svelte:self {...post}/>
+        <svelte:self {...post} marginTop="2rem" terminal={true}/>
       {/each}
 
     </div>
@@ -245,9 +257,7 @@
     align-items: stretch;
     max-width: var(--gobo-max-width-primary);
     background: var(--gobo-color-panel);
-    border: var(--gobo-border-panel);
-    border-radius: var(--gobo-border-radius);
-    margin-bottom: var(--gobo-height-spacer);
+    margin-bottom: 0;
     box-sizing: border-box;
     cursor: var(--cursor);
   }
@@ -268,7 +278,9 @@
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: stretch;
-    margin: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex) 0 var(--gobo-width-spacer-flex);
+    margin-top: var(--margin-top);
+    border-left: 4px solid var(--gobo-color-text);
+    padding-left: var(--gobo-width-spacer-half);
   }
 
 
@@ -342,9 +354,14 @@
   .outer-frame .inner-frame .main .content {
     max-height: var(--max-height);
     overflow-y: hidden;
-    margin-bottom: var(--gobo-height-spacer);
+    margin-bottom: 0;
     mask-image: var(--gradient);
     -webkit-mask-image: var(--gradient)
+  }
+
+  .outer-frame .inner-frame .main .media,
+  .outer-frame .inner-frame .main .poll {
+    margin-top: var(--gobo-height-spacer);
   }
 
   .outer-frame .inner-frame .main .content :global(h2) {
@@ -373,12 +390,6 @@
 
   .outer-frame .inner-frame .main .content :global(:last-child) {
     margin-bottom: 0;
-  }
-
-
-  .outer-frame .inner-frame .main .media,
-  .outer-frame .inner-frame .main .poll {
-    margin-bottom: 1rem;
   }
 
   .outer-frame .inner-frame .main .media :global(a) {

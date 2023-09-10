@@ -35,3 +35,14 @@ sl-button.action::part(label),
 sl-button.action:hover::part(label) {
   color: var(--gobo-color-active-text);
 }
+
+sl-button.hollow::part(base),
+sl-button.hollow:hover::part(base) {
+  background: var(--gobo-color-panel);
+  border: 1px solid var(--gobo-color-text);
+}
+
+sl-button.hollow::part(label),
+sl-button.hollow:hover::part(label) {
+  color: var(--gobo-color-text);
+}
