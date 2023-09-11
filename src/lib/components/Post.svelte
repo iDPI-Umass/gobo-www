@@ -236,7 +236,8 @@
     <PostReplied 
       {identity} 
       centerID={id}
-      {...repliedPost}>
+      {...repliedPost}
+      {fullPage}>
     </PostReplied>
   {/if}
 
@@ -293,7 +294,7 @@
           centerID={id}
           {...post}
           marginTop={renderedContent ? "2rem" : "0"}
-          >
+          {fullPage}>
         </PostShared>
       {/each}
 

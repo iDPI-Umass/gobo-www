@@ -54,21 +54,28 @@ const getPost = async function ({ identity, id }) {
   return posts[ result.feed[0] ];
 };
 
-const buildMetadata = function ( identity, options ) {
+const buildMetadata = function ( identity, draft ) {
+  const { options } = draft;
+
   switch ( identity.type ) {
     case "bluesky":
-      return {};
+      return {
+        reply: draft.reply?.data ?? undefined,
+        quote: draft.quote?.data ?? undefined
+      };
     case "mastodon":
       return {
         sensitive: options.sensitive,
-        spoiler: options.spoilerText
+        spoiler: options.spoilerText,
+        reply: draft.reply?.data ?? undefined
       }
     case "reddit":
       return {
         title: options.title,
         subreddit: options.subreddit,
         nsfw: options.sensitive,
-        spoiler: options.spoiler
+        spoiler: options.spoiler,
+        reply: draft.reply?.data ?? undefined
       }
     default:
       throw new Error("unknown platform type");
@@ -95,10 +102,12 @@ const publish = async function ( draft ) {
 
   const targets = [];
   for ( const identity of draft.identities ) {
-    targets.push({
-      identity: identity.id,
-      metadata: buildMetadata( identity, options )
-    });
+    if ( identity.active === true ) {
+      targets.push({
+        identity: identity.id,
+        metadata: buildMetadata( identity, draft )
+      });
+    }
   }
 
   const client = await getGOBOClient();

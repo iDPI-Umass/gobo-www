@@ -22,7 +22,7 @@ const isVideo = function ( value ) {
 const emptyDraft = function () {
   return {
     identities: [],
-    identitiesLoaded: false,
+    identitiesLoaded: "start",
     attachments: [],
     options: {
       spoiler: false,
@@ -32,7 +32,9 @@ const emptyDraft = function () {
       title: null,
       subreddit: null
     },
-    content: null
+    content: null,
+    reply: null,
+    quote: null
   };
 };
 

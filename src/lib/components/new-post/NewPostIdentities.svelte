@@ -4,24 +4,26 @@
   import Spinner from "$lib/components/primitives/Spinner.svelte";
   import { draftStore } from "$lib/stores/post-draft.js";
   import { onMount } from "svelte";
+  import { get } from "svelte/store";
   import * as Identity from "$lib/resources/identity.js";
 
   let identities = [];
+  let identityLock = null;
   let allEmpty = true;
 
   const loadIdentities = async function () {
-    const _identities = await Identity.list();
+    const identities = await Identity.list();
+    const draft = get( draftStore );
     
-    // Merge in the active state from the draft store, but take in the freshest values for other fields.
-    for ( const _identity of _identities ) {
-      const match = identities.find( i => i.key === _identity.key );
+    // Merge in the "active" state from the draft store, with fresh API data.
+    for ( const identity of identities ) {
+      const match = draft.identities.find( i => i.key === identity.key );
       if ( match != null ) {
-        _identity.active = match.active;
-      } 
+        identity.active = match.active;
+      }
     }
- 
-    identities = _identities;
-    draftStore.update({ identities, identitiesLoaded: true });
+    
+    draftStore.update({ identities, identitiesLoaded: "ready" });
   };
 
   const handleIdentitySwitch = function ( identity ) {
@@ -38,16 +40,31 @@
         draftStore.clear();
         return;
       }
-      
-      identities = draft.identities;
-      if ( draft.identitiesLoaded === false ) {
+      if ( draft.identitiesLoaded === "start" ) {
+        draftStore.update({ identities, identitiesLoaded: "waiting" });
         await loadIdentities();
+        return;
       }
-
+      if ( draft.identitiesLoaded === "waiting" ) {
+        // Not yet ready to process identities.
+        return;
+      }
+      
+      // We have a fresh list of identities from API. We're ready to process.
+      identities = draft.identities;
       if ( identities.length === 0 ) {
         allEmpty = true;
       } else {
         allEmpty = false;
+      }
+
+
+      // In this case, we're not allowed to cross-post.
+      identityLock = draft.reply?.identity ?? draft.quote?.identity;
+      if ( identityLock != null ) {
+        for ( const identity of identities ) {
+          identity.active = identity.id === identityLock;
+        }
       }
     });
 
@@ -64,35 +81,45 @@
   Select the identities you'd like to use to publish this post.
 </p>
 
-
-{#if allEmpty == true}
-
+{#await loadIdentities()}
   <Spinner></Spinner>
+{:then}
 
-{:else}
-  
-  {#each identities as identity (identity.key)}
-    <div class="identity">
-      
-      <div class="label">
-        <sl-icon 
-          src="/icons/{identity.type}.svg" 
-          class="{identity.type}"
+  {#if allEmpty == true}
+
+    <p>No identities currently registered.</p>
+
+  {:else}
+
+    {#each identities as identity (identity.key)}
+      <div class="identity">
+        
+        <div class="label">
+          <sl-icon 
+            src="/icons/{identity.type}.svg" 
+            class="{identity.type}"
+            size="medium">
+          </sl-icon>
+          {identity.prettyName}
+        </div>
+
+        <sl-switch
+          checked={identity.active}
+          disabled={identityLock}
+          on:sl-change={handleIdentitySwitch( identity )}
           size="medium">
-        </sl-icon>
-        {identity.prettyName}
+        </sl-switch>
+        
       </div>
+    {/each}
 
-      <sl-switch
-        checked={identity.active}
-        on:sl-change={handleIdentitySwitch( identity )}
-        size="medium">
-      </sl-switch>
-      
-    </div>
-  {/each}
+  {/if}
 
-{/if}
+{:catch}
+  <p>There fetching your identities.</p>
+{/await}
+
+
  
 <style>
   .identity {
