@@ -233,7 +233,11 @@
   on:keydown={handleClick}>
 
   {#if repliedPost}
-    <PostReplied {identity} {...repliedPost}></PostReplied>
+    <PostReplied 
+      {identity} 
+      centerID={id}
+      {...repliedPost}>
+    </PostReplied>
   {/if}
 
   <div class="inner-frame">
@@ -269,7 +273,7 @@
 
       {#if mediaEmbeds.length > 0}
         <div class="media">
-          <PostMedia {id} attachments={mediaEmbeds}></PostMedia>
+          <PostMedia {identity} {id} attachments={mediaEmbeds}></PostMedia>
         </div>
       {:else if textEmbeds.length > 0}
         <div class="text-embed">
@@ -284,7 +288,9 @@
       {/if}
 
       {#each sharedPosts as post}
-        <PostShared 
+        <PostShared
+          {identity} 
+          centerID={id}
           {...post}
           marginTop={renderedContent ? "2rem" : "0"}
           >

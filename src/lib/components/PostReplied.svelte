@@ -14,6 +14,7 @@
 
   export let identity;
 
+  export let centerID;
   export let id;
   export let source_id;
   export let base_url;
@@ -202,7 +203,7 @@
     }
 
     // Go to the post's main page.
-    goto( `/post/${ identity }/${ id }`);
+    goto( `/post/${ identity }/${ centerID }`);
   }
 
 </script>
@@ -255,7 +256,7 @@
 
       {#if mediaEmbeds.length > 0}
         <div class="media">
-          <PostMedia {id} attachments={mediaEmbeds}></PostMedia>
+          <PostMedia {identity} {id} attachments={mediaEmbeds}></PostMedia>
         </div>
       {:else if textEmbeds.length > 0}
         <div class="text-embed">
@@ -270,7 +271,9 @@
       {/if}
 
       {#each sharedPosts as post}
-        <PostShared 
+        <PostShared
+          {identity} 
+          centerID={centerID}
           {...post}
           marginTop={renderedContent ? "2rem" : "0"}
           >

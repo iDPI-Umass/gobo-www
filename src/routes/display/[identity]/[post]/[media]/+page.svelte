@@ -6,12 +6,13 @@
   import { getPost } from "$lib/resources/post.js";
   
   export let data;
+  let { identity, post: id, media: mediaID } = data.bindings;
   
   let post, media;
 
   const loadMedia = async function () {
-    post = await getPost( data.bindings.post );
-    media = post?.attachments[ Number(data.bindings.media) ];
+    post = await getPost({ identity, id });
+    media = post?.attachments[ Number(mediaID) ];
     if ( media == null ) {
       media = {};
     }

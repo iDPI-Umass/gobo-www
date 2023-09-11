@@ -1,6 +1,7 @@
 <script>
   import { isImage, isVideo } from "$lib/helpers/type.js";
 
+  export let identity;
   export let id;
   export let attachments = [];
 
@@ -24,7 +25,7 @@
 
 
   {#if attachments.length === 1}
-    <a href="{`/display/${id}/0`}">
+    <a href="{`/display/${ identity }/${ id }/0`}">
       <figure>
         {#if isImage( attachments[0] )}
           <img 
@@ -50,7 +51,7 @@
   {:else if attachments.length === 2}
     <div class="media">
       <div class="left">
-        <a href="{`/display/${id}/0`}">
+        <a href="{`/display/${ identity }/${ id }/0`}">
           <figure>
             {#if isImage( attachments[0] )}
               <img 
@@ -72,7 +73,7 @@
       </div>
 
       <div class="right">
-        <a href="{`/display/${id}/1`}">
+        <a href="{`/display/${ identity }/${ id }/1`}">
           <figure>
             {#if isImage( attachments[1] )}
               <img 
@@ -97,7 +98,7 @@
   {:else if attachments.length === 3}
     <div class="media">
       <div class="left">
-        <a href="{`/display/${id}/0`}">
+        <a href="{`/display/${ identity }/${ id }/0`}">
           <figure>
             {#if isImage( attachments[0] )}
               <img 
@@ -120,7 +121,7 @@
 
       <div class="right">
         <div class="top">
-          <a href="{`/display/${id}/1`}">
+          <a href="{`/display/${ identity }/${ id }/1`}">
             <figure>
               {#if isImage( attachments[1] )}
                 <img 
@@ -142,7 +143,7 @@
         </div>
 
         <div class="bottom">
-          <a href="{`/display/${id}/2`}">
+          <a href="{`/display/${ identity }/${ id }/2`}">
             <figure>
               {#if isImage( attachments[2] )}
                 <img 
@@ -169,7 +170,7 @@
     <div class="media">
       <div class="left">
         <div class="top">
-          <a href="{`/display/${id}/0`}">
+          <a href="{`/display/${ identity }/${ id }/0`}">
             <figure>
               {#if isImage( attachments[0] )}
                 <img 
@@ -191,7 +192,7 @@
         </div>
 
         <div class="bottom">
-          <a href="{`/display/${id}/2`}">
+          <a href="{`/display/${ identity }/${ id }/2`}">
             <figure>
               {#if isImage( attachments[2] )}
                 <img 
@@ -215,7 +216,7 @@
 
       <div class="right">
         <div class="top">
-          <a href="{`/display/${id}/1`}">
+          <a href="{`/display/${ identity }/${ id }/1`}">
             <figure>
               {#if isImage( attachments[1] )}
                 <img 
@@ -237,7 +238,7 @@
         </div>
 
         <div class="bottom">
-          <a href="{`/display/${id}/3`}">
+          <a href="{`/display/${ identity }/${ id }/3`}">
             <figure>
               {#if isImage( attachments[3] )}
                 <img 

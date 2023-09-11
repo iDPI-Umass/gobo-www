@@ -10,6 +10,9 @@
   import { goto } from "$app/navigation";
   import { Cache } from "$lib/resources/cache.js";
 
+  export let identity;
+  export let centerID;
+
   export let id;
   export let source_id;
   export let base_url;
@@ -151,6 +154,26 @@
     }
   }
 
+  const hasButtonParent = function ( element ) {
+    if ( element.parentNode.tagName === "SL-BUTTON" ) {
+      return true;
+    } else if ( element.parentNode.tagName === "ARTICLE" ) {
+      return false;
+    } else {
+      return hasButtonParent( element.parentNode );
+    }
+  };
+
+  const isButton = function ( element ) {
+    if ( element.tagName === "SL-BUTTON" ) {
+      return true;
+    } else if ( element.tagName === "ARTICLE" ) {
+      return false;
+    } else {
+      return hasButtonParent( element )
+    }
+  };
+
   const handleClick = function ( event ) {
     // Bail if this is a non-Enter key press event.
     if ( (event.type === "keydown") && (event.key !== "Enter") ) {
@@ -167,13 +190,18 @@
       return;
     }
 
+    // Bail if agent clicked a button.
+    if ( isButton(event.target) ) {
+      return;
+    }
+
     // Bail if the agent is trying to highlight text for non-link purposes.
     if ( window.getSelection().toString().length > 0 ) {
       return;
     }
 
     // Go to the post's main page.
-    goto( `/post/${ id }`);
+    goto( `/post/${ identity }/${ centerID }`);
   }
 
 </script>
@@ -222,7 +250,7 @@
 
       {#if mediaEmbeds.length > 0}
         <div class="media">
-          <PostMedia {id} attachments={mediaEmbeds}></PostMedia>
+          <PostMedia {identity} {id} attachments={mediaEmbeds}></PostMedia>
         </div>
       {:else if textEmbeds.length > 0}
         <div class="text-embed">
@@ -237,7 +265,12 @@
       {/if}
 
       {#each sharedPosts as post}
-        <svelte:self {...post} marginTop="2rem" terminal={true}/>
+        <svelte:self 
+          {identity}
+          centerID={centerID} 
+          {...post} 
+          marginTop="2rem"
+          terminal={true}/>
       {/each}
 
     </div>
