@@ -13,6 +13,8 @@
   import { goto } from "$app/navigation";
   import { Cache } from "$lib/resources/cache.js";
 
+  export let identity;
+
   export let id;
   export let source_id;
   export let base_url;
@@ -165,6 +167,26 @@
     }
   }
 
+  const hasButtonParent = function ( element ) {
+    if ( element.parentNode.tagName === "SL-BUTTON" ) {
+      return true;
+    } else if ( element.parentNode.tagName === "ARTICLE" ) {
+      return false;
+    } else {
+      return hasButtonParent( element.parentNode );
+    }
+  };
+
+  const isButton = function ( element ) {
+    if ( element.tagName === "SL-BUTTON" ) {
+      return true;
+    } else if ( element.tagName === "ARTICLE" ) {
+      return false;
+    } else {
+      return hasButtonParent( element )
+    }
+  };
+
   const handleClick = function ( event ) {
     // Bail if this is a non-Enter key press event.
     if ( (event.type === "keydown") && (event.key !== "Enter") ) {
@@ -177,7 +199,12 @@
     }
 
     // Bail if agent clicked a legit link.
-    if ( isLink( event.target ) ) {
+    if ( isLink(event.target) ) {
+      return;
+    }
+
+    // Bail if agent clicked a button.
+    if ( isButton(event.target) ) {
       return;
     }
 
@@ -187,7 +214,7 @@
     }
 
     // Go to the post's main page.
-    goto( `/post/${ id }`);
+    goto( `/post/${ identity }/${ id }`);
   }
 
 </script>
@@ -206,7 +233,7 @@
   on:keydown={handleClick}>
 
   {#if repliedPost}
-    <PostReplied {...repliedPost}></PostReplied>
+    <PostReplied {identity} {...repliedPost}></PostReplied>
   {/if}
 
   <div class="inner-frame">
@@ -264,7 +291,7 @@
         </PostShared>
       {/each}
 
-      <PostActions {platform}></PostActions>
+      <PostActions {identity} post={id} {platform}></PostActions>
 
     </div>
 

@@ -31,9 +31,9 @@ class FeedEngine {
     const results = [];
 
     for ( let i = 0; i < count - 1; i++ ) {      
-      const post = await this.feed.next();
-      if ( post != null ) {
-        results.push( post );
+      const result = await this.feed.next();
+      if ( result != null ) {
+        results.push( result );
       }
     }
 

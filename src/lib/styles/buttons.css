@@ -36,10 +36,12 @@ sl-button.action:hover::part(label) {
   color: var(--gobo-color-active-text);
 }
 
-sl-button.hollow::part(base),
-sl-button.hollow:hover::part(base) {
+sl-button.hollow::part(base) {
   background: var(--gobo-color-panel);
-  border: 1px solid var(--gobo-color-text);
+  border: none;
+}
+sl-button.hollow:hover::part(base) {
+  background: rgba(231, 63, 156, 0.25);
 }
 
 sl-button.hollow::part(label),

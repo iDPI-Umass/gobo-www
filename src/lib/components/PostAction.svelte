@@ -2,31 +2,32 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
+  import { createEventDispatcher } from "svelte";
 
-  export let platform;
-  export let action;
-  export let isActive = false;
+  export let name;
+  export let isActive
   
-  let actionButton;
+  
+  const dispatch = createEventDispatcher();
 
-  const toggleSocialEdge = async function () {
-    console.log("toggle social action");
-  };
+  const toggle = async function () {
+    dispatch( "toggle", { name } );
+  }
 
   const handle = async function (event) {
     if ( event.type === "keypress" ) {
         if ( event.key === "Enter" ) {
-          await toggleSocialEdge();
+          await toggle();
         }
       } else {
-        await toggleSocialEdge();
+        await toggle();
       }
   };
 
 
   let iconURL;
   iconURL = "/icons/heart.svg";
-  switch (action) {
+  switch ( name ) {
     case "like":
       iconURL = "/icons/heart.svg";
       break;
@@ -52,17 +53,16 @@
 </script>
 
 
-<sl-tooltip content={action}>
+<sl-tooltip content={name}>
   
   <sl-button
-    bind:this={actionButton}
     on:click={handle}
     on:keypress={handle}
     circle
     size="small"
-    class="{isActive ? "active" : "hollow"}">
+    class="{isActive ? "submit" : "hollow"} {name}">
     
-    <sl-icon src={iconURL} label="{action}"></sl-icon>
+    <sl-icon src={iconURL} label="{name}"></sl-icon>
   
   </sl-button>
 
@@ -71,12 +71,26 @@
 
 <style>
   sl-icon {
-    font-size: 1rem;
+    font-size: 16px;
   }
 
-  sl-button::part(label) {
-    display: flex;
-    align-items: center;
+  sl-button.like::part(label) {
+    padding-top: 4px;
+  }
+  sl-button.reply::part(label) {
+    padding-top: 1px;
+  }
+  sl-button.repost::part(label) {
+    padding-top: 2px;
+  }
+  sl-button.quote::part(label) {
+    padding-top: 2px;
+  }
+  sl-button.upvote::part(label) {
+    padding-top: 2px;
+  }
+  sl-button.downvote::part(label) {
+    padding-top: 3px;
   }
 </style>
 
