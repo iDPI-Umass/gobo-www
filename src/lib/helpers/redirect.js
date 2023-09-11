@@ -2,6 +2,7 @@ import { goto } from "$app/navigation";
 import { browser } from "$app/environment";
 import * as LS from  "$lib/helpers/local-storage.js";
 import * as Account from "$lib/helpers/account.js";
+import * as Welcome from "$lib/helpers/welcome.js";
 import { getAuth0Client } from "$lib/helpers/auth0.js";
 
 const exists = function ( value ) {
@@ -49,6 +50,14 @@ const handleRootRedirect = async function () {
   }
 }
 
+const successfulAuth = async function () {
+  const welcome = await Welcome.get();
+  if ( welcome == null ) {
+    return goto("/welcome");
+  } else {
+    return goto("/home");
+  }
+}
 
 const handleAuthCallback = async function ( query ) {
   console.log( "Starting primary authentication callback", query );
@@ -61,7 +70,7 @@ const handleAuthCallback = async function ( query ) {
 
       if ( exists(state) && ( exists(code) || exists(error) )) {
         await client.handleRedirectCallback();
-        return goto( "/home" );
+        return await successfulAuth();
       } else {
         console.log( "auth callback lacks expected credentials", query );
         return await handleCallbackError();
@@ -73,7 +82,7 @@ const handleAuthCallback = async function ( query ) {
   } else {
     // Passthrough for now. Happens if client back buttons to callback.
     console.log( "auth credentials already loaded" );
-    return goto( "/home" );
+    return await successfulAuth();
   }
 };
 
