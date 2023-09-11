@@ -56,10 +56,15 @@
   onMount( function () {
     const unsubscribeDraft = draftStore.subscribe( async function ( draft ) {
       options = draft.options;
-      
       let match;
-      match = draft.identities.find( i => i.type === "reddit" && i.active === true);
-      hasReddit = match != null;
+      
+      // In Reddit, replies are comments, not full posts. So don't show options.
+      if ( draft.reply != null ) {
+        hasReddit = false;
+      } else {
+        match = draft.identities.find( i => i.type === "reddit" && i.active === true);
+        hasReddit = match != null;
+      }
       
       match = draft.identities.find( i => i.type === "mastodon" && i.active === true);
       hasMastodon = match != null;

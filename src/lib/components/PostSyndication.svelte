@@ -13,10 +13,11 @@
   let sourceURL = attachment.source;
   let mediaURL = attachment.media;
 
-  if (!content || content === "") {
+  const domain = ( new URL(sourceURL) ).hostname;
+
+  if ( !content ) {
     content = `<p>${sourceURL}</p>`;
   }
-
 
   const handleSingleLoad = function ( event ) {
     let previewWidth = event.target.width;
@@ -53,6 +54,8 @@
 
     <section>
       <div class="spacer-wrap">
+        <span>{domain}</span>
+
         {#if title}
           <h2>{title}</h2>
         {/if}
@@ -67,6 +70,10 @@
 
 <style>
 
+span {
+  color: var(--gobo-color-text-muted);
+}
+
 .syndication-link {
   min-width: 100%;
   text-decoration: none;
@@ -80,11 +87,10 @@
   justify-content: flex-start;
   align-items: stretch;
   width: 100%;
-  height: 300px;
   background: var(--gobo-color-panel);
   border: var(--gobo-border-panel);
   border-radius: var(--gobo-border-radius);
-  margin-bottom: var(--gobo-height-spacer);
+  margin-top: var(--gobo-height-spacer);
   box-sizing: border-box;
   cursor: var(--cursor);
   color: var(--gobo-color-text);
@@ -121,16 +127,6 @@
 .syndication section :global(p) {
   font-size: var(--gobo-font-size-detail);
   font-weight: var(--gobo-font-weight-regular);
-}
-
-/* TODO: take a look at this in the future. This prevents the text in the
-         syndication overflow from displaying a cutoff line, but would this
-         be better addressed with text rhythm? I don't like how brittle this
-         is should we wish to adjust the embed size more dynamically
-*/
-.spacer-wrap {
-  column-width: 100vw;
-  max-height: 6rem;
 }
 </style>
 

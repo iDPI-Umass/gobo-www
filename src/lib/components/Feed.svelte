@@ -9,22 +9,22 @@
   import { feedStore } from "$lib/stores/feed.js";
 
   let feed, engine;
-  let posts = [];
+  let items = [];
   let loaded = false;
 
   const pull = async function ( count, marker ) {
     const current = await engine.pull( count, marker );
     if ( current.length > 0 ) {
-      const _posts = [ ...posts, ...current ];
-      FeedSaver.setFeed( _posts );
-      posts = _posts;
+      const _items = [ ...items, ...current ];
+      FeedSaver.setFeed( _items );
+      items = _items;
     }
   };
 
   const loadFeed = async function () {
     engine = await FeedSaver.getEngine();
-    posts = FeedSaver.getFeed();
-    if ( posts.length === 0 ) {
+    items = FeedSaver.getFeed();
+    if ( items.length === 0 ) {
       await pull( 25 );
     }
     loaded = true;
@@ -80,11 +80,11 @@
 </script>
 
 <section class="feed" bind:this={feed}>
-  {#if posts.length > 0}
-    {#each posts as post }
-      <Post {...post}></Post>
+  {#if items.length > 0}
+    {#each items as { identity, post } }
+      <Post {identity} {...post}></Post>
     {/each}
-  {:else if loaded && posts.length === 0 }
+  {:else if loaded && items.length === 0 }
     <section class="gobo-copy">
       <p>
         Your feed is empty! Add or activate an identity to get started.

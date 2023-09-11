@@ -1,18 +1,20 @@
 import { getGOBOClient, logout } from "$lib/helpers/account";
-import { cache, Cache } from "$lib/resources/cache.js";
+import { Cache } from "$lib/resources/cache.js";
 import * as Draft from "$lib/resources/draft-image.js";
 
-const getPost = async function ( id ) {
-  let post = Cache.getPost( id );
-  if ( post != null ) {
-    return post;
+const getPost = async function ({ identity, id }) {
+  if ( Cache.hasPostCenter(id) ) {
+    return Cache.getPost( id );
   }
-
 
   let result;
   try {
     const client = await getGOBOClient();
-    result = await client.postGraph.get({ id });
+    result = await client.personIdentityPost.get({ 
+      person_id: client.id,
+      identity_id: identity,
+      id 
+    });
   } catch (error) {
     if ( error.status === 401 ) {
       await logout();
@@ -24,9 +26,13 @@ const getPost = async function ( id ) {
 
   const posts = {};
   const sources = {};
+  const postEdges = {};
 
   for ( const post of result.posts ) {
     posts[ post.id ] = post;
+  }
+  for ( const reply of result.replies ) {
+    posts[ reply[0] ].reply = reply[1];
   }
   for ( const share of result.shares ) {
     posts[ share[0] ].shares ??= [];
@@ -35,29 +41,41 @@ const getPost = async function ( id ) {
   for ( const source of result.sources ) {
     sources[ source.id ] = source;
   }
+  for ( const edge of result.post_edges ?? [] ) {
+    postEdges[ edge[0] ] ??= new Set();
+    postEdges[ edge[0] ].add( edge[1] );
+  }
  
-
-  Object.assign( cache.posts, posts );
-  Object.assign( cache.sources, sources );
+  Cache.addPostCenter( id );
+  Cache.putPosts( posts );
+  Cache.putSources( sources );
+  Cache.putPostEdges( identity, postEdges );
   
   return posts[ result.feed[0] ];
 };
 
-const buildMetadata = function ( identity, options ) {
+const buildMetadata = function ( identity, draft ) {
+  const { options } = draft;
+
   switch ( identity.type ) {
     case "bluesky":
-      return {};
+      return {
+        reply: draft.reply?.data ?? undefined,
+        quote: draft.quote?.data ?? undefined
+      };
     case "mastodon":
       return {
         sensitive: options.sensitive,
-        spoiler: options.spoilerText
+        spoiler: options.spoilerText,
+        reply: draft.reply?.data ?? undefined
       }
     case "reddit":
       return {
         title: options.title,
         subreddit: options.subreddit,
         nsfw: options.sensitive,
-        spoiler: options.spoiler
+        spoiler: options.spoiler,
+        reply: draft.reply?.data ?? undefined
       }
     default:
       throw new Error("unknown platform type");
@@ -84,10 +102,12 @@ const publish = async function ( draft ) {
 
   const targets = [];
   for ( const identity of draft.identities ) {
-    targets.push({
-      identity: identity.id,
-      metadata: buildMetadata( identity, options )
-    });
+    if ( identity.active === true ) {
+      targets.push({
+        identity: identity.id,
+        metadata: buildMetadata( identity, draft )
+      });
+    }
   }
 
   const client = await getGOBOClient();

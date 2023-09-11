@@ -9,9 +9,10 @@
   
   const fullPage = true;
   let post;
+  let identity = data.bindings.identity;
 
   const loadPost = async function () {
-    post = await getPost( data.bindings.id );
+    post = await getPost( data.bindings );
   };
   
   guard();
@@ -26,7 +27,10 @@
   {#await loadPost()}
     <Spinner></Spinner>
   {:then}
-    <Post {...post} {fullPage}></Post>
+    <Post {identity} {...post} {fullPage}></Post>
+  {:catch}
+    <!-- TODO: We need something here for 404 reponses to post graphs. -->
+    <p>This post is not available.</p>
   {/await}
   
 </div>

@@ -10,6 +10,9 @@
   import { goto } from "$app/navigation";
   import { Cache } from "$lib/resources/cache.js";
 
+  export let identity;
+  export let centerID;
+
   export let id;
   export let source_id;
   export let base_url;
@@ -26,6 +29,8 @@
   export let visibility = null;
   export let created;
   export let updated;
+  export let marginTop = "0";
+  export let terminal = false;
 
   export let fullPage = false;
 
@@ -56,14 +61,24 @@
   }
 
   let sharedPosts = [];
-  for ( const item of shares ) {
-    const post = Cache.getPost( item );
-    if ( post == null ) {
-      console.error(`expected post ${item}, but it appears to be missing from graph`);
-    } else {
-      sharedPosts.push( post );
+  // Prevent graph sprawl in feed.
+  if ( terminal !== true ) {
+    for ( const item of shares ) {
+      const post = Cache.getPost( item );
+      if ( post == null ) {
+        console.error(`expected post ${item}, but it appears to be missing from graph`);
+      } else {
+        sharedPosts.push( post );
+      }
+    }
+
+    // Correct errors in graph that produce multiple shares.
+    // TODO: Look for errors in either feed response constructor or feed intermediary constructor.
+    if ( sharedPosts.length > 1 ) {
+      sharedPosts = [ sharedPosts[0] ];
     }
   }
+
 
   let sourceCopy;
   switch ( platform ) {
@@ -139,6 +154,26 @@
     }
   }
 
+  const hasButtonParent = function ( element ) {
+    if ( element.parentNode.tagName === "SL-BUTTON" ) {
+      return true;
+    } else if ( element.parentNode.tagName === "ARTICLE" ) {
+      return false;
+    } else {
+      return hasButtonParent( element.parentNode );
+    }
+  };
+
+  const isButton = function ( element ) {
+    if ( element.tagName === "SL-BUTTON" ) {
+      return true;
+    } else if ( element.tagName === "ARTICLE" ) {
+      return false;
+    } else {
+      return hasButtonParent( element )
+    }
+  };
+
   const handleClick = function ( event ) {
     // Bail if this is a non-Enter key press event.
     if ( (event.type === "keydown") && (event.key !== "Enter") ) {
@@ -155,13 +190,18 @@
       return;
     }
 
+    // Bail if agent clicked a button.
+    if ( isButton(event.target) ) {
+      return;
+    }
+
     // Bail if the agent is trying to highlight text for non-link purposes.
     if ( window.getSelection().toString().length > 0 ) {
       return;
     }
 
     // Go to the post's main page.
-    goto( `/post/${ id }`);
+    goto( `/post/${ identity }/${ centerID }`);
   }
 
 </script>
@@ -180,7 +220,7 @@
   on:keydown={handleClick}>
 
 
-  <div class="inner-frame">
+  <div class="inner-frame" style:--margin-top="{marginTop}">
     <div class="main">
       
       <header>
@@ -210,7 +250,7 @@
 
       {#if mediaEmbeds.length > 0}
         <div class="media">
-          <PostMedia {id} attachments={mediaEmbeds}></PostMedia>
+          <PostMedia {identity} {id} attachments={mediaEmbeds}></PostMedia>
         </div>
       {:else if textEmbeds.length > 0}
         <div class="text-embed">
@@ -225,7 +265,12 @@
       {/if}
 
       {#each sharedPosts as post}
-        <svelte:self {...post}/>
+        <svelte:self 
+          {identity}
+          centerID={centerID} 
+          {...post} 
+          marginTop="2rem"
+          terminal={true}/>
       {/each}
 
     </div>
@@ -245,9 +290,7 @@
     align-items: stretch;
     max-width: var(--gobo-max-width-primary);
     background: var(--gobo-color-panel);
-    border: var(--gobo-border-panel);
-    border-radius: var(--gobo-border-radius);
-    margin-bottom: var(--gobo-height-spacer);
+    margin-bottom: 0;
     box-sizing: border-box;
     cursor: var(--cursor);
   }
@@ -268,7 +311,9 @@
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: stretch;
-    margin: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex) 0 var(--gobo-width-spacer-flex);
+    margin-top: var(--margin-top);
+    border-left: 4px solid var(--gobo-color-text);
+    padding-left: var(--gobo-width-spacer-half);
   }
 
 
@@ -342,9 +387,14 @@
   .outer-frame .inner-frame .main .content {
     max-height: var(--max-height);
     overflow-y: hidden;
-    margin-bottom: var(--gobo-height-spacer);
+    margin-bottom: 0;
     mask-image: var(--gradient);
     -webkit-mask-image: var(--gradient)
+  }
+
+  .outer-frame .inner-frame .main .media,
+  .outer-frame .inner-frame .main .poll {
+    margin-top: var(--gobo-height-spacer);
   }
 
   .outer-frame .inner-frame .main .content :global(h2) {
@@ -373,12 +423,6 @@
 
   .outer-frame .inner-frame .main .content :global(:last-child) {
     margin-bottom: 0;
-  }
-
-
-  .outer-frame .inner-frame .main .media,
-  .outer-frame .inner-frame .main .poll {
-    margin-bottom: 1rem;
   }
 
   .outer-frame .inner-frame .main .media :global(a) {

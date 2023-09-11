@@ -7,10 +7,13 @@
   import PostPoll from "$lib/components/PostPoll.svelte";
   import PostShared from "$lib/components/PostShared.svelte";
   import PostReplied from "$lib/components/PostReplied.svelte";
+  import PostActions from "$lib/components/PostActions.svelte";
   import { humanize } from "$lib/helpers/humanize.js";
   import { render } from "$lib/helpers/markdown.js";
   import { goto } from "$app/navigation";
   import { Cache } from "$lib/resources/cache.js";
+
+  export let identity;
 
   export let id;
   export let source_id;
@@ -30,6 +33,7 @@
   export let updated;
 
   export let fullPage = false;
+
 
   let unused = [ platform_id, visibility, created, updated ];
 
@@ -70,6 +74,13 @@
       sharedPosts.push( post );
     }
   }
+
+  // Correct errors in graph that produce multiple shares.
+  // TODO: Look for errors in either feed response constructor or feed intermediary constructor.
+  if ( sharedPosts.length > 1 ) {
+    sharedPosts = [ sharedPosts[0] ];
+  }
+
 
   let repliedPost = null;
   if ( reply != null ) {
@@ -156,6 +167,26 @@
     }
   }
 
+  const hasButtonParent = function ( element ) {
+    if ( element.parentNode.tagName === "SL-BUTTON" ) {
+      return true;
+    } else if ( element.parentNode.tagName === "ARTICLE" ) {
+      return false;
+    } else {
+      return hasButtonParent( element.parentNode );
+    }
+  };
+
+  const isButton = function ( element ) {
+    if ( element.tagName === "SL-BUTTON" ) {
+      return true;
+    } else if ( element.tagName === "ARTICLE" ) {
+      return false;
+    } else {
+      return hasButtonParent( element )
+    }
+  };
+
   const handleClick = function ( event ) {
     // Bail if this is a non-Enter key press event.
     if ( (event.type === "keydown") && (event.key !== "Enter") ) {
@@ -168,7 +199,12 @@
     }
 
     // Bail if agent clicked a legit link.
-    if ( isLink( event.target ) ) {
+    if ( isLink(event.target) ) {
+      return;
+    }
+
+    // Bail if agent clicked a button.
+    if ( isButton(event.target) ) {
       return;
     }
 
@@ -178,7 +214,7 @@
     }
 
     // Go to the post's main page.
-    goto( `/post/${ id }`);
+    goto( `/post/${ identity }/${ id }`);
   }
 
 </script>
@@ -197,7 +233,12 @@
   on:keydown={handleClick}>
 
   {#if repliedPost}
-    <PostReplied {...repliedPost}></PostReplied>
+    <PostReplied 
+      {identity} 
+      centerID={id}
+      {...repliedPost}
+      {fullPage}>
+    </PostReplied>
   {/if}
 
   <div class="inner-frame">
@@ -233,7 +274,7 @@
 
       {#if mediaEmbeds.length > 0}
         <div class="media">
-          <PostMedia {id} attachments={mediaEmbeds}></PostMedia>
+          <PostMedia {identity} {id} attachments={mediaEmbeds}></PostMedia>
         </div>
       {:else if textEmbeds.length > 0}
         <div class="text-embed">
@@ -248,8 +289,16 @@
       {/if}
 
       {#each sharedPosts as post}
-        <PostShared {...post}></PostShared>
+        <PostShared
+          {identity} 
+          centerID={id}
+          {...post}
+          marginTop={renderedContent ? "2rem" : "0"}
+          {fullPage}>
+        </PostShared>
       {/each}
+
+      <PostActions {identity} post={id} {platform}></PostActions>
 
     </div>
 
@@ -397,7 +446,7 @@
   .outer-frame .inner-frame .main .content {
     max-height: var(--max-height);
     overflow-y: hidden;
-    margin-bottom: var(--gobo-height-spacer);
+    margin-bottom: 0;
     mask-image: var(--gradient);
     -webkit-mask-image: var(--gradient)
   }
@@ -421,6 +470,9 @@
     font-weight: var(--gobo-font-weight-regular);
     margin-bottom: 1rem;
   }
+  .outer-frame .inner-frame .main .content :global(p:last-of-type) {
+    margin-bottom: 0;
+  }
 
   .outer-frame .inner-frame .main .content :global(a) {
     position: relative;
@@ -433,7 +485,8 @@
 
   .outer-frame .inner-frame .main .media,
   .outer-frame .inner-frame .main .poll {
-    margin-bottom: 1rem;
+    margin-bottom: 0;
+    margin-top: var(--gobo-height-spacer);
   }
 
   .outer-frame .inner-frame .main .media :global(a) {

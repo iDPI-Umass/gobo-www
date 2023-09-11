@@ -1,5 +1,6 @@
 <script>
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";  
+  import NewPostReference from "$lib/components/new-post/NewPostReference.svelte";
   import NewPostBody from "$lib/components/new-post/NewPostBody.svelte";
   import NewPostMedia from "$lib/components/new-post/NewPostMedia.svelte";
   import NewPostIdentities from "$lib/components/new-post/NewPostIdentities.svelte";
@@ -20,6 +21,10 @@
   </header>
   
   <form class="gobo-form">
+
+    <section class="panel">
+      <NewPostReference></NewPostReference>
+    </section>
   
     <section class="panel">
       <NewPostBody></NewPostBody>

@@ -6,11 +6,15 @@
   import PostSyndication from "$lib/components/PostSyndication.svelte";
   import PostPoll from "$lib/components/PostPoll.svelte";
   import PostShared from "$lib/components/PostShared.svelte";
+  import PostActions from "$lib/components/PostActions.svelte";
   import { humanize } from "$lib/helpers/humanize.js";
   import { render } from "$lib/helpers/markdown.js";
   import { goto } from "$app/navigation";
   import { Cache } from "$lib/resources/cache.js";
 
+  export let identity;
+
+  export let centerID;
   export let id;
   export let source_id;
   export let base_url;
@@ -70,6 +74,13 @@
     }
   }
 
+  // Correct errors in graph that produce multiple shares.
+  // TODO: Look for errors in either feed response constructor or feed intermediary constructor.
+  if ( sharedPosts.length > 1 ) {
+    sharedPosts = [ sharedPosts[0] ];
+  }
+
+  
   let sourceCopy;
   switch ( platform ) {
     case "bluesky":
@@ -133,7 +144,7 @@
     } else {
       return hasLinkParent( element.parentNode );
     }
-  }
+  };
 
   const isLink = function ( element ) {
     if ( element.tagName === "A" ) {
@@ -143,7 +154,27 @@
     } else {
       return hasLinkParent( element )
     }
-  }
+  };
+
+  const hasButtonParent = function ( element ) {
+    if ( element.parentNode.tagName === "SL-BUTTON" ) {
+      return true;
+    } else if ( element.parentNode.tagName === "ARTICLE" ) {
+      return false;
+    } else {
+      return hasButtonParent( element.parentNode );
+    }
+  };
+
+  const isButton = function ( element ) {
+    if ( element.tagName === "SL-BUTTON" ) {
+      return true;
+    } else if ( element.tagName === "ARTICLE" ) {
+      return false;
+    } else {
+      return hasButtonParent( element )
+    }
+  };
 
   const handleClick = function ( event ) {
     // Bail if this is a non-Enter key press event.
@@ -161,13 +192,18 @@
       return;
     }
 
+    // Bail if agent clicked a button.
+    if ( isButton(event.target) ) {
+      return;
+    }
+
     // Bail if the agent is trying to highlight text for non-link purposes.
     if ( window.getSelection().toString().length > 0 ) {
       return;
     }
 
     // Go to the post's main page.
-    goto( `/post/${ id }`);
+    goto( `/post/${ identity }/${ centerID }`);
   }
 
 </script>
@@ -220,7 +256,7 @@
 
       {#if mediaEmbeds.length > 0}
         <div class="media">
-          <PostMedia {id} attachments={mediaEmbeds}></PostMedia>
+          <PostMedia {identity} {id} attachments={mediaEmbeds}></PostMedia>
         </div>
       {:else if textEmbeds.length > 0}
         <div class="text-embed">
@@ -235,8 +271,22 @@
       {/if}
 
       {#each sharedPosts as post}
-        <PostShared {...post}></PostShared>
+        <PostShared
+          {identity} 
+          centerID={centerID}
+          {...post}
+          marginTop={renderedContent ? "2rem" : "0"}
+          >
+        </PostShared>
       {/each}
+
+      <PostActions 
+        {identity} 
+        post={id} 
+        {platform}
+        marginBottom="1rem"
+        >
+      </PostActions>
 
     </div>
 
@@ -335,7 +385,7 @@
   .inner-frame .main .content {
     max-height: var(--max-height);
     overflow-y: hidden;
-    margin-bottom: var(--gobo-height-spacer);
+    margin-bottom: 0;
     mask-image: var(--gradient);
     -webkit-mask-image: var(--gradient)
   }

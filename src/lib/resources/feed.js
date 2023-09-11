@@ -1,5 +1,5 @@
 import { getGOBOClient, logout } from "$lib/helpers/account";
-import { cache } from "$lib/resources/cache.js";
+import { Cache, cache } from "$lib/resources/cache.js";
 
 // The following classes play an HTTP intermediary role. They are focused on
 // RESTful composition that stablizes this client's request pattern to the GOBO
@@ -39,6 +39,7 @@ class Reader {
       const feed = [];
       const posts = {};
       const sources = {};
+      const postEdges = {};
 
       for ( const post of result.posts ) {
         posts[ post.id ] = post;
@@ -53,15 +54,21 @@ class Reader {
       for ( const source of result.sources ) {
         sources[ source.id ] = source;
       }
+      for ( const edge of result.post_edges ?? [] ) {
+        postEdges[ edge[0] ] ??= new Set();
+        postEdges[ edge[0] ].add( edge[1] );
+      }
       for ( const id of result.feed ) {
+        Cache.addPostCenter( id );
         feed.push( posts[ id ] );
       }
 
       this.queue.push( ...feed );
       this.head = this.queue[0]?.published;
       this.tail = result.next;
-      Object.assign( cache.posts, posts );
-      Object.assign( cache.sources, sources );
+      Cache.putPosts( posts );
+      Cache.putSources( sources );
+      Cache.putPostEdges( this.id, postEdges );
 
     } catch (error) {
       if ( error.status === 401 ) {
@@ -135,7 +142,7 @@ class Reader {
     await this.checkQueue()
     const post = this.queue.shift();
     this.head = this.queue[0]?.published;
-    return post;
+    return { identity: this.id, post };
   }
 }
 
@@ -145,9 +152,6 @@ class Reader {
 class Feed {
   constructor ({ readers }) {
     this.readers = readers;
-    this.posts = {};
-    this.sources = {};
-    this.feed = [];
   }
 
   static async create ({ identities }) {

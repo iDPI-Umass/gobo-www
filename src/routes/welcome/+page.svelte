@@ -4,7 +4,18 @@
   import "@shoelace-style/shoelace/dist/components/input/input.js";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
-  import "$lib/styles/buttons.css";
+  import { goto } from "$app/navigation";
+  import { allyEvent } from "$lib/helpers/event";
+  import * as Welcome from "$lib/helpers/welcome.js";
+
+  const markWelcomeComplete = async function () {
+    await Welcome.put();
+    goto("/identities");
+  }
+
+  const handle = allyEvent( markWelcomeComplete );
+
+
 </script>
 
 <PlainHeader></PlainHeader>
@@ -21,7 +32,8 @@
       </p>
       <nav>
         <sl-button
-          href="/identities"
+          on:click={handle}
+          on:keypress={handle}
           class="submit"
           size="medium"
           pill>
