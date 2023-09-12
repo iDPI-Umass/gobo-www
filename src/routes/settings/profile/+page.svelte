@@ -19,7 +19,7 @@
     const data = new FormData( form );
     profile.name = data.get( "name" );
 
-    await client.person.put( profile );
+    await client.personProfile.put( profile );
     profileStore.updateProfile( profile );
   };
 
