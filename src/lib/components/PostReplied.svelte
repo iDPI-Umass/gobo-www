@@ -275,7 +275,7 @@
           {identity} 
           centerID={centerID}
           {...post}
-          marginTop={renderedContent ? "2rem" : "0"}
+          marginTop={renderedContent ? "1rem" : "6.5px"}
           >
         </PostShared>
       {/each}
@@ -341,7 +341,7 @@
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: center;
-    margin-bottom: var(--gobo-height-spacer-half);
+    margin-bottom: 0.25rem;
   }
 
   .inner-frame .main header .names {
@@ -422,7 +422,7 @@
   .inner-frame .main .media,
   .inner-frame .main .poll {
     margin-bottom: 0;
-    margin-top: var(--gobo-height-spacer);
+    margin-top: var(--gobo-height-spacer-half);
   }
 
   .inner-frame .main .media :global(a) {

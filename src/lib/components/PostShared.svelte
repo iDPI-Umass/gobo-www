@@ -29,6 +29,7 @@
   export let visibility = null;
   export let created;
   export let updated;
+  export let marginTop = "0";
   export let terminal = false;
 
   export let fullPage = false;
@@ -219,7 +220,7 @@
   on:keydown={handleClick}>
 
 
-  <div class="inner-frame" style:--margin-top="1rem">
+  <div class="inner-frame" style:--margin-top="{marginTop}">
     <div class="main">
       
       <header>
@@ -268,6 +269,7 @@
           {identity}
           centerID={centerID} 
           {...post} 
+          marginTop="1rem"
           terminal={true}/>
       {/each}
 
@@ -339,7 +341,7 @@
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: center;
-    margin-bottom: var(--gobo-height-spacer-half);
+    margin-bottom: 0.25rem;
   }
 
   .outer-frame .inner-frame .main header .names {
@@ -392,7 +394,7 @@
 
   .outer-frame .inner-frame .main .media,
   .outer-frame .inner-frame .main .poll {
-    margin-top: var(--gobo-height-spacer);
+    margin-top: var(--gobo-height-spacer-half);
   }
 
   .outer-frame .inner-frame .main .content :global(h2) {
