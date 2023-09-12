@@ -365,7 +365,7 @@
     </sl-icon>
 
     <sl-icon
-      src="/icons/arrow-repeat.svg">
+      src="/icons/repeat.svg">
     </sl-icon>
 
     <sl-icon

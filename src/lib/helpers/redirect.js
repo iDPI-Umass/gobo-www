@@ -111,7 +111,9 @@ const handleAddIdentityCallback = async function ( query ) {
   const client = await Account.getGOBOClient();
   const login = LS.read( "gobo-bluesky-login" );
   const secret = LS.read( "gobo-bluesky-secret" );
-  
+  LS.remove(  "gobo-bluesky-login" );
+  LS.remove( "gobo-bluesky-secret" );
+
   try {
     await client.actionOnboardIdentityCallback.post({ content: {
       base_url: baseURL,

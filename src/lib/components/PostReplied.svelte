@@ -421,7 +421,8 @@
 
   .inner-frame .main .media,
   .inner-frame .main .poll {
-    margin-bottom: 1rem;
+    margin-bottom: 0;
+    margin-top: var(--gobo-height-spacer);
   }
 
   .inner-frame .main .media :global(a) {

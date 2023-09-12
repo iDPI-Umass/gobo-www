@@ -32,7 +32,7 @@
     loaded = true;
     if ( items.length > 0 ) {
       fetching = false;
-      LS.write("fetching", false);
+      LS.remove("fetching");
     }
     await tick();
     feed.scrollTo( 0, FeedSaver.getScrollPosition() );

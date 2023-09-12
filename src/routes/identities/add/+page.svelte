@@ -9,6 +9,7 @@
   import { onMount } from "svelte";
   import * as LS from "$lib/helpers/local-storage.js";
   import { getGOBOClient } from "$lib/helpers/account.js";
+  export let data;
   let form, select, button;
   let targetingBluesky = true;
   let targetingMastodon = false;
@@ -105,6 +106,11 @@
   <form class="gobo-form" bind:this={form}>
     
     <h2>Select Platform</h2>
+    {#if data.bindings.failure}
+      <p class="danger">
+        We were unable to add your identity.
+      </p>
+    {/if}
 
     <sl-select
       bind:this={select}
@@ -141,7 +147,7 @@
       <sl-input
         name="mastodonURL"
         label="Mastodon Server URL"
-        help-text="For example, https://mastodon.social"
+        help-text="For example, https://mastodon.social or mastodon.social (you can omit the prefix for convenience)"
         autocomplete="off"
         size="medium">
       </sl-input>
@@ -163,5 +169,9 @@
   .gobo-form sl-select {
     width: 10rem;
     align-self: flex-start;
+  }
+
+  .danger {
+    color: var(--gobo-color-danger);
   }
 </style>

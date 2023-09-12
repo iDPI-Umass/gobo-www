@@ -179,25 +179,31 @@
     {/if}
   
     <footer>
+
+      <sl-icon 
+        class="vote"
+        src="/icons/caret-up.svg">
+      </sl-icon>
+      <span class="vote">0</span>
+      <sl-icon
+        class="vote down"
+        src="/icons/caret-down.svg">
+      </sl-icon>
+
       <sl-icon
         src="/icons/chat.svg">
       </sl-icon>
       <span>0 Comments</span>
   
-      <sl-icon
+      <sl-icon class="desktop"
         src="/icons/gift.svg">
       </sl-icon>
-      <span>Award</span>
+      <span class="desktop">Award</span>
   
-      <sl-icon
+      <sl-icon class="desktop"
         src="/icons/arrow-90deg-right.svg">
       </sl-icon>
-      <span>Share</span>
-  
-      <sl-icon
-        src="/icons/bookmark.svg">
-      </sl-icon>
-      <span>Save</span>
+      <span class="desktop">Share</span>
   
       <sl-icon
         src="/icons/three-dots.svg">
@@ -401,6 +407,34 @@
     color: #606984;
     margin-right: 20px;
     padding-top: 4px;
+  }
+
+  .vote {
+    display: none;
+  }
+
+  .outer-frame > .main > footer > span.vote {
+    margin-right: 6px;
+  }
+
+  .outer-frame > .main > footer > sl-icon.vote.down {
+    margin-top: 2px;
+    margin-right: 20px;
+    margin-left: -1px;
+  }
+
+  @media ( max-width: 680px ) {
+    .outer-frame > .gutter {
+      display: none;
+    }
+
+    .desktop {
+      display: none;
+    }
+
+    .vote {
+      display: unset;
+    }
   }
 
 </style>
