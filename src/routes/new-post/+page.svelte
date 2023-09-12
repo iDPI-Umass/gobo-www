@@ -11,13 +11,37 @@
   import RedditPreview from "$lib/components/new-post/RedditPreview.svelte";
   import TwitterPreview from "$lib/components/new-post/BlueskyPreview.svelte";
   import NewPostPreview from "$lib/components/new-post/NewPostPreview.svelte";
+  import { onDestroy, onMount } from "svelte";
+  import { get } from "svelte/store";
+  import { draftStore } from "$lib/stores/post-draft.js";
+  import BackLink from "$lib/components/primitives/BackLink.svelte";
 
+  let heading = "New Post";
+
+  onDestroy( function () {
+    draftStore.clear();
+  });
+
+  onMount( function () {
+    const draft = get(draftStore);
+    if(draft.reply != null) {
+      heading = "New Reply";
+    }
+    else if(draft.quote != null ) {
+      heading = "New Quote";
+    }
+    else{
+      heading = "New Post";
+    }
+  });
 
 </script>
 
 <div class="main-child">
   <header>
-    <h1>New Post</h1>
+    <BackLink
+      {heading}>
+    </BackLink>
   </header>
   
   <form class="gobo-form">

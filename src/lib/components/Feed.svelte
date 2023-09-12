@@ -7,10 +7,12 @@
   import { ScrollSmoother } from "$lib/helpers/infinite-scroll.js";
   import { scrollStore } from "$lib/stores/scroll.js";
   import { feedStore } from "$lib/stores/feed.js";
+  import * as LS from "$lib/helpers/local-storage.js";
 
   let feed, engine;
   let items = [];
   let loaded = false;
+  let fetching = false;
 
   const pull = async function ( count, marker ) {
     const current = await engine.pull( count, marker );
@@ -28,6 +30,10 @@
       await pull( 25 );
     }
     loaded = true;
+    if ( items.length > 0 ) {
+      fetching = false;
+      LS.write("fetching", false);
+    }
     await tick();
     feed.scrollTo( 0, FeedSaver.getScrollPosition() );
   };  
@@ -37,6 +43,7 @@
       await pull( 25 );
     };
     feed.addEventListener( "gobo-smooth-scroll", listener );
+    fetching = LS.read( "fetching" );
 
     const smoother = ScrollSmoother.create({ element: feed });
     smoother.start();
@@ -59,6 +66,7 @@
 
       switch ( command ) {
         case "reset":
+          loaded = false;
           await FeedSaver.reset();
           await loadFeed();
           feedStore.push({}); // We're using store as message queue, clear out old message.
@@ -84,6 +92,12 @@
     {#each items as { identity, post } }
       <Post {identity} {...post}></Post>
     {/each}
+  {:else if loaded && items.length === 0 && fetching === true }
+    <section class="gobo-copy">
+      <p>
+        We are fetching your feed. This may take a couple of minutes.
+      </p> 
+    </section>
   {:else if loaded && items.length === 0 }
     <section class="gobo-copy">
       <p>

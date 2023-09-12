@@ -1,13 +1,19 @@
 <script>
+  import { allyEvent } from "$lib/helpers/event";
   import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
   export let href;
   export let heading;
+
+  const handleClick = allyEvent( function () {
+    history.back();
+  });
 </script>
 
 <header>
   
   <sl-icon-button 
-    href={href}
+    on:click={handleClick}
+    on:keypress={handleClick}
     src="/icons/arrow-left.svg">
   </sl-icon-button>
   

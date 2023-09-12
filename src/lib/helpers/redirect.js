@@ -112,17 +112,23 @@ const handleAddIdentityCallback = async function ( query ) {
   const login = LS.read( "gobo-bluesky-login" );
   const secret = LS.read( "gobo-bluesky-secret" );
   
-  await client.actionOnboardIdentityCallback.post({ content: {
-    base_url: baseURL,
-    oauth_token: query.oauth_token,
-    oauth_verifier: query.oauth_verifier,
-    code: query.code,
-    state: query.state,
-    bluesky_login: login,
-    bluesky_secret: secret
-  }});
-  
-  return goto( "/identities" );
+  try {
+    await client.actionOnboardIdentityCallback.post({ content: {
+      base_url: baseURL,
+      oauth_token: query.oauth_token ?? undefined,
+      oauth_verifier: query.oauth_verifier ?? undefined,
+      code: query.code ?? undefined,
+      state: query.state ?? undefined,
+      bluesky_login: login ?? undefined,
+      bluesky_secret: secret ?? undefined
+    }});
+    LS.write("fetching", true);
+    return goto( "/identities" );
+  }
+  catch (error) {
+    console.error(error);
+    return goto( "/identities/add?failure=true" );
+  }
 };
 
 

@@ -47,14 +47,9 @@
   {:then}
 
     <section class="identities">
-      {#if allEmpty === true}
-        <p>Add an identity to get started!</p>
-      {/if}
-
       {#each identities as identity (identity.key)}  
         <Identity {identity}></Identity>
       {/each}
-
     </section>
 
   {/await}

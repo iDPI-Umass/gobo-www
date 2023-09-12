@@ -87,6 +87,14 @@
       isActive={edges.has(name)}>
     </PostAction>
   {/each}
+  {#if proxyActions.length < 4 }
+    {#each { length: 4 - proxyActions.length } as i }
+      <PostAction 
+        name="placeholder"
+        isActive={false}
+      ></PostAction>
+    {/each}
+  {/if}
 </section>
 
 <style>
@@ -97,8 +105,8 @@
     justify-content: space-between;
     align-items: center;
     height: 2rem;
-    margin-top: var(--gobo-height-spacer-flex);
-    margin-bottom: var(--bottom-margin);
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
   }
 </style>
 

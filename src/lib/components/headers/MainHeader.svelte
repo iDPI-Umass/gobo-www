@@ -15,13 +15,13 @@
   </nav>
 </header>
 
-<header class="mobile">
+<!-- <header class="mobile">
   <nav>
     <a class="logo" href="/home">
       <img src="/images/gobo-logo.svg" alt="Main logo for the Gobo application">
     </a>
   </nav>
-</header>
+</header> -->
 
 <style>
   header {

@@ -314,7 +314,7 @@
     height: 2.8125rem;
     width: 2.8125rem;
     border-radius: var(--sl-border-radius-circle);
-    margin-right: var(--gobo-width-spacer-flex);
+    margin-right: var(--gobo-width-spacer-half);
     border: var(--gobo-border-panel);
   }
 

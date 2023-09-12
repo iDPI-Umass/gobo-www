@@ -318,8 +318,8 @@
 
 
   .outer-frame .inner-frame img {
-    height: 2.8125rem;
-    width: 2.8125rem;
+    height: 1.40625rem;
+    width: 1.40625rem;
     border-radius: var(--sl-border-radius-circle);
     margin-right: var(--gobo-width-spacer-half);
     border: var(--gobo-border-panel);

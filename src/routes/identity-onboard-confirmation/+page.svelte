@@ -6,10 +6,11 @@
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import { goto } from "$app/navigation";
   import { allyEvent } from "$lib/helpers/event";
-  import * as Welcome from "$lib/helpers/welcome.js";
+
+  export let data;
+
 
   const markWelcomeComplete = async function () {
-    await Welcome.put();
     goto("/identities");
   }
 
@@ -18,16 +19,16 @@
 
 </script>
 
+<PlainHeader></PlainHeader>
 <Center>
   <div class="main-child">
     <section class="gobo-copy">
       <header>
-        <h1>Welcome to Gobo!</h1>
-        <h2>A loyal social media client</h2>
+        <h1>We are adding your identity!</h1>
       </header>
-      <p>Gobo enables you to aggregate your social media feeds, 
-        control the algorithms applied to your feeds, and 
-        cross-post to different platforms.
+      <p> 
+        This might take a couple minutes. 
+        Refresh your feed to see if it's ready.
       </p>
       <nav>
         <sl-button

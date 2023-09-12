@@ -5,6 +5,7 @@
   import { onMount } from "svelte";
 
   let content = null;
+  let placeholder = "Write your post";
 
   const handleContent = function ( event ) {
     draftStore.update({ content: event.target.value });
@@ -13,6 +14,12 @@
   onMount( function () {
     const unsubscribeDraft = draftStore.subscribe( function ( draft ) {
       content = draft.content;
+      if( draft.reply != null ) {
+        placeholder = "Write your reply"
+      }
+      else if( draft.quote != null ) {
+        placeholder = "Write your quote post"
+      }
     });
 
     return function () {
@@ -25,7 +32,7 @@
 <sl-textarea
   on:sl-input={handleContent}
   value={content}
-  placeholder="Compose your post here."
+  {placeholder}
   size="medium"
   resize="none"
   rows=4>

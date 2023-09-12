@@ -32,7 +32,7 @@
       iconURL = "/icons/heart.svg";
       break;
     case "repost":
-      iconURL = "/icons/arrow-repeat.svg";
+      iconURL = "/icons/repeat.svg";
       break;
     case "reply":
       iconURL = "/icons/reply-fill.svg";
@@ -46,6 +46,9 @@
     case "downvote":
       iconURL = "/icons/chevron-double-down.svg";
       break;
+    case "placeholder":
+      iconURL = "";
+      break;
     default:
       throw new Error("unknown proxy action, unable to assign button icon");
   }
@@ -53,25 +56,43 @@
 </script>
 
 
-<sl-tooltip content={name}>
-  
+{#if name === "placeholder"}
   <sl-button
-    on:click={handle}
-    on:keypress={handle}
     circle
     size="small"
-    class="{isActive ? "submit" : "hollow"} {name}">
-    
+    class="placeholder">
     <sl-icon src={iconURL} label="{name}"></sl-icon>
-  
   </sl-button>
+{:else}
+  <sl-tooltip content={name}>
+    
+    <sl-button
+      on:click={handle}
+      on:keypress={handle}
+      circle
+      size="small"
+      class="{isActive ? "submit" : "hollow"} {name}">
+      
+      <sl-icon src={iconURL} label="{name}"></sl-icon>
+    
+    </sl-button>
 
-</sl-tooltip>
+  </sl-tooltip>
+{/if}
 
 
 <style>
   sl-icon {
-    font-size: 16px;
+    font-size: var(--gobo-font-size-copy);
+  }
+
+  sl-button::part(label) {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  sl-button::part(base) {
+    margin: 0 -7.5px;
   }
 
   sl-button.like::part(label) {
@@ -91,6 +112,10 @@
   }
   sl-button.downvote::part(label) {
     padding-top: 3px;
+  }
+  sl-button.placeholder::part(base) {
+    background: var(--gobo-color-panel);
+    border: none;
   }
 </style>
 
