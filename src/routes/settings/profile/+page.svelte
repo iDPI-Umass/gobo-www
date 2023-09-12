@@ -18,6 +18,7 @@
     const client = await getGOBOClient();
     const data = new FormData( form );
     profile.name = data.get( "name" );
+    profile.person_id = profile.id;
 
     await client.personProfile.put( profile );
     profileStore.updateProfile( profile );
