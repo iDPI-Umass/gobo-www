@@ -49,13 +49,10 @@
   <MastodonPreview></MastodonPreview>
 {/if}
 
-<h3 class="preview-header">Reddit</h3>
-<RedditPreview></RedditPreview>
-
-<!-- {#if hasReddit}
+{#if hasReddit}
   <h3 class="preview-header">Reddit</h3>
   <RedditPreview></RedditPreview>
-{/if} -->
+{/if}
 
 
 <style>
