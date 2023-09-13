@@ -39,14 +39,20 @@
   };  
   
   onMount( function () {
-    const listener = async function ( event ) {
+    const smoother = ScrollSmoother.create({ element: feed });
+
+    const rawListener = function ( event ) {
+      event.preventDefault();
+      scrollStore.push( event );
+    };
+
+    const smoothListener = async function ( event ) {
       await pull( 25 );
     };
-    feed.addEventListener( "gobo-smooth-scroll", listener );
-    fetching = LS.read( "fetching" );
 
-    const smoother = ScrollSmoother.create({ element: feed });
-    smoother.start();
+    feed.addEventListener( "scroll", rawListener );
+    feed.addEventListener( "gobo-smooth-scroll", smoothListener );
+    fetching = LS.read( "fetching" );
 
     const unsubscribeScroll = scrollStore.subscribe( function ( event ) {
       if ( engine == null || event == null ) {
@@ -75,10 +81,12 @@
 
     });
 
+    smoother.start();
     loadFeed();
 
     return function () {
-      feed.removeEventListener( "gobo-change", listener );
+      feed.removeEventListener( "scroll", rawListener );
+      feed.removeEventListener( "gobo-smooth-scroll", smoothListener );
       smoother.stop();
       unsubscribeScroll();
       unsubscribeFeed();
