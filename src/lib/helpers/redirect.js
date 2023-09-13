@@ -51,6 +51,10 @@ const handleRootRedirect = async function () {
 }
 
 const successfulAuth = async function () {
+  const account = await Account.getAccount();
+  if ( !account.permissions.has("general") ) {
+    return goto( "/permissions" );
+  }
   const welcome = await Welcome.get();
   if ( welcome == null ) {
     return goto("/welcome");
