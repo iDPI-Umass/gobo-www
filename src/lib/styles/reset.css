@@ -9,6 +9,9 @@ html, body {
   background: var(--gobo-color-null);
   color: var(--gobo-color-text);
 }
+html {
+  overflow: hidden;
+}
 img, picture, video, canvas, svg {
   display: block;
   max-width: 100%;
