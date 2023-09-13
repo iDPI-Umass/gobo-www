@@ -54,9 +54,6 @@
         window.location = result.redirect_url;
       } else {
         let login = data.get( "blueskyLogin" );
-        if ( !login.endsWith(".bsky.social") ) {
-          login += ".bsky.social";
-        }
         if ( login.startsWith("@") ) {
           login = login.slice(1);
         }
@@ -127,7 +124,7 @@
       <sl-input
         name="blueskyLogin"
         label="Bluesky Username"
-        help-text="Your full username, like gobo.bsky.social, or your abbreviated username, like gobo"
+        help-text="Your full username, like gobo.bsky.social"
         autocomplete="off"
         size="medium">
       </sl-input>
