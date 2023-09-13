@@ -33,7 +33,7 @@
     display: none;
   }
 
-  @media ( min-width: 680px ) {
+  @media ( min-width: 988px ) {
     .desktop {
       display: flex;
     }

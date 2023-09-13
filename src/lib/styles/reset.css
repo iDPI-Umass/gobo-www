@@ -5,12 +5,9 @@
   margin: 0;
 }
 html, body {
-  height: 100vh;
+  height: 100dvh;
   background: var(--gobo-color-null);
   color: var(--gobo-color-text);
-}
-html {
-  background: var(--gobo-color-primary);
 }
 img, picture, video, canvas, svg {
   display: block;
