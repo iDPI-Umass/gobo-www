@@ -19,6 +19,7 @@ of interfaces that draw on feeds coming off lens calculations.
 class FeedEngine {
   constructor ({ feed }) {
     this.feed = feed;
+    this.replies = new Set();
   }
 
   static async create () {
@@ -33,7 +34,22 @@ class FeedEngine {
     for ( let i = 0; i < count - 1; i++ ) {      
       const result = await this.feed.next();
       if ( result != null ) {
+        const { post } = result;
+        // Skip posts that start reply chains that we've already seen.
+        if ( this.replies.has(post.id) && post.reply == null ) {
+          continue;
+        }
+
+        if ( post.reply != null ) {
+          this.replies.add( post.reply );
+        }
+
         results.push( result );
+      
+      } else {
+        // We're at the bottom of the feed.
+        // TODO: This would be different for non time-based feed sorting.
+        break;
       }
     }
 

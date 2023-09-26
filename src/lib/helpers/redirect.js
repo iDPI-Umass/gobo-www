@@ -108,6 +108,7 @@ const handleAddIdentityCallback = async function ( query ) {
   // We hold onto the base_url in local storage before redirecting. We need to
   // provide this information to GOBO, but POST aren't idempotent, so we need to
   // be careful about only applying this once.
+  const platform = LS.read( "gobo-platform" );
   const baseURL = LS.read( "gobo-baseURL" );
   LS.remove( "gobo-baseURL" );
   if ( baseURL == null ) {
@@ -123,6 +124,7 @@ const handleAddIdentityCallback = async function ( query ) {
 
   try {
     await client.actionOnboardIdentityCallback.post({ content: {
+      platform,
       base_url: baseURL,
       oauth_token: query.oauth_token ?? undefined,
       oauth_verifier: query.oauth_verifier ?? undefined,

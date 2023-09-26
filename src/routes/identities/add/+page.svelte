@@ -43,8 +43,10 @@
       }
 
       LS.write( "gobo-baseURL", baseURL );
+      LS.write( "gobo-platform", platform );
       
       const result = await client.actionOnboardIdentityStart.post({ content: {
+        platform,
         base_url: baseURL
       }});
 
