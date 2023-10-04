@@ -10,6 +10,7 @@
   let options = {};
   let hasMastodon = false;
   let hasReddit = false;
+  let hasSmalltown = false;
 
   const nullEmpty = function ( value ) {
     if ( value == null ) {
@@ -62,12 +63,15 @@
       if ( draft.reply != null ) {
         hasReddit = false;
       } else {
-        match = draft.identities.find( i => i.type === "reddit" && i.active === true);
+        match = draft.identities.find( i => i.platform === "reddit" && i.active === true);
         hasReddit = match != null;
       }
       
-      match = draft.identities.find( i => i.type === "mastodon" && i.active === true);
+      match = draft.identities.find( i => i.platform === "mastodon" && i.active === true);
       hasMastodon = match != null;
+
+      match = draft.identities.find( i => i.platform === "smalltown" && i.active === true);
+      hasSmalltown = match != null;
     });
 
     return function () {
@@ -77,7 +81,7 @@
 </script>
 
 
-{#if hasMastodon || hasReddit }
+{#if hasMastodon || hasReddit || hasSmalltown }
   <section class="panel">
     <h2>Identity Specific Options</h2>
   </section>
@@ -115,7 +119,9 @@
       </sl-input>
     </section>
   {/if}
-  
+
+
+
   {#if hasReddit }
     <section class="panel">
       <div class="subheading">
@@ -149,6 +155,29 @@
         Mark Text as Containing Spoilers
       </sl-checkbox>
 
+    </section>
+  {/if}
+
+
+
+  {#if hasSmalltown }
+    <section class="panel">
+      <div class="subheading">
+        <sl-icon 
+          src="/icons/smalltown.svg"
+          class="smalltown">
+        </sl-icon>
+        <h3>Smalltown</h3>
+      </div>
+
+      <sl-input
+        on:sl-input={handleOptionSpoilerText}
+        value={options.spoilerText}
+        label="Spoiler Text"
+        help-text="Provide text that contextualizes content behind warning."
+        autocomplete="off"
+        size="medium">
+      </sl-input>
     </section>
   {/if}
 {/if}

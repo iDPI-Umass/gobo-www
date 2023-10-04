@@ -5,6 +5,7 @@
   import { onMount } from "svelte";
   import { draftStore } from "$lib/stores/post-draft";
   import { altStore } from "$lib/stores/alt-store";
+  import { allyEvent } from "$lib/helpers/event";
   let form, file, alt, attachments, previewImage;
 
   const handleContent = function ( event ) {
@@ -22,13 +23,9 @@
     goto("/new-post");
   };
 
-  const cancel = function ( event ) {
-    if ( event.type === "keydown" && event.key !== "Enter" ) {
-      return;
-    }
-
+  const cancel = allyEvent(function ( event ) {
     goto("/new-post");
-  }
+  });
 
   onMount(() => {
     const submitListener = function( event ) {

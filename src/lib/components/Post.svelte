@@ -12,10 +12,12 @@
   import { render } from "$lib/helpers/markdown.js";
   import { goto } from "$app/navigation";
   import { Cache } from "$lib/resources/cache.js";
+  import * as h from "$lib/components/post-helpers.js";
 
   export let identity;
 
   export let id;
+  export let platform;
   export let source_id;
   export let base_url;
   export let title = null;
@@ -36,34 +38,7 @@
 
 
   let unused = [ platform_id, visibility, created, updated ];
-
-  
-  let platform;
-  if ( base_url == "https://bsky.app" ) {
-    platform = "bluesky";
-  } else if ( base_url == "https://www.reddit.com" ) {
-    platform = "reddit";
-  } else {
-    platform = "mastodon";
-  }
-
-
   let source = Cache.getSource( source_id );
-  let avatar = source.icon_url;
-  let avatarFallback;
-  switch ( platform ) {
-    case "mastodon":
-    case "bluesky":
-      avatarFallback = "https://mastodon.social/avatars/original/missing.png";
-      break;
-    case "reddit":
-      avatarFallback = "https://www.redditstatic.com/avatars/defaults/v2/avatar_default_6.png";
-      break;
-  }
-
-  if ( avatar == null ) {
-    avatar = avatarFallback;
-  }
 
   let sharedPosts = [];
   for ( const item of shares ) {
@@ -92,41 +67,12 @@
     }
   }
 
-  let sourceCopy;
-  switch ( platform ) {
-    case "bluesky":
-      sourceCopy = "View on Bluesky";
-      break;
-    case "mastodon":
-      // Specialize this to name the server?
-      sourceCopy = "View on Mastodon";
-      break;
-    case "reddit":
-      sourceCopy = "View on Reddit";
-      break;
-  }
-
-
-
-  let logo = `/icons/${ platform }.svg`;
-  let headingSlot1, headingSlot2;
-  switch ( platform ) {
-    case "bluesky":
-      headingSlot1 = source.name;
-      headingSlot2 = `@${source.username}`;
-      break;
-    case "mastodon":
-      headingSlot1 = source.name;
-      headingSlot2 = `@${source.username}`;
-      break;
-    case "reddit":
-      headingSlot1 = `r/${source.name}`;
-      break;
-  }
-
+  let logo = h.getLogo( platform );
+  let { headingSlot1, headingSlot2 } = h.getHeadingSlots( source );
+  let avatar = h.getAvatar( source );
+  let avatarFallback = h.getAvatarFallback( source );
+  let sourceCopy = h.getSourceCopy( platform );
   let renderedContent = render( content );
-
-  
   let mediaEmbeds = attachments.filter( a => /^(image|video)\//.test(a.type) );
   let textEmbeds = attachments.filter( a => /^application\/json/.test(a.type) );
 

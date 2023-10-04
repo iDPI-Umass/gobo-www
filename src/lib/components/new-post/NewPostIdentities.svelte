@@ -96,8 +96,8 @@
         
         <div class="label">
           <sl-icon 
-            src="/icons/{identity.type}.svg" 
-            class="{identity.type}"
+            src="/icons/{identity.platform}.svg" 
+            class="{identity.platform}"
             size="medium">
           </sl-icon>
           {identity.prettyName}

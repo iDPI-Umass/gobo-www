@@ -1,27 +1,17 @@
 import { getGOBOClient, handleUnauthorized } from "$lib/helpers/account.js";
 
 
-const getType = function ( identity ) {
-  switch ( identity.base_url ) {
-    case "https://bsky.app":
-        return "bluesky";
-    case "https://www.reddit.com":
-      return "reddit";
-    default:
-      return "mastodon"; 
-  }
-}
-
 const getPrettyName = function ( identity ) {
   let hostname;
-  const { username, type, base_url } = identity;
+  const { username, platform, base_url } = identity;
 
-  switch ( type ) {
+  switch ( platform ) {
     case "bluesky":
       return `@${ username }`;
     case "reddit":
       return `u/${ username }`;
     case "mastodon":
+    case "smalltown":
       // We just want the hostname to form a fully specified Mastodon reference.
       if ( base_url.startsWith( "https://" ) === true ) {
         let url = new URL( base_url );
@@ -36,30 +26,32 @@ const getPrettyName = function ( identity ) {
 const categorize = function ( identity ) {
   identity.key = String( identity.id );
   identity.active = true;
-  identity.type = getType( identity );
   identity.prettyName = getPrettyName( identity );
   return identity;  
 };
 
 
 const sort = function ( identities ) {
+  let blueskys = [];
   let mastodons = [];
   let reddits = [];
-  let blueskys = [];
+  let smalltowns = [];
 
   for ( let identity of identities ) {
     identity = categorize( identity ); 
 
-    if ( identity.type === "bluesky" ) {
+    if ( identity.platform === "bluesky" ) {
       blueskys.push( identity );
-    } else if ( identity.type === "reddit" ) {
+    } else if ( identity.platform === "reddit" ) {
       reddits.push( identity );
-    } else if ( identity.type === "mastodon" ) {
+    } else if ( identity.platform === "mastodon" ) {
       mastodons.push( identity );
+    } else if ( identity.platform === "smalltown" ) {
+      smalltowns.push( identity );
     }
   }
 
-  return [ ...blueskys, ...mastodons, ...reddits ];
+  return [ ...blueskys, ...mastodons, ...reddits, ...smalltowns ];
 };
 
 const list = handleUnauthorized( async function () {  

@@ -3,6 +3,8 @@
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
   import { createEventDispatcher } from "svelte";
+  import { allyEvent } from "$lib/helpers/event";
+
 
   export let name;
   export let isActive
@@ -10,20 +12,9 @@
   
   const dispatch = createEventDispatcher();
 
-  const toggle = async function () {
+  const handle = allyEvent(async function () {
     dispatch( "toggle", { name } );
-  }
-
-  const handle = async function (event) {
-    if ( event.type === "keypress" ) {
-        if ( event.key === "Enter" ) {
-          await toggle();
-        }
-      } else {
-        await toggle();
-      }
-  };
-
+  });
 
   let iconURL;
   iconURL = "/icons/heart.svg";

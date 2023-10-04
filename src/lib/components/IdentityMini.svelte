@@ -9,7 +9,7 @@
   export let identity;
   
   let activeSwitch;
-  let logo = `/icons/${ identity.type }.svg`;
+  let logo = `/icons/${ identity.platform }.svg`;
 
 
   onMount( function () {
@@ -29,7 +29,7 @@
 <section>
 
   <span>
-    <sl-icon src={logo} class="{identity.type}"></sl-icon>
+    <sl-icon src={logo} class="{identity.platform}"></sl-icon>
     <p>{ identity.prettyName }</p>
   </span>
 

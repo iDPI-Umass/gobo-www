@@ -10,7 +10,7 @@
   export let identity;
   
   let deleteButton, activeSwitch;
-  let logo = `/icons/${ identity.type }.svg`;
+  let logo = `/icons/${ identity.platform }.svg`;
   let nameSlot1 = identity.name;
   let nameSlot2 = identity.prettyName;
 
@@ -67,8 +67,8 @@
 
   <figure>
     <h2>
-      <sl-icon src={logo} class="{identity.type}"></sl-icon>
-      { identity.type }
+      <sl-icon src={logo} class="{identity.platform}"></sl-icon>
+      { identity.platform }
     </h2>
 
     

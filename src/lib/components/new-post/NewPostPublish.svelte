@@ -4,23 +4,11 @@
   import { goto } from "$app/navigation";
   import { onMount } from "svelte";
   import * as Post from "$lib/resources/post.js";
+  import { allyEvent } from "$lib/helpers/event";
 
 
   let draft = {};
   let publishButton;
-
-  const dispatch = function ( f ) {
-    return function ( event ) {
-      event.preventDefault();
-      if ( event.type === "keypress" ) {
-        if ( event.key === "Enter" ) {
-          f(event);
-        }
-      } else {
-        f(event)
-      }
-    };
-  };
 
   const publish = async function () {
     if ( publishButton.loading === true ) {
@@ -35,8 +23,8 @@
   };
 
 
-  const handleDiscard = dispatch( draftStore.clear );
-  const handlePublish = dispatch( publish );
+  const handleDiscard = allyEvent( draftStore.clear );
+  const handlePublish = allyEvent( publish );
 
 
   onMount( function () {

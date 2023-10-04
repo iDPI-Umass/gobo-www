@@ -13,7 +13,8 @@
   const proxyActionTable = {
     "bluesky": [ "reply", "repost", "quote", "like" ],
     "mastodon": [ "reply", "repost", "like" ],
-    "reddit": [ "upvote", "downvote", "reply" ]
+    "reddit": [ "upvote", "downvote", "reply" ],
+    "smalltown": [ "reply", "repost", "like" ],
   };
 
   let toggles = [ "like", "repost", "upvote", "downvote" ];

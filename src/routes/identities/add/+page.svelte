@@ -11,8 +11,18 @@
   import { getGOBOClient } from "$lib/helpers/account.js";
   export let data;
   let form, select, button;
-  let targetingBluesky = true;
-  let targetingMastodon = false;
+  let targetPlatform = "bluesky"
+
+  const parseBaseURL = function ( _url ) {
+    let url;
+    try {
+      url = new URL( _url );
+    } catch {
+      _url = "https://" + _url;
+      url = new URL( _url );
+    }
+    return `https://${ url.hostname }`;
+  }
 
 
   const submit = async function () {
@@ -27,16 +37,13 @@
           baseURL = "https://bsky.app";
           break;
         case "mastodon":
-          baseURL = data.get( "mastodonURL" );
-          if ( !baseURL.startsWith("https://") ) {
-            baseURL = `https://${ baseURL }`;
-          }
-          const domain = baseURL.replace("https://", "");
-          const domainComponents = domain.split("/");
-          baseURL = `https://${ domainComponents[0] }`
+          baseURL = parseBaseURL( data.get("mastodonURL") );
           break;
         case "reddit":
           baseURL = "https://www.reddit.com";
+          break;
+        case "smalltown":
+          baseURL = parseBaseURL( data.get("smalltownURL") );
           break;
         default:
           throw new Error( "unknown platform specified" );
@@ -82,8 +89,7 @@
     };
 
     const changeListener = function( event ) {
-      targetingMastodon = ( event.target.value === "mastodon" );
-      targetingBluesky = ( event.target.value === "bluesky" );
+      targetPlatform = event.target.value;
     };
 
     form.addEventListener( "submit", submitListener);
@@ -120,9 +126,10 @@
       <sl-option value="bluesky">Bluesky</sl-option>
       <sl-option value="mastodon">Mastodon</sl-option>
       <sl-option value="reddit">Reddit</sl-option>
+      <sl-option value="smalltown">Smalltown</sl-option>
     </sl-select>
 
-    {#if targetingBluesky === true}
+    {#if targetPlatform === "bluesky"}
       <sl-input
         name="blueskyLogin"
         label="Bluesky Username"
@@ -142,7 +149,7 @@
     {/if}
 
 
-    {#if targetingMastodon === true}
+    {#if targetPlatform === "mastodon"}
       <sl-input
         name="mastodonURL"
         label="Mastodon Server URL"
@@ -151,6 +158,18 @@
         size="medium">
       </sl-input>
     {/if}
+
+
+    {#if targetPlatform === "smalltown"}
+      <sl-input
+        name="smalltownURL"
+        label="Smalltown Server URL"
+        help-text="For example, https://community.publicinfrastructure.org or community.publicinfrastructure.org (you can omit the prefix for convenience)"
+        autocomplete="off"
+        size="medium">
+      </sl-input>
+    {/if}
+
 
     <sl-button
       bind:this={button}

@@ -2,6 +2,7 @@ html {
   --gobo-color-bluesky: #016bfd;
   --gobo-color-mastodon: #6364FF;
   --gobo-color-reddit: #ff4500;
+  --gobo-color-smalltown: #f1b844;
   --gobo-color-twitter: #1d9bf0;
 }
 
@@ -19,4 +20,8 @@ sl-icon.reddit {
 
 sl-icon.twitter {
   color: var(--gobo-color-twitter);
+}
+
+sl-icon.smalltown {
+  color: var(--gobo-color-smalltown);
 }

@@ -17,7 +17,7 @@
   const setIdentities = function () {
     for ( const key in draftData.identities ) {
       const value = draftData.identities[ key ];
-      if (( value.type === "reddit" ) && ( value.active === true )) {
+      if (( value.platform === "reddit" ) && ( value.active === true )) {
         identity = value;
         return;
       }

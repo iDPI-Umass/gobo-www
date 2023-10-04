@@ -17,7 +17,7 @@
   };
 
   const getLogo = function ( identity ) {
-    return `/icons/${ identity.type }.svg`;
+    return `/icons/${ identity.platform }.svg`;
   } 
 </script>
 
@@ -40,7 +40,7 @@
 
       {#each identities as identity (identity.key)}
         <sl-icon 
-          class="logo { identity.type }"
+          class="logo { identity.platform }"
           src="{getLogo( identity )}">
         </sl-icon>
       {/each}

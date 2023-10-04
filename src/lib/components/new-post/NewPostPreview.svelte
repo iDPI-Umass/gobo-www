@@ -2,25 +2,30 @@
   import BlueskyPreview from "$lib/components/new-post/BlueskyPreview.svelte";
   import MastodonPreview from "$lib/components/new-post/MastodonPreview.svelte";
   import RedditPreview from "$lib/components/new-post/RedditPreview.svelte";
+  import SmalltownPreview from "$lib/components/new-post/SmalltownPreview.svelte";
   import { draftStore } from "$lib/stores/post-draft.js";
   import { onMount } from "svelte";
 
   let hasBluesky = false;
   let hasMastodon = false;
   let hasReddit = false;
+  let hasSmalltown = false;
 
 
   onMount( function () {
     const unsubscribeDraft = draftStore.subscribe( async function ( draft ) {      
       let match;
-      match = draft.identities.find( i => i.type === "bluesky" && i.active === true);
+      match = draft.identities.find( i => i.platform === "bluesky" && i.active === true);
       hasBluesky = match != null;
 
-      match = draft.identities.find( i => i.type === "mastodon" && i.active === true);
+      match = draft.identities.find( i => i.platform === "mastodon" && i.active === true);
       hasMastodon = match != null;
 
-      match = draft.identities.find( i => i.type === "reddit" && i.active === true);
+      match = draft.identities.find( i => i.platform === "reddit" && i.active === true);
       hasReddit = match != null;
+
+      match = draft.identities.find( i => i.platform === "smalltown" && i.active === true);
+      hasSmalltown = match != null;
     });
 
     return function () {
@@ -52,6 +57,11 @@
 {#if hasReddit}
   <h3 class="preview-header">Reddit</h3>
   <RedditPreview></RedditPreview>
+{/if}
+
+{#if hasSmalltown}
+  <h3 class="preview-header">Smalltown</h3>
+  <SmalltownPreview></SmalltownPreview>
 {/if}
 
 

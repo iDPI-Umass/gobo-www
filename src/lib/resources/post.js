@@ -57,7 +57,7 @@ const getPost = async function ({ identity, id }) {
 const buildMetadata = function ( identity, draft ) {
   const { options } = draft;
 
-  switch ( identity.type ) {
+  switch ( identity.platform ) {
     case "bluesky":
       return {
         reply: draft.reply?.data ?? undefined,
@@ -75,6 +75,12 @@ const buildMetadata = function ( identity, draft ) {
         subreddit: options.subreddit,
         nsfw: options.sensitive,
         spoiler: options.spoiler,
+        reply: draft.reply?.data ?? undefined
+      }
+    case "smalltown":
+      return {
+        sensitive: options.sensitive,
+        spoiler: options.spoilerText,
         reply: draft.reply?.data ?? undefined
       }
     default:
