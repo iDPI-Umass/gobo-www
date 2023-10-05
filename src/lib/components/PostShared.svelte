@@ -84,76 +84,13 @@
   }
 
 
-  // Trace DOM parents until we get to overall post article.
-  const hasLinkParent = function ( element ) {
-    if ( element.parentNode.tagName === "A" ) {
-      return true;
-    } else if ( element.parentNode.tagName === "ARTICLE" ) {
-      return false;
-    } else {
-      return hasLinkParent( element.parentNode );
-    }
-  }
-
-  const isLink = function ( element ) {
-    if ( element.tagName === "A" ) {
-      return true;
-    } else if ( element.tagName === "ARTICLE" ) {
-      return false;
-    } else {
-      return hasLinkParent( element )
-    }
-  }
-
-  const hasButtonParent = function ( element ) {
-    if ( element.parentNode.tagName === "SL-BUTTON" ) {
-      return true;
-    } else if ( element.parentNode.tagName === "ARTICLE" ) {
-      return false;
-    } else {
-      return hasButtonParent( element.parentNode );
-    }
-  };
-
-  const isButton = function ( element ) {
-    if ( element.tagName === "SL-BUTTON" ) {
-      return true;
-    } else if ( element.tagName === "ARTICLE" ) {
-      return false;
-    } else {
-      return hasButtonParent( element )
-    }
-  };
-
   const handleClick = function ( event ) {
-    // Bail if this is a non-Enter key press event.
-    if ( (event.type === "keydown") && (event.key !== "Enter") ) {
-      return;
+    const doesPass = h.filterClickEvent( fullPage, event );
+    if ( doesPass ) {
+      // Go to the post's main page.
+      goto( `/post/${ identity }/${ centerID }`);
     }
-
-    // Bail if this is already the post's main page.
-    if ( fullPage === true ) {
-      return;
-    }
-
-    // Bail if agent clicked a legit link.
-    if ( isLink( event.target ) ) {
-      return;
-    }
-
-    // Bail if agent clicked a button.
-    if ( isButton(event.target) ) {
-      return;
-    }
-
-    // Bail if the agent is trying to highlight text for non-link purposes.
-    if ( window.getSelection().toString().length > 0 ) {
-      return;
-    }
-
-    // Go to the post's main page.
-    goto( `/post/${ identity }/${ centerID }`);
-  }
+  };
 
 </script>
 
@@ -340,7 +277,7 @@
     overflow-y: hidden;
     margin-bottom: 0;
     mask-image: var(--gradient);
-    -webkit-mask-image: var(--gradient)
+    -webkit-mask-image: var(--gradient);
   }
 
   .outer-frame .inner-frame .main .media,
@@ -378,6 +315,10 @@
 
   .outer-frame .inner-frame .main .media :global(a) {
     position: relative;
+  }
+
+  .outer-frame .inner-frame .main .content :global(pre) {
+    white-space: pre-wrap;
   }
 </style>
 

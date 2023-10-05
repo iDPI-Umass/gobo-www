@@ -12,7 +12,8 @@
 
   const loadMedia = async function () {
     post = await getPost({ identity, id });
-    media = post?.attachments[ Number(mediaID) ];
+    let attachments = post.attachments.filter( a => /^(image|video)\//.test(a.type) );
+    media = attachments[ Number(mediaID) ];
     if ( media == null ) {
       media = {};
     }

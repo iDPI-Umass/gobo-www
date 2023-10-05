@@ -70,63 +70,69 @@
 
 <style>
 
-span {
-  color: var(--gobo-color-text-muted);
-}
+  span {
+    color: var(--gobo-color-text-muted);
+  }
 
-.syndication-link {
-  min-width: 100%;
-  text-decoration: none;
-}
+  .syndication-link {
+    min-width: 100%;
+    text-decoration: none;
+  }
 
-.syndication {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap;
-  justify-content: flex-start;
-  align-items: stretch;
-  width: 100%;
-  background: var(--gobo-color-panel);
-  border: var(--gobo-border-panel);
-  border-radius: var(--gobo-border-radius);
-  margin-top: var(--gobo-height-spacer);
-  box-sizing: border-box;
-  cursor: var(--cursor);
-  color: var(--gobo-color-text);
-  overflow-y: hidden;
-}
+  .syndication {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: stretch;
+    width: 100%;
+    background: var(--gobo-color-panel);
+    border: var(--gobo-border-panel);
+    border-radius: var(--gobo-border-radius);
+    margin-top: var(--gobo-height-spacer);
+    box-sizing: border-box;
+    cursor: var(--cursor);
+    color: var(--gobo-color-text);
+    overflow-y: hidden;
+  }
 
-.syndication:focus-visible {
-  outline: 2px solid var(--gobo-color-primary);
-}
-
-@supports not selector(:focus-visible) {
-  .syndication:focus {
+  .syndication:focus-visible {
     outline: 2px solid var(--gobo-color-primary);
   }
-}
 
-.syndication .media img {
-  width: 100%;
-  height: 200px;
-  border-radius: var(--gobo-border-radius) var(--gobo-border-radius) 0 0;
-  object-fit: cover;
-}
+  @supports not selector(:focus-visible) {
+    .syndication:focus {
+      outline: 2px solid var(--gobo-color-primary);
+    }
+  }
 
-.syndication section {
-  margin: 0.5rem;
-  margin-bottom: 0.25rem;
-}
+  .syndication .media img {
+    width: 100%;
+    height: 200px;
+    border-radius: var(--gobo-border-radius) var(--gobo-border-radius) 0 0;
+    object-fit: cover;
+  }
 
-.syndication section h2 {
-  font-size: var(--gobo-font-size-large);
-  font-weight: var(--gobo-font-weight-black);
-}
+  .syndication section {
+    margin: 0.5rem;
+    margin-bottom: 0.25rem;
+    overflow-wrap: break-word;
+  }
 
-.syndication section :global(p) {
-  font-size: var(--gobo-font-size-detail);
-  font-weight: var(--gobo-font-weight-regular);
-}
+  .syndication section h2 {
+    font-size: var(--gobo-font-size-large);
+    font-weight: var(--gobo-font-weight-black);
+  }
+
+  .syndication section :global(p) {
+    font-size: var(--gobo-font-size-detail);
+    font-weight: var(--gobo-font-weight-regular);
+    white-space: pre-wrap;
+  }
+
+  .syndication section :global(pre) {
+    white-space: pre-wrap;
+  }
 </style>
 

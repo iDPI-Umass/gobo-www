@@ -50,8 +50,7 @@
     const { name } = event.detail;
 
     // The interlock condition is when you use a counter-vote to create two
-    // state changes. Removing one edge and adding another. We also need to
-    // signal to the parent component that the parent should refresh.
+    // state changes. Removing one edge and adding another.
     if ( isVoteInterlock(name) ) {
       await toggleEdge( "upvote" );
       await toggleEdge( "downvote" );
