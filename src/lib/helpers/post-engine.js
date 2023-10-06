@@ -1,3 +1,5 @@
+import { Cache } from "$lib/resources/cache.js";
+
 const getLogo = function ( platform ) {
   return `/icons/${ platform }.svg`;
 };
@@ -64,6 +66,53 @@ const getAvatar = function ( source ) {
   return source.icon_url ?? getAvatarFallback( source );
 };
 
+
+
+
+const getShare = function ( shares ) {
+  let sharedPosts = [];
+  for ( const item of shares ) {
+    const post = Cache.getPost( item );
+    if ( post == null ) {
+      console.error(`expected post ${item}, but it appears to be missing from graph`);
+    } else {
+      sharedPosts.push( post );
+    }
+  }
+
+  // Correct errors in graph that produce multiple shares.
+  // TODO: Look for errors in either feed response constructor or feed intermediary constructor.
+  if ( sharedPosts.length > 1 ) {
+    sharedPosts = [ sharedPosts[0] ];
+  }
+  
+  return sharedPosts[0];
+};
+
+const getReply = function ( reply ) {
+  let repliedPost = null;
+  if ( reply != null ) {
+    const post = Cache.getPost( reply );
+    if ( post == null ) {
+      console.error(`expected post ${reply}, but it appears to be missing from graph`);
+    } else {
+      repliedPost = post;
+    }
+  }
+
+  return repliedPost;
+};
+
+const getActionTarget = function ({ id, content, sharedPost }) {
+  let actionTarget = null;
+  if ( sharedPost != null && content == null ) {
+    actionTarget = sharedPost.id;
+  } else {
+    actionTarget = id;
+  }
+
+  return actionTarget;
+};
 
 
 
@@ -171,6 +220,10 @@ export {
   getSourceCopy,
   getAvatarFallback,
   getAvatar,
+
+  getShare,
+  getReply,
+  getActionTarget,
 
 
   filterClickEvent

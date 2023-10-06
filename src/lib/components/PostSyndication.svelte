@@ -57,7 +57,7 @@
         <span>{domain}</span>
 
         {#if title}
-          <h2>{title}</h2>
+          <h2>{@html title}</h2>
         {/if}
 
         {@html content}

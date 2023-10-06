@@ -12,7 +12,7 @@
   import { render } from "$lib/helpers/markdown.js";
   import { goto } from "$app/navigation";
   import { Cache } from "$lib/resources/cache.js";
-  import * as h from "$lib/components/post-helpers.js";
+  import * as h from "$lib/helpers/post-engine.js";
 
   export let identity;
 
@@ -39,34 +39,9 @@
 
   let unused = [ platform_id, visibility, created, updated ];
   let source = Cache.getSource( source_id );
-
-  let sharedPosts = [];
-  for ( const item of shares ) {
-    const post = Cache.getPost( item );
-    if ( post == null ) {
-      console.error(`expected post ${item}, but it appears to be missing from graph`);
-    } else {
-      sharedPosts.push( post );
-    }
-  }
-
-  // Correct errors in graph that produce multiple shares.
-  // TODO: Look for errors in either feed response constructor or feed intermediary constructor.
-  if ( sharedPosts.length > 1 ) {
-    sharedPosts = [ sharedPosts[0] ];
-  }
-
-
-  let repliedPost = null;
-  if ( reply != null ) {
-    const post = Cache.getPost( reply );
-    if ( post == null ) {
-      console.error(`expected post ${reply}, but it appears to be missing from graph`);
-    } else {
-      repliedPost = post;
-    }
-  }
-
+  let sharedPost = h.getShare( shares );
+  let replyPost = h.getReply( reply );
+  let actionTarget = h.getActionTarget({ id, content, sharedPost });
   let logo = h.getLogo( platform );
   let { headingSlot1, headingSlot2 } = h.getHeadingSlots( source );
   let avatar = h.getAvatar( source );
@@ -98,9 +73,7 @@
       // Go to the post's main page.
       goto( `/post/${ identity }/${ id }`);
     }
-  };
-
-</script>
+  };</script>
 
 <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 <article 
@@ -115,11 +88,11 @@
   on:click={handleClick}
   on:keydown={handleClick}>
 
-  {#if repliedPost}
+  {#if replyPost}
     <PostReplied 
       {identity} 
       centerID={id}
-      {...repliedPost}
+      {...replyPost}
       {fullPage}>
     </PostReplied>
   {/if}
@@ -171,17 +144,17 @@
         </div>
       {/if}
 
-      {#each sharedPosts as post}
+      {#if sharedPost}
         <PostShared
           {identity} 
           centerID={id}
-          {...post}
+          {...sharedPost}
           marginTop={renderedContent ? "1rem" : "6.5px"}
           {fullPage}>
         </PostShared>
-      {/each}
+      {/if}
 
-      <PostActions {identity} post={id} {platform}></PostActions>
+      <PostActions {platform} {identity} post={actionTarget}></PostActions>
 
     </div>
 

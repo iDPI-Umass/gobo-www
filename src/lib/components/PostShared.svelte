@@ -9,7 +9,7 @@
   import { render } from "$lib/helpers/markdown.js";
   import { goto } from "$app/navigation";
   import { Cache } from "$lib/resources/cache.js";
-  import * as h from "$lib/components/post-helpers.js";
+  import * as h from "$lib/helpers/post-engine.js";
 
   export let identity;
   export let centerID;
@@ -38,27 +38,7 @@
 
   let unused = [ platform_id, visibility, reply, created, updated, url ];
   let source = Cache.getSource( source_id );
-
-  let sharedPosts = [];
-  // Prevent graph sprawl in feed.
-  if ( terminal !== true ) {
-    for ( const item of shares ) {
-      const post = Cache.getPost( item );
-      if ( post == null ) {
-        console.error(`expected post ${item}, but it appears to be missing from graph`);
-      } else {
-        sharedPosts.push( post );
-      }
-    }
-
-    // Correct errors in graph that produce multiple shares.
-    // TODO: Look for errors in either feed response constructor or feed intermediary constructor.
-    if ( sharedPosts.length > 1 ) {
-      sharedPosts = [ sharedPosts[0] ];
-    }
-  }
-
-
+  let sharedPost = h.getShare( shares );
   let logo = h.getLogo( platform );
   let { headingSlot1, headingSlot2 } = h.getHeadingSlots( source );
   let avatar = h.getAvatar( source );
@@ -152,15 +132,15 @@
         </div>
       {/if}
 
-      {#each sharedPosts as post}
-        <svelte:self 
+      {#if sharedPost}
+        <svelte:self
           {identity}
-          centerID={centerID} 
-          {...post} 
+          {centerID}
+          {...sharedPost}
           marginTop="1rem"
-          terminal={true}/>
-      {/each}
-
+          terminal={true}
+        />
+      {/if}
     </div>
 
   </div>
