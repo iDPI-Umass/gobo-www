@@ -2,7 +2,7 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/switch/switch.js";
   import { onMount } from "svelte";
-  import * as Feed from "$lib/helpers/feed.js";
+  import * as FeedSaver from "$lib/engines/feed-singleton.js";
   import { feedStore } from "$lib/stores/feed.js";
 
 
@@ -14,7 +14,8 @@
 
   onMount( function () {
     const listener = async function ( event ) {
-      await Feed.setIdentityActive( identity, event.target.checked );
+      const engine = await FeedSaver.getEngine();
+      engine.setActiveState( identity, event.target.checked );
       feedStore.push({ command: "reset" })
     };
 

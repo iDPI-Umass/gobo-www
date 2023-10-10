@@ -19,7 +19,9 @@
   let heading = "New Post";
 
   onDestroy( function () {
-    draftStore.clear();
+    // TODO: How do we want to handle this? If we do this, we can't navigate to
+    //       to the image page because it resets the draft. 😭
+    // draftStore.clear();
   });
 
   onMount( function () {

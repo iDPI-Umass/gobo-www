@@ -1,23 +1,19 @@
-import { FeedEngine } from "$lib/helpers/feed.js";
+import { FeedEngine } from "$lib/engines/feed.js";
 
 let cache = {
   feed: [],
   scrollPosition: 0
 };
 
-const reset = async function () {
-  cache = {
-    feed: [],
-    scrollPosition: 0,
-    engine: await FeedEngine.create()
-  };
-}
-
+// Careful about the engine state here. We want to enforce a singleton interface.
+// But we have asynchronous instantiation behavior. Assign promise before falling
+// through to resolving the promise.
 const getEngine = async function () {
   if ( cache.engine == null ) {
-    cache.engine = await FeedEngine.create(); 
+    cache.engine = FeedEngine.create();
   }
 
+  cache.engine = await cache.engine;
   return cache.engine;
 };
 
@@ -41,12 +37,24 @@ const setScrollPosition = function ( y ) {
   cache.scrollPosition = y;
 };
 
+const reset = async function () {
+  const engine = await getEngine();
+  await engine.reset();
+
+  cache = {
+    feed: [],
+    scrollPosition: 0,
+    engine
+  };
+};
+
 export {
-  reset,
   getEngine,
   setEngine,
   getFeed,
   setFeed,
   getScrollPosition,
   setScrollPosition,
+
+  reset,
 }

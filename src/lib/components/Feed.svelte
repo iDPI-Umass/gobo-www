@@ -3,7 +3,7 @@
   import Post from "$lib/components/Post.svelte";
   import { onMount, tick } from "svelte";
 
-  import * as FeedSaver from "$lib/helpers/scroll-restoration.js";
+  import * as FeedSaver from "$lib/engines/feed-singleton.js";
   import { ScrollSmoother } from "$lib/helpers/infinite-scroll.js";
   import { scrollStore } from "$lib/stores/scroll.js";
   import { feedStore } from "$lib/stores/feed.js";

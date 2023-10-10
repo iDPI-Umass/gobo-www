@@ -1,28 +1,32 @@
 <script>
+  import * as Value from "@dashkite/joy/value";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/switch/switch.js";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
   import { draftStore } from "$lib/stores/post-draft.js";
   import { onMount } from "svelte";
   import { get } from "svelte/store";
-  import * as Identity from "$lib/resources/identity.js";
+  import * as FeedSaver from "$lib/engines/feed-singleton.js";
 
   let identities = [];
   let identityLock = null;
   let allEmpty = true;
 
   const loadIdentities = async function () {
-    const identities = await Identity.list();
     const draft = get( draftStore );
-    
-    // Merge in the "active" state from the draft store, with fresh API data.
-    for ( const identity of identities ) {
-      const match = draft.identities.find( i => i.key === identity.key );
-      if ( match != null ) {
-        identity.active = match.active;
+    let identities = draft.identities;
+
+    const engine = await FeedSaver.getEngine();
+    const _identities = engine.getIdentities();
+    if ( identities.length !== _identities.length ) {
+      identities = [];
+      for ( const identity of _identities ) {
+        const i = Value.clone( identity );
+        i.active = false;
+        identities.push( i );
       }
     }
-    
+ 
     draftStore.update({ identities, identitiesLoaded: "ready" });
   };
 
@@ -76,14 +80,14 @@
 
 
 <h2>Choose Identities</h2>
-      
-<p>
-  Select the identities you'd like to use to publish this post.
-</p>
 
 {#await loadIdentities()}
   <Spinner></Spinner>
 {:then}
+
+  <p>
+    Select the identities you'd like to use to publish this post.
+  </p>
 
   {#if allEmpty == true}
 
@@ -116,7 +120,7 @@
   {/if}
 
 {:catch}
-  <p>There fetching your identities.</p>
+  <p>There was a problem fetching your identities.</p>
 {/await}
 
 

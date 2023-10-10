@@ -3,14 +3,15 @@
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
-  import * as Feed from "$lib/helpers/feed.js";
+  import * as FeedSaver from "$lib/engines/feed-singleton.js";
   import * as Lens from "$lib/resources/lens.js";
 
   let identities = [];
   let lenses = []
 
   const loadFilters = async function () {
-    identities = await Feed.getActiveIdentities();
+    const engine = await FeedSaver.getEngine();
+    identities = engine.getIdentities();
     lenses = [{
       key: "Keyword Blocking"
     }];

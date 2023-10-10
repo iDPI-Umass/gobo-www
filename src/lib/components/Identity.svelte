@@ -3,7 +3,7 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/switch/switch.js";
   import * as Identity from "$lib/resources/identity.js";
-  import * as Feed from "$lib/helpers/feed.js";
+  import * as FeedSaver from "$lib/engines/feed-singleton.js";
   import { onMount } from "svelte";
 
 
@@ -22,7 +22,6 @@
     }
 
     deleteButton.loading = true;
-    await Feed.removeIdentity( identity );
     await Identity.remove( identity );
 
     // TODO: Figure out how to do this in svelte. I keep getting search results
@@ -32,7 +31,8 @@
 
   onMount( function () {
     const listener = async function ( event ) {
-      await Feed.setIdentityActive( identity, event.target.checked );
+      const engine = await FeedSaver.getEngine();
+      engine.setActiveState( identity, event.target.checked );
     };
 
     activeSwitch.addEventListener( "sl-change", listener );

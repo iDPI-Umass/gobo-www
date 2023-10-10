@@ -25,7 +25,7 @@ const getPrettyName = function ( identity ) {
 
 const categorize = function ( identity ) {
   identity.key = String( identity.id );
-  identity.active = true;
+  identity.active ??= true;
   identity.prettyName = getPrettyName( identity );
   return identity;  
 };
@@ -54,7 +54,7 @@ const sort = function ( identities ) {
   return [ ...blueskys, ...mastodons, ...reddits, ...smalltowns ];
 };
 
-const list = handleUnauthorized( async function () {  
+const list = handleUnauthorized( async function () {
   try {
     const client = await getGOBOClient();
     const identities = await client.personIdentities.get({ 
@@ -73,8 +73,18 @@ const remove = handleUnauthorized( async function ( identity ) {
 });
 
 
+const setActiveState = async function ( identity, active ) {
+  const client = await getGOBOClient();
+  return await client.personIdentity.post({
+    parameters: identity,
+    content: { active }
+  });
+};
+
+
 
 export {
   list,
-  remove
+  remove,
+  setActiveState
 }
