@@ -73,6 +73,7 @@
       switch ( command ) {
         case "reset":
           loaded = false;
+          items = [];
           await FeedSaver.reset();
           await loadFeed();
           feedStore.push({}); // We're using store as message queue, clear out old message.

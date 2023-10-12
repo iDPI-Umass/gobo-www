@@ -20,6 +20,13 @@ It's coming from the lack of a proper caching layer in the browser. So, this
 works for now, but the singleton interface is bespoke and brittle. I imagine 
 a lot of it would evaporate if we had a general write-thru cache like DashKite
 created for application clients.
+
+Something else important: We've been having issues with consensus of posts in
+the feed because, even with a singleton interface, we have an asynchronous flow
+that we'd like to interrupt in reaction to toggled identity filters. In that case,
+we want to avoid wasteful HTTP requests and discard this instance in favor of
+a new empty one. I'm handling that with a flag for right now, but that's
+a strong indication that this would be more clearly expressed as a state machine.
 ***/
 
 class FeedEngine {
@@ -27,6 +34,7 @@ class FeedEngine {
     this.feed = feed;
     this.identityEngine = identityEngine;
     this.replies = new Set();
+    this.nextPosts = [];
   }
 
   static async create () {
@@ -37,15 +45,21 @@ class FeedEngine {
   }
 
   async reset () {
-    const identities = this.identityEngine.getActiveIdentities();
-    this.feed = await Feed.create({ identities });
-    this.replies = new Set();
+    this.isStopped = true;
+    const identityEngine = this.identityEngine;
+    const identities = identityEngine.getActiveIdentities();
+    const feed = await Feed.create({ identities });
+    return new FeedEngine({ feed, identityEngine });
   }
 
   async pull ( count ) {
     const results = [];
 
     for ( let i = 0; i < count - 1; i++ ) {      
+      if ( this.isStopped === true ) {
+        return [];
+      }
+
       const result = await this.feed.next();
       if ( result != null ) {
         const { post } = result;
@@ -67,6 +81,10 @@ class FeedEngine {
       }
     }
 
+    if ( this.isStopped === true ) {
+      return [];
+    }
+    
     return results;
   }
 

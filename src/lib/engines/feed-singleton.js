@@ -8,6 +8,8 @@ let cache = {
 // Careful about the engine state here. We want to enforce a singleton interface.
 // But we have asynchronous instantiation behavior. Assign promise before falling
 // through to resolving the promise.
+
+// See the FeedEngine notes, this should be re-written as a state machine.
 const getEngine = async function () {
   if ( cache.engine == null ) {
     cache.engine = FeedEngine.create();
@@ -39,12 +41,12 @@ const setScrollPosition = function ( y ) {
 
 const reset = async function () {
   const engine = await getEngine();
-  await engine.reset();
+  cache.engine = engine.reset();
 
   cache = {
     feed: [],
     scrollPosition: 0,
-    engine
+    engine: await getEngine()
   };
 };
 

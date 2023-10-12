@@ -42,7 +42,7 @@ const getSourceCopy = function ( platform ) {
       break;
     case "smalltown":
       // Specialize this to name the server?
-      sourceCopy = "View on Mastodon";
+      sourceCopy = "View on Smalltown";
       break;
     default:
       throw new Error( "unknown platform" );
