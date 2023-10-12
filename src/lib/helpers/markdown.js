@@ -5,7 +5,7 @@ import mila from "markdown-it-link-attributes";
 const md = new Markdown({
   html:         true,        // Enable HTML tags in source
   xhtmlOut:     true,        // Use '/' to close single tags (<br />).
-  breaks:       false,        // Convert '\n' in paragraphs into <br>
+  breaks:       true,        // Convert '\n' in paragraphs into <br>
   langPrefix:   'language-',  // CSS language prefix for fenced blocks. Can be
                               // useful for external highlighters.
   linkify:      true,         // Autoconvert URL-like text to links
