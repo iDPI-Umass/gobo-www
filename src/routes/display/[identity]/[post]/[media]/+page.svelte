@@ -23,13 +23,7 @@
 
 <GuardFrame>
 
-  <header>
-    <BackLink
-      href="/home"
-      heading="">
-    </BackLink>
-  </header>
-  
+  <BackLink heading="Media"></BackLink>
 
   {#await loadMedia()}
     <Spinner></Spinner>

@@ -1,4 +1,5 @@
 <script>
+  import BackLink from "$lib/components/primitives/BackLink.svelte";
   import VerticalNav from "$lib/components/primitives/VerticalNav.svelte";
   import NavLink from "$lib/components/primitives/NavLink.svelte";
   import * as Account from "$lib/helpers/account.js"; 
@@ -10,10 +11,7 @@
 </script>
 
 <div class="main-child" >
-  <header>
-    <h1>Settings</h1>
-  </header>
-  
+  <BackLink heading="Settings"></BackLink>
 
   <VerticalNav slot="left">
     <NavLink href="/settings/profile">Profile</NavLink>

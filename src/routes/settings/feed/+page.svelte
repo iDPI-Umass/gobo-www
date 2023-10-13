@@ -72,10 +72,7 @@
 </script>
 
 <div class="main-child">
-  <BackLink
-    href="/settings"
-    heading="Feed Settings">
-  </BackLink>
+  <BackLink heading="Feed Settings"></BackLink>
 
   <section class="gobo-copy">
     <header>

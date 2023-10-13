@@ -103,10 +103,7 @@
 </script>
 
 <div class="main-child">
-  <BackLink
-    href="/identities"
-    heading="Add Identity">
-  </BackLink>
+  <BackLink heading="Add Identity"></BackLink>
 
   <form class="gobo-form" bind:this={form}>
     

@@ -11,10 +11,10 @@
 
   const loadFilters = async function () {
     const engine = await FeedSaver.getEngine();
-    identities = engine.getIdentities();
-    lenses = [{
-      key: "Keyword Blocking"
-    }];
+    identities = engine.getActiveIdentities();
+    // lenses = [{
+    //   key: "Keyword Blocking"
+    // }];
   };
 
   const getLogo = function ( identity ) {
@@ -39,12 +39,13 @@
         slot="prefix">
       </sl-icon>
 
-      {#each identities as identity (identity.key)}
+      {identities.length}
+      <!-- {#each identities as identity (identity.key)}
         <sl-icon 
           class="logo { identity.platform }"
           src="{getLogo( identity )}">
         </sl-icon>
-      {/each}
+      {/each} -->
     </sl-button>
 
 
@@ -59,9 +60,10 @@
         slot="prefix">
       </sl-icon>
 
-      {#each lenses as lens (lens.key)}
+      {lenses.length}
+      <!-- {#each lenses as lens (lens.key)}
         <span> { lens.key } </span>
-      {/each}
+      {/each} -->
     </sl-button>
   
   {/await}
@@ -70,7 +72,6 @@
 
 <style>
   nav {
-    margin-bottom: 1rem;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -104,6 +105,7 @@
     justify-content: flex-start;
     align-items: center;
     text-transform: capitalize;
+    padding: 0 1rem;
   }
 
   nav sl-button sl-icon.identity-label {

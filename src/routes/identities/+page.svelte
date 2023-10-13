@@ -1,4 +1,5 @@
 <script>
+  import BackLink from "$lib/components/primitives/BackLink.svelte";
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import Identity from "$lib/components/Identity.svelte";
@@ -21,9 +22,11 @@
 </script>
   
 <div class="main-child">
+
+  <BackLink heading="Identities"></BackLink>
+  
   <header>
     <div class="header-row">
-      <h1>Identities</h1>
       <nav>
         <sl-button
           href="/identities/add"

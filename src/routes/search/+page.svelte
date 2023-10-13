@@ -1,4 +1,5 @@
 <script>
+  import BackLink from "$lib/components/primitives/BackLink.svelte";
   import "@shoelace-style/shoelace/dist/components/input/input.js";
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
@@ -74,9 +75,7 @@
 </script>
 
 <div class="main-child">
-  <header>
-    <h1>Search</h1>
-  </header>
+  <BackLink heading="Search"></BackLink>
 
   <form class="gobo-form" bind:this={form}>
     

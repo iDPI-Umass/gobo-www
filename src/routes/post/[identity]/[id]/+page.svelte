@@ -19,10 +19,7 @@
 </script>
 
 <div class="main-child">
-  <BackLink
-    href="/home"
-    heading="Post">
-  </BackLink>
+  <BackLink heading="Post"></BackLink>
 
   {#await loadPost()}
     <Spinner></Spinner>

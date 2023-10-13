@@ -58,11 +58,7 @@
 </script>
 
 <div class="main-child">
-  <BackLink
-    href="/settings"
-    heading="Profile">
-  </BackLink>
-    
+  <BackLink heading="Profile"></BackLink>
 
   <form bind:this={form} class="gobo-form">
     

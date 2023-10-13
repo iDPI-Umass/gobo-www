@@ -41,9 +41,7 @@
 
 <div class="main-child">
   <header>
-    <BackLink
-      {heading}>
-    </BackLink>
+    <BackLink {heading}></BackLink>
   </header>
   
   <form class="gobo-form">

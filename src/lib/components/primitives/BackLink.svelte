@@ -1,7 +1,6 @@
 <script>
   import { allyEvent } from "$lib/helpers/event";
   import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
-  export let href;
   export let heading;
 
   const handleClick = allyEvent( function () {

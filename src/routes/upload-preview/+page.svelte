@@ -26,12 +26,7 @@
 </script>
 
 <div class="frame">
-  <header>
-    <BackLink
-      href="/new-post"
-      heading="">
-    </BackLink>
-  </header>
+  <BackLink heading="Preview"></BackLink>
 
   <img
     bind:this={previewImage}

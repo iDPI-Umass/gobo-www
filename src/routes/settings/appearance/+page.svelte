@@ -58,10 +58,7 @@
 
 
 <div class="main-child">
-  <BackLink
-    href="/settings"
-    heading="Appearance">
-  </BackLink>
+  <BackLink heading="Appearance"></BackLink>
 
   <form class="gobo-form">
     <h2>Dark Mode</h2>
