@@ -5,15 +5,18 @@
   import ProfileBadge from "$lib/components/primitives/ProfileBadge.svelte"
 </script>
 
-<header class="desktop">
-  <nav>
-    <a class="logo" href="/home">
-      <img src="/images/gobo-logo.svg" alt="Main logo for the Gobo application">
-    </a>
-    <div class="spacer" aria-hidden=true ></div>
-    <ProfileBadge></ProfileBadge>
-  </nav>
-</header>
+<div class="root relative">
+  <header class="desktop">
+    <nav>
+      <a class="logo" href="/home">
+        <img src="/images/gobo-logo.svg" alt="Main logo for the Gobo application">
+      </a>
+      <div class="spacer" aria-hidden=true ></div>
+      <ProfileBadge></ProfileBadge>
+    </nav>
+  </header>
+</div>
+
 
 <!-- <header class="mobile">
   <nav>
@@ -24,6 +27,11 @@
 </header> -->
 
 <style>
+  .root {
+    width: 100%;
+    height: 4.625rem;
+  }
+
   header {
     flex-direction: row;
     flex-wrap: nowrap;
@@ -69,7 +77,10 @@
       display: none;
     }
     .desktop {
+      position: fixed;
       display: flex;
+      width: 100%;
+      z-index: 10;
     }
   }
 </style>

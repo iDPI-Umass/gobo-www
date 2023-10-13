@@ -4,6 +4,7 @@ import * as LS from  "$lib/helpers/local-storage.js";
 import * as Account from "$lib/helpers/account.js";
 import * as Welcome from "$lib/helpers/welcome.js";
 import { getAuth0Client } from "$lib/helpers/auth0.js";
+import { createWakeLock } from "$lib/helpers/wake-lock.js";
 
 const exists = function ( value ) {
   return value != null;
@@ -34,6 +35,7 @@ const toAuthenticationPage = async function () {
 // TODO: We need to be careful this doesn't create a routing infinite loop with
 //   the guard redirect functionality.
 const handleRootRedirect = async function () {
+  return goto( "/home" );
   const client = await getAuth0Client();
   if ( await client.isAuthenticated() !== true ) {
     // We can stop here.
@@ -149,6 +151,9 @@ const handleRedirect = async function () {
   if ( !browser ) {
     return null;
   }
+
+  // establish wake lock. We need globally used, asynchronous code path.
+  await createWakeLock();
 
   try {
     const url = new URL( document.location );

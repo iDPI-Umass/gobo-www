@@ -120,7 +120,7 @@
   section.feed {
     overflow-y: scroll;
     padding: 2px;
-    max-height: 100%;
+    /* max-height: 100%; */
   }
 
   @media ( max-width: 680px ) {

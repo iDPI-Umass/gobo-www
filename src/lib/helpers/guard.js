@@ -5,6 +5,7 @@ import { getAuth0Client } from "$lib/helpers/auth0.js";
 
 
 export async function guard() {
+  return;
   if ( browser ) {
     try {
       const client = await getAuth0Client();

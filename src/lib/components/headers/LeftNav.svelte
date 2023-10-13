@@ -11,41 +11,43 @@
   };
 </script>
 
-<nav>
-  <sl-button
-    class="home {current === 'home' ? "current" : ""}"
-    pill
-    href="/home"
-    on:click={handleHomeReset}
-    on:keypress={handleHomeReset}>
-    <sl-icon src="/icons/home.svg" slot="prefix"></sl-icon>
-    Home
-  </sl-button>
+<div class="root">
+  <nav>
+    <sl-button
+      class="home {current === 'home' ? "current" : ""}"
+      pill
+      href="/home"
+      on:click={handleHomeReset}
+      on:keypress={handleHomeReset}>
+      <sl-icon src="/icons/home.svg" slot="prefix"></sl-icon>
+      Home
+    </sl-button>
 
-  <sl-button
-    class="identities {current === "identities" ? "current" : ""}"
-    pill
-    href="/identities">
-    <sl-icon src="/icons/identities.svg" slot="prefix"></sl-icon>
-    Identities
-  </sl-button>
+    <sl-button
+      class="identities {current === "identities" ? "current" : ""}"
+      pill
+      href="/identities">
+      <sl-icon src="/icons/identities.svg" slot="prefix"></sl-icon>
+      Identities
+    </sl-button>
 
-  <sl-button
-    class="settings {current === "settings" ? "current" : ""}"
-    pill
-    href="/settings">
-    <sl-icon src="/icons/gear.svg" slot="prefix"></sl-icon>
-    Settings
-  </sl-button>
+    <sl-button
+      class="settings {current === "settings" ? "current" : ""}"
+      pill
+      href="/settings">
+      <sl-icon src="/icons/gear.svg" slot="prefix"></sl-icon>
+      Settings
+    </sl-button>
 
-  <sl-button
-    class="cta"
-    pill
-    href="/new-post">
-    <sl-icon slot="prefix" src="/icons/pencil-square.svg"></sl-icon>
-    New Post
-  </sl-button>
-</nav>
+    <sl-button
+      class="cta"
+      pill
+      href="/new-post">
+      <sl-icon slot="prefix" src="/icons/pencil-square.svg"></sl-icon>
+      New Post
+    </sl-button>
+  </nav>
+</div>
 
 <style>
   nav {
@@ -145,7 +147,7 @@
   }
 
   @media ( min-width: 1300px ) {
-    nav {
+    .root, nav {
       min-width: 16.125rem;
     }
 
@@ -163,8 +165,16 @@
   }
 
   @media ( min-width: 750px ) {
-    nav {
+    .root {
       display: flex;
+      flex-direction: column;
+      height: 100dvh;
+      min-width: 6.5rem;
+    }
+    nav {
+      position: fixed;
+      display: flex;
+      height: 100%;
     }
   }
 </style>

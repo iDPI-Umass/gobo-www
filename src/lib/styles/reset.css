@@ -5,12 +5,12 @@
   margin: 0;
 }
 html, body {
-  height: 100dvh;
+  /* height: 100dvh; */
   background: var(--gobo-color-null);
   color: var(--gobo-color-text);
 }
 html {
-  overflow: hidden;
+  overflow: scroll;
 }
 img, picture, video, canvas, svg {
   display: block;
@@ -97,7 +97,7 @@ p > a:focus-visible {
 
 .page-wrapper {
   width: 100vw;
-  height: 100dvh;
+  /* height: 100dvh; */
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
@@ -106,4 +106,8 @@ p > a:focus-visible {
 
 .hidden {
   display: none;
+}
+
+.relative {
+  position: relative;
 }

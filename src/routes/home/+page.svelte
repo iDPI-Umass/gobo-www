@@ -28,15 +28,13 @@
 
   <MobileFilters></MobileFilters>
   <Feed></Feed>
-
 </div>
 
 
 <style>
   .main-child {
     max-width: unset;
-    max-height: 100%;
-  }
+ }
   .desktop {
     display: none;
   }

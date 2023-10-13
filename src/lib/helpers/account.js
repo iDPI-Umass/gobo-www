@@ -8,6 +8,7 @@ import {
   PUBLIC_GOBO_API
 } from '$env/static/public';
 
+const TOKEN = "";
 
 const extractPermissions = function ( account ) {
   const encoded = account?.token?.access_token.split(".")[1];
@@ -42,11 +43,12 @@ const getGOBOClient = async function () {
   let match = Cache.read( "gobo-client" );
 
   if ( match == null ) {
-    const account = await getAccount();
+    // const account = await getAccount();
+    // console.log(account.token.access_token);
     const client = await setupGOBOClient({
       base: PUBLIC_GOBO_API,
       debug: 1,
-      token: account.token.access_token
+      token: TOKEN
     });
     const profile = await client.me.get();
     client.setProfile( profile );
