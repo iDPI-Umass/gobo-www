@@ -1,6 +1,7 @@
 <script>
   import "@shoelace-style/shoelace/dist/components/input/input.js";
   import "@shoelace-style/shoelace/dist/components/checkbox/checkbox.js";
+  import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/switch/switch.js";
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import "@shoelace-style/shoelace/dist/components/radio-group/radio-group.js";
@@ -11,62 +12,77 @@
   import  "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import BackLink from "$lib/components/primitives/BackLink.svelte";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
-  import * as Lens from "$lib/resources/lens.js";
+  import * as FeedSaver from "$lib/engines/feed-singleton.js";
+  import { allyEvent } from "$lib/helpers/event";
   import { onMount } from "svelte";
 
 
-  let keywordForm, keywordCategory, keywords, keywordButton;
+  let form, button, select, engine, filters;
 
-  const loadKeywords = async function () {
-    keywords = await Lens.listBlocks();
+  const loadFilters = async function () {
+    engine = await FeedSaver.getEngine();
+    filters = engine.getFilters();
   };
 
   const addKeyword = async function () {
-    const data = new FormData( keywordForm );
-    const type = data.get( "category" );
-    const value = data.get( "word" );
+    const data = new FormData( form );
+    const category = data.get( "category" );
+    const configuration = {
+      value: data.get( "word" )
+    };
     
     try {
-      const keyword = await Lens.addBlock({ type, value });
-      keywords = Lens.sort([ ...keywords, keyword ]);
-      keywordForm.reset();
-      keywordCategory.value = "keyword";
-    
+      await engine.filterEngine.addFilter( category, configuration );
+      filters = engine.getFilters();
+      select.value = "block-keyword";
+      form.reset();    
     } catch ( error ) {
       // TODO: Visually represent an error here.
       console.error( error );
     }
 
-    keywordButton.loading = false;
+    button.loading = false;
   };
 
-  const removeKeyword = function ( keyword ) {
-    return async function () {
+  const removeFilter = function ( filter ) {
+    return allyEvent(function () {
       try {
-        await Lens.removeBlock( keyword );
-        const index = keywords.findIndex( k => k.key === keyword.key );
-        keywords.splice( index, 1 );
-        keywords = keywords;
+        engine.filterEngine.removeFilter(filter);
+        filters = engine.getFilters();
       } catch ( error ) {
         // TODO: Visually represent an error here.
         console.error( error );
       }
-    };
-  }
+    });
+  };
+
+  const toggleFilter = function ( filter ) {
+    return allyEvent(function () {
+      try {
+        filter.active = !filter.active;
+        console.log(filter)
+        engine.filterEngine.updateFilter(filter);
+        filters = engine.getFilters();
+      } catch ( error ) {
+        // TODO: Visually represent an error here.
+        console.error( error );
+      }
+    });
+  };
 
   onMount( function () {
     const listener = async function ( event ) {
       event.preventDefault();
-      if ( keywordButton.loading !== true ) {
-        keywordButton.loading = true;
+      if ( button.loading !== true ) {
+        button.loading = true;
         await addKeyword();
       }
     };
 
-    keywordForm.addEventListener( "submit", listener );
+    form.addEventListener( "submit", listener );
 
     return function () {
-      keywordForm.removeEventListener( "submit", listener );
+      form.removeEventListener( "submit", listener );
     };
   });
 </script>
@@ -76,35 +92,43 @@
 
   <section class="gobo-copy">
     <header>
-      <h2>Keyword Blocking</h2>
+      <h2>Feed Filters</h2>
       <p>
         Control which words and phrases you would like to exclude from your 
-        Gobo feed. You can add keywords below or delete any listed in the table.
+        Gobo feed. You can add filters below or delete any listed in the table.
       </p>
     </header>
     
-    {#await loadKeywords()}
+    {#await loadFilters()}
       <Spinner></Spinner>
     {:then}
-      {#if keywords.length === 0}
+      {#if filters.length === 0}
         <section class="keyword-table">
           <section class="table-row">
-            <span class="phrase">No keyword filters configured at this time.</span>
+            <span class="phrase">No filters configured at this time.</span>
           </section>
         </section>
       {:else}
         <section class="keyword-table">
-          {#each keywords as keyword (keyword.key)}
+          {#each filters as filter (filter.id)}
             <section class="table-row">
               <span class="keyword">
-                <span>{ keyword.configuration.type }</span>
+                <sl-button
+                  size="small"
+                  class="{filter.active ? 'action' : 'hollow'}"
+                  on:click={toggleFilter({ ...filter })}
+                  on:keypress={toggleFilter({ ...filter })}>
+                  { filter.category }
+                </sl-button>
+
               </span>
-              <span class="phrase">{ keyword.configuration.value }</span>
+              <span class="phrase">{ filter.configuration.value }</span>
               <sl-icon-button
-                on:click={removeKeyword({ ...keyword })}
-                on:keypress={removeKeyword({ ...keyword })}
-                label="Delete Keyword" 
-                src="/icons/trash.svg"></sl-icon-button>
+                on:click={removeFilter({ ...filter })}
+                on:keypress={removeFilter({ ...filter })}
+                label="Delete Filter" 
+                src="/icons/trash.svg">
+              </sl-icon-button>
             </section>
           {/each}
         </section>
@@ -112,18 +136,17 @@
     {/await}
   </section>
 
-  <form class="gobo-form" bind:this={keywordForm}>
+  <form class="gobo-form" bind:this={form}>
     <sl-select
-      bind:this={keywordCategory}
+      bind:this={select}
       name="category"
-      value="keyword"
+      value="block-keyword"
       label="Category"
       size="medium"
       pill>
-      <sl-option value="keyword">Keyword</sl-option>
-      <sl-option value="username">Username</sl-option>
-      <sl-option value="source">Source</sl-option>
-      <sl-option value="url">URL</sl-option>
+      <sl-option value="block-keyword">Block Keyword</sl-option>
+      <sl-option value="block-username">Block Username</sl-option>
+      <sl-option value="block-domain">Block Domain</sl-option>
     </sl-select>
     
     <sl-input
@@ -136,13 +159,13 @@
 
     <div class="buttons">
       <sl-button
-        bind:this={keywordButton}
+        bind:this={button}
         type="submit"
         class="submit"
         variant="primary"
         size="medium"
         pill>
-        Add Keyword
+        Add Filter
       </sl-button>  
     </div>
     
@@ -159,8 +182,12 @@
     color: var(--gobo-color-danger);
   }
 
+  .keyword-table .keyword {
+    min-width: unset;
+  }
+
   .keyword-table .keyword span {
-    background: var(--gobo-color-active);
+    white-space: nowrap;
   }
 
   sl-select {

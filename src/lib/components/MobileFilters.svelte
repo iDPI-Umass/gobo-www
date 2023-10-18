@@ -4,17 +4,15 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
   import * as FeedSaver from "$lib/engines/feed-singleton.js";
-  import * as Lens from "$lib/resources/lens.js";
+  import * as Lens from "$lib/resources/filter.js";
 
   let identities = [];
-  let lenses = []
+  let filters = []
 
   const loadFilters = async function () {
     const engine = await FeedSaver.getEngine();
     identities = engine.getActiveIdentities();
-    // lenses = [{
-    //   key: "Keyword Blocking"
-    // }];
+    filters = engine.filterEngine.getActiveFilters();
   };
 
   const getLogo = function ( identity ) {
@@ -40,12 +38,6 @@
       </sl-icon>
 
       {identities.length}
-      <!-- {#each identities as identity (identity.key)}
-        <sl-icon 
-          class="logo { identity.platform }"
-          src="{getLogo( identity )}">
-        </sl-icon>
-      {/each} -->
     </sl-button>
 
 
@@ -60,10 +52,7 @@
         slot="prefix">
       </sl-icon>
 
-      {lenses.length}
-      <!-- {#each lenses as lens (lens.key)}
-        <span> { lens.key } </span>
-      {/each} -->
+      {filters.length}
     </sl-button>
   
   {/await}

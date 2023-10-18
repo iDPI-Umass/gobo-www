@@ -8,8 +8,9 @@ import { Cache, cache } from "$lib/resources/cache.js";
 
 
 class Reader {
-  constructor ({ identity, per_page, client }) {
+  constructor ({ identity, filters, per_page, client }) {
     this.identity = identity;
+    this.filters = filters;
     this.id = identity.id
     this.per_page = per_page ?? 50;
     this.client = client;
@@ -19,10 +20,10 @@ class Reader {
     this.unlocksAt = null;
   }
 
-  static async create ({ identity, per_page }) {
+  static async create ({ identity, filters, per_page }) {
     const client = await getGOBOClient();
     per_page = per_page ?? 50;
-    return new Reader({ identity, per_page, client });
+    return new Reader({ identity, filters, per_page, client });
   }
 
   async page () {
@@ -34,6 +35,7 @@ class Reader {
         start: this.tail
       });
 
+      applyFilters( this.filters, result );
       console.log(result)
 
       const feed = [];
@@ -154,10 +156,10 @@ class Feed {
     this.readers = readers;
   }
 
-  static async create ({ identities }) {
+  static async create ({ identities, filters }) {
     const readers = [];
     for ( const identity of identities ) {
-      readers.push( await Reader.create({ identity }) );
+      readers.push( await Reader.create({ identity, filters }) );
     }
 
     return new Feed({ readers });
@@ -206,6 +208,77 @@ class Feed {
     }
   }
 }
+
+
+
+
+const applyFilters = function ( filters, graph ) {
+  const removals = [];
+  const sources = {};
+  for ( const source of graph.sources ) {
+    sources[ source.username ] = source;
+  }
+
+  // Cycle through every individual post looking for exclusions.
+  for ( const post of graph.posts ) {
+    for ( const filter of filters ) {
+      const doesPass = filter.check({ post, sources });
+      if ( doesPass !== true ) {
+        removals.push( post.id );
+        continue;
+      }
+    }
+  }
+
+  console.log(`filtered ${removals.length} posts`);
+
+
+  // TODO: This still allows posts to be shown in the graph of filtered posts.
+  // For example, showing the quote post content of a blocked post. Is
+  // this desirable? There's a delegated design question regarding showing
+  // nothing vs showing that the filter is doing something in the feed.
+
+
+  // Purge the graph of all exclusions.
+  const posts = [];
+  for ( const post of graph.posts ) {
+    if ( removals.includes(post.id) ) {
+      continue;
+    }
+    posts.push( post );
+  }
+  graph.posts = posts;
+
+  // Purge the feed of all exclusions.
+  const feed = [];
+  for ( const id of graph.feed ) {
+    if ( removals.includes(id) ) {
+      continue;
+    }
+    feed.push( id );
+  }
+  graph.feed = feed;
+
+  // Purge graph egdes of all exclusions.
+  const shares = []
+  for ( const share of graph.shares ) {
+    if ( removals.includes(share[0]) || removals.includes(share[1]) ) {
+      continue;
+    }
+    shares.push( share );
+  }
+  graph.shares = shares;
+
+  const replies = []
+  for ( const reply of graph.replies ) {
+    if ( removals.includes(reply[0]) || removals.includes(reply[1]) ) {
+      continue;
+    }
+    replies.push( reply );
+  }
+  graph.replies = replies;
+};
+
 
 
 

@@ -1,5 +1,6 @@
 import { Feed } from "$lib/resources/feed.js";
 import { IdentityEngine } from "$lib/engines/identities.js";
+import { FilterEngine } from "$lib/engines/filters.js";
 
 
 /***
@@ -30,26 +31,31 @@ a strong indication that this would be more clearly expressed as a state machine
 ***/
 
 class FeedEngine {
-  constructor ({ feed, identityEngine }) {
+  constructor ({ feed, identityEngine, filterEngine }) {
     this.feed = feed;
     this.identityEngine = identityEngine;
+    this.filterEngine = filterEngine;
     this.replies = new Set();
     this.nextPosts = [];
   }
 
   static async create () {
     const identityEngine = await IdentityEngine.create();
+    const filterEngine = await FilterEngine.create();
     const identities = identityEngine.getActiveIdentities();
-    const feed = await Feed.create({ identities });
-    return new FeedEngine({ feed, identityEngine });
+    const filters = filterEngine.getActiveFilters();
+    const feed = await Feed.create({ identities, filters });
+    return new FeedEngine({ feed, identityEngine, filterEngine });
   }
 
   async reset () {
     this.isStopped = true;
     const identityEngine = this.identityEngine;
+    const filterEngine = this.filterEngine;
     const identities = identityEngine.getActiveIdentities();
-    const feed = await Feed.create({ identities });
-    return new FeedEngine({ feed, identityEngine });
+    const filters = filterEngine.getActiveFilters();
+    const feed = await Feed.create({ identities, filters });
+    return new FeedEngine({ feed, identityEngine, filterEngine });
   }
 
   async pull ( count ) {
@@ -98,6 +104,10 @@ class FeedEngine {
 
   setActiveState ( identity, active ) {
     this.identityEngine.setActiveState( identity, active );
+  }
+
+  getFilters () {
+    return this.filterEngine.filters;
   }
 }
 

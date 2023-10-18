@@ -13,6 +13,7 @@
 
   const loadPost = async function () {
     post = await getPost( data.bindings );
+    console.log( post );
   };
   
   guard();
