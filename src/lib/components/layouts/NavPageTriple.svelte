@@ -47,7 +47,7 @@
     flex: 0 1 calc( var(--gobo-max-width-primary) + (2 * var(--gobo-width-spacer-flex)) );
     margin: 0;
     overflow-y: scroll;
-    padding: 4px;
+    padding: 0 4px;
     max-width: calc( var(--gobo-max-width-primary) + (2 * var(--gobo-width-spacer-flex)) );
   }
 

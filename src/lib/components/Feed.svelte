@@ -119,8 +119,14 @@
 <style>
   section.feed {
     overflow-y: scroll;
-    padding: 2px;
+    padding: var(--gobo-height-spacer) 2px 2px 2px;
     max-height: 100%;
+  }
+
+  @media( max-width: 988px ) {
+    section.feed {
+      padding: 2px;
+    }
   }
 
   @media ( max-width: 680px ) {

@@ -18,13 +18,6 @@
 </script>
 
 <div class="main-child">
-  <header class="desktop">
-    <h1>Home</h1>
-    <sl-icon-button 
-      src="/icons/gear.svg"
-      href="/settings/feed">
-    </sl-icon-button>
-  </header>
 
   <MobileFilters></MobileFilters>
   <Feed></Feed>
@@ -36,15 +29,7 @@
   .main-child {
     max-width: unset;
     max-height: 100%;
-  }
-  .desktop {
-    display: none;
-  }
-
-  @media ( min-width: 988px ) {
-    .desktop {
-      display: flex;
-    }
+    padding-top: 0;
   }
   @media ( max-width: 750px ) {
     .main-child {

@@ -77,6 +77,7 @@
     flex-wrap: wrap;
     justify-content: flex-start;
     align-items: center;
+    padding-top: var(--gobo-height-spacer);
   }
 
   @media ( max-width: 750px ) {
