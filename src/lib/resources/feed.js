@@ -64,6 +64,13 @@ class Reader {
         postEdges[ edge[0] ].add( edge[1] );
       }
       for ( const id of result.feed ) {
+        // Filters might remove secondary posts that create empty shells in the
+        // feed. This cleans those out.
+        const post = posts[ id ];
+        if ( post.content == null && post.reply == null && post.shares == null ) {
+          continue;
+        }
+
         Cache.addPostCenter( id );
         feed.push( posts[ id ] );
       }
