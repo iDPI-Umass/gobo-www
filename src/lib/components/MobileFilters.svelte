@@ -14,10 +14,6 @@
     identities = engine.getActiveIdentities();
     filters = engine.filterEngine.getActiveFilters();
   };
-
-  const getLogo = function ( identity ) {
-    return `/icons/${ identity.platform }.svg`;
-  } 
 </script>
 
 <nav>

@@ -26,13 +26,8 @@
 
   <header>
     <h2>Filters</h2>
-  </header>
-
-  
-  <section class="inner-frame">
     <sl-button
       pill
-      class="action"
       href="/settings/feed">
       
       <sl-icon 
@@ -41,10 +36,14 @@
         slot="prefix">
       </sl-icon>
       
-      Configure Filters
-    </sl-button>
+      Configure
+  </sl-button>
+  </header>
 
-    <p>Filters allow you to decide what to exclude from your feed.</p>
+  
+  <section class="inner-frame">
+
+    <p>Filters allow you to control what is included in your feed.</p>
   </section>
 
 </section>
@@ -62,6 +61,10 @@
     padding: 0.75rem var(--gobo-width-spacer);
     border-bottom: var(--gobo-border-panel);
     margin-bottom: var(--gobo-height-spacer-flex);
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
   }
 
   h2 {
@@ -72,6 +75,12 @@
 
   .inner-frame {
     margin: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex);
+  }
+
+  header sl-button::part(base) {
+    background-color: var(--gobo-color-panel);
+    border: var(--gobo-border-panel);
+    color: var(--gobo-color-button-lens);
   }
 
   p {

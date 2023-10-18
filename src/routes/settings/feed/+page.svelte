@@ -94,8 +94,8 @@
     <header>
       <h2>Feed Filters</h2>
       <p>
-        Control which words and phrases you would like to exclude from your 
-        Gobo feed. You can add filters below or delete any listed in the table.
+        Control what content you would like to include in your Gobo feed.
+        You can add filters below or delete any listed in the table.
       </p>
     </header>
     
@@ -141,7 +141,7 @@
       bind:this={select}
       name="category"
       value="block-keyword"
-      label="Category"
+      label="Type"
       size="medium"
       pill>
       <sl-option value="block-keyword">Block Keyword</sl-option>
@@ -152,7 +152,7 @@
     <sl-input
       name="word"
       label="Pattern"
-      help-text="Gobo will match against this text to block content from your feed"
+      help-text="Gobo will match against this text to exclude content from your feed"
       autocomplete="off"
       size="medium">
     </sl-input>
