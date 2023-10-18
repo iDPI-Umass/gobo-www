@@ -5,6 +5,7 @@
   import { onDestroy, onMount } from "svelte";
   import { browser } from "$app/environment";
   import { draftStore } from "$lib/stores/post-draft.js";
+  import { render } from "$lib/helpers/markdown.js";
 
   let draftData, unsubscribeDraft;
   let identity = {};
@@ -28,7 +29,7 @@
   };
 
   const setContent = function () {
-    content = draftData.content;
+    content = render( draftData.content );
   };
 
   const setFiles = function () {

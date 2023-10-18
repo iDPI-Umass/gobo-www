@@ -23,6 +23,7 @@
   export let title = null;
   export let content = null;
   export let url;
+  export let proxyURL = null;
   export let published;
   export let attachments = [];
   export let shares = [];
@@ -38,6 +39,7 @@
 
 
   let unused = [ platform_id, visibility, created, updated ];
+  let postURL = proxyURL ?? url;
   let source = Cache.getSource( source_id );
   let sharedPost = h.getShare( shares );
   let replyPost = h.getReply( reply );
@@ -73,7 +75,9 @@
       // Go to the post's main page.
       goto( `/post/${ identity }/${ id }`);
     }
-  };</script>
+  };
+
+</script>
 
 <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 <article 
@@ -171,7 +175,7 @@
     
     <a
       class="source-link"
-      href="{url}"
+      href="{postURL}"
       target="_blank" 
       rel="noopener noreferrer nofollow">
       <sl-icon src="{logo}" class="{platform}"></sl-icon>

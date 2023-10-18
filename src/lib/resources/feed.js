@@ -56,6 +56,9 @@ class Reader {
       for ( const source of result.sources ) {
         sources[ source.id ] = source;
       }
+      
+      decorateMastodon( this.identity, result.feed, sources, posts );
+      
       for ( const edge of result.post_edges ?? [] ) {
         postEdges[ edge[0] ] ??= new Set();
         postEdges[ edge[0] ].add( edge[1] );
@@ -208,6 +211,37 @@ class Feed {
     }
   }
 }
+
+
+
+// Special case for Mastodon and Smalltown. Because they are federated, their posts
+// have both originating and "proxied" URLs from the hosting server. For now,
+// we're addressing that by decorating the relevant posts.
+// TODO:  Should the proxied URL be the one and only canonical URL or should
+//        GOBO's abstract post accomodate this somehow in its data structure?
+//        This is somewhat related to solving this resource resolution problem
+//        generally in Mastodon's federation model. They're not true aliases
+//        because the resource is "deeply copied" across the federation.
+
+const decorateMastodon = function ( identity, feed, sources, posts ) {
+  if ( ! ["mastodon", "smalltown"].includes(identity.platform) ) {
+    return;
+  }
+
+  for ( const id of feed ) {
+    const post = posts[ id ];
+    const postHostname = new URL(post.base_url).hostname;
+    const source = sources[ post.source_id ];
+    const sourceHostname = source.username.split("@").at(-1);
+    if ( postHostname === sourceHostname ) {
+      continue;
+    }
+
+    const path = `/@${source.username}/${post.platform_id}`;
+    post.proxyURL = new URL( path, identity.base_url ).href;
+  }
+};
+
 
 
 

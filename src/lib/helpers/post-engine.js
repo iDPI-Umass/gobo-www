@@ -24,6 +24,11 @@ const getHeadingSlots = function ( source ) {
       break;
   }
 
+  if ( headingSlot1 == null ) {
+    headingSlot1 = headingSlot2;
+    headingSlot2 = null;
+  }
+
   return { headingSlot1, headingSlot2 };
 };
 

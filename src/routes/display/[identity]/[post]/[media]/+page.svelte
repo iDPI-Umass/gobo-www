@@ -21,33 +21,40 @@
 
 </script>
 
-<GuardFrame>
+<main>
+  <GuardFrame>
 
-  <BackLink heading="Media"></BackLink>
+    <BackLink heading="Media"></BackLink>
+  
+    {#await loadMedia()}
+      <Spinner></Spinner>
+    {:then}
+  
+      <div class="frame">
+        {#if isImage( media ) }
+          <img 
+            src="{media.url}"
+            alt="full size">
+        {:else if isVideo( media ) }
+          <!-- svelte-ignore a11y-media-has-caption -->
+          <video loop controls>
+            <source 
+              src={media.url}
+              type={media.type}>
+          </video>
+        {/if}
+      </div>
+  
+    {/await}
+  </GuardFrame>
+</main>
 
-  {#await loadMedia()}
-    <Spinner></Spinner>
-  {:then}
-
-    <div class="frame">
-      {#if isImage( media ) }
-        <img 
-          src="{media.url}"
-          alt="full size">
-      {:else if isVideo( media ) }
-        <!-- svelte-ignore a11y-media-has-caption -->
-        <video loop controls>
-          <source 
-            src={media.url}
-            type={media.type}>
-        </video>
-      {/if}
-    </div>
-
-  {/await}
-</GuardFrame>
 
 <style>
+  main {
+    padding: 1rem;
+  }
+
   header {
     height: 4rem;
     padding: 1rem 1rem 0 1rem;
