@@ -34,8 +34,8 @@
     try {
       await engine.filterEngine.addFilter( category, configuration );
       filters = engine.getFilters();
+      form.reset();
       select.value = "block-keyword";
-      form.reset();    
     } catch ( error ) {
       // TODO: Visually represent an error here.
       console.error( error );

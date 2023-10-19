@@ -24,7 +24,7 @@
 <main>
   <GuardFrame>
 
-    <BackLink heading="Media"></BackLink>
+    <BackLink heading="Media" marginBottom="0"></BackLink>
   
     {#await loadMedia()}
       <Spinner></Spinner>
@@ -52,12 +52,8 @@
 
 <style>
   main {
+    height: 100dvh;
     padding: 1rem;
-  }
-
-  header {
-    height: 4rem;
-    padding: 1rem 1rem 0 1rem;
   }
 
   .frame {

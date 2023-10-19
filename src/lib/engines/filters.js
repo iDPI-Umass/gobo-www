@@ -146,11 +146,11 @@ class BlockUsername {
     this.value = value;
 
     if ( value.startsWith("@") ) {
-      this.username = value.slice(1);
-    } else if ( value.startsWith("u/") ) {
-      this.username = value.slice(2);
+      this.username = value.slice(1).toLowerCase();
+    } else if ( value.startsWith("r/") ) {
+      this.username = value.slice(2).toLowerCase();
     } else {
-      this.username = value;
+      this.username = value.toLowerCase();
     }
   }
 

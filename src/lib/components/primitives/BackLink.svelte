@@ -2,13 +2,14 @@
   import { allyEvent } from "$lib/helpers/event";
   import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
   export let heading;
+  export let marginBottom = "2rem";
 
   const handleClick = allyEvent( function () {
     history.back();
   });
 </script>
 
-<header>
+<header style="margin-bottom: {marginBottom}">
   
   <sl-icon-button 
     on:click={handleClick}
@@ -28,7 +29,6 @@
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: center;
-    margin-bottom: 2rem;
   }
 
   header > h1 {

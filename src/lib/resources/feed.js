@@ -35,7 +35,7 @@ class Reader {
         start: this.tail
       });
 
-      applyFilters( this.filters, result );
+      applyFilters( this.identity, this.filters, result );
       console.log(result)
 
       const feed = [];
@@ -67,7 +67,7 @@ class Reader {
         // Filters might remove secondary posts that create empty shells in the
         // feed. This cleans those out.
         const post = posts[ id ];
-        if ( post.content == null && post.reply == null && post.shares == null ) {
+        if ( post.content == null && post.reply == null && post.shares == null && (post.attachments ?? []).length === 0 ) {
           continue;
         }
 
@@ -231,34 +231,44 @@ class Feed {
 //        because the resource is "deeply copied" across the federation.
 
 const decorateMastodon = function ( identity, feed, sources, posts ) {
-  if ( ! ["mastodon", "smalltown"].includes(identity.platform) ) {
-    return;
-  }
+  if ( identity.platform === "mastodon" ) {
+    for ( const id of feed ) {
+      const post = posts[ id ];
+      const postHostname = new URL(post.base_url).hostname;
+      const source = sources[ post.source_id ];
+      const sourceHostname = source.username.split("@").at(-1);
+      if ( postHostname === sourceHostname ) {
+        continue;
+      }
 
-  for ( const id of feed ) {
-    const post = posts[ id ];
-    const postHostname = new URL(post.base_url).hostname;
-    const source = sources[ post.source_id ];
-    const sourceHostname = source.username.split("@").at(-1);
-    if ( postHostname === sourceHostname ) {
-      continue;
+      const path = `/@${source.username}/${post.platform_id}`;
+      post.proxyURL = new URL( path, identity.base_url ).href;
     }
-
-    const path = `/@${source.username}/${post.platform_id}`;
-    post.proxyURL = new URL( path, identity.base_url ).href;
-  }
+  
+  } else if ( identity.platform === "smalltown" ) {
+    for ( const id of feed ) {
+      const post = posts[ id ];
+      const path = `/web/statuses/${post.platform_id}`;
+      post.proxyURL = new URL( path, identity.base_url ).href;
+    }
+  } 
 };
 
 
 
-
-
-const applyFilters = function ( filters, graph ) {
+const applyFilters = function ( identity, filters, graph ) {
   const removals = [];
   const sources = {};
-  for ( const source of graph.sources ) {
-    sources[ source.username ] = source;
+  if ( identity.platform === "reddit" ) {
+    for ( const source of graph.sources ) {
+      sources[ source.name.toLowerCase() ] = source;
+    }
+  } else {
+    for ( const source of graph.sources ) {
+      sources[ source.username.toLowerCase() ] = source;
+    }
   }
+  
 
   // Cycle through every individual post looking for exclusions.
   for ( const post of graph.posts ) {

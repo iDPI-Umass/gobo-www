@@ -146,10 +146,6 @@ const handleAddIdentityCallback = async function ( query ) {
 
 // Detect and handle any redirect or callback.
 const handleRedirect = async function () {
-  if ( !browser ) {
-    return null;
-  }
-
   try {
     const url = new URL( document.location );
     const query = extractQuery( url );

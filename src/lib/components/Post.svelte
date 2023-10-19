@@ -122,15 +122,15 @@
         <time datetime="published">{ humanize( published ) }</time>
       </header>
 
-      {#if renderedContent}
-        <section class="content" style={fullPage === true ? "max-height:unset" : ""}>
-          {#if title != null}
-            <h2>{title}</h2>
-          {/if}
+      <section class="content" style={fullPage === true ? "max-height:unset" : ""}>
+        {#if title != null}
+          <h2>{title}</h2>
+        {/if}
 
-          {@html renderedContent}          
-        </section>
-      {/if}
+        {#if renderedContent}
+          {@html renderedContent}
+        {/if}          
+      </section>
 
       {#if mediaEmbeds.length > 0}
         <div class="media">
