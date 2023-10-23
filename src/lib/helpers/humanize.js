@@ -21,15 +21,20 @@ dayjs.updateLocale( "en", {
 
 
 export const humanize = function ( time ) {
-  const now = dayjs();
-  const target = dayjs( time );
-  const diff = now.diff( target );
- 
-  if ( diff < 604800000 ) {
-    return dayjs( time ).fromNow( true );
-  } else if ( now.$y === target.$y ) {
-    return target.format("MMM DD");
-  } else {
-    return target.format("MMM DD, YYYY");
-  }  
+  try {
+    const now = dayjs();
+    const target = dayjs( time );
+    const diff = now.diff( target );
+   
+    if ( diff < 604800000 ) {
+      return dayjs( time ).fromNow( true );
+    } else if ( now.$y === target.$y ) {
+      return target.format("MMM DD");
+    } else {
+      return target.format("MMM DD, YYYY");
+    }  
+  } catch ( error ) {
+    console.error( time, error );
+    return "";
+  }
 };
