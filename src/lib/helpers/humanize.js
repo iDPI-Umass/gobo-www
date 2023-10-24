@@ -34,7 +34,7 @@ export const humanize = function ( time ) {
       return target.format("MMM DD, YYYY");
     }  
   } catch ( error ) {
-    console.error( time, error );
+    console.warn( time, error );
     return "";
   }
 };

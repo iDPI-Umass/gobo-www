@@ -156,7 +156,7 @@
 </sl-checkbox>
 
 <div 
-  class="keyword-table" 
+  class="gobo-table" 
   ondragover="return false" 
   on:dragenter={handleDragEnter}
   on:dragleave={handleDragLeave}
@@ -210,7 +210,7 @@
     margin-top: var(--gobo-height-spacer-flex);
   }
 
-  .keyword-table {
+  .gobo-table {
     height: 20rem;
     margin-top: var(--gobo-height-spacer-flex);
   }

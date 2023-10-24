@@ -4,6 +4,7 @@
   align-items: stretch;
   max-width: var(--gobo-max-width-primary);
   margin: 0;
+  margin-top: var(--gobo-height-spacer);
   padding: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex);
   background: var(--gobo-color-panel);
   border: var(--gobo-border-panel);
@@ -31,11 +32,11 @@
 
 .gobo-copy p {
   font-size: var(--sl-font-size-medium);
-  margin-bottom: 1rem;
+  margin-top: 1rem;
 }
 
-.gobo-copy p:last-of-type {
-  margin-bottom: 0;
+.gobo-copy p:first-child {
+  margin-top: 0;
 }
 
 .gobo-copy a {
@@ -52,11 +53,10 @@
   width: 100%;
   margin-top: 2rem;
   padding-top: var(--gobo-height-spacer);
-  border-top: var(--gobo-border-panel);
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  justify-content: flex-end;
+  justify-content: flex-start;
   margin-bottom: 0;
 }
 

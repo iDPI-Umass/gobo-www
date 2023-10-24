@@ -1,5 +1,6 @@
 <script>
   import { isImage, isVideo } from "$lib/helpers/type.js";
+  import { elide } from "$lib/helpers/text.js";
   import { render } from "$lib/helpers/markdown.js";
 
   export let attachments = [];
@@ -9,30 +10,19 @@
   // TODO: How would we want to approach multiple syndication embeds?
   let attachment = attachments[0];
   let title = attachment.title;
-  let content = render( attachment.description );
+  let content = attachment.description;
   let sourceURL = attachment.source;
   let mediaURL = attachment.media;
 
   const domain = ( new URL(sourceURL) ).hostname;
 
+  let renderedContent
   if ( !content ) {
-    content = `<p>${sourceURL}</p>`;
+    renderedContent = `<p>${elide( 100, sourceURL )}</p>`;
+  } else {
+    renderedContent = render( elide( 250, content ));
   }
 
-  const handleSingleLoad = function ( event ) {
-    let previewWidth = event.target.width;
-    let naturalWidth = event.target.naturalWidth || event.target.videoWidth;
-    let naturalHeight = event.target.naturalHeight || event.target.videoHeight;
-    let ratio = naturalHeight / naturalWidth;
-    let previewHeight = Math.round( previewWidth * ratio );
-
-
-    if ( previewHeight > 512 ) {
-      event.target.style.height = "512px";
-    } else {
-      event.target.style.height = "unset";
-    }    
-  }
 </script>
 
 
@@ -60,7 +50,7 @@
           <h2>{@html title}</h2>
         {/if}
 
-        {@html content}
+        {@html renderedContent}
       </div>
     </section>
   

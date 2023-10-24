@@ -4,23 +4,16 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
-  import IdentityMini from "$lib/components/IdentityMini.svelte";
+  import FilterGroup from "$lib/components/GeneralFilterMiniGroup.svelte";
   import * as FeedSaver from "$lib/engines/feed-singleton.js";
 
-  let identities = [];
-  let allEmpty = true;
+  let engine;
 
-  const loadIdentities = async function () {
-    const engine = await FeedSaver.getEngine();
-    identities = engine.getIdentities();
-    
-    if ( identities.length === 0 ) {
-      allEmpty = true;
-    } else {
-      allEmpty = false;
-    }
+  const loadFilters = async function () {
+    engine = await FeedSaver.getEngine();    
   };
 </script>
+
 
 <section class="outer-frame">
 
@@ -28,7 +21,7 @@
     <h2>Filters</h2>
     <sl-button
       pill
-      href="/settings/feed">
+      href="/settings/filters">
       
       <sl-icon 
         class="lens-label"
@@ -42,8 +35,32 @@
 
   
   <section class="inner-frame">
+    {#await loadFilters()}
+  
+      <Spinner></Spinner>
+  
+    {:then}
 
-    <p>Filters allow you to control what is included in your feed.</p>
+      <h3>Block Keyword</h3>
+      <FilterGroup
+        {engine}
+        category="block-keyword">
+      </FilterGroup>
+
+      <h3>Block Username</h3>
+      <FilterGroup
+        {engine}
+        category="block-username">
+      </FilterGroup>
+
+      <h3>Block Domain</h3>
+      <FilterGroup
+        {engine}
+        category="block-domain">
+      </FilterGroup>
+    
+    {/await}
+
   </section>
 
 </section>
@@ -67,10 +84,14 @@
     align-items: center;
   }
 
-  h2 {
-    font-weight: var(--gobo-font-weight-black);
-    font-size: 1.25rem;
+  h3 {
     text-transform: capitalize;
+    margin: 0;
+    margin-top: 2rem;
+  }
+
+  h3:first-child {
+    margin: 0;
   }
 
   .inner-frame {

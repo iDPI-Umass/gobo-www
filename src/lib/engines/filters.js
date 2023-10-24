@@ -177,7 +177,7 @@ class BlockDomain {
     const domain = new URL(value).hostname
     
     this.matchesDomain = function ( url ) {
-      return new URL( url ).hostname === domain
+      return domain.endsWith( new URL( url ).hostname );
     };
 
     const input = escapeRegex( domain );

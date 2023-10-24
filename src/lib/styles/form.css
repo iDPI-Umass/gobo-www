@@ -3,7 +3,8 @@
   flex-direction: column;
   align-items: stretch;
   max-width: var(--gobo-max-width-primary);
-  margin: 0 0 var(--gobo-height-spacer) 0;
+  margin: 0;
+  margin-top: var(--gobo-height-spacer);
   padding: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex);
   background: var(--gobo-color-panel);
   border: var(--gobo-border-panel);
@@ -12,21 +13,21 @@
 
 .gobo-form h1 {
   font-size: var(--sl-font-size-x-large);
-  margin-bottom: 2rem;
+  margin: 0;
 }
 
 .gobo-form h2 {
   font-size: var(--sl-font-size-medium);
   font-weight: var(--sl-font-weight-bold);
-  margin-bottom: 1rem;
+  margin: 0;
 }
 
 .gobo-form > * {
-  margin-bottom: var(--gobo-height-spacer);
+  margin-top: var(--gobo-height-spacer);
 }
 
-.gobo-form > :last-child {
-  margin-bottom: 0;
+.gobo-form > :first-child {
+  margin-top: 0;
 }
 
 .gobo-form a {
@@ -34,7 +35,7 @@
 }
 
 .gobo-form sl-divider {
-  margin-bottom: 1rem;
+  margin-top: 1rem;
 }
 
 .gobo-form sl-button {
@@ -53,20 +54,19 @@
   --color: var(--gobo-color-border-panel);
 }
 
-.gobo-form sl-radio-group sl-radio:last-child {
+/* .gobo-form sl-radio-group sl-radio:last-child {
   margin-bottom: 0;
-}
+} */
 
 .gobo-form .buttons {
   width: 100%;
   margin-top: 2rem;
   padding-top: var(--gobo-height-spacer);
-  border-top: var(--gobo-border-panel);
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
   justify-content: flex-end;
-  margin-bottom: 0;
+  margin-top: 0;
 }
 
 /* TODO: We can do better than this once Firefox supports :has by default. */
@@ -75,7 +75,7 @@
 }
 
 .gobo-form .buttons sl-button {
-  margin-bottom: 0;
+  margin-top: 0;
 }
 
 @media ( max-width: 680px ) {

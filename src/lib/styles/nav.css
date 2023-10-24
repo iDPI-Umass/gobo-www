@@ -1,0 +1,25 @@
+nav.gobo-nav {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  max-width: var(--gobo-max-width-primary);
+  margin-bottom: var(--gobo-height-spacer);
+  padding: 0;
+}
+
+nav.gobo-nav sl-button::part(base) {
+  height: 2.1875rem;
+  background-color: var(--gobo-color-panel);
+  border: var(--gobo-border-panel);
+  color: var(--gobo-color-button-lens);
+}
+
+nav.gobo-nav sl-button::part(label) {
+  font-size: var(--gobo-font-size-detail);
+  font-weight: var(--gobo-font-weight-medium);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}

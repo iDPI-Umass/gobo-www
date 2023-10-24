@@ -257,7 +257,7 @@ const decorateMastodon = function ( identity, feed, sources, posts ) {
 
 
 const applyFilters = function ( identity, filters, graph ) {
-  const removals = [];
+  const removals = new Set();
   const sources = {};
   if ( identity.platform === "reddit" ) {
     for ( const source of graph.sources ) {
@@ -270,64 +270,78 @@ const applyFilters = function ( identity, filters, graph ) {
   }
   
 
-  // Cycle through every individual post looking for exclusions.
+  // Cycle through every individual post looking for posts to exclude.
   for ( const post of graph.posts ) {
     for ( const filter of filters ) {
       const doesPass = filter.check({ post, sources });
       if ( doesPass !== true ) {
-        removals.push( post.id );
+        removals.add( post.id );
         continue;
       }
     }
   }
 
-  console.log(`filtered ${removals.length} posts`);
+  // Include all posts in graph connected to excluded posts.
+  let currentSize = null;
+  while ( currentSize !== removals.size ) {
+    currentSize = removals.size;
+    const shares = [];
+    for ( const share of graph.shares ) {
+      if ( removals.has(share[0]) ) {
+        removals.add( share[1] );
+        continue;
+      }
+      if ( removals.has( share[1]) ) {
+        removals.add( share[0] );
+        continue;
+      }
+      shares.push( share );
+    }
+    graph.shares = shares;
+  }
+
+  currentSize = null;
+  while ( currentSize !== removals.size ) {
+    currentSize = removals.size;
+    const replies = [];
+    for ( const reply of graph.replies ) {
+      if ( removals.has(reply[0]) ) {
+        removals.add( reply[1] );
+        continue;
+      }
+      if ( removals.has( reply[1]) ) {
+        removals.add( reply[0] );
+        continue;
+      }
+      replies.push( reply );
+    }
+    graph.replies = replies;
+  }
+  
+
+  console.log(`filtered ${removals.size} posts`);
 
 
-  // TODO: This still allows posts to be shown in the graph of filtered posts.
-  // For example, showing the quote post content of a blocked post. Is
-  // this desirable? There's a delegated design question regarding showing
-  // nothing vs showing that the filter is doing something in the feed.
-
-
-  // Purge the graph of all exclusions.
+  // Now that we know all exclusions, purge them from post array...
   const posts = [];
   for ( const post of graph.posts ) {
-    if ( removals.includes(post.id) ) {
+    if ( removals.has(post.id) ) {
       continue;
     }
     posts.push( post );
   }
   graph.posts = posts;
 
-  // Purge the feed of all exclusions.
+  // ...and from the feed array.
   const feed = [];
   for ( const id of graph.feed ) {
-    if ( removals.includes(id) ) {
+    if ( removals.has(id) ) {
       continue;
     }
     feed.push( id );
   }
   graph.feed = feed;
 
-  // Purge graph egdes of all exclusions.
-  const shares = []
-  for ( const share of graph.shares ) {
-    if ( removals.includes(share[0]) || removals.includes(share[1]) ) {
-      continue;
-    }
-    shares.push( share );
-  }
-  graph.shares = shares;
-
-  const replies = []
-  for ( const reply of graph.replies ) {
-    if ( removals.includes(reply[0]) || removals.includes(reply[1]) ) {
-      continue;
-    }
-    replies.push( reply );
-  }
-  graph.replies = replies;
 };
 
 

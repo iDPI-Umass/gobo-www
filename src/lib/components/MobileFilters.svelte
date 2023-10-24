@@ -39,7 +39,7 @@
 
 
     <sl-button 
-      href="/settings/feed"
+      href="/settings/filters"
       pill>
 
       <sl-icon 

@@ -17,20 +17,15 @@
 
 .main-child > header {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   flex-wrap: nowrap;
-  justify-content: space-between;
-  padding-top: 4px;
+  justify-content: flex-start;
   max-width: var(--gobo-max-width-primary);
+  margin: 0;
+  padding: 0;
+  padding-top: 4px;
   padding-bottom: 0.25rem;
   margin-bottom: var(--gobo-height-spacer);
-}
-
-@media ( max-width: 680px ) {
-  .main-child {
-    padding-left: 0;
-    padding-right: 0;
-  }
 }
 
 @media ( max-width: 750px ) {

@@ -9,6 +9,7 @@
   import { onMount } from "svelte";
   import * as LS from "$lib/helpers/local-storage.js";
   import { getGOBOClient } from "$lib/helpers/account.js";
+
   export let data;
   let form, select, button;
   let targetPlatform = "bluesky"

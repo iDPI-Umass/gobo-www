@@ -23,27 +23,26 @@
   
 <div class="main-child">
 
-  <BackLink heading="Identities"></BackLink>
-  
-  <header>
-    <div class="header-row">
-      <nav>
-        <sl-button
-          href="/identities/add"
-          pill>
-          Add Identity
-        </sl-button>
-      </nav>
-    </div>
+  <BackLink heading="Identities">
+
+    <nav class="gobo-nav">
+      <sl-button
+        href="/identities/add"
+        pill>
+        Add Identity
+      </sl-button>
+    </nav>
+
     <section class="gobo-copy">
       <p>
         Control which identities you would like to include in your Gobo feed. 
         You can add identities from Bluesky, Mastodon, and Reddit.
       </p> 
     </section>
-  </header>
-  
 
+  </BackLink>
+  
+  
   {#await loadIdentities()}
   
     <Spinner></Spinner>
@@ -63,47 +62,8 @@
 
 <style>
 
-  .gobo-copy {
-    margin-bottom: var(--gobo-height-spacer);
+  .identities {
+    margin-top: var(--gobo-height-spacer);
   }
 
-  .main-child > header {
-    flex-direction: column;
-  }
-
-  header nav {
-    margin-bottom: 0;
-  }
-
-  nav {
-    margin-bottom: 1rem;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: flex-end;
-    align-items: center;
-  }
-
-  nav > sl-button:first-child {
-    margin-right: var(--gobo-width-spacer-flex);
-  }
-
-  header nav > sl-button:first-child {
-    margin-right: 0;
-  }
-
-  nav sl-button::part(base) {
-    height: 2.1875rem;
-    background-color: var(--gobo-color-panel);
-    border: var(--gobo-border-panel);
-    color: var(--gobo-color-button-lens);
-  }
-
-  nav sl-button::part(label) {
-    font-size: var(--gobo-font-size-detail);
-    font-weight: var(--gobo-font-weight-medium);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
 </style>

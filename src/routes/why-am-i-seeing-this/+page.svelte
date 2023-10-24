@@ -34,7 +34,7 @@
         <sl-button
           class="action"
           size="medium"
-          href="/settings/feed"
+          href="/settings/filters"
           pill>
           Edit Filters
         </sl-button>
