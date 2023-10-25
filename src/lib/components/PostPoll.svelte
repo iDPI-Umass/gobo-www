@@ -4,73 +4,86 @@
   let total = poll.total ?? 0;
   let results = poll.options ?? [];
 
-  for ( const result of results ) {
-    result.value = 100 * result.count / total;
+  if ( total > 0 ) {
+    for ( const result of results ) {
+      result.value = ( 100 * result.count / total ).toPrecision( 3 );
+    }
+  } else {
+    for ( const result of results ) {
+      result.value = 0;
+    }
   }
+
+  total = new Intl.NumberFormat().format( total );
+  
 </script>
 
-<section class="question-container">
-  <div class="question-box">
-    {#each results as result }
-      <div class="question">
-        <div class="question-value-bar" style="width: {result.value}%;"></div>
+
+<section class="question">
+  {#each results as result }
+      <div class="question-text">
         <div class="question-key">{result.key}</div>
         <div class="question-value">{result.value}%</div>
       </div>
-    {/each}
-  </div>
-  <p class="tally">{ new Intl.NumberFormat().format( total ) } Votes</p>
+      <div class="question-bar" style="width: {result.value}%;"></div>
+  {/each}
+
+  <p class="tally">{ total } Votes</p>
 </section>
 
 <style>
-  .question-container {
+  .question {
     position: relative;
     margin: 0;
-    overflow-y: hidden;
-  }
-
-  .question-container > .question-box {
-    position: relative;
     width: 100%;
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
+    border: var(--gobo-border-panel);
+    padding: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex);
+    border-radius: var(--gobo-border-radius);
   }
 
-  .question-container > .question-box > .question {
+  .question-text {
     position: relative;
     width: 100%;
-    height: 2rem;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     align-items: center;
     justify-content: space-between;
-    margin: 0.25rem 0 0.25rem 0;
+    margin: 0;
+    margin-top: 1rem;
   }
 
-  .question-container > .question-box > .question >.question-value-bar {
-    height: 100%;
-    position: absolute;
-    left: 0;
+  .question-text:first-child {
+    margin-top: 0;
+  }
+
+  .question-text > .question-key {
+    padding-left: 0.5rem;
+    z-index: 1;
+    color: var(--gobo-color-text);
+    font-size: var(--gobo-font-size-copy);
+    font-weight: var(--gobo-font-weight-normal);
+  }
+
+  .question-text > .question-value {
+    z-index: 1;
+    margin-left: var(--gobo-width-spacer-flex);
+  }
+
+  .question-bar {
+    height: 0.5rem;
     background-color: var(--gobo-color-primary);
     border-radius: var(--gobo-border-radius);
     z-index: 0;
   }
 
-  .question-container > .question-box > .question > .question-key {
-    padding-left: 0.5rem;
-    z-index: 1;
-    color: var(--gobo-color-text);
-    font-weight: var(--gobo-font-weight-black);
-  }
-
-  .question-container > .question-box > .question > .question-value {
-    z-index: 1;
-  }
-
-  .question-container > .tally {
-    margin-bottom: 0;
+  .tally {
+    margin: 0;
+    margin-top: var(--gobo-height-spacer);
+    align-self: flex-end;
   }
 
 </style>

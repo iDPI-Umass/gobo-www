@@ -28,15 +28,29 @@ class Reader {
 
   async page () {
     try {
-      const result = await this.client.personIdentityFeed.get({ 
-        person_id: this.client.id,
-        id: this.id,
-        per_page: this.per_page,
-        start: this.tail
-      });
-
-      applyFilters( this.identity, this.filters, result );
-      console.log(result)
+      let result;
+      while ( true ) {
+        result = await this.client.personIdentityFeed.get({ 
+          person_id: this.client.id,
+          id: this.id,
+          per_page: this.per_page,
+          start: this.tail
+        });
+  
+        const removals = applyFilters( this.identity, this.filters, result );
+        console.log(result)
+        
+        // This logic allows us to continue pulling if everything is filtered.
+        // TODO: risk of infinite loop here. I think it's a pretty strong case
+        //    for a state machine refactor because we are scrutinizing 
+        //    conditionals mid-flow again.
+        if ( removals.size > 0 && result.feed.length === 0 ) {
+          this.tail = result.next;
+        } else {
+          break;
+        }
+      }
+      
 
       const feed = [];
       const posts = {};
@@ -64,13 +78,6 @@ class Reader {
         postEdges[ edge[0] ].add( edge[1] );
       }
       for ( const id of result.feed ) {
-        // Filters might remove secondary posts that create empty shells in the
-        // feed. This cleans those out.
-        const post = posts[ id ];
-        if ( post.content == null && post.reply == null && post.shares == null && (post.attachments ?? []).length === 0 ) {
-          continue;
-        }
-
         Cache.addPostCenter( id );
         feed.push( posts[ id ] );
       }
@@ -258,6 +265,7 @@ const decorateMastodon = function ( identity, feed, sources, posts ) {
 
 const applyFilters = function ( identity, filters, graph ) {
   const removals = new Set();
+  const now = new Date().toISOString();
   const sources = {};
   if ( identity.platform === "reddit" ) {
     for ( const source of graph.sources ) {
@@ -272,6 +280,13 @@ const applyFilters = function ( identity, filters, graph ) {
 
   // Cycle through every individual post looking for posts to exclude.
   for ( const post of graph.posts ) {
+    
+    // Remove impossible date anomalies.
+    if ( post.published > now ) {
+      removals.add( post.id );
+      continue;
+    }
+
     for ( const filter of filters ) {
       const doesPass = filter.check({ post, sources });
       if ( doesPass !== true ) {
@@ -342,6 +357,9 @@ const applyFilters = function ( identity, filters, graph ) {
   }
   graph.feed = feed;
 
+
+  // Return the removed posts so the engine can decide what to do next.
+  return removals;
 };
 
 

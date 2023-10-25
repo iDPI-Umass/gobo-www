@@ -88,7 +88,8 @@
   style:--cursor="{styles.cursor}"
   style:--max-height="{styles.maxHeight}"
   style:--gradient-stop="{styles.gradientStop}"
-  style:--gradient="{styles.gradient}" 
+  style:--gradient="{styles.gradient}"
+  style:margin-top="{fullPage ? '2rem' : '0'}" 
   on:click={handleClick}
   on:keydown={handleClick}>
 
