@@ -7,6 +7,7 @@
   import PostPoll from "$lib/components/PostPoll.svelte";
   import PostShared from "$lib/components/PostShared.svelte";
   import PostReplied from "$lib/components/PostReplied.svelte";
+  import PostConnector from "$lib/components/PostConnector.svelte";
   import PostActions from "$lib/components/PostActions.svelte";
   import { humanize } from "$lib/helpers/humanize.js";
   import { render } from "$lib/helpers/markdown.js";
@@ -28,6 +29,8 @@
   export let attachments = [];
   export let shares = [];
   export let reply = null;
+  export let thread = null;
+  export let fullThread = null;
   export let poll = null;
 
   export let platform_id;
@@ -43,6 +46,8 @@
   let source = Cache.getSource( source_id );
   let sharedPost = h.getShare( shares );
   let replyPost = h.getReply( reply );
+  let threadPost = h.getThreadOrigin( reply, thread );
+  let threadPosts = h.getFullThread( fullThread );
   let actionTarget = h.getActionTarget({ id, content, sharedPost });
   let logo = h.getLogo( platform );
   let { headingSlot1, headingSlot2 } = h.getHeadingSlots( source );
@@ -93,13 +98,41 @@
   on:click={handleClick}
   on:keydown={handleClick}>
 
-  {#if replyPost}
-    <PostReplied 
-      {identity} 
-      centerID={id}
-      {...replyPost}
-      {fullPage}>
-    </PostReplied>
+  {#if fullPage === true}
+
+    {#each threadPosts as threadPost (threadPost.id)}
+      <PostReplied 
+        {identity} 
+        centerID={id}
+        {...threadPost}
+        {fullPage}>
+      </PostReplied>
+    {/each}
+  
+  {:else}
+
+    {#if threadPost}
+      <PostReplied 
+        {identity} 
+        centerID={id}
+        {...threadPost}
+        {fullPage}>
+      </PostReplied>
+    {/if}
+
+    {#if threadPost != null && replyPost != null}
+      <PostConnector></PostConnector>
+    {/if}
+
+    {#if replyPost}
+      <PostReplied 
+        {identity} 
+        centerID={id}
+        {...replyPost}
+        {fullPage}>
+      </PostReplied>
+    {/if}
+
   {/if}
 
   <div class="inner-frame">

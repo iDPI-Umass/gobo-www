@@ -31,9 +31,6 @@ const getPost = async function ({ identity, id }) {
   for ( const post of result.posts ) {
     posts[ post.id ] = post;
   }
-  for ( const reply of result.replies ) {
-    posts[ reply[0] ].reply = reply[1];
-  }
   for ( const share of result.shares ) {
     posts[ share[0] ].shares ??= [];
     posts[ share[0] ].shares.push( share[1] );
@@ -45,6 +42,9 @@ const getPost = async function ({ identity, id }) {
     postEdges[ edge[0] ] ??= new Set();
     postEdges[ edge[0] ].add( edge[1] );
   }
+
+  posts[ id ].fullThread = result.fullThread ?? [];
+
  
   Cache.addPostCenter( id );
   Cache.putPosts( posts );

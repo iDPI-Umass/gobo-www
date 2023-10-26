@@ -1,4 +1,4 @@
-import { getGOBOClient, logout } from "$lib/helpers/account";
+import { getGOBOClient, logout } from "$lib/helpers/account.js";
 import { Cache, cache } from "$lib/resources/cache.js";
 
 // The following classes play an HTTP intermediary role. They are focused on
@@ -66,6 +66,9 @@ class Reader {
       }
       for ( const reply of result.replies ?? [] ) {
         posts[ reply[0] ].reply = reply[1];
+      }
+      for ( const thread of result.threads ?? [] ) {
+        posts[ thread[0] ].thread = thread[1];
       }
       for ( const source of result.sources ) {
         sources[ source.id ] = source;
@@ -313,6 +316,24 @@ const applyFilters = function ( identity, filters, graph ) {
       shares.push( share );
     }
     graph.shares = shares;
+  }
+
+  currentSize = null;
+  while ( currentSize !== removals.size ) {
+    currentSize = removals.size;
+    const threads = [];
+    for ( const thread of graph.threads ) {
+      if ( removals.has(thread[0]) ) {
+        removals.add( thread[1] );
+        continue;
+      }
+      if ( removals.has( thread[1]) ) {
+        removals.add( thread[0] );
+        continue;
+      }
+      threads.push( thread );
+    }
+    graph.threads = threads;
   }
 
   currentSize = null;

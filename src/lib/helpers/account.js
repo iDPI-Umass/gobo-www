@@ -58,7 +58,17 @@ const getGOBOClient = async function () {
 
 const fetchProfile = async function () {
   const client = await getGOBOClient();
-  const profile = await client.me.get();
+  let profile;
+  try {
+    profile = await client.me.get();
+  } catch (error) {
+    if ( error.status === 401 ) {
+      await logout();
+    } else {
+      throw error;
+    }
+  }
+  
   
   let { name } = profile;
   if ( (name == null) || (name == "") ) {

@@ -21,10 +21,12 @@
   export let title = null;
   export let content = null;
   export let url;
+  export let proxyURL = null;
   export let published;
   export let attachments = [];
   export let shares = [];
   export let reply = null;
+  export let thread = null;
   export let poll = null;
 
   export let platform_id;
@@ -36,7 +38,7 @@
 
   export let fullPage = false;
 
-  let unused = [ platform_id, visibility, reply, created, updated, url ];
+  let unused = [ platform_id, visibility, reply, created, updated, url, proxyURL, thread ];
   let source = Cache.getSource( source_id );
   let sharedPost = h.getShare( shares );
   let logo = h.getLogo( platform );

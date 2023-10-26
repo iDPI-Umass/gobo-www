@@ -77,6 +77,9 @@ class FeedEngine {
         if ( post.reply != null ) {
           this.replies.add( post.reply );
         }
+        if ( post.thread != null ) {
+          this.replies.add( post.thread );
+        }
 
         results.push( result );
       

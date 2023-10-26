@@ -108,6 +108,32 @@ const getReply = function ( reply ) {
   return repliedPost;
 };
 
+const getThreadOrigin = function ( reply, thread ) {
+  let post = null;
+  if ( reply != null && thread != null && reply !== thread ) {
+    post = Cache.getPost( thread );
+    if ( post == null ) {
+      console.error(`expected post ${thread}, but it appears to be missing from graph`);
+    }
+  }
+
+  return post;
+};
+
+const getFullThread = function ( ids ) {
+  const results = [];
+  ids ??= [];
+  for ( const id of ids ) {
+    const post = Cache.getPost( id );
+    if ( post == null ) {
+      console.error(`expected post ${thread}, but it appears to be missing from graph`);
+    }
+    results.push( post );
+  }
+
+  return results;
+};
+
 const getActionTarget = function ({ id, content, sharedPost }) {
   let actionTarget = null;
   if ( sharedPost != null && content == null ) {
@@ -228,6 +254,8 @@ export {
 
   getShare,
   getReply,
+  getThreadOrigin,
+  getFullThread,
   getActionTarget,
 
 
