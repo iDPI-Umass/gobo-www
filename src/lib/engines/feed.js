@@ -60,36 +60,35 @@ class FeedEngine {
 
   async pull ( count ) {
     const results = [];
+    let current = 0;
 
-    for ( let i = 0; i < count - 1; i++ ) {      
+    while ( current < count ) {
       if ( this.isStopped === true ) {
         return [];
       }
 
       const result = await this.feed.next();
-      if ( result != null ) {
-        const { post } = result;
-        // Skip posts that start reply chains that we've already seen.
-        if ( this.replies.has(post.id) && post.reply == null ) {
-          continue;
-        }
-
-        if ( post.reply != null ) {
-          this.replies.add( post.reply );
-        }
-        if ( post.thread != null ) {
-          this.replies.add( post.thread );
-        }
-
-        results.push( result );
-      
-      } else {
+      if ( result == null ) {
         // We're at the bottom of the feed.
         // TODO: This would be different for non time-based feed sorting.
         break;
+      
+      } else {
+        const { post } = result;
+        // Skip posts that start reply chains that we've already seen.
+        if ( this.replies.has(post.id) ) {
+          continue;
+        }
+
+        for ( const id of post.threads ?? [] ) {
+          this.replies.add( id );
+        }
+
+        results.push( result );
+        current++;
       }
     }
-
+   
     if ( this.isStopped === true ) {
       return [];
     }

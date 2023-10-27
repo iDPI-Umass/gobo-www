@@ -27,8 +27,7 @@
   export let published;
   export let attachments = [];
   export let shares = [];
-  export let reply = null;
-  export let thread = null;
+  export let threads = null;
   export let poll = null;
 
   export let platform_id;
@@ -38,7 +37,7 @@
 
   export let fullPage = false;
 
-  let unused = [ platform_id, visibility, reply, url, created, updated, proxyURL, thread ];
+  let unused = [ platform_id, visibility, url, created, updated, proxyURL, threads ];
   let source = Cache.getSource( source_id );
   let sharedPost = h.getShare( shares );
   let actionTarget = h.getActionTarget({ id, content, sharedPost });

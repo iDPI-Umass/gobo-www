@@ -39,9 +39,46 @@ class Cache {
     cache.postEdges[ id ] ??= {};
     Object.assign( cache.postEdges[id], edges );
   }
-} 
+
+  static decorateMastodon ( ids ) {
+    for ( const id of ids ) {
+      decorateMastodon( id );
+    }
+  }
+}
+
+
+// Special case for Mastodon and Smalltown. Because they are federated, their posts
+// have both originating and "proxied" URLs from the hosting server. For now,
+// we're addressing that by decorating the relevant posts.
+// TODO:  Should the proxied URL be the one and only canonical URL or should
+//        GOBO's abstract post accomodate this somehow in its data structure?
+//        This is somewhat related to solving this resource resolution problem
+//        generally in Mastodon's federation model. They're not true aliases
+//        because the resource is "deeply copied" across the federation.
+
+const decorateMastodon = function ( id ) {
+  const post = Cache.getPost( id );
+  const source = Cache.getSource( post.source_id );
+
+  if ( source.platform === "mastodon" ) {
+    const postHostname = new URL(post.base_url).hostname;
+    const sourceHostname = source.username.split("@").at(-1);
+    if ( postHostname !== sourceHostname ) {
+      const path = `/@${source.username}/${post.platform_id}`;
+      post.proxyURL = new URL( path, source.base_url ).href;
+    }
+
+  } else if ( source.platform === "smalltown" ) {
+    const path = `/web/statuses/${post.platform_id}`;
+    post.proxyURL = new URL( path, identity.base_url ).href;
+  } 
+};
+
+
 
 export {
   cache,
-  Cache
+  Cache,
+  decorateMastodon
 }

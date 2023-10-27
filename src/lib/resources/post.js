@@ -35,6 +35,10 @@ const getPost = async function ({ identity, id }) {
     posts[ share[0] ].shares ??= [];
     posts[ share[0] ].shares.push( share[1] );
   }
+  for ( const thread of result.threads ) {
+    posts[ thread[0] ].threads ??= [];
+    posts[ thread[0]].threads.push( thread[1] );
+  }
   for ( const source of result.sources ) {
     sources[ source.id ] = source;
   }
@@ -43,14 +47,13 @@ const getPost = async function ({ identity, id }) {
     postEdges[ edge[0] ].add( edge[1] );
   }
 
-  posts[ id ].fullThread = result.fullThread ?? [];
-
  
   Cache.addPostCenter( id );
   Cache.putPosts( posts );
   Cache.putSources( sources );
+  Cache.decorateMastodon( Object.keys(posts) );
   Cache.putPostEdges( identity, postEdges );
-  
+
   return posts[ result.feed[0] ];
 };
 

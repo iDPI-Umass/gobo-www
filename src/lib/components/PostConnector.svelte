@@ -11,7 +11,6 @@
     </aside>
 
     <div class="main">
-
     </div>
 
   </div>
@@ -53,6 +52,7 @@
     justify-content: flex-start;
     align-items: stretch;
     min-width: 0;
+    margin-left: var(--gobo-width-spacer-flex);
   }
 
 </style>

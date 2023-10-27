@@ -28,9 +28,7 @@
   export let published;
   export let attachments = [];
   export let shares = [];
-  export let reply = null;
-  export let thread = null;
-  export let fullThread = null;
+  export let threads = [];
   export let poll = null;
 
   export let platform_id;
@@ -45,9 +43,7 @@
   let postURL = proxyURL ?? url;
   let source = Cache.getSource( source_id );
   let sharedPost = h.getShare( shares );
-  let replyPost = h.getReply( reply );
-  let threadPost = h.getThreadOrigin( reply, thread );
-  let threadPosts = h.getFullThread( fullThread );
+  let threadPosts = h.getThreads( threads );
   let actionTarget = h.getActionTarget({ id, content, sharedPost });
   let logo = h.getLogo( platform );
   let { headingSlot1, headingSlot2 } = h.getHeadingSlots( source );
@@ -111,26 +107,35 @@
   
   {:else}
 
-    {#if threadPost}
+    {#if threadPosts.length > 2}
+
       <PostReplied 
         {identity} 
         centerID={id}
-        {...threadPost}
+        {...threadPosts.at(0)}
         {fullPage}>
       </PostReplied>
-    {/if}
-
-    {#if threadPost != null && replyPost != null}
+    
       <PostConnector></PostConnector>
-    {/if}
 
-    {#if replyPost}
       <PostReplied 
         {identity} 
         centerID={id}
-        {...replyPost}
+        {...threadPosts.at(-1)}
         {fullPage}>
       </PostReplied>
+    
+    {:else}
+
+      {#each threadPosts as threadPost (threadPost.id)}
+        <PostReplied 
+          {identity} 
+          centerID={id}
+          {...threadPost}
+          {fullPage}>
+        </PostReplied>
+      {/each}
+
     {/if}
 
   {/if}

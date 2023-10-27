@@ -64,18 +64,13 @@ class Reader {
         posts[ share[0] ].shares ??= [];
         posts[ share[0] ].shares.push( share[1] );
       }
-      for ( const reply of result.replies ?? [] ) {
-        posts[ reply[0] ].reply = reply[1];
-      }
       for ( const thread of result.threads ?? [] ) {
-        posts[ thread[0] ].thread = thread[1];
+        posts[ thread[0] ].threads ??= [];
+        posts[ thread[0] ].threads.push( thread[1] );
       }
       for ( const source of result.sources ) {
         sources[ source.id ] = source;
       }
-      
-      decorateMastodon( this.identity, result.feed, sources, posts );
-      
       for ( const edge of result.post_edges ?? [] ) {
         postEdges[ edge[0] ] ??= new Set();
         postEdges[ edge[0] ].add( edge[1] );
@@ -90,6 +85,7 @@ class Reader {
       this.tail = result.next;
       Cache.putPosts( posts );
       Cache.putSources( sources );
+      Cache.decorateMastodon( Object.keys(posts) );
       Cache.putPostEdges( this.id, postEdges );
 
     } catch (error) {
@@ -231,41 +227,6 @@ class Feed {
 
 
 
-// Special case for Mastodon and Smalltown. Because they are federated, their posts
-// have both originating and "proxied" URLs from the hosting server. For now,
-// we're addressing that by decorating the relevant posts.
-// TODO:  Should the proxied URL be the one and only canonical URL or should
-//        GOBO's abstract post accomodate this somehow in its data structure?
-//        This is somewhat related to solving this resource resolution problem
-//        generally in Mastodon's federation model. They're not true aliases
-//        because the resource is "deeply copied" across the federation.
-
-const decorateMastodon = function ( identity, feed, sources, posts ) {
-  if ( identity.platform === "mastodon" ) {
-    for ( const id of feed ) {
-      const post = posts[ id ];
-      const postHostname = new URL(post.base_url).hostname;
-      const source = sources[ post.source_id ];
-      const sourceHostname = source.username.split("@").at(-1);
-      if ( postHostname === sourceHostname ) {
-        continue;
-      }
-
-      const path = `/@${source.username}/${post.platform_id}`;
-      post.proxyURL = new URL( path, identity.base_url ).href;
-    }
-  
-  } else if ( identity.platform === "smalltown" ) {
-    for ( const id of feed ) {
-      const post = posts[ id ];
-      const path = `/web/statuses/${post.platform_id}`;
-      post.proxyURL = new URL( path, identity.base_url ).href;
-    }
-  } 
-};
-
-
-
 const applyFilters = function ( identity, filters, graph ) {
   const removals = new Set();
   const now = new Date().toISOString();
@@ -334,24 +295,6 @@ const applyFilters = function ( identity, filters, graph ) {
       threads.push( thread );
     }
     graph.threads = threads;
-  }
-
-  currentSize = null;
-  while ( currentSize !== removals.size ) {
-    currentSize = removals.size;
-    const replies = [];
-    for ( const reply of graph.replies ) {
-      if ( removals.has(reply[0]) ) {
-        removals.add( reply[1] );
-        continue;
-      }
-      if ( removals.has( reply[1]) ) {
-        removals.add( reply[0] );
-        continue;
-      }
-      replies.push( reply );
-    }
-    graph.replies = replies;
   }
   
 
