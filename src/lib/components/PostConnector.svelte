@@ -1,5 +1,5 @@
 <script>
-  
+  export let url = "#";
 </script>
 
 <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
@@ -11,6 +11,7 @@
     </aside>
 
     <div class="main">
+      <a href={url}>View Full Thread</a>
     </div>
 
   </div>
@@ -26,7 +27,6 @@
     justify-content: flex-start;
     align-items: stretch;
     margin: 0 var(--gobo-width-spacer-flex) 0 var(--gobo-width-spacer-flex);
-    height: 2rem;
     box-sizing: border-box;
   }
 
@@ -36,10 +36,11 @@
   }
 
   .inner-frame .gutter .spine {
-    height: 2rem;
+    height: 100%;
     box-sizing: border-box;
     border-right: 4px dotted var(--gobo-color-primary);
     margin-left: calc((2.8125rem / 2) - 2px);
+    margin-right: calc((2.8125rem / 2) - 2px + var(--gobo-width-spacer-half));
     margin-top: 0.25rem;
     margin-bottom: 0.25rem;
   }
@@ -49,10 +50,14 @@
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
-    justify-content: flex-start;
-    align-items: stretch;
+    justify-content: center;
+    align-items: flex-start;
     min-width: 0;
-    margin-left: var(--gobo-width-spacer-flex);
+    min-height: 3rem;
+  }
+
+  .main a {
+    font-size: var(--gobo-font-size-detail);
   }
 
 </style>

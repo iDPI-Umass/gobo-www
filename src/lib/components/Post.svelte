@@ -55,6 +55,7 @@
   let renderedContent = render( content );
   let mediaEmbeds = attachments.filter( a => /^(image|video)\//.test(a.type) );
   let textEmbeds = attachments.filter( a => /^application\/json/.test(a.type) );
+  let clickURL = `/post/${ identity }/${ id }`
 
   const styles = {}
   if ( fullPage === true ) {
@@ -76,7 +77,7 @@
     const doesPass = h.filterClickEvent( fullPage, event );
     if ( doesPass ) {
       // Go to the post's main page.
-      goto( `/post/${ identity }/${ id }`);
+      goto( clickURL );
     }
   };
 
@@ -127,7 +128,7 @@
         </PostReplied>
       {/if}
     
-      <PostConnector></PostConnector>
+      <PostConnector url={clickURL}></PostConnector>
 
       {#if h.isFilteredPost(threadPosts.at(-1))}
         <PostRepliedFiltered></PostRepliedFiltered>

@@ -54,7 +54,7 @@ class Reader {
         this.filterEngine.filterTraversals( weave );
         
         // Another check after we've applied higher-order filters.
-        if ( weave.feed.length === 0 ) {
+        if ( weave.feed.length === 0 && graph.feed.length > 0 ) {
           this.tail = graph.next;
           continue;
         }
