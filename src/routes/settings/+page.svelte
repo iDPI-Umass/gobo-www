@@ -15,7 +15,7 @@
 
   <VerticalNav slot="left">
     <NavLink href="/settings/profile">Profile</NavLink>
-    <NavLink href="/settings/appearance">Apperance</NavLink>
+    <NavLink href="/settings/appearance">Appearance</NavLink>
     <NavLink href="/settings/filters">Filters</NavLink>
     <NavLink href="#" action={logout}>Logout</NavLink>
   </VerticalNav>
