@@ -45,6 +45,16 @@ class Cache {
       decorateMastodon( id );
     }
   }
+
+  static mergeWeave ( identity, weave ) {
+    for ( const id of weave.feed ) {
+      Cache.addPostCenter( id );
+    }
+    Cache.putPosts( weave.posts );
+    Cache.putSources( weave.sources );
+    Cache.decorateMastodon( Object.keys(weave.posts) );
+    Cache.putPostEdges( identity.id, weave.postEdges );
+  }
 }
 
 
@@ -71,7 +81,7 @@ const decorateMastodon = function ( id ) {
 
   } else if ( source.platform === "smalltown" ) {
     const path = `/web/statuses/${post.platform_id}`;
-    post.proxyURL = new URL( path, identity.base_url ).href;
+    post.proxyURL = new URL( path, source.base_url ).href;
   } 
 };
 

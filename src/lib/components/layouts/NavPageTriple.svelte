@@ -6,18 +6,18 @@
 
   let panels;
 
-  onMount(() => {
-    const listener = function ( event ) {
-      event.preventDefault();
-      scrollStore.push( event );
-    };
+  // onMount(() => {
+  //   const listener = function ( event ) {
+  //     // event.preventDefault();
+  //     scrollStore.push( event );
+  //   };
 
-    panels.addEventListener( "wheel", listener );
+  //   panels.addEventListener( "wheel", listener );
 
-    return function () {
-      panels.removeEventListener( "wheel", listener );
-    };
-  });
+  //   return function () {
+  //     panels.removeEventListener( "wheel", listener );
+  //   };
+  // });
 </script>
 
 <div class="panels" bind:this={panels}>

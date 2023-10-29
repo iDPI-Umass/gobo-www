@@ -23,28 +23,34 @@ class FilterEngine {
     const active = [];
     for ( const filter of this.filters ) {
       if ( filter.active === true ) {
-        switch ( filter.category ) {
-          case "block-keyword":
-            active.push( new BlockKeyword({ filter }) );
-            break;
-          case "block-username":
-            active.push( new BlockUsername({ filter }) );
-            break;
-          case "block-domain":
-            active.push( new BlockDomain({ filter }) );
-            break;
-          default:
-            console.error("unknown filter category", filter);
-        }
+        active.push( filter );
       }
     }
     return active;
   };
+
+  getRunners () {
+    this.runners = [];
+    for ( const filter of this.filters ) {
+      switch ( filter.category ) {
+        case "block-keyword":
+          this.runners.push( new BlockKeyword({ filter }) );
+          break;
+        case "block-username":
+          this.runners.push( new BlockUsername({ filter }) );
+          break;
+        case "block-domain":
+          this.runners.push( new BlockDomain({ filter }) );
+          break;
+        default:
+          console.error("unknown filter category", filter);
+      }
+    }
+
+    return this.runners;
+  }
   
-  async refreshFilters () {
-    this.filters = await Filter.list();
-  };
-  
+
   setActiveState ( filter, active ) {
     const match = this.filters.find( i => i.id === filter.id );
     if ( match == null ) {
@@ -78,6 +84,167 @@ class FilterEngine {
     // This is asynchronous, but we let it just run without awaiting for now.
     Filter.remove( match );
   }
+
+
+
+  filterPrimary ( graph ) {
+    const filters = this.runners.filter( r => r.active === true);
+    const removals = new Set();
+    const now = new Date().toISOString();
+    
+    const sources = {};
+    for ( const source of graph.sources ) {
+      if ( source.platform === "reddit" ) {
+        sources[ source.name.toLowerCase() ] = source;
+      } else {
+        sources[ source.username.toLowerCase() ] = source;
+      }
+    }
+
+    
+
+    // Cycle through every individual post looking for posts to exclude.
+    for ( const post of graph.posts ) {
+      
+      // Remove impossible date anomalies.
+      if ( post.published > now ) {
+        removals.add( post.id );
+        continue;
+      }
+  
+      for ( const filter of filters ) {
+        const doesPass = filter.check({ post, sources });
+        if ( doesPass !== true ) {
+          removals.add( post.id );
+          continue;
+        }
+      }
+    }
+  
+    console.log(`filtered ${removals.size} posts`);
+  
+  
+    // Now that we know all exclusions, purge them from post array...
+    const posts = [];
+    for ( const post of graph.posts ) {
+      if ( removals.has(post.id) ) {
+        continue;
+      }
+      posts.push( post );
+    }
+    graph.posts = posts;
+  
+    // ...and from the feed array.
+    const feed = [];
+    for ( const id of graph.feed ) {
+      if ( removals.has(id) ) {
+        continue;
+      }
+      feed.push( id );
+    }
+    graph.feed = feed;
+  
+  
+    // Examine effects on 1st-order graph edges.
+    const shares = [];
+    for ( const share of graph.shares ) {
+      if ( removals.has(share[0]) ) {
+        continue;
+      }
+      if ( removals.has( share[1]) ) {
+        shares.push([ share[0], "gobo-filtered-post" ]);
+        continue;
+      }
+      shares.push( share );
+    }
+    graph.shares = shares;
+  
+    const threads = [];
+    for ( const thread of graph.threads ) {
+      if ( removals.has(thread[0]) ) {
+        continue;
+      }
+      if ( removals.has( thread[1]) ) {
+        threads.push([ thread[0], "gobo-filtered-post" ]);
+        continue;
+      }
+      threads.push( thread );
+    }
+    graph.threads = threads;
+    
+  
+    // Return the removed posts so the engine can decide what to do next.
+    return removals;
+  }
+
+  // TODO: Where does this go? We'd like to express a repeatable way to assemble
+  // feeds and threads while being mindful of the filter configuration.
+  // However, control flow interferes with composition.
+  weaveGraph ( graph ) {
+    const feed = [ ...graph.feed ];
+    const posts = {};
+    const sources = {};
+    const postEdges = {};
+
+    for ( const post of graph.posts ) {
+      posts[ post.id ] = post;
+    }
+    for ( const share of graph.shares ?? [] ) {
+      posts[ share[0] ].shares ??= [];
+      posts[ share[0] ].shares.push( share[1] );
+    }
+    for ( const thread of graph.threads ?? [] ) {
+      posts[ thread[0] ].threads ??= [];
+      posts[ thread[0] ].threads.push( thread[1] );
+    }
+    for ( const source of graph.sources ) {
+      sources[ source.id ] = source;
+    }
+    for ( const edge of graph.post_edges ?? [] ) {
+      postEdges[ edge[0] ] ??= new Set();
+      postEdges[ edge[0] ].add( edge[1] );
+    }
+
+    return {
+      feed,
+      posts,
+      sources,
+      postEdges
+    };
+  }
+
+
+
+
+  // The current filters act on individual posts, with consequences for their
+  // immediate graph edges. Once all that is done, we can examine the resulting
+  // graph and look for traversal structures that need further action.
+  filterTraversals ( weave ) {
+    const removals = new Set();
+    for ( const id of weave.feed ) {
+      const post = weave.posts[ id ];
+
+      // Reposts
+      if ( hasNoContent(post) && post.shares?.length > 0 ) {
+        if ( post.shares[0] === "gobo-filtered-post" ) {
+          removals.add( id );
+          continue;
+        }
+      }
+
+
+      // Threads
+      if ( post.threads?.length > 0 ) {
+        // Oldest ancestor post. If filtered, we hide graph from feed only.
+        if ( post.threads[0] === "gobo-filtered-post" ) {
+          removals.add( id );
+          continue;
+        }
+      }
+    }
+
+    weave.feed = weave.feed.filter( id => !removals.has(id) )
+  }
 }
 
 
@@ -102,7 +269,11 @@ class BlockKeyword {
   constructor ({ filter }) {
     this.filter = filter;
     const input = escapeRegex( filter.configuration.value );
-    this.re = new RegExp( input, "i" );
+    this.re = new RegExp( input + "('|('s))?", "i" );
+  }
+
+  get active () {
+    return this.filter.active;
   }
 
   check ({ post }) {
@@ -134,6 +305,14 @@ class BlockKeyword {
       }
     }
 
+    for ( const option of post.poll?.options ?? [] ) {
+      if ( option.key != null ) {
+        if ( this.re.test(option.key) === true ) {
+          return false;
+        }
+      }
+    }
+
     return true;
   }
 }
@@ -152,6 +331,10 @@ class BlockUsername {
     } else {
       this.username = value.toLowerCase();
     }
+  }
+
+  get active () {
+    return this.filter.active;
   }
 
   check ({ post, sources }) {
@@ -174,14 +357,26 @@ class BlockDomain {
     if ( !value.startsWith("http") ) {
       value = `https://${value}`;
     }
+
+    // Isolate the domain so we can precisely match subdomains.
+    // filter = www.example.com
+    //    excludes: 
+    //      www.example.com
+    //      sub.www.example.com
+    //    allows:  
+    //      example.com
+    //      sites.example.com
+    //      myexample.com
     const domain = new URL(value).hostname
+    this.re = new RegExp("(^|\\.)" + escapeRegex(domain) + "$", "i");
     
     this.matchesDomain = function ( url ) {
-      return domain.endsWith( new URL( url ).hostname );
+      return this.re.test( new URL(url).hostname );
     };
+  }
 
-    const input = escapeRegex( domain );
-    this.re = new RegExp( input, "i" );
+  get active () {
+    return this.filter.active;
   }
 
 
@@ -210,6 +405,12 @@ class BlockDomain {
 
     return true;
   }
+}
+
+
+
+const hasNoContent = function ( post ) {
+  return post.content == null || post.content === "";
 }
 
 export {

@@ -6,14 +6,16 @@
   import PostSyndication from "$lib/components/PostSyndication.svelte";
   import PostPoll from "$lib/components/PostPoll.svelte";
   import PostShared from "$lib/components/PostShared.svelte";
+  import PostSharedFiltered from "$lib/components/PostSharedFiltered.svelte";
   import PostReplied from "$lib/components/PostReplied.svelte";
+  import PostRepliedFiltered from "$lib/components/PostRepliedFiltered.svelte";
   import PostConnector from "$lib/components/PostConnector.svelte";
   import PostActions from "$lib/components/PostActions.svelte";
   import { humanize } from "$lib/helpers/humanize.js";
   import { render } from "$lib/helpers/markdown.js";
   import { goto } from "$app/navigation";
   import { Cache } from "$lib/resources/cache.js";
-  import * as h from "$lib/helpers/post-engine.js";
+  import * as h from "$lib/engines/post.js";
 
   export let identity;
 
@@ -97,43 +99,60 @@
   {#if fullPage === true}
 
     {#each threadPosts as threadPost (threadPost.id)}
-      <PostReplied 
-        {identity} 
-        centerID={id}
-        {...threadPost}
-        {fullPage}>
-      </PostReplied>
-    {/each}
-  
-  {:else}
-
-    {#if threadPosts.length > 2}
-
-      <PostReplied 
-        {identity} 
-        centerID={id}
-        {...threadPosts.at(0)}
-        {fullPage}>
-      </PostReplied>
-    
-      <PostConnector></PostConnector>
-
-      <PostReplied 
-        {identity} 
-        centerID={id}
-        {...threadPosts.at(-1)}
-        {fullPage}>
-      </PostReplied>
-    
-    {:else}
-
-      {#each threadPosts as threadPost (threadPost.id)}
+      {#if h.isFilteredPost(threadPost)}
+        <PostRepliedFiltered></PostRepliedFiltered>
+      {:else}
         <PostReplied 
           {identity} 
           centerID={id}
           {...threadPost}
           {fullPage}>
         </PostReplied>
+      {/if}
+      
+    {/each}
+  
+  {:else}
+
+    {#if threadPosts.length > 2}
+
+      {#if h.isFilteredPost(threadPosts.at(0))}
+        <PostRepliedFiltered></PostRepliedFiltered>
+      {:else}
+        <PostReplied 
+          {identity} 
+          centerID={id}
+          {...threadPosts.at(0)}
+          {fullPage}>
+        </PostReplied>
+      {/if}
+    
+      <PostConnector></PostConnector>
+
+      {#if h.isFilteredPost(threadPosts.at(-1))}
+        <PostRepliedFiltered></PostRepliedFiltered>
+      {:else}
+        <PostReplied 
+          {identity} 
+          centerID={id}
+          {...threadPosts.at(-1)}
+          {fullPage}>
+        </PostReplied>
+      {/if}
+    
+    {:else}
+
+      {#each threadPosts as threadPost (threadPost.id)}
+        {#if h.isFilteredPost(threadPost)}
+          <PostRepliedFiltered></PostRepliedFiltered>
+        {:else}
+          <PostReplied 
+            {identity} 
+            centerID={id}
+            {...threadPost}
+            {fullPage}>
+          </PostReplied>
+        {/if}
       {/each}
 
     {/if}
@@ -188,13 +207,17 @@
       {/if}
 
       {#if sharedPost}
-        <PostShared
-          {identity} 
-          centerID={id}
-          {...sharedPost}
-          marginTop={renderedContent ? "1rem" : "6.5px"}
-          {fullPage}>
-        </PostShared>
+        {#if h.isFilteredPost(sharedPost)}
+          <PostSharedFiltered></PostSharedFiltered>
+        {:else}
+          <PostShared
+            {identity} 
+            centerID={id}
+            {...sharedPost}
+            marginTop={renderedContent ? "1rem" : "6.5px"}
+            {fullPage}>
+          </PostShared>
+        {/if}
       {/if}
 
       <PostActions {platform} {identity} post={actionTarget}></PostActions>

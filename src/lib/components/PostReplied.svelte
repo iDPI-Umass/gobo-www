@@ -7,11 +7,12 @@
   import PostPoll from "$lib/components/PostPoll.svelte";
   import PostShared from "$lib/components/PostShared.svelte";
   import PostActions from "$lib/components/PostActions.svelte";
+  import PostSharedFiltered from "$lib/components/PostSharedFiltered.svelte";
   import { humanize } from "$lib/helpers/humanize.js";
   import { render } from "$lib/helpers/markdown.js";
   import { goto } from "$app/navigation";
   import { Cache } from "$lib/resources/cache.js";
-  import * as h from "$lib/helpers/post-engine.js";
+  import * as h from "$lib/engines/post.js";
 
   export let identity;
 
@@ -139,12 +140,16 @@
       {/if}
 
       {#if sharedPost}
-        <PostShared
-          {identity}
-          {centerID}
-          {...sharedPost}
-          marginTop={renderedContent ? "1rem" : "6.5px"}
-        ></PostShared>
+        {#if h.isFilteredPost(sharedPost)}
+          <PostSharedFiltered></PostSharedFiltered>
+        {:else}
+          <PostShared
+            {identity}
+            {centerID}
+            {...sharedPost}
+            marginTop={renderedContent ? "1rem" : "6.5px"}
+          ></PostShared>
+        {/if}
       {/if}
 
       <PostActions 

@@ -20,4 +20,9 @@
   <FooterNav current="home"></FooterNav>
 </GuardFrame>
 
-<style></style>
+<style>
+  div {
+    max-height: calc(100dvh - 4rem);
+    overflow-y: scroll;
+  }
+</style>

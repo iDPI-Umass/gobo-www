@@ -2,6 +2,7 @@
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
+  import PostSharedFiltered from "$lib/components/PostSharedFiltered.svelte";
   import PostMedia from "$lib/components/PostMedia.svelte";
   import PostSyndication from "$lib/components/PostSyndication.svelte";
   import PostPoll from "$lib/components/PostPoll.svelte";
@@ -9,7 +10,7 @@
   import { render } from "$lib/helpers/markdown.js";
   import { goto } from "$app/navigation";
   import { Cache } from "$lib/resources/cache.js";
-  import * as h from "$lib/helpers/post-engine.js";
+  import * as h from "$lib/engines/post.js";
 
   export let identity;
   export let centerID;
@@ -134,13 +135,17 @@
       {/if}
 
       {#if sharedPost}
-        <svelte:self
-          {identity}
-          {centerID}
-          {...sharedPost}
-          marginTop="1rem"
-          terminal={true}
-        />
+        {#if h.isFilteredPost(sharedPost)}
+          <PostSharedFiltered></PostSharedFiltered>
+        {:else}
+          <svelte:self
+            {identity}
+            {centerID}
+            {...sharedPost}
+            marginTop="1rem"
+            terminal={true}
+          />
+        {/if}
       {/if}
     </div>
 

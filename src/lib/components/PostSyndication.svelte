@@ -107,12 +107,13 @@
   .syndication section {
     margin: 0.5rem;
     margin-bottom: 0.25rem;
-    overflow-wrap: break-word;
+    overflow-wrap: anywhere;
   }
 
   .syndication section h2 {
     font-size: var(--gobo-font-size-large);
     font-weight: var(--gobo-font-weight-black);
+    overflow-wrap: anywhere;
   }
 
   .syndication section :global(p) {

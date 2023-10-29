@@ -66,6 +66,7 @@
     color: var(--gobo-color-text);
     font-size: var(--gobo-font-size-copy);
     font-weight: var(--gobo-font-weight-normal);
+    overflow-wrap: anywhere;
   }
 
   .question-text > .question-value {

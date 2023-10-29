@@ -1,20 +1,22 @@
 import { getGOBOClient, logout } from "$lib/helpers/account";
 import { Cache } from "$lib/resources/cache.js";
 import * as Draft from "$lib/resources/draft-image.js";
+import * as FeedSaver from "$lib/engines/feed-singleton.js";
 
 const getPost = async function ({ identity, id }) {
   if ( Cache.hasPostCenter(id) ) {
     return Cache.getPost( id );
   }
 
-  let result;
+  let graph, weave;
   try {
     const client = await getGOBOClient();
-    result = await client.personIdentityPost.get({ 
+    graph = await client.personIdentityPost.get({ 
       person_id: client.id,
       identity_id: identity,
       id 
     });
+
   } catch (error) {
     if ( error.status === 401 ) {
       await logout();
@@ -24,37 +26,20 @@ const getPost = async function ({ identity, id }) {
     }
   }
 
-  const posts = {};
-  const sources = {};
-  const postEdges = {};
-
-  for ( const post of result.posts ) {
-    posts[ post.id ] = post;
+  try {
+    const engine = await FeedSaver.getEngine();
+    const filterEngine = engine.filterEngine;
+    filterEngine.filterPrimary( graph );
+    console.log( "filtered graph", graph );
+  
+    weave = filterEngine.weaveGraph( graph );
+    filterEngine.filterTraversals( weave );
+    Cache.mergeWeave( {id: identity}, weave );
+  
+    return weave.posts[ weave.feed[0] ];
+  } catch (error) {
+    console.error(error);
   }
-  for ( const share of result.shares ) {
-    posts[ share[0] ].shares ??= [];
-    posts[ share[0] ].shares.push( share[1] );
-  }
-  for ( const thread of result.threads ) {
-    posts[ thread[0] ].threads ??= [];
-    posts[ thread[0]].threads.push( thread[1] );
-  }
-  for ( const source of result.sources ) {
-    sources[ source.id ] = source;
-  }
-  for ( const edge of result.post_edges ?? [] ) {
-    postEdges[ edge[0] ] ??= new Set();
-    postEdges[ edge[0] ].add( edge[1] );
-  }
-
- 
-  Cache.addPostCenter( id );
-  Cache.putPosts( posts );
-  Cache.putSources( sources );
-  Cache.decorateMastodon( Object.keys(posts) );
-  Cache.putPostEdges( identity, postEdges );
-
-  return posts[ result.feed[0] ];
 };
 
 const buildMetadata = function ( identity, draft ) {

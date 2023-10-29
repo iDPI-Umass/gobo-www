@@ -43,8 +43,7 @@ class FeedEngine {
     const identityEngine = await IdentityEngine.create();
     const filterEngine = await FilterEngine.create();
     const identities = identityEngine.getActiveIdentities();
-    const filters = filterEngine.getActiveFilters();
-    const feed = await Feed.create({ identities, filters });
+    const feed = await Feed.create({ identities, filterEngine });
     return new FeedEngine({ feed, identityEngine, filterEngine });
   }
 
@@ -53,8 +52,7 @@ class FeedEngine {
     const identityEngine = this.identityEngine;
     const filterEngine = this.filterEngine;
     const identities = identityEngine.getActiveIdentities();
-    const filters = filterEngine.getActiveFilters();
-    const feed = await Feed.create({ identities, filters });
+    const feed = await Feed.create({ identities, filterEngine });
     return new FeedEngine({ feed, identityEngine, filterEngine });
   }
 

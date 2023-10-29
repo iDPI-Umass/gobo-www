@@ -46,7 +46,7 @@
       case "block-keyword":
         return "Gobo matches this phrase against this first-class and syndicated content and excludes those posts from your feed.";
       case "block-username":
-        return "Gobo matches this username against authors in the feed social graph and excludes those posts from your feed.";
+        return "Gobo matches this username against authors in the feed social graph and excludes those posts from your feed. For Reddit, this applies to subreddits not individual users.";
       case "block-domain":
         return "Gobo Matches this domain, ex: example.com, against related URLs shared as links and exlcudes those posts from your feed."; 
       default:

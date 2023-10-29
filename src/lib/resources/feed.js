@@ -8,9 +8,8 @@ import { Cache, cache } from "$lib/resources/cache.js";
 
 
 class Reader {
-  constructor ({ identity, filters, per_page, client }) {
+  constructor ({ identity, per_page, client, filterEngine }) {
     this.identity = identity;
-    this.filters = filters;
     this.id = identity.id
     this.per_page = per_page ?? 50;
     this.client = client;
@@ -18,75 +17,63 @@ class Reader {
     this.tail = null;
     this.queue = [];
     this.unlocksAt = null;
+    this.filterEngine = filterEngine;
+    this.filterEngine.getRunners();
   }
 
-  static async create ({ identity, filters, per_page }) {
+  static async create ({ identity, per_page, filterEngine }) {
     const client = await getGOBOClient();
     per_page = per_page ?? 50;
-    return new Reader({ identity, filters, per_page, client });
+    return new Reader({ identity, per_page, client, filterEngine });
   }
 
   async page () {
     try {
-      let result;
+      let graph, weave;
       while ( true ) {
-        result = await this.client.personIdentityFeed.get({ 
+        graph = await this.client.personIdentityFeed.get({ 
           person_id: this.client.id,
           id: this.id,
           per_page: this.per_page,
           start: this.tail
         });
   
-        const removals = applyFilters( this.identity, this.filters, result );
-        console.log(result)
+        const removals = this.filterEngine.filterPrimary( graph );
+        console.log( "filtered graph", graph );
         
         // This logic allows us to continue pulling if everything is filtered.
         // TODO: risk of infinite loop here. I think it's a pretty strong case
         //    for a state machine refactor because we are scrutinizing 
         //    conditionals mid-flow again.
-        if ( removals.size > 0 && result.feed.length === 0 ) {
-          this.tail = result.next;
-        } else {
-          break;
+        if ( removals.size > 0 && graph.feed.length === 0 ) {
+          this.tail = graph.next;
+          continue;
         }
-      }
-      
 
+        weave = this.filterEngine.weaveGraph( graph );
+        this.filterEngine.filterTraversals( weave );
+        
+        // Another check after we've applied higher-order filters.
+        if ( weave.feed.length === 0 ) {
+          this.tail = graph.next;
+          continue;
+        }
+
+        // If we make it here, we have posts to show.
+        break;
+      }
+
+      // Store the filtered state in the application cache.
+      Cache.mergeWeave( this.identity, weave );
+
+      // Almost done. Place results into outer interface and ready next cycle.
       const feed = [];
-      const posts = {};
-      const sources = {};
-      const postEdges = {};
-
-      for ( const post of result.posts ) {
-        posts[ post.id ] = post;
+      for ( const id of weave.feed ) {
+        feed.push( weave.posts[id] );
       }
-      for ( const share of result.shares ?? [] ) {
-        posts[ share[0] ].shares ??= [];
-        posts[ share[0] ].shares.push( share[1] );
-      }
-      for ( const thread of result.threads ?? [] ) {
-        posts[ thread[0] ].threads ??= [];
-        posts[ thread[0] ].threads.push( thread[1] );
-      }
-      for ( const source of result.sources ) {
-        sources[ source.id ] = source;
-      }
-      for ( const edge of result.post_edges ?? [] ) {
-        postEdges[ edge[0] ] ??= new Set();
-        postEdges[ edge[0] ].add( edge[1] );
-      }
-      for ( const id of result.feed ) {
-        Cache.addPostCenter( id );
-        feed.push( posts[ id ] );
-      }
-
       this.queue.push( ...feed );
       this.head = this.queue[0]?.published;
-      this.tail = result.next;
-      Cache.putPosts( posts );
-      Cache.putSources( sources );
-      Cache.decorateMastodon( Object.keys(posts) );
-      Cache.putPostEdges( this.id, postEdges );
+      this.tail = graph.next;
 
     } catch (error) {
       if ( error.status === 401 ) {
@@ -172,10 +159,10 @@ class Feed {
     this.readers = readers;
   }
 
-  static async create ({ identities, filters }) {
+  static async create ({ identities, filterEngine }) {
     const readers = [];
     for ( const identity of identities ) {
-      readers.push( await Reader.create({ identity, filters }) );
+      readers.push( await Reader.create({ identity, filterEngine }) );
     }
 
     return new Feed({ readers });
@@ -224,108 +211,6 @@ class Feed {
     }
   }
 }
-
-
-
-const applyFilters = function ( identity, filters, graph ) {
-  const removals = new Set();
-  const now = new Date().toISOString();
-  const sources = {};
-  if ( identity.platform === "reddit" ) {
-    for ( const source of graph.sources ) {
-      sources[ source.name.toLowerCase() ] = source;
-    }
-  } else {
-    for ( const source of graph.sources ) {
-      sources[ source.username.toLowerCase() ] = source;
-    }
-  }
-  
-
-  // Cycle through every individual post looking for posts to exclude.
-  for ( const post of graph.posts ) {
-    
-    // Remove impossible date anomalies.
-    if ( post.published > now ) {
-      removals.add( post.id );
-      continue;
-    }
-
-    for ( const filter of filters ) {
-      const doesPass = filter.check({ post, sources });
-      if ( doesPass !== true ) {
-        removals.add( post.id );
-        continue;
-      }
-    }
-  }
-
-  // Include all posts in graph connected to excluded posts.
-  let currentSize = null;
-  while ( currentSize !== removals.size ) {
-    currentSize = removals.size;
-    const shares = [];
-    for ( const share of graph.shares ) {
-      if ( removals.has(share[0]) ) {
-        removals.add( share[1] );
-        continue;
-      }
-      if ( removals.has( share[1]) ) {
-        removals.add( share[0] );
-        continue;
-      }
-      shares.push( share );
-    }
-    graph.shares = shares;
-  }
-
-  currentSize = null;
-  while ( currentSize !== removals.size ) {
-    currentSize = removals.size;
-    const threads = [];
-    for ( const thread of graph.threads ) {
-      if ( removals.has(thread[0]) ) {
-        removals.add( thread[1] );
-        continue;
-      }
-      if ( removals.has( thread[1]) ) {
-        removals.add( thread[0] );
-        continue;
-      }
-      threads.push( thread );
-    }
-    graph.threads = threads;
-  }
-  
-
-  console.log(`filtered ${removals.size} posts`);
-
-
-  // Now that we know all exclusions, purge them from post array...
-  const posts = [];
-  for ( const post of graph.posts ) {
-    if ( removals.has(post.id) ) {
-      continue;
-    }
-    posts.push( post );
-  }
-  graph.posts = posts;
-
-  // ...and from the feed array.
-  const feed = [];
-  for ( const id of graph.feed ) {
-    if ( removals.has(id) ) {
-      continue;
-    }
-    feed.push( id );
-  }
-  graph.feed = feed;
-
-
-  // Return the removed posts so the engine can decide what to do next.
-  return removals;
-};
-
 
 
 

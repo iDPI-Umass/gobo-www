@@ -1,4 +1,25 @@
 import { Cache } from "$lib/resources/cache.js";
+import * as Type from "@dashkite/joy/type";
+
+class FilteredPost {
+  constructor ({ id }) {
+    this.id = id;
+  }
+
+  static create() {
+    // TODO: This should eventually hold the hidden post data.
+    const id = Math.random().toString();
+    return new FilteredPost({ id });
+  }
+
+  static isType ( value ) {
+    return Type.isType( FilteredPost, value );
+  }
+}
+
+const isFilteredPost = function ( value ) {
+  return FilteredPost.isType( value );
+}
 
 const getLogo = function ( platform ) {
   return `/icons/${ platform }.svg`;
@@ -75,42 +96,46 @@ const getAvatar = function ( source ) {
 
 
 const getShare = function ( shares ) {
-  let sharedPosts = [];
-  for ( const item of shares ) {
-    const post = Cache.getPost( item );
-    if ( post == null ) {
-      console.error(`expected post ${item}, but it appears to be missing from graph`);
-    } else {
-      sharedPosts.push( post );
-    }
+  const share = shares[0];
+  if ( share == null ) {
+    return;
   }
 
-  // Correct errors in graph that produce multiple shares.
-  // TODO: Look for errors in either feed response constructor or feed intermediary constructor.
-  if ( sharedPosts.length > 1 ) {
-    sharedPosts = [ sharedPosts[0] ];
+  if ( share === "gobo-filtered-post" ) {
+    return FilteredPost.create();
   }
-  
-  return sharedPosts[0];
+
+  const post = Cache.getPost( share );
+  if ( post == null ) {
+    console.error(`expected post ${share}, but it appears to be missing from graph`);
+  }
+  return post;
 };
 
 const getReply = function ( reply ) {
-  let repliedPost = null;
-  if ( reply != null ) {
-    const post = Cache.getPost( reply );
-    if ( post == null ) {
-      console.error(`expected post ${reply}, but it appears to be missing from graph`);
-    } else {
-      repliedPost = post;
-    }
+  if ( reply == null ) {
+    return;
   }
 
-  return repliedPost;
+  if ( reply === "gobo-filtered-post" ) {
+    return FilteredPost.create();
+  }
+
+  const post = Cache.getPost( reply );
+  if ( post == null ) {
+    console.error(`expected post ${reply}, but it appears to be missing from graph`);
+  }
+  return post;
 };
 
 const getThreads = function ( ids ) {
   const result = [];
   for( const id of ids ) {
+    if ( id === "gobo-filtered-post" ) {
+      result.push( FilteredPost.create() );
+      continue;
+    }
+
     const post = Cache.getPost( id );
     if ( post == null ) {
       console.error(`expected post ${id}, but it appears to be missing from graph`);
@@ -235,6 +260,8 @@ const filterClickEvent = function ( fullPage, event ) {
 
 
 export {
+  isFilteredPost,
+
   getHeadingSlots,
   getLogo,
   getSourceCopy,
