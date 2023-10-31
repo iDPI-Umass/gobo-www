@@ -44,11 +44,11 @@
   const getHintCopy = function ( category ) {
     switch ( category ) {
       case "block-keyword":
-        return "Gobo matches this phrase against this first-class and syndicated content and excludes those posts from your feed.";
+        return "Gobo will exclude posts from your feed that include this word or phrase.";
       case "block-username":
-        return "Gobo matches this username against authors in the feed social graph and excludes those posts from your feed. For Reddit, this applies to subreddits not individual users.";
+        return "Gobo will exclude posts from your feed by this username (e.g., @gobo.bsky.social or r/idpi).";
       case "block-domain":
-        return "Gobo Matches this domain, ex: example.com, against related URLs shared as links and exlcudes those posts from your feed."; 
+        return "Gobo will exclude posts from your feed that include links to this domain (e.g., publicinfrastructure.com)."; 
       default:
         console.warn( "unknown category, cannot provide hint copy." )
         return "";

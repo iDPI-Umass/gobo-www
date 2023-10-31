@@ -27,11 +27,7 @@
 
     <section class="gobo-copy">
       <p>
-        Filters exclude posts from your feeds based on your configuration.
-        Gobo aims to make these easy to add, use, and experiment with. Different
-        filter categories are available with unique and powerful effects. These
-        filters are private and reversable. Feel free to toggle or delete filters
-        at will.
+        Filters include and exclude posts from your feeds. Once you create a filter, you can turn it on and off or delete it entirely.
       </p> 
     </section>
 
