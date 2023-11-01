@@ -85,6 +85,12 @@
     align-items: center;
   }
 
+  header h2 {
+    font-weight: var(--gobo-font-weight-black);
+    font-size: 1.25rem;
+    text-transform: capitalize;
+  }
+
   h3 {
     text-transform: capitalize;
     margin: 0;
