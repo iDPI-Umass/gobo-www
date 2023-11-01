@@ -70,7 +70,7 @@
     background: var(--gobo-color-panel);
     border: var(--gobo-border-panel);
     border-radius: var(--gobo-border-radius);
-    max-width: 20rem;
+    width: 20rem;
     margin-bottom: var(--gobo-height-spacer);
   }
 
@@ -78,6 +78,7 @@
     padding: 0.75rem var(--gobo-width-spacer);
     border-bottom: var(--gobo-border-panel);
     margin-bottom: var(--gobo-height-spacer-flex);
+    width: 100%;
     display: flex;
     flex-wrap: nowrap;
     justify-content: space-between;
