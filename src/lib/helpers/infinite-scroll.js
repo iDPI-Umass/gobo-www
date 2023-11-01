@@ -9,6 +9,7 @@ class ScrollSmoother {
     this.loopID = null;
     this.marker = null;
     this.inbox = null;
+    this.isStopped = true;
     this.element = element;
   }
 
@@ -17,16 +18,25 @@ class ScrollSmoother {
   }
 
   start () {
-    this.loopID = window.requestAnimationFrame( this.watch.bind(this) );
+    this.isStopped = false;
+    this.watch();
   }
 
   stop () {
+    this.isStopped = true;
+    this.marker = null;
+    this.inbox = null;
     if ( this.loopID != null ) {
       window.cancelAnimationFrame( this.loopID );
     }
+    this.loopID = null;
   }
 
   update ( event ) {
+    if ( this.isStopped === true ) {
+      return;
+    }
+
     // We only care about downward scrolling.
     if ( event.deltaY <= 0 ) {
       return;
@@ -39,18 +49,18 @@ class ScrollSmoother {
   }
 
   watch () {
-    if ( this.inbox == null ) {
-      return this.start();
+    if ( this.isStopped === true ) {
+      return;
     }
 
-    if ( this.marker !== this.inbox ) {
+    if ( this.inbox != null && this.marker !== this.inbox ) {
       this.marker = this.inbox;
       const detail = { marker: this.marker };
       const event = new CustomEvent( "gobo-smooth-scroll", { detail });
       this.element.dispatchEvent( event );
     }
 
-    this.start();
+    this.loopID = window.requestAnimationFrame( this.watch.bind(this) );
   }
 }
 

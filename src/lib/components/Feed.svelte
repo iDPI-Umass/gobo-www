@@ -73,9 +73,11 @@
       switch ( command ) {
         case "reset":
           loaded = false;
+          smoother.stop();
           items = [];
           await FeedSaver.reset();
           await loadFeed();
+          smoother.start();
           feedStore.push({}); // We're using store as message queue, clear out old message.
           break;
       }
