@@ -81,10 +81,11 @@ const getAvatarFallback = function ( source ) {
   switch ( source.platform ) {
     case "mastodon":
     case "smalltown":
+      return "/icons/mastodon-avatar.png";
     case "bluesky":
-      return "https://mastodon.social/avatars/original/missing.png";
+      return "/icons/bluesky-avatar.png";
     case "reddit":
-      return "https://www.redditstatic.com/avatars/defaults/v2/avatar_default_6.png";
+      return "/icons/reddit-avatar.png";
   }
 };
 
