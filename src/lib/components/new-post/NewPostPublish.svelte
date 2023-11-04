@@ -10,8 +10,43 @@
   let draft = {};
   let publishButton;
 
+  const isValid = function () {
+    console.log(draft);
+
+    const active = draft.identities.filter( i => i.active === true );
+   
+
+    if ( active.length === 0 ) {
+      draftStore.update({ alert: "Must select an identity to publish this post." });
+      return false;
+    }
+
+    for ( const identity of active ) {
+      if ( identity.platform === "bluesky" && draft.content?.length > 300 ) {
+        draftStore.update({ alert: "Bluesky does not accept posts with more than 300 characters." });
+        return false;
+      }
+
+      if ( identity.platform === "mastodon" && draft.content?.length > 500 ) {
+        draftStore.update({ alert: "Mastodon does not accept posts with more than 500 characters." });
+        return false;
+      }
+
+      if ( identity.platform === "reddit" && draft.content?.length > 4000 ) {
+        draftStore.update({ alert: "Reddit does not accept posts with more than 40,000 characters." });
+        return false;
+      }
+
+      return true;
+    }
+  };
+
   const publish = async function () {
     if ( publishButton.loading === true ) {
+      return;
+    }
+
+    if ( isValid() !== true ) {
       return;
     }
     

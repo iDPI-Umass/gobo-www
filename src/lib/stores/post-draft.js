@@ -21,6 +21,7 @@ const isVideo = function ( value ) {
 
 const emptyDraft = function () {
   return {
+    alert: null,
     identities: [],
     identitiesLoaded: "start",
     attachments: [],

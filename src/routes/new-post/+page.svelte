@@ -1,15 +1,12 @@
 <script>
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";  
+  import NewPostToast from "$lib/components/new-post/NewPostToast.svelte";
   import NewPostReference from "$lib/components/new-post/NewPostReference.svelte";
   import NewPostBody from "$lib/components/new-post/NewPostBody.svelte";
   import NewPostMedia from "$lib/components/new-post/NewPostMedia.svelte";
   import NewPostIdentities from "$lib/components/new-post/NewPostIdentities.svelte";
   import NewPostOptions from "$lib/components/new-post/NewPostOptions.svelte";
   import NewPostPublish from "$lib/components/new-post/NewPostPublish.svelte";
-
-  import MastodonPreview from "$lib/components/new-post/MastodonPreview.svelte";
-  import RedditPreview from "$lib/components/new-post/RedditPreview.svelte";
-  import TwitterPreview from "$lib/components/new-post/BlueskyPreview.svelte";
   import NewPostPreview from "$lib/components/new-post/NewPostPreview.svelte";
   import { onDestroy, onMount } from "svelte";
   import { get } from "svelte/store";
@@ -70,6 +67,10 @@
     
     <section class="panel extra-wide">
       <NewPostPreview></NewPostPreview>
+    </section>
+
+    <section class="panel warning">
+      <NewPostToast></NewPostToast>
     </section>
   
     <section class="panel publish">
