@@ -5,6 +5,7 @@
   import { onMount } from "svelte";
   import * as Post from "$lib/resources/post.js";
   import { allyEvent } from "$lib/helpers/event";
+  import * as linkify from 'linkifyjs';
 
 
   let draft = {};
@@ -22,9 +23,27 @@
     }
 
     for ( const identity of active ) {
-      if ( identity.platform === "bluesky" && draft.content?.length > 300 ) {
-        draftStore.update({ alert: "Bluesky does not accept posts with more than 300 characters." });
-        return false;
+      if ( identity.platform === "bluesky" && draft.content != null ) {
+        const links = linkify.find(draft.content, "url");
+        let length = draft.content.length;
+        let surplus = 0;
+        for ( const link of links ) {
+          const url = new URL( link.href );
+          if ( url.pathname.length > 16 ) {
+            surplus += ( url.pathname.length - 16 );
+          }
+          if (link.value.startsWith("https://")) {
+            surplus += 8;
+          }
+          else if (link.value.startsWith("http://")) {
+            surplus += 7;
+          }
+        }
+        length = length - surplus;
+        if ( length > 300 ){
+          draftStore.update({ alert: "Bluesky does not accept posts with more than 300 characters." });
+          return false;
+        }
       }
 
       if ( identity.platform === "mastodon" && draft.content?.length > 500 ) {
@@ -32,7 +51,7 @@
         return false;
       }
 
-      if ( identity.platform === "reddit" && draft.content?.length > 4000 ) {
+      if ( identity.platform === "reddit" && draft.content?.length > 40000 ) {
         draftStore.update({ alert: "Reddit does not accept posts with more than 40,000 characters." });
         return false;
       }

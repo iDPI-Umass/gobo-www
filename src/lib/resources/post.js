@@ -2,6 +2,19 @@ import { getGOBOClient, logout } from "$lib/helpers/account";
 import { Cache } from "$lib/resources/cache.js";
 import * as Draft from "$lib/resources/draft-image.js";
 import * as FeedSaver from "$lib/engines/feed-singleton.js";
+import { RichText, BskyAgent, UnicodeString } from "@atproto/api"
+
+const agent = new BskyAgent({ service: "https://bsky.app"});
+
+const shortURL = function (url) {
+  const url_ = new URL(url);
+  const path =
+    (url_.pathname === '/' ? '' : url_.pathname) + url_.search + url_.hash
+  if (path.length > 15) {
+    return url_.host + path.slice(0, 13) + '...'
+  }
+  return url_.host + path
+}
 
 const getPost = async function ({ identity, id }) {
   if ( Cache.hasPostCenter(id) ) {
@@ -42,15 +55,41 @@ const getPost = async function ({ identity, id }) {
   }
 };
 
-const buildMetadata = function ( identity, draft ) {
+const buildMetadata = async function ( identity, draft ) {
   const { options } = draft;
 
   switch ( identity.platform ) {
     case "bluesky":
+      let facets = [];
+      let text = "";
+      if ( draft.content != null ) {
+        const rt = new RichText({ text: draft.content });
+        await rt.detectFacets(agent);
+        facets = rt.facets;
+        for (const facet of facets) { 
+          if (facet.features.find(
+            f => f.$type === 'app.bsky.richtext.facet#link',
+          )){
+            const { byteStart, byteEnd } = facet.index;
+            const url = rt.unicodeText.slice(byteStart, byteEnd);
+            const shortened = new UnicodeString(shortURL(url));
+            // insert the shortened URL
+            rt.insert(byteStart, shortened.utf16);
+            // update the facet to cover the new shortened URL
+            facet.index.byteStart = byteStart;
+            facet.index.byteEnd = byteStart + shortened.length;
+            // remove the old URL
+            rt.delete(byteStart + shortened.length, byteEnd + shortened.length);
+          }
+        }
+        text = rt.text;
+      }
       return {
         reply: draft.reply?.data ?? undefined,
-        quote: draft.quote?.data ?? undefined
-      };
+        quote: draft.quote?.data ?? undefined,
+        facets: facets,
+        text: text
+      }
     case "mastodon":
       return {
         sensitive: options.sensitive,
@@ -99,7 +138,7 @@ const publish = async function ( draft ) {
     if ( identity.active === true ) {
       targets.push({
         identity: identity.id,
-        metadata: buildMetadata( identity, draft )
+        metadata: await buildMetadata( identity, draft )
       });
     }
   }
