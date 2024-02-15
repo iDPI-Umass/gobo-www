@@ -82,10 +82,9 @@
   }
 
   footer > nav > sl-button {
-    margin: 12px;
+    margin: 6px 0 12px 0;
     font-size: 26px;
     color: var(--gobo-color-text);
-    margin-top: 6px;
   }
 
   footer > nav > sl-button::part(base):hover,
