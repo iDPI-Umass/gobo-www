@@ -23,6 +23,14 @@
   </sl-button>
 
   <sl-button
+    class="notifications {current === "notifications" ? "current" : ""}"
+    pill
+    href="/notifications">
+    <sl-icon src="/icons/bell.svg" slot="prefix"></sl-icon>
+    Notifications
+  </sl-button>  
+
+  <sl-button
     class="identities {current === "identities" ? "current" : ""}"
     pill
     href="/identities">
@@ -94,6 +102,10 @@
   }
 
   nav > .home::part(prefix) {
+    font-size: 1.25rem; 
+  }
+
+  nav > .notifications::part(prefix) {
     font-size: 1.25rem; 
   }
 

@@ -2,6 +2,7 @@ const cache = {
   posts: {},
   postCenters: new Set(),
   sources: {},
+  notifications: {},
   postEdges: {}
 };
 
@@ -28,6 +29,14 @@ class Cache {
 
   static putSources ( sources ) {
     Object.assign( cache.sources, sources );
+  }
+
+  static getNotification( id ) {
+    return cache.notifications[ id ];
+  }
+
+  static putNotifications ( notifications ) {
+    Object.assign( cache.notifications, notifications );
   }
 
   static getPostEdge ( identity, post ) {

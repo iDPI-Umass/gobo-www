@@ -1,18 +1,19 @@
 <script>
+  import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
+  import "@shoelace-style/shoelace/dist/components/tab/tab.js";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
-  import Post from "$lib/components/Post.svelte";
+  import Notification from "./Notification.svelte";
   import { onMount, tick } from "svelte";
 
-  import * as FeedSaver from "$lib/engines/feed-singleton.js";
+  import * as FeedSaver from "$lib/engines/notification-singleton.js";
   import { ScrollSmoother } from "$lib/helpers/infinite-scroll.js";
-  import { scrollStore } from "$lib/stores/scroll.js";
-  import { feedStore } from "$lib/stores/feed.js";
-  import * as LS from "$lib/helpers/local-storage.js";
+  import { scrollStore } from "$lib/stores/notification-scroll.js";
+  import { feedStore } from "$lib/stores/notification-feed.js";
 
-  let feed, engine;
+  let tabs, feed, engine;
   let items = [];
   let loaded = false;
-  let fetching = false;
+  let view = "all";
 
   const pull = async function ( count, marker ) {
     const current = await engine.pull( count, marker );
@@ -24,16 +25,12 @@
   };
 
   const loadFeed = async function () {
-    engine = await FeedSaver.getEngine();
+    engine = await FeedSaver.getEngine({ view });
     items = FeedSaver.getFeed();
     if ( items.length === 0 ) {
       await pull( 25 );
     }
     loaded = true;
-    if ( items.length > 0 ) {
-      fetching = false;
-      LS.remove("fetching");
-    }
     await tick();
     feed.scrollTo( 0, FeedSaver.getScrollPosition() );
   };  
@@ -52,7 +49,6 @@
 
     feed.addEventListener( "scroll", rawListener );
     feed.addEventListener( "gobo-smooth-scroll", smoothListener );
-    fetching = LS.read( "fetching" );
 
     const unsubscribeScroll = scrollStore.subscribe( function ( event ) {
       if ( engine == null || event == null ) {
@@ -75,17 +71,24 @@
           loaded = false;
           smoother.stop();
           items = [];
-          await FeedSaver.reset();
+          await FeedSaver.reset({ view });
           await loadFeed();
           smoother.start();
           feedStore.push({}); // We're using store as message queue, clear out old message.
           break;
       }
-
     });
+
+    
+    tabs.addEventListener("sl-tab-show", function ( event ) {
+        view = event.detail.name;
+        feedStore.push({ command: "reset" });
+    });
+
 
     smoother.start();
     loadFeed();
+
 
     return function () {
       feed.removeEventListener( "scroll", rawListener );
@@ -98,32 +101,39 @@
 
 </script>
 
+<sl-tab-group bind:this={tabs}>
+  <sl-tab slot="nav" panel="all">All</sl-tab>
+  <sl-tab slot="nav" panel="mentions">Mentions</sl-tab>
+</sl-tab-group>
+  
 <section class="feed" bind:this={feed}>
-  {#if items.length > 0}
-    {#each items as { identity, post } }
-      <Post {identity} {...post}></Post>
+  {#if loaded === false }
+    <Spinner></Spinner>
+  {:else if items.length > 0}
+    {#each items as { identity, notification } }
+      <Notification {identity} {...notification}></Notification>
     {/each}
-  {:else if loaded && items.length === 0 && fetching === true }
+  {:else if items.length === 0 }
     <section class="gobo-copy">
       <p>
-        We are fetching your feed. This may take a couple of minutes.
-      </p> 
-    </section>
-  {:else if loaded && items.length === 0 }
-    <section class="gobo-copy">
-      <p>
-        Your feed is empty! Add or activate an identity to get started.
+        No notifications at this time.
       </p> 
     </section>
   {/if}
 </section>
 
 <style>
+  sl-tab-group {
+    position: sticky;
+  }
+
   section.feed {
     overflow-y: scroll;
     padding: var(--gobo-height-spacer) 2px 5rem 2px;
     max-height: 100%;
   }
+
+
 
   @media( max-width: 988px ) {
     section.feed {

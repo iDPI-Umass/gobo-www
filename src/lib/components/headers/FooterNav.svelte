@@ -24,6 +24,13 @@
 
     <sl-button
       pill
+      href="/notifications"
+      class="{current === "notifications" ? "current" : ""}">
+      <sl-icon slot="prefix" src="/icons/bell.svg"></sl-icon>
+    </sl-button>
+
+    <sl-button
+      pill
       href="/new-post"
       class="{current === "new post" ? "current" : ""}">
       <sl-icon slot="prefix" src="/icons/pencil-square.svg"></sl-icon>

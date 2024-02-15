@@ -1,6 +1,5 @@
 import FS from "node:fs/promises";
 import Path from "node:path";
-import fetch from "node-fetch";
 import * as Secret from "@dashkite/dolores/secrets";
 
 const getManagementToken = async function ( bundle ) {

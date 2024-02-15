@@ -4,6 +4,7 @@
   import { onMount } from "svelte";
   import * as FeedSaver from "$lib/engines/feed-singleton.js";
   import { feedStore } from "$lib/stores/feed.js";
+  import { feedStore as notificationStore } from "$lib/stores/notification-feed.js";
 
 
   export let identity;
@@ -16,7 +17,8 @@
     const listener = async function ( event ) {
       const engine = await FeedSaver.getEngine();
       engine.setActiveState( identity, event.target.checked );
-      feedStore.push({ command: "reset" })
+      feedStore.push({ command: "reset" });
+      notificationStore.push({ command: "reset" });
     };
 
     activeSwitch.addEventListener( "sl-change", listener );
