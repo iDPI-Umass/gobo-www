@@ -5,8 +5,8 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
   import '@shoelace-style/shoelace/dist/components/badge/badge.js';
-  import MobileNotificationFilters from "$lib/components/MobileNotificationFilters.svelte";
-  import NotificationFeed from "$lib/components/NotificationFeed.svelte";
+  import MobileFilters from "$lib/components/Notification/MobileFilters.svelte";
+  import Feed from "$lib/components/Notification/Feed.svelte";
   import { onMount } from "svelte";
   import { draftStore } from "$lib/stores/post-draft.js";
 
@@ -18,8 +18,8 @@
 </script>
 
 <div class="main-child">
-  <MobileNotificationFilters></MobileNotificationFilters>
-  <NotificationFeed></NotificationFeed>
+  <MobileFilters></MobileFilters>
+  <Feed></Feed>
 </div>
 
 

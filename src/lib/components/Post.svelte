@@ -39,6 +39,7 @@
   export let updated;
 
   export let fullPage = false;
+  export let showWhy = true;
 
 
   let unused = [ platform_id, visibility, created, updated ];
@@ -215,7 +216,7 @@
             {identity} 
             centerID={id}
             {...sharedPost}
-            marginTop={renderedContent ? "1rem" : "6.5px"}
+            marginTop={content ? "1rem" : "6.5px"}
             {fullPage}>
           </PostShared>
         {/if}
@@ -230,11 +231,15 @@
 
   <footer>
     
-    <a
-      class="why"
-      href="/why-am-i-seeing-this">
-      Why am I seeing this?
-    </a>
+    {#if showWhy === true}
+      <a
+        class="why"
+        href="/why-am-i-seeing-this">
+        Why am I seeing this?
+      </a>
+    {/if}
+
+    <div class="spacer"></div>
     
     <a
       class="source-link"
@@ -434,13 +439,8 @@
     justify-content: space-between;
   }
 
-  .outer-frame footer a {
-    text-decoration: none;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    align-items: center;
+  .outer-frame .spacer {
+    flex: 1;
   }
 
   .outer-frame footer a {
@@ -452,7 +452,6 @@
     align-items: center;
     font-size: var(--gobo-font-size-detail);
   }
-
 
   .outer-frame footer a sl-icon {
     font-size: 1rem;

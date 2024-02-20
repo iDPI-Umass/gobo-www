@@ -2,7 +2,7 @@
   import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
   import "@shoelace-style/shoelace/dist/components/tab/tab.js";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
-  import Notification from "./Notification.svelte";
+  import Notification from "$lib/components/Notification/Notification.svelte";
   import { onMount, tick } from "svelte";
 
   import * as FeedSaver from "$lib/engines/notification-singleton.js";
