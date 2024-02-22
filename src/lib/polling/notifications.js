@@ -17,8 +17,8 @@ const When = {
 
 
 const Poll = {
-  // interval: 300000, // 5 minutes
-  interval: 30000,
+  interval: 300000, // 5 minutes
+  // interval: 30000,
   count: 0,
   id: null,
 

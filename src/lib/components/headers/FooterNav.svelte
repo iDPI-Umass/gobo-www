@@ -26,7 +26,6 @@
   onMount( function () {
     const unsubscribeCount = countStore.subscribe( function ( event ) {
       notificationCount = event?.count ?? 0;
-      console.log({notificationCount})
     });
 
     return function () {

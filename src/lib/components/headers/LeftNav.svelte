@@ -129,6 +129,7 @@
   }
 
   nav > sl-button::part(prefix) {
+    position: relative;
     width: 3rem;
     height: 2rem;
     display: flex;
