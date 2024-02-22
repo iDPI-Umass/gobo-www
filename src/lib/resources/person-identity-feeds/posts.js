@@ -1,109 +1,82 @@
-import { getGOBOClient, logout } from "$lib/helpers/account.js";
-import { Cache, cache } from "$lib/resources/cache.js";
+import * as Posts from "$lib/resources/person-identity-feeds/_posts.js";
+import { Cache } from "$lib/resources/cache.js";
 
 // The following classes play an HTTP intermediary role. They are focused on
 // RESTful composition that stablizes this client's request pattern to the GOBO
 // HTTP API while building an integrative layer that provides a unified feed as
 // a transparent interface.
 
-// TODO: I copied this from the filter engine interface and modififed. This needs
-// to be a part of the refactor.
-const weaveGraph = function ( graph ) {
-  const feed = [ ...graph.feed ];
-  const posts = {};
-  const sources = {};
-  const postEdges = {};
-  const notifications = {}
-
-  for ( const post of graph.posts ) {
-    posts[ post.id ] = post;
-  }
-  for ( const share of graph.shares ?? [] ) {
-    posts[ share[0] ].shares ??= [];
-    posts[ share[0] ].shares.push( share[1] );
-  }
-  for ( const thread of graph.threads ?? [] ) {
-    posts[ thread[0] ].threads ??= [];
-    posts[ thread[0] ].threads.push( thread[1] );
-  }
-  for ( const source of graph.sources ) {
-    sources[ source.id ] = source;
-  }
-  for ( const edge of graph.post_edges ?? [] ) {
-    postEdges[ edge[0] ] ??= new Set();
-    postEdges[ edge[0] ].add( edge[1] );
-  }
-  for ( const notification of graph.notifications ?? [] ) {
-    notifications[ notification.id ] = notification;
-  }
-
-  return {
-    feed,
-    posts,
-    sources,
-    postEdges,
-    notifications
-  };
-};
-
-
 
 class Reader {
-  constructor ({ identity, per_page, client, view }) {
+  constructor ({ identity, per_page, filterEngine }) {
     this.identity = identity;
     this.id = identity.id
     this.per_page = per_page ?? 50;
-    this.client = client;
-    this.view = view;
     this.head = null;
     this.tail = null;
     this.queue = [];
     this.unlocksAt = null;
+    this.filterEngine = filterEngine;
+    this.filterEngine.getRunners();
   }
 
-  static async create ({ identity, per_page, view }) {
-    const client = await getGOBOClient();
+  static async create ({ identity, per_page, filterEngine }) {
     per_page = per_page ?? 50;
-    return new Reader({ identity, per_page, client, view });
+    return new Reader({ identity, per_page, filterEngine });
+  }
+
+  getOptions () {
+    return {
+      id: this.id,
+      per_page: this.per_page,
+      start: this.tail
+    };
   }
 
   async page () {
-    try {
-      const graph = await this.client.personNotifications.get({ 
-        person_id: this.client.id,
-        id: this.id,
-        per_page: this.per_page,
-        start: this.tail,
-        view: this.view
-      });
-
-      // Prepare the raw graph for integration into application state.
-      const weave = weaveGraph( graph );
-
-      // Store graph state in the application cache.
-      Cache.putPosts( weave.posts );
-      Cache.putSources( weave.sources );
-      Cache.decorateMastodon( Object.keys(weave.posts) );
-      Cache.putPostEdges( this.id, weave.postEdges );
-      Cache.putNotifications( weave.notifications );
-
-
-      // Almost done. Place results into outer interface and ready next cycle.
-      const feed = [];
-      for ( const id of weave.feed ) {
-        feed.push( weave.notifications[id] );
+    let graph, weave;
+    while ( true ) {
+      graph = await Posts.list( this.getOptions() );
+      if ( !graph ) {
+        return; // Bail if we run into an authorization problem.
       }
-      this.queue.push( ...feed );
-      this.head = this.queue[0]?.notified;
-      this.tail = graph.next;
 
-    } catch (error) {
-      if ( error.status === 401 ) {
-        await logout();
-      } else {
-        throw error;
+      const removals = this.filterEngine.filterPrimary( graph );
+      console.log( "filtered graph", graph );
+      
+      // This logic allows us to continue pulling if everything is filtered.
+      // TODO: risk of infinite loop here. I think it's a pretty strong case
+      //    for a state machine refactor because we are scrutinizing 
+      //    conditionals mid-flow again.
+      if ( removals.size > 0 && graph.feed.length === 0 ) {
+        this.tail = graph.next;
+        continue;
       }
+
+      weave = this.filterEngine.weaveGraph( graph );
+      this.filterEngine.filterTraversals( weave );
+      
+      // Another check after we've applied higher-order filters.
+      if ( weave.feed.length === 0 && graph.feed.length > 0 ) {
+        this.tail = graph.next;
+        continue;
+      }
+
+      // If we make it here, we have posts to show.
+      break;
     }
+
+    // Store the filtered state in the application cache.
+    Cache.mergeWeave( this.identity, weave );
+
+    // Almost done. Place results into outer interface and ready next cycle.
+    const feed = [];
+    for ( const id of weave.feed ) {
+      feed.push( weave.posts[id] );
+    }
+    this.queue.push( ...feed );
+    this.head = this.queue[0]?.published;
+    this.tail = graph.next;
   }
 
   lock () {
@@ -164,12 +137,12 @@ class Reader {
     return this.head;
   }
 
-  // Fetch the next highest notification.
+  // Fetch the next highest post.
   async next () {
     await this.checkQueue()
-    const notification = this.queue.shift();
-    this.head = this.queue[0]?.notified;
-    return { identity: this.id, notification };
+    const post = this.queue.shift();
+    this.head = this.queue[0]?.published;
+    return { identity: this.id, post };
   }
 }
 
@@ -181,10 +154,10 @@ class Feed {
     this.readers = readers;
   }
 
-  static async create ({ identities, view }) {
+  static async create ({ identities, filterEngine }) {
     const readers = [];
     for ( const identity of identities ) {
-      readers.push( await Reader.create({ identity, view }) );
+      readers.push( await Reader.create({ identity, filterEngine }) );
     }
 
     return new Feed({ readers });
@@ -222,7 +195,7 @@ class Feed {
     return match;
   }
 
-  // Fetch the next highest scoring notification from the reader with the highest head.
+  // Fetch the next highest scoring post from the reader with the highest head.
   async next () {
     const reader = await this.getNextReader();
     

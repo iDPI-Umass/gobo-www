@@ -1,4 +1,4 @@
-import { Feed } from "$lib/resources/notification-feed.js";
+import { Feed } from "$lib/resources/person-identity-feeds/notifications.js";
 import * as PostFeedSingleton from "$lib/engines/feed-singleton.js";
 
 /***

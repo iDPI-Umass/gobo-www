@@ -9,6 +9,7 @@
   import { ScrollSmoother } from "$lib/helpers/infinite-scroll.js";
   import { scrollStore } from "$lib/stores/notification-scroll.js";
   import { feedStore } from "$lib/stores/notification-feed.js";
+  import { countStore } from "$lib/stores/notifications/count.js";
 
   let tabs, feed, engine;
   let items = [];
@@ -36,6 +37,7 @@
   };  
   
   onMount( function () {
+    countStore.clear();
     const smoother = ScrollSmoother.create({ element: feed });
 
     const rawListener = function ( event ) {
@@ -71,6 +73,7 @@
           loaded = false;
           smoother.stop();
           items = [];
+          countStore.clear();
           await FeedSaver.reset({ view });
           await loadFeed();
           smoother.start();
@@ -129,21 +132,13 @@
 
   section.feed {
     overflow-y: scroll;
-    padding: var(--gobo-height-spacer) 2px 5rem 2px;
+    padding: var(--gobo-height-spacer) 0 5rem 0;
     max-height: 100%;
-  }
-
-
-
-  @media( max-width: 988px ) {
-    section.feed {
-      padding: 2px;
-    }
   }
 
   @media ( max-width: 680px ) {
     section.feed {
-      padding: 0;
+      padding: var(--gobo-height-spacer) 0 10rem 0;
     }
     .gobo-copy {
       margin-left: var(--gobo-width-spacer-flex);

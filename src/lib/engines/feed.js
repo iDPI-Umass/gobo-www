@@ -1,4 +1,4 @@
-import { Feed } from "$lib/resources/feed.js";
+import { Feed } from "$lib/resources/person-identity-feeds/posts.js";
 import { IdentityEngine } from "$lib/engines/identities.js";
 import { FilterEngine } from "$lib/engines/filters.js";
 

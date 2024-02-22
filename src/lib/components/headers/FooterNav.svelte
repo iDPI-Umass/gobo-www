@@ -1,14 +1,38 @@
 <script>
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
+  import "@shoelace-style/shoelace/dist/components/badge/badge.js";
   import { feedStore } from "$lib/stores/feed.js";
+  import { countStore } from "$lib/stores/notifications/count.js";
+  import { feedStore as notificationStore} from "$lib/stores/notification-feed.js";
+  import { onMount } from "svelte";
+
   export let current;
+
+  let notificationCount = 0;
 
   const handleHomeReset = function () {
     if ( current === "home" ) {
       feedStore.push({ command: "reset" });
     }
   };
+
+  const handleNotificationReset = function () {
+    if ( current === "notifications" ) {
+      notificationStore.push({ command: "reset" });
+    }
+  };
+
+  onMount( function () {
+    const unsubscribeCount = countStore.subscribe( function ( event ) {
+      notificationCount = event?.count ?? 0;
+      console.log({notificationCount})
+    });
+
+    return function () {
+      unsubscribeCount();
+    };
+  });
 </script>
 
 <footer>
@@ -19,39 +43,54 @@
       class="{current === "home" ? "current" : ""}"
       on:click={handleHomeReset}
       on:keypress={handleHomeReset}>
-      <sl-icon slot="prefix" src="/icons/home.svg"></sl-icon>
+      <div slot="prefix">
+        <sl-icon src="/icons/home.svg"></sl-icon>
+      </div>
     </sl-button>
 
     <sl-button
       pill
       href="/notifications"
-      class="{current === "notifications" ? "current" : ""}">
-      <sl-icon slot="prefix" src="/icons/bell.svg"></sl-icon>
+      class="notifications {current === "notifications" ? "current" : ""}"
+      on:click={handleNotificationReset}
+      on:keypress={handleNotificationReset}>
+      <div slot="prefix">
+        <sl-icon src="/icons/bell.svg" slot="prefix"></sl-icon>
+        {#if notificationCount > 0}
+          <sl-badge pill part="badge">{notificationCount}</sl-badge>
+        {/if}
+      </div>
     </sl-button>
 
     <sl-button
       pill
       href="/new-post"
       class="{current === "new post" ? "current" : ""}">
-      <sl-icon slot="prefix" src="/icons/pencil-square.svg"></sl-icon>
+      <div slot="prefix">
+        <sl-icon src="/icons/pencil-square.svg"></sl-icon>
+      </div>
     </sl-button>
 
     <!-- <sl-button
-      <sl-icon slot="prefix" src="/icons/search.svg"></sl-icon>
+      <sl-icon src="/icons/search.svg"></sl-icon>
       href="/search"></sl-button> -->
 
     <sl-button
       pill
       href="/identities"
       class="{current === "identities" ? "current" : ""} identities">
-      <sl-icon slot="prefix" src="/icons/identities.svg"></sl-icon>
+      <div slot="prefix">
+        <sl-icon src="/icons/identities.svg"></sl-icon>
+      </div>
     </sl-button>
 
     <sl-button
       pill
       href="/settings"
       class="{current === "settings" ? "current" : ""}">
-      <sl-icon slot="prefix" src="/icons/gear.svg"></sl-icon>
+      <div slot="prefix">
+        <sl-icon src="/icons/gear.svg"></sl-icon>
+      </div>
     </sl-button>
 
   </nav>
@@ -110,8 +149,9 @@
 
   nav > sl-button::part(prefix) {
     width: 1.625rem;
+    height: 1.625rem;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     flex-wrap: nowrap;
     justify-content: center;
     align-items: center;
@@ -120,10 +160,6 @@
 
   nav > sl-button::part(prefix) {
     font-size: 1.25rem; 
-  }
-
-  nav > sl-button.identities::part(prefix) {
-    font-size: 1.625rem; 
   }
 
   nav > .current::part(base) {
@@ -144,6 +180,26 @@
     width: 80%;
     border-radius: 4px;
     background: var(--gobo-color-primary);
+  }
+
+  /* This is awful, but including the badge is messing up the alignment across
+      the buttons. "top" is accessing more vertical space than the others.
+      and needing a container to be the badge parent and button prefix slot
+      is awkward. There's probaby a better way to do to this. */
+  nav :global(sl-icon) {
+    margin-top: 0.75rem;
+  }
+
+  nav > .notifications :global(sl-badge) {
+    position: absolute;
+    top: 0;
+    right: 3%;
+  }
+
+  nav > .notifications :global(sl-badge::part(base)) {
+    color: #FFFFFF;
+    font-weight: var(--gobo-font-weight-black);
+    border: none;
   }
 
   @media ( min-width: 750px ) {
