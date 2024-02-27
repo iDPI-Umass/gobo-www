@@ -4,7 +4,7 @@ Web Client Frontend for the Gobo Project
 
 ## Developing
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+Once you've created a project and installed dependencies with `npm install` (or `npm install` or `yarn`), start a development server:
 
 ```bash
 npm run dev

@@ -37,7 +37,7 @@
 		"@atproto/api": "^0.7.2",
 		"@auth0/auth0-spa-js": "^2.0.3",
 		"@dashkite/joy": "^0.3.16",
-		"@dashkite/talos": "^0.0.1",
+		"@dashkite/talos": "0.0.3",
 		"@shoelace-style/shoelace": "2.3.0",
 		"dayjs": "^1.11.7",
 		"gobo-client": "file:../gobo-client",

@@ -1,52 +1,64 @@
 import * as Time from "@dashkite/joy/time";
+import * as It from "@dashkite/joy/iterable";
 import * as Talos from "@dashkite/talos";
 import * as Count from "$lib/resources/notification-count.js";
 
 
-const When = {
-  listen: function ( talos, event ) {
-    return event === "listen";
+const Poll = {
+  state: "listen",
+  interval: 300000, // 5 minutes
+  // interval: 30000, // 30 seconds debug
+  count: 0,
+
+  fetch: async () => {
+    console.log("fetching")
+    const result = await Count.get();
+    Poll.count = result.count;
   },
-  stop: function ( talos, event ) {
-    return event === "stop";
-  },
-  fetch: function ( talos, event ) {
-    return event === "fetch";
+  clear: async () => {
+    await Count.put( 0 );
+    Poll.count = 0;
   }
 };
 
 
-const Poll = {
-  interval: 300000, // 5 minutes
-  // interval: 30000,
-  count: 0,
-  id: null,
+// Gather events into a queue...
+const Events = {};
 
-  fetch: async function () {
-    const result = await Count.get();
-    Poll.count = result.count;
-  },
+Events.queue = It.Queue.create();
+Events.push = ( event ) => Events.queue.enqueue( event );
+Events.wait = () => Events.queue.dequeue();
 
-  clear: async function () {
-    await Count.put( 0 );
-    Poll.count = 0;
-  },
+// Fetch the notification count at regular intervals.
+(async () => {
+  while ( true ) {
+    await Time.sleep( Poll.interval );
+    Events.push({ name: "fetch" });
+  }
+})();
+
+// Watch for visibility events from the document.
+document.addEventListener( "visibilitychange", () => {
+  if ( document.hidden ) {
+    Events.push({ name: "wait" });
+  } else {
+    Events.push({ name: "listen" });
+  }
+});
+
+// Expose event queue as a reactor that a Talos state machine can pull on.
+// Completes conversion of push-based events into pull-based reactor.
+Events.buildReactor = async function* () {
+  while ( true ) {
+    yield await Events.wait();
+  }
+}
 
 
-  sourceArray: [],
-  source: async function* () {
-    while ( true ) {
-      await Time.sleep(1000);
-      while ( Poll.sourceArray.length > 0 ) {
-        const event = Poll.sourceArray.shift();
-        // console.log({ event });
-        yield event
-      }
-    }
-  },
-  event: function ( event ) {
-    Poll.sourceArray.push( event );
-  },
+const When = {
+  fetch: ( talos, event ) => event.name === "fetch",
+  wait: ( talos, event ) => event.name === "wait",
+  listen: ( talos, event ) => event.name === "listen" 
 };
 
 
@@ -58,38 +70,19 @@ const machine = Talos.Machine.make( "notification polling", {
       run: Poll.fetch,
       move: "listen"
     },
-    stop: When.stop,
+    wait: When.wait,
     default: "listen"
   },
-  stop: {
+  wait: {
     listen: When.listen,
-    default: "stop"
+    default: "wait"
   }
 });
 
-Poll.reactor = Talos.Async.start( machine, Poll.source() );
 
-
-// Setup events
-
-// Regular interval events
-(async function () {
-  while ( true ) {
-    await Time.sleep( Poll.interval );
-    Poll.event( "fetch" );
-  }
-})();
-
-// Visibility events
-document.addEventListener( "visibilitychange", function() {
-  if ( document.hidden ) {
-    Poll.event( "stop" );
-  } else {
-    Poll.event( "listen" );
-  }
-});
-
+// Setup talos run instance.
+Poll.reactor = Talos.Async.start( machine, Events.buildReactor() );
 
 
 // Export the Poll interface so we can pipe the count value around with Svelte.
-export { Poll }
+export { Poll, Events }
