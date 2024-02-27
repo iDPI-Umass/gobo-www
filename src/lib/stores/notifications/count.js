@@ -21,8 +21,10 @@ const createStore = function () {
   };
 
   store.clear = async () => {
-    await Poll.clear();
-    store.broadcast();
+    if ( Poll.count !== 0 ) {
+      await Poll.clear();
+      store.broadcast();
+    }
   };
 
   // Pulls on the Polling state machine reactor.

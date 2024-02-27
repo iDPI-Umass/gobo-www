@@ -50,6 +50,12 @@ const reset = async function ({ view }) {
   };
 };
 
+const getIdentity = async ( id ) => {
+  const engine = await getEngine();
+  const identities = engine.getIdentities();
+  return identities.find(( identity ) => identity.id === id );
+};
+
 export {
   getEngine,
   setEngine,
@@ -57,6 +63,8 @@ export {
   setFeed,
   getScrollPosition,
   setScrollPosition,
+
+  getIdentity,
 
   reset,
 }

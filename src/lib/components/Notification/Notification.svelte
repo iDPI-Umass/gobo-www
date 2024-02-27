@@ -1,40 +1,21 @@
 <script>
   import Post from "$lib/components/Post.svelte";
-import Frame from "$lib/components/Notification/Frame.svelte";
+  import Frame from "$lib/components/Notification/Frame.svelte";
   import Icon from "$lib/components/Notification/Icon.svelte";
   import Action from "$lib/components/Notification/Action.svelte"
+  import Footer from "$lib/components/Notification/Footer.svelte";
   import Content from "$lib/components/Post/Content.svelte";
   import { Cache } from "$lib/resources/cache.js";
-    import { attr } from "svelte/internal";
+
 
   export let identity;
+  export let baseURL;
+  export let notification;
 
-  export let id;
-  export let platform;
-  export let platform_id;
-  export let base_url;
-  export let type;
-  export let active = null;
-  export let notified;
-  export let source_id;
-  export let post_id = null;
-  export let created;
-  export let updated;
-  let unused = [ 
-    id,
-    platform,
-    platform_id,
-    base_url,
-    active,
-    created, 
-    updated 
-  ];
-  
-  
-  let source = Cache.getSource( source_id );
+  let source = Cache.getSource( notification.source_id );
   let post = null;
-  if ( post_id != null ) {
-    post = Cache.getPost( post_id ) ?? {};
+  if ( notification.post_id != null ) {
+    post = Cache.getPost( notification.post_id ) ?? {};
   }
 
   let showPost = [
@@ -47,7 +28,8 @@ import Frame from "$lib/components/Notification/Frame.svelte";
   let attributed = [
     "repost",
     "like",
-    "follow"
+    "follow",
+    "direct message"
   ];
 
   let contentStyles = {
@@ -57,16 +39,16 @@ import Frame from "$lib/components/Notification/Frame.svelte";
 
 </script>
 
-{#if showPost.includes( type )}
+{#if showPost.includes( notification.type )}
   <section>
     <Post {identity} {...post} showWhy={false}></Post>
   </section>
 
-{:else if attributed.includes( type )}
+{:else if attributed.includes( notification.type )}
   <Frame>
-    <Icon slot="gutter" name={type}></Icon>
+    <Icon slot="gutter" name={notification.type}></Icon>
     <div slot="content" class="attributed">
-      <Action {source} {type} {notified}></Action>
+      <Action {source} {notification}></Action>
       {#if post != null}
         <Content
           title={post?.title}
@@ -75,12 +57,13 @@ import Frame from "$lib/components/Notification/Frame.svelte";
         ></Content>
       {/if}
     </div>
+    <Footer slot="footer" {baseURL} {notification} {source} {post} ></Footer>
   </Frame>
 
 {:else}
   <Frame>
-    <Icon slot="gutter" name={type}></Icon>
-    <p slot="content">Unable to render {type} notification.</p>
+    <Icon slot="gutter" name={notification.type}></Icon>
+    <p slot="content">Unable to render {notification.type} notification.</p>
   </Frame>
 {/if}
 
@@ -89,7 +72,7 @@ import Frame from "$lib/components/Notification/Frame.svelte";
 <style>
   section {
     width: 100%;
-    margin-top: 2.5rem;
+    margin-top: var(--gobo-height-spacer);
   }
 
   section:first-child {

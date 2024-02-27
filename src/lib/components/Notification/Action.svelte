@@ -3,8 +3,9 @@
   import * as h from "$lib/engines/post.js";
 
   export let source;
-  export let type;
-  export let notified;
+  export let notification;
+
+  let { type, notified } = notification;
 
   let logo = h.getLogo( source.platform );
   let { headingSlot1 } = h.getHeadingSlots( source );
@@ -21,6 +22,9 @@
       break;
     case "follow":
       action = "followed you.";
+      break;
+    case "direct message":
+      action = "sent you a direct message.";
       break;
     default:
       action = "unknown notification";

@@ -24,6 +24,9 @@
     case "poll complete":
       iconURL = "/icons/check2-circle.svg";
       break;
+    case "direct message":
+      iconURL = "/icons/envelope-fill.svg";
+      break;
     default:
       iconURL = "/icons/question-circle.svg";
   }

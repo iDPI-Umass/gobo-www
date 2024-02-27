@@ -123,7 +123,11 @@ class Reader {
     await this.checkQueue()
     const notification = this.queue.shift();
     this.head = this.queue[0]?.notified;
-    return { identity: this.id, notification };
+    return { 
+      identity: this.id, 
+      baseURL: this.identity.base_url,
+      notification 
+    };
   }
 }
 

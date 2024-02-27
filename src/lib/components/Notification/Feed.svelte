@@ -113,8 +113,8 @@
   {#if loaded === false }
     <Spinner></Spinner>
   {:else if items.length > 0}
-    {#each items as { identity, notification } }
-      <Notification {identity} {...notification}></Notification>
+    {#each items as { identity, baseURL, notification } }
+      <Notification {identity} {baseURL} {notification}></Notification>
     {/each}
   {:else if items.length === 0 }
     <section class="gobo-copy">

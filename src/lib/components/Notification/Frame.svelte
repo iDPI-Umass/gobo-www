@@ -1,18 +1,23 @@
-<section class="outer">
-  <div class="gutter">
-    <slot name="gutter"></slot>
+<section>
+  <div class="main">
+    <div class="gutter">
+      <slot name="gutter"></slot>
+    </div>
+   
+    <div class="content">
+      <slot name="content"></slot>
+    </div>
   </div>
- 
-  <div class="content">
-    <slot name="content"></slot>
+  
+  <div class="footer">
+    <slot name="footer"></slot>
   </div>
 </section>
 
 <style>
   section {
-    position: relative;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: stretch;
@@ -20,10 +25,20 @@
     background: var(--gobo-color-panel);
     border: var(--gobo-border-panel);
     border-radius: var(--gobo-border-radius);
-    margin-bottom: var(--gobo-height-spacer);
-    padding: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex);
     box-sizing: border-box;
-    margin-top: 2.5rem;
+    margin-top: var(--gobo-height-spacer);
+  }
+
+  .main {
+    flex: 1;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: stretch;
+    width: 100%;
+    padding: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex) 0 var(--gobo-width-spacer-flex);
   }
 
   section:first-child {
@@ -35,7 +50,6 @@
       border-radius: 0;
       border-left: none;
       border-right: none;
-      margin-bottom: calc(var(--gobo-height-spacer) / 2)
     }
   }
 
@@ -55,6 +69,11 @@
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
+  }
+
+  .footer {
+    flex: 1;
+    width: 100%;
   }
 
 </style>
