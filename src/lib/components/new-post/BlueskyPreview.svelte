@@ -94,7 +94,11 @@
     </header>
 
 
-    <section> {@html content} </section>
+    <section>
+      {#if content != null}
+        {@html content}
+      {/if}
+    </section>
 
     {#if displayedFiles.length === 1}
       <div class="media-single">
@@ -502,6 +506,7 @@
     font-size: 14px;
     color: #0f1419;
     margin-bottom: 12px;
+    min-height: 1.5rem;
   }
 
   .outer-frame > .main > .media-single {

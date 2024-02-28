@@ -80,7 +80,12 @@
       </p>
     </div>
   {:else}
-    <section> {@html content} </section>
+
+    <section>
+      {#if content != null}
+        {@html content}
+      {/if}
+    </section>
   
 
     {#if displayedFiles.length === 1}
@@ -468,6 +473,7 @@
     font-family: var(--sl-font-family-sans);
     color: #000;
     margin-bottom: 16px;
+    min-height: 1.5rem;
   }
 
   .outer-frame > .media {

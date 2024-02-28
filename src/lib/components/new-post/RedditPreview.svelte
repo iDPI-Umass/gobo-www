@@ -119,7 +119,9 @@
   <div class="main">
     <header>
       <div class="pfp"></div>
-      <span class="subreddit">{options.subreddit}</span>
+      {#if options.subreddit != null}
+        <span class="subreddit">{options.subreddit}</span>
+      {/if}
       <span class="interpunct">·</span>
       <span class="account">Posted by {identity.prettyName}</span>
       <span class="timestamp">just now</span>
@@ -138,7 +140,9 @@
         </div>
       {:else}
         <section>
-          {@html content}
+          {#if content != null}
+            {@html content}
+          {/if}
         </section>
       {/if}
 
@@ -335,6 +339,7 @@
     color: #000;
     margin-bottom: 16px;
     padding: 10px 8px 10px 8px;
+    min-height: 1.5rem;
     max-height: 512px;
     overflow-y: hidden;
   }
