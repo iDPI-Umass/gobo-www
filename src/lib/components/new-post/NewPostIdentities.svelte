@@ -37,6 +37,26 @@
     }
   };
 
+  const splitPrettyName = ( name ) => {
+    const output = [];
+    let current = [];
+    
+    for ( const c of name ) {
+      if ( c === "@" ) {
+        output.push( current.join("") + "@" );
+        current = [];
+      } else if ( c === "." ) {
+        output.push( current.join("") + "." );
+        current = [];
+      } else {
+        current.push( c );
+      }
+    }
+
+    output.push( current.join("") );
+    return output;
+  };
+
   onMount( function () {
     const unsubscribeDraft = draftStore.subscribe( async function ( draft ) {
       if ( draft.identitiesLoaded == null ) {
@@ -78,66 +98,79 @@
   });
 </script>
 
+<section>
+  <h2>Choose Identities</h2>
 
-<h2>Choose Identities</h2>
+  {#await loadIdentities()}
+    <Spinner></Spinner>
+  {:then}
 
-{#await loadIdentities()}
-  <Spinner></Spinner>
-{:then}
+    <p>
+      Select the identities you'd like to use to publish this post.
+    </p>
 
-  <p>
-    Select the identities you'd like to use to publish this post.
-  </p>
+    {#if allEmpty == true}
 
-  {#if allEmpty == true}
+      <p>No identities currently registered.</p>
 
-    <p>No identities currently registered.</p>
+    {:else}
 
-  {:else}
+      <div class="identities">
+        {#each identities as identity (identity.key)}
+          <div class="identity">
+            
+            <div class="label">
+              <sl-icon 
+                src="/icons/{identity.platform}.svg" 
+                class="{identity.platform}"
+                size="medium">
+              </sl-icon>
+              <span>
+                {#each splitPrettyName(identity.prettyName) as part}
+                  <span>{part}</span>
+                {/each}
+              </span>
+            </div>
 
-    {#each identities as identity (identity.key)}
-      <div class="identity">
-        
-        <div class="label">
-          <sl-icon 
-            src="/icons/{identity.platform}.svg" 
-            class="{identity.platform}"
-            size="medium">
-          </sl-icon>
-          {identity.prettyName}
-        </div>
-
-        <sl-switch
-          checked={identity.active}
-          disabled={identityLock}
-          on:sl-change={handleIdentitySwitch( identity )}
-          size="medium">
-        </sl-switch>
-        
+            <sl-switch
+              checked={identity.active}
+              disabled={identityLock}
+              on:sl-change={handleIdentitySwitch( identity )}
+              size="medium">
+            </sl-switch>
+            
+          </div>
+        {/each}
       </div>
-    {/each}
 
-  {/if}
+    {/if}
 
-{:catch}
-  <p>There was a problem fetching your identities.</p>
-{/await}
+  {:catch}
+    <p>There was a problem fetching your identities.</p>
+  {/await}
 
+</section>
 
  
 <style>
+  .identities {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .identity {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: space-between;
     align-items: center;
-    height: 4rem;
+    max-width: 100%;
     margin-bottom: 0;
     border-radius: var(--gobo-border-radius);
     border: var(--gobo-border-panel);
     margin-top: var(--gobo-height-spacer-half);
-    padding: var(--gobo-height-spacer) var(--gobo-width-spacer);
+    padding: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex);
   }
 
   .identity:first-of-type {
@@ -149,6 +182,7 @@
   }
 
   .identity .label {
+    flex: 1 1 auto;
     height: 100%;
     display: flex;
     flex-direction: row;
@@ -156,13 +190,31 @@
     align-items: center;
   }
 
-  .identity sl-switch {
-    margin-left: 0.25rem;
-    margin-right: 0.5rem;
-  }
-  
-  .identity sl-icon {
+  .identity .label sl-icon {
     font-size: 1.5rem;
-    margin-right: 0.5rem;
+    margin-right: 1rem;
+    min-width: max-content;
   }
+
+  .identity .label span {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: start;
+  }
+
+  .identity .label span span {
+    flex: 0 0 auto;
+    margin: 0;
+    word-break: break-all;
+  }
+
+  .identity sl-switch {
+    flex: 0 0 auto;
+    margin-left: 1rem;
+    margin-right: 0;
+    min-width: max-content;
+  }
+
 </style>

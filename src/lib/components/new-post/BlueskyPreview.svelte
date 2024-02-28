@@ -493,13 +493,6 @@
     flex: 1 1 auto;
   }
 
-  .outer-frame > .main > header > sl-icon {
-    font-size: 15px;
-    color: #536471;
-  }
-
-
-
 
   .outer-frame > .main > section {
     font-family: var(--sl-font-family-sans);
