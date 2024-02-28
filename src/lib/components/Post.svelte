@@ -11,6 +11,7 @@
   import PostRepliedFiltered from "$lib/components/PostRepliedFiltered.svelte";
   import PostConnector from "$lib/components/PostConnector.svelte";
   import PostActions from "$lib/components/PostActions.svelte";
+  import Footer from "$lib/components/Post/Footer.svelte";
   import { humanize } from "$lib/helpers/humanize.js";
   import { render } from "$lib/helpers/markdown.js";
   import { goto } from "$app/navigation";
@@ -41,18 +42,15 @@
   export let fullPage = false;
   export let showWhy = true;
 
-
-  let unused = [ platform_id, visibility, created, updated ];
-  let postURL = proxyURL ?? url;
+  let unused = [ base_url, platform_id, visibility, created, updated ];
+  let footer = { platform, proxyURL, url };
   let source = Cache.getSource( source_id );
   let sharedPost = h.getShare( shares );
   let threadPosts = h.getThreads( threads );
   let actionTarget = h.getActionTarget({ id, content, sharedPost });
-  let logo = h.getLogo( platform );
   let { headingSlot1, headingSlot2 } = h.getHeadingSlots( source );
   let avatar = h.getAvatar( source );
   let avatarFallback = h.getAvatarFallback( source );
-  let sourceCopy = h.getSourceCopy( platform );
   let renderedContent = render( content );
   let mediaEmbeds = attachments.filter( a => /^(image|video)\//.test(a.type) );
   let textEmbeds = attachments.filter( a => /^application\/json/.test(a.type) );
@@ -229,28 +227,7 @@
   </div>
 
 
-  <footer>
-    
-    {#if showWhy === true}
-      <a
-        class="why"
-        href="/why-am-i-seeing-this">
-        Why am I seeing this?
-      </a>
-    {/if}
-
-    <div class="spacer"></div>
-    
-    <a
-      class="source-link"
-      href="{postURL}"
-      target="_blank" 
-      rel="noopener noreferrer nofollow">
-      <sl-icon src="{logo}" class="{platform}"></sl-icon>
-      <span>{sourceCopy}</span>     
-    </a>
-   
-  </footer>
+  <Footer post={footer} {showWhy}></Footer>
 
 </article>
 
@@ -423,63 +400,4 @@
   .outer-frame .inner-frame .main .media :global(a) {
     position: relative;
   }
-
-
-
-
-
-  .outer-frame footer {
-    width: 100%;
-    height: 2.5rem;
-    padding: 0.5rem var(--gobo-width-spacer-flex);
-    border-top: var(--gobo-border-panel);
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: space-between;
-  }
-
-  .outer-frame .spacer {
-    flex: 1;
-  }
-
-  .outer-frame footer a {
-    text-decoration: none;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    align-items: center;
-    font-size: var(--gobo-font-size-detail);
-  }
-
-  .outer-frame footer a sl-icon {
-    font-size: 1rem;
-    margin-right: 0;
-  }
-
-  .outer-frame footer a.source-link {
-    color: var(--gobo-color-text-muted);
-  }
-
-  .outer-frame footer a.source-link span {
-    display: none;
-  }
-
-  @media ( min-width: 425px ) {
-    .outer-frame footer a.source-link sl-icon {
-      margin-right: 0.5rem;
-    }
-
-    .outer-frame footer a.source-link span {
-      display: inline;
-    }
-  }
-
-
-
-
-
 </style>
-
-
