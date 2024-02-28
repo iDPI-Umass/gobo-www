@@ -221,6 +221,6 @@
 
   .buttons {
     border-top: none;
-    padding-top: 0;
+    padding-top: var(--gobo-height-spacer-flex);
   }
 </style>
