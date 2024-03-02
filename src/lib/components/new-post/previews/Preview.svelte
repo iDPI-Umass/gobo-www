@@ -3,33 +3,32 @@
   import Mastodon from "$lib/components/new-post/previews/Mastodon.svelte";
   import Reddit from "$lib/components/new-post/previews/Reddit.svelte";
   import Smalltown from "$lib/components/new-post/previews/Smalltown.svelte";
-  import { draftStore } from "$lib/stores/draft.js";
   import { onMount } from "svelte";
+  import { State, Identity } from "$lib/engines/draft.js";
 
-  let hasBluesky = false;
-  let hasMastodon = false;
-  let hasReddit = false;
-  let hasSmalltown = false;
+  let hasBluesky, hasMastodon, hasReddit, hasSmalltown;
+  const Render = State.make();
+
+  Render.cleanup = () => {
+    hasBluesky = false;
+    hasMastodon = false;
+    hasReddit = false;
+    hasSmalltown = false;
+  }
+
+  Render.cycle = ( draft ) => {
+    hasBluesky = Identity.hasBluesky();
+    hasMastodon = Identity.hasMastodon();
+    hasReddit = Identity.hasReddit();
+    hasSmalltown = Identity.hasSmalltown();
+  };
 
 
-  onMount( function () {
-    const unsubscribeDraft = draftStore.subscribe( async function ( draft ) {      
-      let match;
-      match = draft.identities.find( i => i.platform === "bluesky" && i.active === true);
-      hasBluesky = match != null;
-
-      match = draft.identities.find( i => i.platform === "mastodon" && i.active === true);
-      hasMastodon = match != null;
-
-      match = draft.identities.find( i => i.platform === "reddit" && i.active === true);
-      hasReddit = match != null;
-
-      match = draft.identities.find( i => i.platform === "smalltown" && i.active === true);
-      hasSmalltown = match != null;
-    });
-
-    return function () {
-      unsubscribeDraft();
+  Render.reset();
+  onMount(() => {
+    Render.listen( "identities", Render.cycle );
+    return () => {
+      Render.reset()
     };
   });
 </script>
@@ -49,7 +48,7 @@
   <Bluesky></Bluesky>
 {/if}
 
-{#if hasMastodon}
+<!-- {#if hasMastodon}
   <h3 class="preview-header">Mastodon</h3>
   <Mastodon></Mastodon>
 {/if}
@@ -62,7 +61,7 @@
 {#if hasSmalltown}
   <h3 class="preview-header">Smalltown</h3>
   <Smalltown></Smalltown>
-{/if}
+{/if} -->
 
 
 <style>

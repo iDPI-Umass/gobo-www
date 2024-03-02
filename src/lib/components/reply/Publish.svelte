@@ -9,7 +9,7 @@
   const Render = State.make();
 
   Render.cycle = ( draft ) => {
-    const match = draft.identities.find( i => i.active === true );
+    const match = draft.identities?.find( i => i.active === true );
     if ( match == null ) {
       return;
     }

@@ -4,78 +4,62 @@
   import "@shoelace-style/shoelace/dist/components/option/option.js";
   import "@shoelace-style/shoelace/dist/components/input/input.js";
   import "@shoelace-style/shoelace/dist/components/checkbox/checkbox.js";
-  import { draftStore } from "$lib/stores/draft.js";
   import { onMount } from "svelte";
+  import { State, Options, Identity } from "$lib/engines/draft.js";
 
-  let options = {};
-  let hasMastodon = false;
-  let hasReddit = false;
-  let hasSmalltown = false;
+  let options, hasMastodon, hasReddit, hasSmalltown;
+  const Render = State.make();
 
-  const nullEmpty = function ( value ) {
-    if ( value == null ) {
-      return null
+  Render.cleanup = () => {
+    options = {};
+    hasMastodon = false;
+    hasReddit = false;
+    hasSmalltown = false;
+  };
+
+  Render.cycle = ( draft ) => {
+    options = draft.options;
+  };
+
+  Render.identities = ( draft ) => {
+    hasMastodon = Identity.hasMastodon();
+    hasSmalltown = Identity.hasSmalltown();
+
+    // In Reddit, replies are comments, not full posts. So don't show options.
+    if ( draft.reply != null ) {
+      hasReddit = false;
     } else {
-      if ( value.length === 0 ) {
-        return null;
-      } else {
-        return value;
-      }
+      hasReddit = Identity.hasReddit();
     }
   };
 
-  const handleOptionVisibility = function ( event ) {
-    draftStore.updateOption({
-      visibility: event.target.value 
-    });
+
+
+  const Handle = {};
+  Handle.visibility = ( event ) => {
+    Options.handle( "visibility", event );
+  };
+  Handle.spoilerText = ( event ) => {
+    Options.handle( "spoilerText", event );
+  };
+  Handle.title = ( event ) => {
+    Options.handle( "title", event );
+  };
+  Handle.subreddit = ( event ) => {
+    Options.handle( "subreddit", event );
+  };
+  Handle.spoiler = ( event ) => {
+    Options.handle( "spoiler", event );
   };
 
-  const handleOptionSpoilerText = function ( event ) {
-    draftStore.updateOption({ 
-      spoilerText: nullEmpty( event.target.value )
-    });
-  };
 
-  const handleOptionTitle = function ( event ) {
-    draftStore.updateOption({
-      title: nullEmpty( event.target.value )
-    });
-  };
-
-  const handleOptionSubreddit = function ( event ) {
-    draftStore.updateOption({
-      subreddit: nullEmpty( event.target.value )
-    });
-  };
-
-  const handleOptionSpoiler = function ( event ) {
-    draftStore.updateOption({ 
-      spoiler: event.target.checked 
-    });
-  }
-
-  onMount( function () {
-    const unsubscribeDraft = draftStore.subscribe( async function ( draft ) {
-      options = draft.options;
-      let match;
-      
-      // In Reddit, replies are comments, not full posts. So don't show options.
-      if ( draft.reply != null ) {
-        hasReddit = false;
-      } else {
-        match = draft.identities.find( i => i.platform === "reddit" && i.active === true);
-        hasReddit = match != null;
-      }
-      
-      match = draft.identities.find( i => i.platform === "mastodon" && i.active === true);
-      hasMastodon = match != null;
-
-      match = draft.identities.find( i => i.platform === "smalltown" && i.active === true);
-      hasSmalltown = match != null;
-    });
-
-    return function () {
-      unsubscribeDraft();
+  
+  Render.reset();
+  onMount(() => {
+    Render.listen( "options", Render.cycle );
+    Render.listen( "identities", Render.identities );
+    return () => {
+      Render.reset();
     };
   });
 </script>
@@ -99,7 +83,7 @@
       </div>
 
       <sl-select
-        on:sl-change={handleOptionVisibility}
+        on:sl-change={Handle.visibility}
         name="visibility"
         value={options.visibility}
         size="medium"
@@ -110,7 +94,7 @@
       </sl-select>
 
       <sl-input
-        on:sl-input={handleOptionSpoilerText}
+        on:sl-input={Handle.spoilerText}
         value={options.spoilerText}
         label="Spoiler Text"
         help-text="Provide text that contextualizes content behind warning."
@@ -133,7 +117,7 @@
       </div>
 
       <sl-input
-        on:sl-input={handleOptionSubreddit}
+        on:sl-input={Handle.subreddit}
         value={options.subreddit}
         label="Target Subreddit"
         help-text="This is the subreddit where Gobo will submit your post."
@@ -141,7 +125,7 @@
       </sl-input>
 
       <sl-input
-        on:sl-input={handleOptionTitle}
+        on:sl-input={Handle.title}
         value={options.title}
         label="Post Title"
         help-text="Provide a title that will appear in your Reddit post."
@@ -149,7 +133,7 @@
       </sl-input>
 
       <sl-checkbox
-        on:sl-change={handleOptionSpoiler}
+        on:sl-change={Handle.spoiler}
         checked={options.spoiler}
         size="medium">
         Mark Text as Containing Spoilers
@@ -171,7 +155,7 @@
       </div>
 
       <sl-input
-        on:sl-input={handleOptionSpoilerText}
+        on:sl-input={Handle.spoilerText}
         value={options.spoilerText}
         label="Spoiler Text"
         help-text="Provide text that contextualizes content behind warning."

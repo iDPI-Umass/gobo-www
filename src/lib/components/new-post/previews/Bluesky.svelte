@@ -2,51 +2,48 @@
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
-  import { onDestroy, onMount } from "svelte";
-  import { browser } from "$app/environment";
-  import { draftStore } from "$lib/stores/draft.js";
-  import { render } from "$lib/helpers/markdown.js";
+  import { onMount } from "svelte";
+  import { State, Identity, Media } from "$lib/engines/draft.js";
+  import * as markdown from "$lib/helpers/markdown.js";
 
-  let draftData, unsubscribeDraft;
-  let identity = {};
-  let options = {};
-  let content;
-  let displayedFiles = [];
-  let sensitiveOverride = false;  
+  let identity, options, content, displayedFiles, sensitiveOverride;
+  const Render = State.make();
 
-  const setIdentities = function () {
-    for ( const key in draftData.identities ) {
-      const value = draftData.identities[ key ];
-      if (( value.platform === "bluesky" ) && ( value.active === true )) {
-        identity = value;
-        return;
-      }
-    }
+  Render.cleanup = () => {
+    identity = {};
+    options = {};
+    content = null;
+    displayedFiles = [];
+    sensitiveOverride = false;  
   };
 
-  const setOptions = function () {
-    options = draftData.options;
+  Render.identity = ( draft ) => {
+    identity = Identity.findActive( "bluesky" );
   };
 
-  const setContent = function () {
-    content = render( draftData.content );
+  Render.options = ( draft ) => {
+    options = draft.options;
   };
 
-  const setFiles = function () {
-    const _files = [];
-    for ( const attachment of draftData.attachments.slice( 0, 4 ) ) {
-      _files.push(attachment.file);
-    }
-    displayedFiles = _files;
+  Render.content = ( draft ) => {
+    content = markdown.render( draft.content );
   };
 
-  const handleSingleLoad = function ( event ) {
-    let previewWidth = event.target.width;
-    let naturalWidth = event.target.naturalWidth || event.target.videoWidth;
-    let naturalHeight = event.target.naturalHeight || event.target.videoHeight;
-    let ratio = naturalHeight / naturalWidth;
-    let previewHeight = Math.round( previewWidth * ratio );
+  Render.attachments = ( draft ) => {
+    displayedFiles = draft.attachments
+      .slice( 0, 4 )
+      .map( attachment => attachment.file );
+  };
 
+
+
+  const Handle = {};
+  Handle.singleImage = ( event ) => {
+    const previewWidth = event.target.width;
+    const naturalWidth = event.target.naturalWidth || event.target.videoWidth;
+    const naturalHeight = event.target.naturalHeight || event.target.videoHeight;
+    const ratio = naturalHeight / naturalWidth;
+    const previewHeight = Math.round( previewWidth * ratio );
 
     if ( previewHeight > 512 ) {
       event.target.style.height = "512px";
@@ -55,26 +52,22 @@
     }    
   }
 
-  const toggleSensitive = function () {
+  Handle.sensitive = () => {
     sensitiveOverride = !sensitiveOverride;
   };
  
-  if ( browser ) {
-    onMount( function () {
-      unsubscribeDraft = draftStore.subscribe( function ( draft ) {
-        draftData = draft;
-        setIdentities();
-        setOptions();
-        setContent();
-        setFiles();
-      });
-    });;
 
-    onDestroy( function () {
-      unsubscribeDraft();
-    });
-  }
 
+  Render.reset();
+  onMount(() => {
+    Render.listen( "identities", Render.identity );
+    Render.listen( "options", Render.options );
+    Render.listen( "content", Render.content );
+    Render.listen( "attachments", Render.attachments );
+    return () => {
+      Render.reset();
+    }
+  });
 </script>
 
 <article class="outer-frame">
@@ -106,8 +99,8 @@
           {#if (options.sensitive === true) && (sensitiveOverride === true)}
             <div class="media-hide">
               <div
-                on:click={toggleSensitive}
-                on:keypress={toggleSensitive}
+                on:click={Handle.sensitive}
+                on:keypress={Handle.sensitive}
                 tabindex="0"
                 role="button">
                 <span>Hide</span>
@@ -121,8 +114,8 @@
               <p>Content warning: Sensitive content</p>
               <p>The Tweet author flagged this Tweet as showing sensitive content.</p>
               <div
-                on:click={toggleSensitive}
-                on:keypress={toggleSensitive}
+                on:click={Handle.sensitive}
+                on:keypress={Handle.sensitive}
                 tabindex="0"
                 role="button">
                 <span>Show</span>
@@ -130,17 +123,17 @@
             </div>
           {/if}
 
-          {#if draftStore.isImage( displayedFiles[0] )}
+          {#if Media.isImage( displayedFiles[0] )}
             <img 
               src={URL.createObjectURL( displayedFiles[0] )}
               alt="uploaded"
-              on:load={handleSingleLoad}>
-          {:else if draftStore.isVideo( displayedFiles[0] )}
+              on:load={Handle.singleImage}>
+          {:else if Media.isVideo( displayedFiles[0] )}
             <!-- svelte-ignore a11y-media-has-caption -->
             <video 
               loop 
               controls
-              on:loadedmetadata={handleSingleLoad}>
+              on:loadedmetadata={Handle.singleImage}>
               <source 
                 src={URL.createObjectURL( displayedFiles[0] )}
                 type={displayedFiles[0].type}>
@@ -154,8 +147,8 @@
         {#if (options.sensitive === true) && (sensitiveOverride === true)}
           <div class="media-hide">
             <div
-              on:click={toggleSensitive}
-              on:keypress={toggleSensitive}
+              on:click={Handle.sensitive}
+              on:keypress={Handle.sensitive}
               tabindex="0"
               role="button">
               <span>Hide</span>
@@ -169,8 +162,8 @@
             <p>Content warning: Sensitive content</p>
             <p>The Tweet author flagged this Tweet as showing sensitive content.</p>
             <div
-              on:click={toggleSensitive}
-              on:keypress={toggleSensitive}
+              on:click={Handle.sensitive}
+              on:keypress={Handle.sensitive}
               tabindex="0"
               role="button">
               <span>Show</span>
@@ -180,11 +173,11 @@
 
         <div class="left">
           <div class="image-box">
-            {#if draftStore.isImage( displayedFiles[0] )}
+            {#if Media.isImage( displayedFiles[0] )}
               <img 
                 src={URL.createObjectURL( displayedFiles[0] )}
                 alt="uploaded">
-            {:else if draftStore.isVideo( displayedFiles[0] )}
+            {:else if Media.isVideo( displayedFiles[0] )}
               <!-- svelte-ignore a11y-media-has-caption -->
               <video loop controls>
                 <source 
@@ -197,11 +190,11 @@
   
         <div class="right">
           <div class="image-box">
-            {#if draftStore.isImage( displayedFiles[1] )}
+            {#if Media.isImage( displayedFiles[1] )}
               <img 
                 src={URL.createObjectURL( displayedFiles[1] )}
                 alt="uploaded">
-            {:else if draftStore.isVideo( displayedFiles[1] )}
+            {:else if Media.isVideo( displayedFiles[1] )}
               <!-- svelte-ignore a11y-media-has-caption -->
               <video loop controls>
                 <source 
@@ -217,8 +210,8 @@
         {#if (options.sensitive === true) && (sensitiveOverride === true)}
           <div class="media-hide">
             <div
-              on:click={toggleSensitive}
-              on:keypress={toggleSensitive}
+              on:click={Handle.sensitive}
+              on:keypress={Handle.sensitive}
               tabindex="0"
               role="button">
               <span>Hide</span>
@@ -232,8 +225,8 @@
             <p>Content warning: Sensitive content</p>
             <p>The Tweet author flagged this Tweet as showing sensitive content.</p>
             <div
-              on:click={toggleSensitive}
-              on:keypress={toggleSensitive}
+              on:click={Handle.sensitive}
+              on:keypress={Handle.sensitive}
               tabindex="0"
               role="button">
               <span>Show</span>
@@ -243,11 +236,11 @@
 
         <div class="left">
           <div class="image-box">
-            {#if draftStore.isImage( displayedFiles[0] )}
+            {#if Media.isImage( displayedFiles[0] )}
               <img 
                 src={URL.createObjectURL( displayedFiles[0] )}
                 alt="uploaded">
-            {:else if draftStore.isVideo( displayedFiles[0] )}
+            {:else if Media.isVideo( displayedFiles[0] )}
               <!-- svelte-ignore a11y-media-has-caption -->
               <video loop controls>
                 <source 
@@ -261,11 +254,11 @@
         <div class="right">
           <div class="top">
             <div class="image-box">
-              {#if draftStore.isImage( displayedFiles[1] )}
+              {#if Media.isImage( displayedFiles[1] )}
                 <img 
                   src={URL.createObjectURL( displayedFiles[1] )}
                   alt="uploaded">
-              {:else if draftStore.isVideo( displayedFiles[1] )}
+              {:else if Media.isVideo( displayedFiles[1] )}
                 <!-- svelte-ignore a11y-media-has-caption -->
                 <video loop controls>
                   <source 
@@ -277,11 +270,11 @@
           </div>
           <div class="bottom">
             <div class="image-box">
-              {#if draftStore.isImage( displayedFiles[2] )}
+              {#if Media.isImage( displayedFiles[2] )}
                 <img 
                   src={URL.createObjectURL( displayedFiles[2] )}
                   alt="uploaded">
-              {:else if draftStore.isVideo( displayedFiles[2] )}
+              {:else if Media.isVideo( displayedFiles[2] )}
                 <!-- svelte-ignore a11y-media-has-caption -->
                 <video loop controls>
                   <source 
@@ -299,8 +292,8 @@
         {#if (options.sensitive === true) && (sensitiveOverride === true)}
           <div class="media-hide">
             <div
-              on:click={toggleSensitive}
-              on:keypress={toggleSensitive}
+              on:click={Handle.sensitive}
+              on:keypress={Handle.sensitive}
               tabindex="0"
               role="button">
               <span>Hide</span>
@@ -314,8 +307,8 @@
             <p>Content warning: Sensitive content</p>
             <p>The Tweet author flagged this Tweet as showing sensitive content.</p>
             <div
-              on:click={toggleSensitive}
-              on:keypress={toggleSensitive}
+              on:click={Handle.sensitive}
+              on:keypress={Handle.sensitive}
               tabindex="0"
               role="button">
               <span>Show</span>
@@ -326,11 +319,11 @@
         <div class="left">
           <div class="top">
             <div class="image-box">
-              {#if draftStore.isImage( displayedFiles[0] )}
+              {#if Media.isImage( displayedFiles[0] )}
                 <img 
                   src={URL.createObjectURL( displayedFiles[0] )}
                   alt="uploaded">
-              {:else if draftStore.isVideo( displayedFiles[0] )}
+              {:else if Media.isVideo( displayedFiles[0] )}
                 <!-- svelte-ignore a11y-media-has-caption -->
                 <video loop controls>
                   <source 
@@ -342,11 +335,11 @@
           </div>
           <div class="bottom">
             <div class="image-box">
-              {#if draftStore.isImage( displayedFiles[2] )}
+              {#if Media.isImage( displayedFiles[2] )}
                 <img 
                   src={URL.createObjectURL( displayedFiles[2] )}
                   alt="uploaded">
-              {:else if draftStore.isVideo( displayedFiles[2] )}
+              {:else if Media.isVideo( displayedFiles[2] )}
                 <!-- svelte-ignore a11y-media-has-caption -->
                 <video loop controls>
                   <source 
@@ -361,11 +354,11 @@
         <div class="right">
           <div class="top">
             <div class="image-box">
-              {#if draftStore.isImage( displayedFiles[1] )}
+              {#if Media.isImage( displayedFiles[1] )}
                 <img 
                   src={URL.createObjectURL( displayedFiles[1] )}
                   alt="uploaded">
-              {:else if draftStore.isVideo( displayedFiles[1] )}
+              {:else if Media.isVideo( displayedFiles[1] )}
                 <!-- svelte-ignore a11y-media-has-caption -->
                 <video loop controls>
                   <source 
@@ -377,11 +370,11 @@
           </div>
           <div class="bottom">
             <div class="image-box">
-              {#if draftStore.isImage( displayedFiles[3] )}
+              {#if Media.isImage( displayedFiles[3] )}
                 <img 
                   src={URL.createObjectURL( displayedFiles[3] )}
                   alt="uploaded">
-              {:else if draftStore.isVideo( displayedFiles[3] )}
+              {:else if Media.isVideo( displayedFiles[3] )}
                 <!-- svelte-ignore a11y-media-has-caption -->
                 <video loop controls>
                   <source 

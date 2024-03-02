@@ -55,6 +55,7 @@ const Draft = {
     const draft = Draft.read();
     Draft.put( "content", draft );
     Draft.put( "identities", draft );
+    Draft.put( "attachments", draft );
     Draft.put( "reply", draft );
     Draft.put( "quote", draft );
     Draft.put( "options", draft );
@@ -125,41 +126,59 @@ const Draft = {
 
 
 
-const Identity = {
-  load: async () => {
-    const draft = Draft.read();
-    let current = draft.identities.map(( identity ) => identity.id );
-  
-    const engine = await FeedSaver.getEngine();
-    const canon = engine.getIdentities();
-    const target = canon.map(( identity ) => identity.id );
+const Identity = {};
+Identity.load = async () => {
+  const draft = Draft.read();
+  let current = draft.identities.map(( identity ) => identity.id );
 
-    if ( !Value.equal( current, target )) {
-      const actives = {};
-      for ( const { id, active } of draft.identities ) {
-        actives[ id ] = active;
-      }
-      
-      const identities = [];
-      for ( const _identity of canon ) {
-        const identity = Value.clone( _identity );
-        identity.active = actives[ identity.id ] ?? false;
-        identities.push( identity );
-      }
-      
-      Draft.updateAspect( "identities", identities );
+  const engine = await FeedSaver.getEngine();
+  const canon = engine.getIdentities();
+  const target = canon.map(( identity ) => identity.id );
+
+  if ( !Value.equal( current, target )) {
+    const actives = {};
+    for ( const { id, active } of draft.identities ) {
+      actives[ id ] = active;
     }
-  },
-
-  find: ( target ) => {
-    const draft = Draft.read();
-    return draft.identities
-      .find(( identity ) => identity.id == target );
-  },
-
-  clear: () => {
-    return Identity.load({ identities: [] });
+    
+    const identities = [];
+    for ( const _identity of canon ) {
+      const identity = Value.clone( _identity );
+      identity.active = actives[ identity.id ] ?? false;
+      identities.push( identity );
+    }
+    
+    Draft.updateAspect( "identities", identities );
   }
+};
+
+Identity.find = ( target ) => {
+  const draft = Draft.read();
+  return draft.identities
+    .find(( identity ) => identity.id == target );
+};
+
+Identity.findActive = ( target ) => {
+  const draft = Draft.read();
+  return draft.identities.find(({ platform, active }) => {
+    return (platform === target) && (active === true);
+  });
+}
+
+Identity.hasActive = ( target ) => {
+  return () => {
+    const match = Identity.findActive( target );
+    return match != null;
+  };
+};
+
+Identity.hasBluesky = Identity.hasActive( "bluesky" );
+Identity.hasMastodon = Identity.hasActive( "mastodon" );
+Identity.hasReddit = Identity.hasActive( "reddit" );
+Identity.hasSmalltown = Identity.hasActive( "smalltown" );
+
+Identity.clear = () => {
+  return Identity.load({ identities: [] });
 };
 
 
@@ -179,6 +198,45 @@ const Lock = {
     }
     Draft.updateAspect( "identities", identities );
   }
+};
+
+
+
+const Options = {};
+Options.handle = ( name, event ) => {
+  if ( event?.target?.checked != null ) {
+    Options.checked( name, event );
+  } else {
+    Options.value( name, event );
+  }
+};
+
+Options.checked = ( name, event ) => {
+  const value = event.target.checked;
+  Options.update( name, value );
+}
+
+Options.value = ( name, event ) => {
+  const value = Options.nullEmpty( event.target.value );
+  Options.update( name, value );
+}
+
+Options.nullEmpty = ( value ) => {
+  if ( value == null ) {
+    return null
+  } else {
+    if ( value.length === 0 ) {
+      return null;
+    } else {
+      return value;
+    }
+  }
+};
+
+Options.update = ( name, value ) => {
+  const { options } = Draft.read();
+  options[ name ] = value;
+  Draft.updateAspect( "options", options );
 };
 
 
@@ -220,6 +278,7 @@ const Media = {
 class State {
   constructor() {
     this.closers = [];
+    this.cleanup = function () {};
   }
 
   static make () {
@@ -227,22 +286,27 @@ class State {
   }
 
   listen ( store, f ) {
-    let closeFunction = Draft.subscribe( store, f );
+    const g = ( draft ) => {
+      if ( draft == null ) {
+        return;
+      } else {
+        return f( draft );
+      }
+    };
+
+    let closeFunction = Draft.subscribe( store, g );
     this.closers.push( closeFunction );
     return;
   }
 
+  // Handles sundry tasks when destroying a component.
   reset () {
-    // Release Svelte store subscriptions using the close functions we collected.
+    // Release Svelte store subscriptions using the collected closers.
     for ( const close of this.closers ) {
       close();
     }
-    this.closers = [];
-    
-    // Run a cleanup if it was added to the instance.
-    if ( this.cleanup != null ) {
-      this.cleanup();
-    }
+    this.closers = [];    
+    this.cleanup();
   }
 }
 
@@ -282,22 +346,8 @@ Validate.hasContent = () => {
   return draft.content != null;
 };
 
-Validate.hasPlatform = ( target ) => {
-  return () => {
-    const draft = Draft.read();
-    const hasPlatform = ({ platform }) => platform === target;
-    const match = draft.identities.find( hasPlatform );
-    return match != null;
-  };
-};
-
-Validate.hasBluesky = Validate.hasPlatform( "bluesky" );
-Validate.hasMastodon = Validate.hasPlatform( "mastodon" );
-Validate.hasReddit = Validate.hasPlatform( "reddit" );
-Validate.hasSmalltown = Validate.hasPlatform( "smalltown" );
-
 Validate.bluesky = () => {
-  if ( Validate.hasBluesky() && Bluesky.contentLength() > 300 ) {
+  if ( Identity.hasBluesky() && Bluesky.contentLength() > 300 ) {
     Draft.updateAspect( "alert",
       "Bluesky does not accept posts with more than 300 characters." );
     return false;
@@ -306,7 +356,7 @@ Validate.bluesky = () => {
 };
 
 Validate.mastodon = () => {
-  if ( Validate.hasMastodon() && Mastodon.contentLength() > 500 ) {
+  if ( Identity.hasMastodon() && Mastodon.contentLength() > 500 ) {
     Draft.updateAspect( "alert", 
       "Mastodon does not accept posts with more than 500 characters." );
     return false;
@@ -315,7 +365,7 @@ Validate.mastodon = () => {
 };
 
 Validate.reddit = () => {
-  if ( Validate.hasReddit() && Reddit.contentLength() > 40000 ) {
+  if ( Identity.hasReddit() && Reddit.contentLength() > 40000 ) {
     Draft.updateAspect( "alert", 
       "Reddit does not accept posts with more than 40,000 characters." );
     return false;
@@ -324,7 +374,7 @@ Validate.reddit = () => {
 };
 
 Validate.smalltown = () => {
-  if ( Validate.hasSmalltown() && Smalltown.contentLength() > 500 ) {
+  if ( Identity.hasSmalltown() && Smalltown.contentLength() > 500 ) {
     Draft.updateAspect( "alert", 
       "Smalltown does not accept posts with more than 500 characters." );
     return false;
@@ -389,6 +439,8 @@ export {
   Draft,
   Identity,
   Lock,
+
+  Options,
 
   Name,
   Media,

@@ -2,7 +2,7 @@ import { writable } from "svelte/store";
 
 
 const createStore = function () {
-  let event = {};
+  let event = null;
 
   const { subscribe, update } = writable( event );
 
@@ -21,6 +21,7 @@ const draftStore = createStore();
 const draftStores = {
   content: createStore(),
   identities: createStore(),
+  attachments: createStore(),
   reply: createStore(),
   quote: createStore(),
   options: createStore(),

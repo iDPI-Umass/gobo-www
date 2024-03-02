@@ -5,22 +5,37 @@
   import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
-  import { draftStore } from "$lib/stores/draft.js";
+  import { State, Draft, Options, Media } from "$lib/engines/draft.js";
   import { previewStore } from "$lib/stores/image-preview.js";
   import { altStore } from "$lib/stores/alt-store.js"
-  import * as DraftImage from "$lib/resources/draft-image";
 
-  let options = {};
-  let attachments = [];
+  let options, attachments
   let fileInput;
+  const Render = State.make();
 
-  const handleOptionSensitive = function ( event ) {
-    draftStore.updateOption({ 
-      sensitive: event.target.checked 
-    });
+  Render.cleanup = () => {
+    options = {};
+    attachments = [];
   };
 
-  const addFile = function ( file ) {
+  Render.cycle = ( draft ) => {
+    for ( const attachment of draft.attachments ) {
+      if ( !Media.isFile( attachment.file )) {
+        attachments = [];
+        Draft.updateAspect( "attachments", attachments );
+      }
+    }
+    attachments = draft.attachments;
+  };
+
+  Render.options = ( draft ) => {
+    options = draft.options
+  };
+
+
+
+  const File = {};
+  File.add = ( file ) => {
     const index = attachments.findIndex( a => a.file.name === file.name );
 
     if ( index < 0 ) {
@@ -31,27 +46,41 @@
       if ( file.lastModified !== match.file.lastModified ) {
         altStore.set({ file, alt: match.alt });
         attachments.splice( index, 1 );
-        draftStore.update({ attachments });
-        goto("/new-post/alt");
+        Draft.updateAspect( "attachments", attachments );
+        goto( "/new-post/alt" );
       }
     }
-  }
-
-  const handleDragEnter = function ( event ) {
-    event.preventDefault();
   };
 
-  const handleDragLeave = function ( event ) {
-    event.preventDefault();
+  File.listen = () => {
+    const _files = fileInput.files;
+    if ( _files.length > 0 ) {
+      for ( const file of _files ) {
+        addFile( file );
+      }
+      fileInput.value = null;
+    }
   };
 
-  const handleDrop = function ( event ) {
+
+
+  const Handle = {};
+  Handle.sensitive = ( event ) => {
+    Options.handle( "sensitive", event );
+  };
+  Handle.dragEnter = ( event ) => {
+    event.preventDefault();
+  };
+  Handle.dragLeave = ( event ) => {
+    event.preventDefault();
+  };
+  Handle.drop = ( event ) => {
     event.preventDefault();
 
     // Support both item list and file interfaces.
     if ( event.dataTransfer.items ) {
 
-      [ ...event.dataTransfer.items ].forEach( function ( item ) {
+      [ ...event.dataTransfer.items ].forEach(( item ) => {
         // If dropped items aren't files, reject them
         if ( item.kind === "file" ) {
           const file = item.getAsFile();
@@ -60,33 +89,29 @@
       });
 
     } else {
-      [ ...event.dataTransfer.files ].forEach( function ( file ) {
+      [ ...event.dataTransfer.files ].forEach(( file ) => {
         addFile( file );
       });
     }
   };
 
-  const handleFileChrome = function ( event ) {
+  Handle.fileChrome = ( event ) => {
     fileInput.click();
   };
-
-  const handleFileChromeKey = function ( event ) {
+  Handle.fileChromeKey = ( event ) => {
     if ( event.key === "Enter" ) {
       fileInput.click();
     }
   };
-
-
-  const handlePreview = function( attachment ) {
-    return function ( event ) {
+  Handle.preview = ( attachment ) => {
+    return ( event ) => {
       event.preventDefault();
       previewStore.set( attachment );
       goto( "/upload-preview" );
     }
   };
-
-  const handleDelete = function ( attachment ) {
-    return function ( event ) {
+  Handle.delete = ( attachment ) => {
+    return ( event ) => {
       event.preventDefault();
       if ( event.type === "keypress" && event.key !== "Enter" ) {
         return;
@@ -96,13 +121,12 @@
 
       if ( index >= 0 ) {
         attachments.splice( index, 1 );
-        draftStore.update({ attachments });
+        Draft.updateAspect( "attachments", attachments );
       }
     }
   };
-
-  const handleEdit = function ( attachment ) {
-    return function ( event ) {
+  Handle.edit = ( attachment ) => {
+    return ( event ) => {
       event.preventDefault();
       if ( event.type === "keypress" && event.key !== "Enter" ) {
         return;
@@ -112,34 +136,16 @@
     };
   }
 
-  onMount( function () {
-    const unsubscribeDraft = draftStore.subscribe( function ( draft ) {
-      for ( const attachment of draft.attachments ) {
-        if ( ! draftStore.isFile( attachment.file ) ) {
-          attachments = [];
-          draftStore.update({ attachments });
-        }
-      }
 
-      options = draft.options;
-      attachments = draft.attachments;
-    });
 
-    const listener = function () {
-      const _files = fileInput.files;
-      if ( _files.length > 0 ) {
-        for ( const file of _files ) {
-          addFile( file );
-        }
-        fileInput.value = null;
-      }
-    };
-
-    fileInput.addEventListener( "change", listener );
-
-    return function () {
-      unsubscribeDraft();
-      fileInput.removeEventListener( "change", listener );
+  Render.reset();
+  onMount(() => {
+    Render.listen( "attachments", Render.cycle );
+    Render.listen( "options", Render.options );
+    fileInput.addEventListener( "change", File.listen );
+    return () => {
+      Render.reset();
+      fileInput.removeEventListener( "change", File.listen );
     };
   });
 </script>
@@ -148,7 +154,7 @@
 <h2>Attach Media</h2>
   
 <sl-checkbox
-  on:sl-change={handleOptionSensitive}
+  on:sl-change={Handle.sensitive}
   checked={options.sensitive}
   size="medium">
   Mark Media as Sensitive
@@ -157,30 +163,30 @@
 <div 
   class="gobo-table" 
   ondragover="return false" 
-  on:dragenter={handleDragEnter}
-  on:dragleave={handleDragLeave}
-  on:drop={handleDrop}>
+  on:dragenter={Handle.dragEnter}
+  on:dragleave={Handle.dragLeave}
+  on:drop={Handle.drop}>
   {#each attachments as attachment (attachment.file.name)}
     <div class="table-row">
       <a
         href="/upload-preview"
-        on:click={handlePreview( attachment )}
-        on:keypress={handlePreview( attachment )}>
+        on:click={Handle.preview( attachment )}
+        on:keypress={Handle.preview( attachment )}>
         { attachment.file.name }
       </a>
       <sl-icon-button
         class="danger"
         label="Delete File" 
         src="/icons/trash.svg"
-        on:click={handleDelete( attachment )}
-        on:keypress={handleDelete( attachment )}>>
+        on:click={Handle.delete( attachment )}
+        on:keypress={Handle.delete( attachment )}>>
       </sl-icon-button>
       <sl-icon-button
         class="warning"
         label="Edit Alt" 
         src="/icons/pencil-square.svg"
-        on:click={handleEdit( attachment )}
-        on:keypress={handleEdit( attachment )}>>
+        on:click={Handle.edit( attachment )}
+        on:keypress={Handle.edit( attachment )}>>
       </sl-icon-button>
     </div>
   {/each}
@@ -195,8 +201,8 @@
 
 <div class="buttons">
   <sl-button
-    on:click={handleFileChrome}
-    on:keypress={handleFileChromeKey}
+    on:click={Handle.fileChrome}
+    on:keypress={Handle.fileChromeKey}
     size="medium"
     class="submit"
     pill>
