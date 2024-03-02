@@ -16,7 +16,7 @@ const shortURL = function (url) {
   return url_.host + path
 }
 
-const getPost = async function ({ identity, id }) {
+const get = async function ({ identity, id }) {
   if ( Cache.hasPostCenter(id) ) {
     return Cache.getPost( id );
   }
@@ -153,6 +153,6 @@ const publish = async function ( draft ) {
 };
 
 export {
-  getPost,
+  get,
   publish
 }

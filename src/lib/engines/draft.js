@@ -1,7 +1,8 @@
 import * as Value from "@dashkite/joy/value";
 import * as Type from "@dashkite/joy/type";
+import * as linkify from "linkifyjs";
 import * as LS from "$lib/helpers/local-storage.js";
-import { getPost } from "$lib/resources/post.js";
+import * as Post from "$lib/resources/post.js";
 import * as FeedSaver from "$lib/engines/feed-singleton.js";
 import { draftStores } from "$lib/stores/draft.js";
 
@@ -85,7 +86,7 @@ const Draft = {
     if ( reply == null ) {
       return;
     }
-    reply.data = await getPost( reply );
+    reply.data = await Post.get( reply );
     Draft.updateAspect( "reply", reply );
   },
 
@@ -94,9 +95,11 @@ const Draft = {
     if ( quote == null ) {
       return;
     }
-    quote.data = await getPost( quote );
+    quote.data = await Post.get( quote );
     Draft.updateAspect( "quote", quote );
   },
+
+  publish: Post.publish,
 
   // This is unfortunately hacky. For replies and quotes, the post data is
   // stowed in the draft store, including local storage. However, on page
@@ -245,6 +248,142 @@ class State {
 
 
 
+const Validate = {};
+Validate.isValid = () => {
+  const draft = Draft.read();
+  console.log( "validating", draft );
+
+  const tests = [
+    Validate.active,
+    Validate.bluesky,
+    Validate.mastodon,
+    Validate.reddit,
+    Validate.smalltown,
+  ];
+
+  return tests.every( test => test() === true );
+};
+
+
+Validate.active = () => {
+  const draft = Draft.read();
+  const actives = draft.identities.filter( i => i.active === true );
+  if ( actives.length === 0 ) {
+    Draft.updateAspect( "alert", 
+      "Must select an identity to publish this post.");
+    return false;
+  }
+  return true;
+};
+
+
+Validate.hasContent = () => {
+  const draft = Draft.read();
+  return draft.content != null;
+};
+
+Validate.hasPlatform = ( target ) => {
+  return () => {
+    const draft = Draft.read();
+    const hasPlatform = ({ platform }) => platform === target;
+    const match = draft.identities.find( hasPlatform );
+    return match != null;
+  };
+};
+
+Validate.hasBluesky = Validate.hasPlatform( "bluesky" );
+Validate.hasMastodon = Validate.hasPlatform( "mastodon" );
+Validate.hasReddit = Validate.hasPlatform( "reddit" );
+Validate.hasSmalltown = Validate.hasPlatform( "smalltown" );
+
+Validate.bluesky = () => {
+  if ( Validate.hasBluesky() && Bluesky.contentLength() > 300 ) {
+    Draft.updateAspect( "alert",
+      "Bluesky does not accept posts with more than 300 characters." );
+    return false;
+  }
+  return true;
+};
+
+Validate.mastodon = () => {
+  if ( Validate.hasMastodon() && Mastodon.contentLength() > 500 ) {
+    Draft.updateAspect( "alert", 
+      "Mastodon does not accept posts with more than 500 characters." );
+    return false;
+  }
+  return true;
+};
+
+Validate.reddit = () => {
+  if ( Validate.hasReddit() && Reddit.contentLength() > 40000 ) {
+    Draft.updateAspect( "alert", 
+      "Reddit does not accept posts with more than 40,000 characters." );
+    return false;
+  }
+  return true;
+};
+
+Validate.smalltown = () => {
+  if ( Validate.hasSmalltown() && Smalltown.contentLength() > 500 ) {
+    Draft.updateAspect( "alert", 
+      "Smalltown does not accept posts with more than 500 characters." );
+    return false;
+  }
+  return true;
+};
+
+
+
+const Bluesky = {
+  contentLength: () => {
+    const draft = Draft.read();
+    const links = linkify.find( draft.content, "url" );
+    let length = draft.content.length;
+    let surplus = 0;
+    
+    for ( const link of links ) {
+      const url = new URL( link.href );
+      if ( url.pathname.length > 16 ) {
+        surplus += ( url.pathname.length - 16 );
+      }
+      if ( link.value.startsWith("https://") ) {
+        surplus += 8;
+      }
+      else if ( link.value.startsWith("http://") ) {
+        surplus += 7;
+      }
+    }
+    
+    return length - surplus;
+  }
+};
+
+
+const Mastodon = {
+  contentLength: () => {
+    const draft = Draft.read();
+    return draft.content?.length ?? 0;
+  }
+};
+
+
+const Reddit = {
+  contentLength: () => {
+    const draft = Draft.read();
+    return draft.content?.length ?? 0;
+  }
+};
+
+
+const Smalltown = {
+  contentLength: () => {
+    const draft = Draft.read();
+    return draft.content?.length ?? 0;
+  }
+};
+
+
+
 
 export {
   Draft,
@@ -254,5 +393,11 @@ export {
   Name,
   Media,
 
-  State
+  State,
+
+  Validate,
+  Bluesky,
+  Mastodon,
+  Reddit,
+  Smalltown
 }

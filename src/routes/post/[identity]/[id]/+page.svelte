@@ -3,7 +3,7 @@
   import BackLink from "$lib/components/primitives/BackLink.svelte";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
   import { guard } from "$lib/helpers/guard";
-  import { getPost } from "$lib/resources/post.js";
+  import { get } from "$lib/resources/post.js";
   
   export let data;
   
@@ -12,7 +12,7 @@
   let identity = data.bindings.identity;
 
   const loadPost = async function () {
-    post = await getPost( data.bindings );
+    post = await get( data.bindings );
   };
   
   guard();

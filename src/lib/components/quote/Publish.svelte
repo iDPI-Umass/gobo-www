@@ -9,11 +9,15 @@
   const Render = State.make();
 
   Render.cycle = ( draft ) => {
-    return;
+    const match = draft.identities.find( i => i.active === true );
+    if ( match == null ) {
+      return;
+    }
+    nameParts = Name.split( match.prettyName );
   };
 
   Render.cleanup = () => {
-    return;
+    nameParts = [];
   }
 
 
@@ -48,9 +52,15 @@
 </script>
 
 
-<h2>Publish</h2>
+<h2>Quote</h2>
 <p>
-  Gobo will issue requests to each of the identities you specified.
+  You are quote-posting as
+
+  <span>
+    {#each nameParts as part}
+      <span>{ part }</span>
+    {/each}
+  </span>
 </p>
 
 <div class="buttons">
@@ -70,13 +80,26 @@
     class="submit"
     size="medium"
     pill>
-    Publish
+    Quote
   </sl-button>
 </div>
 
 <style>
   p {
     margin: 0;
+  }
+
+  p span {
+    display: inline-flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: start;
+  }
+
+  p span span {
+    flex: 0 0 auto;
+    margin: 0;
+    word-break: break-all;
   }
 
   .buttons {

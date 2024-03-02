@@ -2,12 +2,12 @@
   import Post from "$lib/components/Post.svelte"
   import Spinner from "$lib/components/primitives/Spinner.svelte";
   import { onMount } from "svelte";
-  import { State, Draft, Lock } from "$lib/engines/draft.js";
+  import { State, Draft } from "$lib/engines/draft.js";
 
   let reference, state;
   const Render = State.make();
 
-  Render.cycle = ( draft ) => {
+  Render.cycle = async ( draft ) => {
     if ( draft.quote?.data == null ) {
       state = "waiting";
       return;
@@ -25,7 +25,7 @@
   onMount(() => {
     Render.listen( "quote", Render.cycle );
     return () => {
-      Render.reset();
+      return;
     };
   });
 </script>

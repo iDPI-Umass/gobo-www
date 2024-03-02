@@ -2,100 +2,65 @@
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
-  import { draftStore } from "$lib/stores/draft.js";
-  import * as Post from "$lib/resources/post.js";
+  import { State, Draft, Name, Validate } from "$lib/engines/draft.js";
   import { allyEvent } from "$lib/helpers/event";
-  import * as linkify from 'linkifyjs';
 
+  let publishButton, nameParts;
+  const Render = State.make();
 
-  let draft = {};
-  let publishButton;
-
-  const isValid = function () {
-    console.log(draft);
-
-    const active = draft.identities.filter( i => i.active === true );
-   
-
-    if ( active.length === 0 ) {
-      draftStore.update({ alert: "Must select an identity to publish this post." });
-      return false;
+  Render.cycle = ( draft ) => {
+    const match = draft.identities.find( i => i.active === true );
+    if ( match == null ) {
+      return;
     }
-
-    for ( const identity of active ) {
-      if ( identity.platform === "bluesky" && draft.content != null ) {
-        const links = linkify.find(draft.content, "url");
-        let length = draft.content.length;
-        let surplus = 0;
-        for ( const link of links ) {
-          const url = new URL( link.href );
-          if ( url.pathname.length > 16 ) {
-            surplus += ( url.pathname.length - 16 );
-          }
-          if (link.value.startsWith("https://")) {
-            surplus += 8;
-          }
-          else if (link.value.startsWith("http://")) {
-            surplus += 7;
-          }
-        }
-        length = length - surplus;
-        if ( length > 300 ){
-          draftStore.update({ alert: "Bluesky does not accept posts with more than 300 characters." });
-          return false;
-        }
-      }
-
-      if ( identity.platform === "mastodon" && draft.content?.length > 500 ) {
-        draftStore.update({ alert: "Mastodon does not accept posts with more than 500 characters." });
-        return false;
-      }
-
-      if ( identity.platform === "reddit" && draft.content?.length > 40000 ) {
-        draftStore.update({ alert: "Reddit does not accept posts with more than 40,000 characters." });
-        return false;
-      }
-
-      return true;
-    }
+    nameParts = Name.split( match.prettyName );
   };
+
+  Render.cleanup = () => {
+    nameParts = [];
+  }
+
 
   const publish = async function () {
     if ( publishButton.loading === true ) {
       return;
     }
 
-    if ( isValid() !== true ) {
+    if ( !Validate.isValid() ) {
       return;
     }
     
     publishButton.loading = true;
-    await Post.publish( draft );
-    draftStore.clear();
+    const draft = Draft.read();
+    await Draft.publish( draft );
+    Draft.clear();
     publishButton.loading = false;
     goto("/home");
   };
 
 
-  const handleDiscard = allyEvent( draftStore.clear );
+  const handleDiscard = allyEvent( Draft.clear );
   const handlePublish = allyEvent( publish );
 
-
-  onMount( function () {
-    const unsubscribeDraft = draftStore.subscribe( function ( _draft ) {
-      draft = _draft
-    });
-
-    return function () {
-      unsubscribeDraft();
-    };
+  Render.reset();
+  onMount(() => {
+    Render.listen( "identities", Render.cycle );
+    return () => {
+      Render.reset();
+    }
   });
 </script>
 
 
-<h2>Publish</h2>
+<h2>Reply</h2>
 <p>
-  Gobo will issue requests to each of the identities you specified.
+  You are replying as
+
+  <span>
+    {#each nameParts as part}
+      <span>{ part }</span>
+    {/each}
+  </span>
 </p>
 
 <div class="buttons">
@@ -115,13 +80,26 @@
     class="submit"
     size="medium"
     pill>
-    Publish
+    Reply
   </sl-button>
 </div>
 
 <style>
   p {
     margin: 0;
+  }
+
+  p span {
+    display: inline-flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: start;
+  }
+
+  p span span {
+    flex: 0 0 auto;
+    margin: 0;
+    word-break: break-all;
   }
 
   .buttons {

@@ -62,7 +62,7 @@
     } else if ( name === "quote" ) {
       Draft.updateAspect( "quote", { identity, id: post });
       Draft.updateAspect( "reply", null );
-      goto( "/new-post" );
+      goto( "/quote" );
     } else if ( name === "reply" ) {
       Draft.updateAspect( "quote", null );
       Draft.updateAspect( "reply", { identity, id: post })
