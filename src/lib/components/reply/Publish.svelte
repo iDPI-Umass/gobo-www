@@ -1,8 +1,8 @@
 <script>
   import "@shoelace-style/shoelace/dist/components/button/button.js";
-  import { draftStore } from "$lib/stores/post-draft.js";
-  import { goto } from "$app/navigation";
   import { onMount } from "svelte";
+  import { goto } from "$app/navigation";
+  import { draftStore } from "$lib/stores/draft.js";
   import * as Post from "$lib/resources/post.js";
   import { allyEvent } from "$lib/helpers/event";
   import * as linkify from 'linkifyjs';

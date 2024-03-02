@@ -7,14 +7,6 @@
   import '@shoelace-style/shoelace/dist/components/badge/badge.js';
   import MobileFilters from "$lib/components/Notification/MobileFilters.svelte";
   import Feed from "$lib/components/Notification/Feed.svelte";
-  import { onMount } from "svelte";
-  import { draftStore } from "$lib/stores/post-draft.js";
-
-  // As a temporary measure, we reset the draft when we go home. This keeps
-  // us from resetting on all navigations, like the image pages.
-  onMount( function () {
-    draftStore.clear();
-  });
 </script>
 
 <div class="main-child">

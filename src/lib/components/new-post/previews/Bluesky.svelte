@@ -4,7 +4,7 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import { onDestroy, onMount } from "svelte";
   import { browser } from "$app/environment";
-  import { draftStore } from "$lib/stores/post-draft.js";
+  import { draftStore } from "$lib/stores/draft.js";
   import { render } from "$lib/helpers/markdown.js";
 
   let draftData, unsubscribeDraft;

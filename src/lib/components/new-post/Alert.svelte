@@ -1,7 +1,7 @@
 <script>
   import "@shoelace-style/shoelace/dist/components/alert/alert.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
-  import { draftStore } from "$lib/stores/post-draft.js";
+  import { draftStore } from "$lib/stores/draft.js";
   import { onMount } from "svelte";
 
   let alert;

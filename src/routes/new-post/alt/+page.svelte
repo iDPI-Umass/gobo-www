@@ -3,7 +3,7 @@
   import "@shoelace-style/shoelace/dist/components/textarea/textarea.js";
   import { goto } from "$app/navigation";
   import { onMount } from "svelte";
-  import { draftStore } from "$lib/stores/post-draft";
+  import { draftStore } from "$lib/stores/draft
   import { altStore } from "$lib/stores/alt-store";
   import { allyEvent } from "$lib/helpers/event";
   let form, file, alt, attachments, previewImage;

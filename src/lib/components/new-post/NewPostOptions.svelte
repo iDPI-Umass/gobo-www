@@ -4,7 +4,7 @@
   import "@shoelace-style/shoelace/dist/components/option/option.js";
   import "@shoelace-style/shoelace/dist/components/input/input.js";
   import "@shoelace-style/shoelace/dist/components/checkbox/checkbox.js";
-  import { draftStore } from "$lib/stores/post-draft.js";
+  import { draftStore } from "$lib/stores/draft.js";
   import { onMount } from "svelte";
 
   let options = {};

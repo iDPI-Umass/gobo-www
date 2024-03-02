@@ -11,7 +11,7 @@ const Poll = {
   count: 0,
 
   fetch: async () => {
-    console.log("fetching")
+    console.log("fetching notification count...")
     const result = await Count.get();
     Poll.count = result.count;
   },

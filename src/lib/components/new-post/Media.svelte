@@ -5,7 +5,7 @@
   import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
-  import { draftStore } from "$lib/stores/post-draft.js";
+  import { draftStore } from "$lib/stores/draft.js";
   import { previewStore } from "$lib/stores/image-preview.js";
   import { altStore } from "$lib/stores/alt-store.js"
   import * as DraftImage from "$lib/resources/draft-image";
@@ -26,7 +26,6 @@
     if ( index < 0 ) {
       altStore.set({ file, alt: null });
       goto("/new-post/alt");
-      // draftStore.update({ attachments: [ ...attachments, attachment ] });
     } else {
       const match = attachments[ index ];
       if ( file.lastModified !== match.file.lastModified ) {

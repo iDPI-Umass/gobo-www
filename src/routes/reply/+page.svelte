@@ -1,68 +1,58 @@
 <script>
-  import "@shoelace-style/shoelace/dist/components/divider/divider.js";  
   import BackLink from "$lib/components/primitives/BackLink.svelte";
-  import Reference from "$lib/components/new-post/Reference.svelte";
+  import Spinner from "$lib/components/primitives/Spinner.svelte";
+  import Reference from "$lib/components/reply/Reference.svelte";
   import Body from "$lib/components/new-post/Body.svelte";
-  import Media from "$lib/components/new-post/Media.svelte";
-  import NewPostIdentities from "$lib/components/new-post/NewPostIdentities.svelte";
-  import NewPostOptions from "$lib/components/new-post/NewPostOptions.svelte";
-  import NewPostPreview from "$lib/components/new-post/previews/Preview.svelte";
-  import Publish from "$lib/components/new-post/Publish.svelte";
-  import Alert from "$lib/components/new-post/Alert.svelte";
+  import Publish from "$lib/components/reply/Publish.svelte";
   import { onMount } from "svelte";
-  import { State, Draft, Identity } from "$lib/engines/draft.js";
+  import { Identity, Draft, Lock } from "$lib/engines/draft.js";
 
-  let heading;
-  const Render = State.make();
-  
-  Render.cycle = ( draft ) => {
-    if( draft.reply != null ) {
-      heading = "New Reply";
-    } else if( draft.quote != null ) {
-      heading = "New Quote";
-    } else {
-      heading = "New Post";
-    }
+  // This is asynchronous and affects signalling through the Svelte store.
+  // So we must avoid both race conditions and infinite looping.
+  const once = async () => {
+    Draft.pruneGraph();
+    Draft.load();
+    await Promise.all([
+      Identity.load(),
+      Draft.loadReply(),
+    ]);
+    Lock.close();
   };
 
-  Render.cleanup = () => heading = "New Post";
-
-  Render.reset();
   onMount(() => {
-    Render.listen( "reply", Render.cycle );
-    Render.listen( "quote", Render.cycle );
+    once();
     return () => {
-      Render.reset();
+      return;
     };
   });
+
 </script>
 
 <div class="main-child">
   <header>
-    <BackLink { heading }></BackLink>
+    <BackLink heading="New Reply"></BackLink>
   </header>
   
   <form class="gobo-form">
+    {#await once}
+      <Spinner></Spinner>
+    
+    {:then}
+      <section class="panel">
+        <Reference></Reference>
+      </section>
 
-    <section class="panel">
-      <Reference></Reference>
-    </section>
-  
-    <section class="panel">
-      <Body></Body>
-    </section>
-  
-  
-    <section class="panel">
-      <Media></Media>
-    </section>
-  
-  
-    <section class="panel">
-      <NewPostIdentities></NewPostIdentities>
-    </section>
+      <section class="panel">
+        <Body></Body>
+      </section>
 
-    <section class="panel">
+      <section class="panel">
+        <Publish></Publish>
+      </section>
+    {/await}
+
+   
+    <!-- <section class="panel">
       <NewPostOptions></NewPostOptions>
     </section>
     
@@ -75,8 +65,8 @@
     </section>
   
     <section class="panel publish">
-      <Publish></Publish>     
-    </section>
+      <NewPostPublish></NewPostPublish>     
+    </section> -->
   
   </form>
 </div>

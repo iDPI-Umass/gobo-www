@@ -42,7 +42,7 @@
     on:click={handleHomeReset}
     on:keypress={handleHomeReset}>
     <div slot="prefix">
-      <sl-icon src="/icons/home.svg" slot="prefix"></sl-icon>
+      <sl-icon class="home" src="/icons/home.svg" slot="prefix"></sl-icon>
     </div>
     Home
   </sl-button>
@@ -54,7 +54,7 @@
     on:click={handleNotificationReset}
     on:keypress={handleNotificationReset}>
     <div slot="prefix">
-      <sl-icon src="/icons/bell.svg" slot="prefix"></sl-icon>
+      <sl-icon class="notifications" src="/icons/bell.svg" slot="prefix"></sl-icon>
       {#if notificationCount > 0}
         <sl-badge pill part="badge">{notificationCount}</sl-badge>
       {/if}
@@ -77,7 +77,7 @@
     pill
     href="/settings">
     <div slot="prefix">
-      <sl-icon src="/icons/gear.svg" slot="prefix"></sl-icon>
+      <sl-icon class="settings" src="/icons/gear.svg" slot="prefix"></sl-icon>
     </div>
     Settings
   </sl-button>
@@ -199,6 +199,21 @@
       and needing a container to be the badge parent and button prefix slot
       is awkward. There's probaby a better way to do to this. */
   nav :global(sl-icon) {
+    margin-top: 0.65rem;
+    margin-left: 0;
+  }
+
+  nav :global(sl-icon.home) {
+    margin-top: 0.65rem;
+    margin-left: 0.1rem;
+  }
+
+  nav :global(sl-icon.notifications) {
+    margin-top: 0.65rem;
+    margin-left: 0.1rem;
+  }
+
+  nav :global(sl-icon.settings) {
     margin-top: 0.65rem;
     margin-left: 0.1rem;
   }

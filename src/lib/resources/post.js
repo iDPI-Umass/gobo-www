@@ -47,7 +47,7 @@ const getPost = async function ({ identity, id }) {
   
     weave = filterEngine.weaveGraph( graph );
     filterEngine.filterTraversals( weave );
-    Cache.mergeWeave( {id: identity}, weave );
+    Cache.mergeWeave({ id: identity }, weave );
   
     return weave.posts[ weave.feed[0] ];
   } catch (error) {

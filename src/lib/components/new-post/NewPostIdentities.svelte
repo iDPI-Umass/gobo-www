@@ -1,153 +1,149 @@
 <script>
-  import * as Value from "@dashkite/joy/value";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/switch/switch.js";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
-  import { draftStore } from "$lib/stores/post-draft.js";
   import { onMount } from "svelte";
-  import { get } from "svelte/store";
-  import * as FeedSaver from "$lib/engines/feed-singleton.js";
+  import { Draft, Identity, Lock, Name } from "$lib/engines/draft.js";
 
-  let identities = [];
-  let identityLock = null;
-  let allEmpty = true;
+  let state, visual, identities, lockedIdentity;
+  const reset = () => {
+    state = "start";
+    visual = "waiting";
+    identities = [];
+    lockedIdentity = null;
+  }
+  reset();
 
-  const loadIdentities = async function () {
-    const draft = get( draftStore );
-    let identities = draft.identities;
 
-    const engine = await FeedSaver.getEngine();
-    const _identities = engine.getIdentities();
-    if ( identities.length !== _identities.length ) {
-      identities = [];
-      for ( const identity of _identities ) {
-        const i = Value.clone( identity );
-        i.active = false;
-        identities.push( i );
-      }
+  const renderListing = ( draft ) => {
+    if ( identities.length === 0 ) {
+      visual = "no identities";   
+    } else if ( Identity.checkLock( draft )) {
+      lockedIdentity = Identity.lock( draft );
+      visual = "locked";
+    } else {
+      visual = "normal";
     }
- 
-    draftStore.update({ identities, identitiesLoaded: "ready" });
   };
+
+
+  const cycle = async ( draft ) => {
+    if ( draft == null || draft.identities == null ) {
+      Draft.clear();
+      state = "start";
+
+    } else if ( state === "start" ) {
+      state = "mutex";
+      await Identity.load( draft );
+      state = "identities loaded";
+      if ( needsRecycle ) {
+        return cycle( draft );
+      }
+    
+    } else if ( state === "identities loaded" ) { 
+      identities = draft.identities;
+      renderListing( draft );
+      state = "ready";
+    }
+  };
+
+
+  onMount( async () => {
+    reset();
+    await Identity.load()
+    if ( Lock.isRequired() ) {
+      Lock.close();
+    }
+
+    const draft = Draft.read();
+    identities = draft.identities;
+
+
+    return function () {
+      reset();
+    };
+  });
+
+
 
   const handleIdentitySwitch = function ( identity ) {
     return function ( event ) {
       identity.active = event.target.checked;
-      draftStore.update({ identities });
+      Draft.update({ identities });
     }
   };
-
-  const splitPrettyName = ( name ) => {
-    const output = [];
-    let current = [];
-    
-    for ( const c of name ) {
-      if ( c === "@" ) {
-        output.push( current.join("") + "@" );
-        current = [];
-      } else if ( c === "." ) {
-        output.push( current.join("") + "." );
-        current = [];
-      } else {
-        current.push( c );
-      }
-    }
-
-    output.push( current.join("") );
-    return output;
-  };
-
-  onMount( function () {
-    const unsubscribeDraft = draftStore.subscribe( async function ( draft ) {
-      if ( draft.identitiesLoaded == null ) {
-        // Old draft stored in localStorage. Wipe it out and start over.
-        draftStore.clear();
-        return;
-      }
-      if ( draft.identitiesLoaded === "start" ) {
-        draftStore.update({ identities, identitiesLoaded: "waiting" });
-        await loadIdentities();
-        return;
-      }
-      if ( draft.identitiesLoaded === "waiting" ) {
-        // Not yet ready to process identities.
-        return;
-      }
-      
-      // We have a fresh list of identities from API. We're ready to process.
-      identities = draft.identities;
-      if ( identities.length === 0 ) {
-        allEmpty = true;
-      } else {
-        allEmpty = false;
-      }
-
-
-      // In this case, we're not allowed to cross-post.
-      identityLock = draft.reply?.identity ?? draft.quote?.identity;
-      if ( identityLock != null ) {
-        for ( const identity of identities ) {
-          identity.active = identity.id === identityLock;
-        }
-      }
-    });
-
-    return function () {
-      unsubscribeDraft();
-    };
-  });
 </script>
 
 <section>
   <h2>Choose Identities</h2>
 
-  {#await loadIdentities()}
+  {#if visual === "waiting"}
     <Spinner></Spinner>
-  {:then}
+  {:else}
 
-    <p>
-      Select the identities you'd like to use to publish this post.
-    </p>
-
-    {#if allEmpty == true}
+    {#if state === "no identities"}
 
       <p>No identities currently registered.</p>
 
-    {:else}
+    {:else if state === "locked"}
+
+      <p>You cannot alter your identity for replies and quotes.</p>
 
       <div class="identities">
-        {#each identities as identity (identity.key)}
-          <div class="identity">
-            
-            <div class="label">
-              <sl-icon 
-                src="/icons/{identity.platform}.svg" 
-                class="{identity.platform}"
-                size="medium">
-              </sl-icon>
-              <span>
-                {#each splitPrettyName(identity.prettyName) as part}
-                  <span>{part}</span>
-                {/each}
-              </span>
-            </div>
-
-            <sl-switch
-              checked={identity.active}
-              disabled={identityLock}
-              on:sl-change={handleIdentitySwitch( identity )}
+        <div class="identity">
+          
+          <div class="label">
+            <sl-icon 
+              src="/icons/{lockedIdentity.platform}.svg" 
+              class="{lockedIdentity.platform}"
               size="medium">
-            </sl-switch>
-            
+            </sl-icon>
+            <span>
+              {#each Name.split(lockedIdentity.prettyName) as part}
+                <span>{ part }</span>
+              {/each}
+            </span>
           </div>
-        {/each}
+
+          <sl-switch
+            checked={true}
+            disabled={true}
+            size="medium">
+          </sl-switch>
+          
+        </div>
       </div>
+
+    {:else}
+      {#each identities as identity (identity.key)}
+        <div class="identity">
+          
+          <div class="label">
+            <sl-icon 
+              src="/icons/{identity.platform}.svg" 
+              class="{identity.platform}"
+              size="medium">
+            </sl-icon>
+            <span>
+              {#each Name.split(identity.prettyName) as part}
+                <span>{ part }</span>
+              {/each}
+            </span>
+          </div>
+
+          <sl-switch
+            checked={identity.active}
+            disabled={identityLock}
+            on:sl-change={handleIdentitySwitch( identity )}
+            size="medium">
+          </sl-switch>
+        
+        </div>
+      {/each}
 
     {/if}
 
-  {:catch}
-    <p>There was a problem fetching your identities.</p>
-  {/await}
+  {/if}
 
 </section>
 

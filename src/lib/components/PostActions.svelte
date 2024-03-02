@@ -3,7 +3,7 @@
   import { goto } from "$app/navigation";
   import { Cache } from "$lib/resources/cache.js";
   import * as PostEdge from "$lib/resources/post-edge.js";
-  import { draftStore } from "$lib/stores/post-draft.js";
+  import { Draft } from "$lib/engines/draft.js";
 
   export let identity;
   export let post;
@@ -60,17 +60,13 @@
     if ( toggles.includes(name) ) {
       await toggleEdge( name );
     } else if ( name === "quote" ) {
-      draftStore.update({
-        quote: { identity, id: post },
-        reply: null
-      });
+      Draft.updateAspect( "quote", { identity, id: post });
+      Draft.updateAspect( "reply", null );
       goto( "/new-post" );
     } else if ( name === "reply" ) {
-      draftStore.update({
-        quote: null,
-        reply: { identity, id: post }
-      });
-      goto( "/new-post" );
+      Draft.updateAspect( "quote", null );
+      Draft.updateAspect( "reply", { identity, id: post })
+      goto( "/reply" );
     } else {
       throw new Error(`no action defined for ${ name }`);
     }

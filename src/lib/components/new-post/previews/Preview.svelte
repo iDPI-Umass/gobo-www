@@ -1,9 +1,9 @@
 <script>
-  import BlueskyPreview from "$lib/components/new-post/BlueskyPreview.svelte";
-  import MastodonPreview from "$lib/components/new-post/MastodonPreview.svelte";
-  import RedditPreview from "$lib/components/new-post/RedditPreview.svelte";
-  import SmalltownPreview from "$lib/components/new-post/SmalltownPreview.svelte";
-  import { draftStore } from "$lib/stores/post-draft.js";
+  import Bluesky from "$lib/components/new-post/previews/Bluesky.svelte";
+  import Mastodon from "$lib/components/new-post/previews/Mastodon.svelte";
+  import Reddit from "$lib/components/new-post/previews/Reddit.svelte";
+  import Smalltown from "$lib/components/new-post/previews/Smalltown.svelte";
+  import { draftStore } from "$lib/stores/draft.js";
   import { onMount } from "svelte";
 
   let hasBluesky = false;
@@ -46,22 +46,22 @@
 
 {#if hasBluesky}
   <h3 class="preview-header">Bluesky</h3>
-  <BlueskyPreview></BlueskyPreview>
+  <Bluesky></Bluesky>
 {/if}
 
 {#if hasMastodon}
   <h3 class="preview-header">Mastodon</h3>
-  <MastodonPreview></MastodonPreview>
+  <Mastodon></Mastodon>
 {/if}
 
 {#if hasReddit}
   <h3 class="preview-header">Reddit</h3>
-  <RedditPreview></RedditPreview>
+  <Reddit></Reddit>
 {/if}
 
 {#if hasSmalltown}
   <h3 class="preview-header">Smalltown</h3>
-  <SmalltownPreview></SmalltownPreview>
+  <Smalltown></Smalltown>
 {/if}
 
 
