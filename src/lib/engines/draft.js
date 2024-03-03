@@ -397,52 +397,70 @@ Validate.smalltown = () => {
 
 
 
-const Bluesky = {
-  contentLength: () => {
-    const draft = Draft.read();
-    const links = linkify.find( draft.content, "url" );
-    let length = draft.content.length;
-    let surplus = 0;
-    
-    for ( const link of links ) {
-      const url = new URL( link.href );
-      if ( url.pathname.length > 16 ) {
-        surplus += ( url.pathname.length - 16 );
-      }
-      if ( link.value.startsWith("https://") ) {
-        surplus += 8;
-      }
-      else if ( link.value.startsWith("http://") ) {
-        surplus += 7;
-      }
+const Bluesky = {};
+Bluesky.limit = 300;
+Bluesky.contentLength = () => {
+  const draft = Draft.read();
+  if ( draft.content == null ) {
+    return 0;
+  }
+
+  const links = linkify.find( draft.content, "url" );
+  let length = draft.content.length;
+  let surplus = 0;
+  
+  for ( const link of links ) {
+    const url = new URL( link.href );
+    if ( url.pathname.length > 16 ) {
+      surplus += ( url.pathname.length - 16 );
     }
-    
-    return length - surplus;
+    if ( link.value.startsWith("https://") ) {
+      surplus += 8;
+    }
+    else if ( link.value.startsWith("http://") ) {
+      surplus += 7;
+    }
   }
+  
+  return length - surplus;
 };
 
 
-const Mastodon = {
-  contentLength: () => {
-    const draft = Draft.read();
-    return draft.content?.length ?? 0;
+// From: https://docs.joinmastodon.org/user/posting/
+// "All links are counted as 23 characters, no matter how long they actually are"
+const Mastodon = {};
+Mastodon.limit = 500;
+Mastodon.contentLength = () => {
+  const draft = Draft.read();
+  if ( draft.content == null ) {
+    return 0;
   }
+
+  const links = linkify.find( draft.content, "url" );
+  let length = draft.content.length;
+  let surplus = 0;
+  
+  for ( const link of links ) {
+    surplus -= 23 - link.href.length;
+  }
+  
+  return length - surplus;
 };
 
 
-const Reddit = {
-  contentLength: () => {
-    const draft = Draft.read();
-    return draft.content?.length ?? 0;
-  }
+const Reddit = {};
+Reddit.limit = 40000;
+Reddit.contentLength = () => {
+  const draft = Draft.read();
+  return draft.content?.length ?? 0;
 };
 
 
-const Smalltown = {
-  contentLength: () => {
-    const draft = Draft.read();
-    return draft.content?.length ?? 0;
-  }
+const Smalltown = {};
+Smalltown.maximum = 500;
+Smalltown.contentLength = () => {
+  const draft = Draft.read();
+  return draft.content?.length ?? 0;
 };
 
 
