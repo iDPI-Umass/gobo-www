@@ -2,6 +2,7 @@
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
+  import SharedHeading from "$lib/components/Post/SharedHeading.svelte";
   import PostSharedFiltered from "$lib/components/PostSharedFiltered.svelte";
   import PostMedia from "$lib/components/PostMedia.svelte";
   import PostSyndication from "$lib/components/PostSyndication.svelte";
@@ -94,17 +95,7 @@
     <div class="main">
       
       <header>
-        <img 
-          src="{avatar}" 
-          alt={`avatar for ${ headingSlot1 }`}
-          onerror="this.onerror=null;this.src='{avatarFallback}'"
-        >
-        <div class="names">
-          <div class="slot1">{ headingSlot1 }</div>
-          {#if headingSlot2}
-            <div class="slot2">{ headingSlot2 }</div>
-          {/if}
-        </div>
+        <SharedHeading {source} ></SharedHeading>
         <time datetime="published">{ humanize( published ) }</time>
       </header>
 
@@ -190,15 +181,6 @@
     padding-left: var(--gobo-width-spacer-half);
   }
 
-
-  .outer-frame .inner-frame img {
-    height: 1.40625rem;
-    width: 1.40625rem;
-    border-radius: var(--sl-border-radius-circle);
-    margin-right: var(--gobo-width-spacer-half);
-    border: var(--gobo-border-panel);
-  }
-
   .outer-frame .inner-frame .main {
     flex: 1 1 auto;
     display: flex;
@@ -216,33 +198,6 @@
     justify-content: flex-start;
     align-items: center;
     margin-bottom: 0.25rem;
-  }
-
-  .outer-frame .inner-frame .main header .names {
-    flex: 1;
-    display: flex;
-    flex-wrap: wrap;
-    min-width: 0;
-    align-self: flex-start;
-  }
-
-  .outer-frame .inner-frame .main header .slot1 {
-    font-size: var(--gobo-font-size-copy);
-    font-weight: var(--gobo-font-weight-bold);
-    color: var(--gobo-color-text);
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    margin-right: 0.75rem;
-  }
-
-  .outer-frame .inner-frame .main header .slot2 {
-    font-size: var(--gobo-font-size-copy);
-    font-weight: var(--gobo-font-weight-regular);
-    color: var(--gobo-color-text-muted);
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
   }
 
   .outer-frame .inner-frame .main header time {

@@ -84,12 +84,16 @@ const decorateMastodon = function ( id ) {
     const postHostname = new URL(post.base_url).hostname;
     const sourceHostname = source.username.split("@").at(-1);
     if ( postHostname !== sourceHostname ) {
-      const path = `/@${source.username}/${post.platform_id}`;
-      post.proxyURL = new URL( path, source.base_url ).href;
+      const sourcePath = `/@${ source.username }`;
+      source.proxyURL = new URL( sourcePath, source.base_url ).href;
+      const postPath = `${ sourcePath }/${ post.platform_id }`;
+      post.proxyURL = new URL( postPath, source.base_url ).href;
     }
 
   } else if ( source.platform === "smalltown" ) {
-    const path = `/web/statuses/${post.platform_id}`;
+    let path = `web/accounts/${ source.platform_id }`;
+    source.proxyURL = new URL( path, source.base_url ).href;
+    path = `/web/statuses/${ post.platform_id }`;
     post.proxyURL = new URL( path, source.base_url ).href;
   } 
 };

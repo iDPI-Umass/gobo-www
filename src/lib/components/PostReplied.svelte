@@ -2,6 +2,8 @@
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
+  import Gutter from "$lib/components/Post/Gutter.svelte";
+  import Heading from '$lib/components/Post/Heading.svelte';
   import PostMedia from "$lib/components/PostMedia.svelte";
   import PostSyndication from "$lib/components/PostSyndication.svelte";
   import PostPoll from "$lib/components/PostPoll.svelte";
@@ -92,24 +94,12 @@
 
 
   <div class="inner-frame">
-    <aside class="gutter">
-      <img 
-        src="{avatar}" 
-        alt={`avatar for ${ headingSlot1 }`}
-        onerror="this.onerror=null;this.src='{avatarFallback}'"
-      >
-      <div class="spine"></div>
-    </aside>
+    <Gutter {source} hasSpine={true}></Gutter>
 
     <div class="main">
       
       <header>
-        <div class="names">
-          <div class="slot1">{ headingSlot1 }</div>
-          {#if headingSlot2}
-            <div class="slot2">{ headingSlot2 }</div>
-          {/if}
-        </div>
+        <Heading {source}></Heading>
         <time datetime="published">{ humanize( published ) }</time>
       </header>
 
@@ -176,26 +166,6 @@
     margin: 0 var(--gobo-width-spacer-flex) 0 var(--gobo-width-spacer-flex);
   }
 
-  .inner-frame .gutter {
-    min-width: max-content;
-  }
-
-
-  .inner-frame .gutter img {
-    height: 2.8125rem;
-    width: 2.8125rem;
-    border-radius: var(--sl-border-radius-circle);
-    margin-right: var(--gobo-width-spacer-half);
-    border: var(--gobo-border-panel);
-  }
-
-  .inner-frame .gutter .spine {
-    height: calc(100% - 2.8125rem);
-    width: 4px;
-    background-color: var(--gobo-color-primary);
-    margin-left: calc((2.8125rem / 2) - 2px);
-  }
-
   .inner-frame .main {
     flex: 1 1 auto;
     display: flex;
@@ -213,32 +183,6 @@
     justify-content: flex-start;
     align-items: center;
     margin-bottom: 0.25rem;
-  }
-
-  .inner-frame .main header .names {
-    flex: 1;
-    display: flex;
-    flex-wrap: wrap;
-    min-width: 0;
-  }
-
-  .inner-frame .main header .slot1 {
-    font-size: var(--gobo-font-size-copy);
-    font-weight: var(--gobo-font-weight-bold);
-    color: var(--gobo-color-text);
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    margin-right: 0.75rem;
-  }
-
-  .inner-frame .main header .slot2 {
-    font-size: var(--gobo-font-size-copy);
-    font-weight: var(--gobo-font-weight-regular);
-    color: var(--gobo-color-text-muted);
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
   }
 
   .inner-frame .main header time {
