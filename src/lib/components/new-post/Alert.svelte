@@ -13,7 +13,6 @@
 
   Render.alert = ( draft ) => {
     if ( draft.alert == null ) {
-      console.log("hiding");
       alert.hide();
       message = null;
     } else {
