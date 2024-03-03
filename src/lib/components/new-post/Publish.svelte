@@ -17,7 +17,8 @@
   }
 
 
-  const publish = async function () {
+  const Handle = {};
+  Handle.publish = allyEvent(async function () {
     if ( publishButton.loading === true ) {
       return;
     }
@@ -29,14 +30,15 @@
     publishButton.loading = true;
     const draft = Draft.read();
     await Draft.publish( draft );
-    Draft.clear();
+    await Draft.clear();
     publishButton.loading = false;
     goto("/home");
-  };
+  });
 
+  Handle.discard = allyEvent(async () => {
+    await Draft.clear();
+  });
 
-  const handleDiscard = allyEvent( Draft.clear );
-  const handlePublish = allyEvent( publish );
 
   Render.reset();
   onMount(() => {
@@ -55,8 +57,8 @@
 
 <div class="buttons">
   <sl-button
-    on:click={handleDiscard}
-    on:keypress={handleDiscard}
+    on:click={Handle.discard}
+    on:keypress={Handle.discard}
     class="cancel"
     size="medium"
     pill>
@@ -65,8 +67,8 @@
 
   <sl-button
     bind:this={publishButton}
-    on:click={handlePublish}
-    on:keypress={handlePublish}
+    on:click={Handle.publish}
+    on:keypress={Handle.publish}
     class="submit"
     size="medium"
     pill>

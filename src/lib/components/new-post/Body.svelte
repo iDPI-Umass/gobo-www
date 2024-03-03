@@ -9,11 +9,12 @@
 
   Render.cycle = ( draft ) => {
     content = draft.content;
-    if( draft.reply != null ) {
+    if ( draft.reply != null ) {
       placeholder = "Write your reply"
-    }
-    else if( draft.quote != null ) {
+    } else if ( draft.quote != null ) {
       placeholder = "Write your quote post"
+    } else {
+      placeholder = "Write your post";
     }
   };
 

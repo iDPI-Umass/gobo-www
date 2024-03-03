@@ -3,75 +3,48 @@
   import "@shoelace-style/shoelace/dist/components/switch/switch.js";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
   import { onMount } from "svelte";
-  import { Draft, Identity, Lock, Name } from "$lib/engines/draft.js";
+  import { State, Draft, Lock, Name } from "$lib/engines/draft.js";
 
   let state, visual, identities, lockedIdentity;
-  const reset = () => {
+  const Render = State.make();
+
+  Render.cleanup = () => {
     state = "start";
     visual = "waiting";
     identities = [];
     lockedIdentity = null;
-  }
-  reset();
-
-
-  const renderListing = ( draft ) => {
-    if ( identities.length === 0 ) {
-      visual = "no identities";   
-    } else if ( Identity.checkLock( draft )) {
-      lockedIdentity = Identity.lock( draft );
-      visual = "locked";
-    } else {
-      visual = "normal";
-    }
   };
 
-
-  const cycle = async ( draft ) => {
-    if ( draft == null || draft.identities == null ) {
-      Draft.clear();
-      state = "start";
-
-    } else if ( state === "start" ) {
-      state = "mutex";
-      await Identity.load( draft );
-      state = "identities loaded";
-      if ( needsRecycle ) {
-        return cycle( draft );
-      }
-    
-    } else if ( state === "identities loaded" ) { 
-      identities = draft.identities;
-      renderListing( draft );
-      state = "ready";
-    }
-  };
-
-
-  onMount( async () => {
-    reset();
-    await Identity.load()
-    if ( Lock.isRequired() ) {
-      Lock.close();
-    }
-
-    const draft = Draft.read();
+  Render.identities = ( draft ) => {
     identities = draft.identities;
+    lockedIdentity = Lock.getIdentity();
+    if ( identities.length === 0 ) {
+      state = "no identities";
+    } else if ( lockedIdentity != null ) {
+      state = "locked"
+    } else {
+      state = "normal"
+    }
+    visual = "ready";
+  };
 
 
-    return function () {
-      reset();
+  const Handle = {};
+  Handle.switchIdentity = ( identity ) => {
+    return ( event ) => {
+      identity.active = event.target.checked;
+      Draft.updateAspect( "identities", identities );
+    };
+  };
+
+ 
+  Render.reset();
+  onMount(() => {
+    Render.listen( "identities", Render.identities );
+    return () => {
+      Render.reset();
     };
   });
-
-
-
-  const handleIdentitySwitch = function ( identity ) {
-    return function ( event ) {
-      identity.active = event.target.checked;
-      Draft.update({ identities });
-    }
-  };
 </script>
 
 <section>
@@ -133,8 +106,8 @@
 
           <sl-switch
             checked={identity.active}
-            disabled={identityLock}
-            on:sl-change={handleIdentitySwitch( identity )}
+            disabled={false}
+            on:sl-change={Handle.switchIdentity( identity )}
             size="medium">
           </sl-switch>
         

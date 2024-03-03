@@ -18,7 +18,7 @@
   };
 
   Render.identity = ( draft ) => {
-    identity = Identity.findActive( "bluesky" );
+    identity = Identity.findActive( "bluesky" ) ?? {};
   };
 
   Render.options = ( draft ) => {

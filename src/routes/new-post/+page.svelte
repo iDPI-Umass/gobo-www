@@ -5,16 +5,20 @@
   import Body from "$lib/components/new-post/Body.svelte";
   import Media from "$lib/components/new-post/Media.svelte";
   import NewPostIdentities from "$lib/components/new-post/NewPostIdentities.svelte";
-  import NewPostOptions from "$lib/components/new-post/NewPostOptions.svelte";
+  import Options from "$lib/components/new-post/Options.svelte";
   import NewPostPreview from "$lib/components/new-post/previews/Preview.svelte";
   import Publish from "$lib/components/new-post/Publish.svelte";
   import Alert from "$lib/components/new-post/Alert.svelte";
   import { onMount } from "svelte";
-  import { State, Draft, Identity } from "$lib/engines/draft.js";
+  import { State, Draft, Identity, Lock } from "$lib/engines/draft.js";
 
   let heading;
   const Render = State.make();
-  
+
+  Render.cleanup = () => {
+    heading = "New Post";
+  };
+
   Render.cycle = ( draft ) => {
     if( draft.reply != null ) {
       heading = "New Reply";
@@ -25,12 +29,28 @@
     }
   };
 
-  Render.cleanup = () => heading = "New Post";
+  
+  // This is asynchronous and affects signalling through the Svelte store.
+  // So we must avoid both race conditions and infinite looping.
+  const once = async () => {
+    Draft.pruneGraph();
+    Draft.load();
+    await Promise.all([
+      Identity.load(),
+      Draft.loadReply(),
+      Draft.loadQuote(),
+    ]);
+    if ( Lock.isRequired() ) {
+      Lock.close();
+    }
+  };
+
 
   Render.reset();
   onMount(() => {
     Render.listen( "reply", Render.cycle );
     Render.listen( "quote", Render.cycle );
+    once();
     return () => {
       Render.reset();
     };
@@ -38,9 +58,7 @@
 </script>
 
 <div class="main-child">
-  <header>
-    <BackLink { heading }></BackLink>
-  </header>
+  <BackLink { heading }></BackLink>
   
   <form class="gobo-form">
 
@@ -63,7 +81,7 @@
     </section>
 
     <section class="panel">
-      <NewPostOptions></NewPostOptions>
+      <Options></Options>
     </section>
     
     <section class="panel extra-wide">
@@ -85,7 +103,7 @@
 <style>
 
   .gobo-form {
-    margin-top: 0;
+    margin-top: var(--gobo-height-spacer-flex);
     padding: 0;
   }
 

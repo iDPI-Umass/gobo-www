@@ -64,8 +64,8 @@ const buildMetadata = async function ( identity, draft ) {
       let text = "";
       if ( draft.content != null ) {
         const rt = new RichText({ text: draft.content });
-        await rt.detectFacets(agent);
-        facets = rt.facets;
+        await rt.detectFacets( agent );
+        facets = rt.facets ?? [];
         for (const facet of facets) { 
           if (facet.features.find(
             f => f.$type === 'app.bsky.richtext.facet#link',

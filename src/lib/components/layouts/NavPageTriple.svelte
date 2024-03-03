@@ -47,13 +47,14 @@
     flex: 0 1 calc( var(--gobo-max-width-primary) + (2 * var(--gobo-width-spacer-flex)) );
     margin: 0;
     overflow-y: scroll;
-    padding: 0 4px;
+    padding: 4px;
     max-width: calc( var(--gobo-max-width-primary) + (2 * var(--gobo-width-spacer-flex)) );
   }
 
   @media ( max-width: 680px ) {
     main {
-      padding: 0;
+      padding-left: 0;
+      padding-right: 0;
     }
   }
 

@@ -8,6 +8,7 @@
   import { allyEvent } from "$lib/helpers/event";
 
   export let data;
+  let unused = [ data ];
 
 
   const markWelcomeComplete = async function () {

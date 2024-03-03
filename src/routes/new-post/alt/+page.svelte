@@ -3,58 +3,68 @@
   import "@shoelace-style/shoelace/dist/components/textarea/textarea.js";
   import { goto } from "$app/navigation";
   import { onMount } from "svelte";
-  import { draftStore } from "$lib/stores/draft
+  import { State, Draft } from "$lib/engines/draft.js";
   import { altStore } from "$lib/stores/alt-store";
   import { allyEvent } from "$lib/helpers/event";
-  let form, file, alt, attachments, previewImage;
 
-  const handleContent = function ( event ) {
-    alt = event.target.value;
-  }
-
-  const submit = function () {
-    const index = attachments.findIndex( a => a.file.name === file.name );
-    if ( index < 0 ) {
-      attachments.push({ file, alt })
-    } else {
-      attachments[ index ].alt = alt;
-    }
-    draftStore.update({ attachments })
-    goto("/new-post");
+  let alt, attachments, file;
+  let form, previewImage;
+  const Render = State.make();
+  
+  Render.cleanup = () => {
+    alt = null;
+    attachments = [];
+    file = {};
   };
 
-  const cancel = allyEvent(function ( event ) {
+  Render.attachments = ( draft ) => {
+    attachments = draft.attachments;
+  };
+
+  Render.preview = ( data ) => {
+    file = data.file;
+    alt = data.alt;
+
+    if ( file.name != null ) {
+      if ( previewImage.src !== "#" ) {
+        URL.revokeObjectURL( previewImage.src );
+      }
+      previewImage.src = URL.createObjectURL( file );
+    }
+  };
+
+
+  const Handle = {};
+  Handle.alt = ( event ) => alt = event.target.value;
+  
+  Handle.cancel = allyEvent(() => {
     goto("/new-post");
   });
 
+  Handle.submit = ( event ) => {
+    event.preventDefault();
+    
+    const attachment = attachments.find( a => a.file.name === file.name );
+    if ( attachment == null ) {
+      attachments.push({ file, alt })
+    } else {
+      attachment.alt = alt;
+    }
+
+    Draft.updateAspect( "attachments", attachments );
+    goto("/new-post");
+  };
+
+
+
+  Render.reset();
   onMount(() => {
-    const submitListener = function( event ) {
-      event.preventDefault();
-      submit();
-    };
-
-    form.addEventListener( "submit", submitListener);
-
-    const unsubscribeAlt = altStore.subscribe( function ( data ) {
-      file = data.file;
-      alt = data.alt;
-
-      if ( file.name != null ) {
-        if ( previewImage.src !== "#" ) {
-          URL.revokeObjectURL( previewImage.src );
-        }
-        previewImage.src = URL.createObjectURL( file );
-      }
-    });
-
-    const unsubscribeDraft = draftStore.subscribe( function ( draft ) {
-      attachments = draft.attachments;
-    });
-
-    return function () {
-      form.removeEventListener( "submit", submitListener);
-      unsubscribeAlt();
-      unsubscribeDraft();
+    Render.listen( "attachments", Render.attachments );
+    form.addEventListener( "submit", Handle.submit );
+    Render.closers.push( altStore.subscribe( Render.preview ));
+    return () => {
+      Render.reset();
+      form.removeEventListener( "submit", Handle.submit );
     };
   });
 </script>
@@ -72,7 +82,7 @@
     >
     
     <sl-textarea
-      on:sl-input={handleContent}
+      on:sl-input={Handle.alt}
       value={alt}
       placeholder="Add alt text"
       size="medium"
@@ -82,8 +92,8 @@
 
     <section class="buttons">
       <sl-button
-        on:click={cancel}
-        on:keydown={cancel}
+        on:click={Handle.cancel}
+        on:keydown={Handle.cancel}
         class="cancel"
         type="cancel"
         size="medium"

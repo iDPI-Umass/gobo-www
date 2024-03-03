@@ -68,3 +68,12 @@
 .gobo-copy nav sl-button {
   margin-bottom: 0;
 }
+
+
+@media ( max-width: 680px ) {
+  .gobo-copy {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+}

@@ -5,13 +5,13 @@
   flex-direction: column;
   flex-wrap: nowrap;
   justify-content: flex-start;
-  padding: 0 4px 5rem 4px;
+  padding: 0 0 10rem 0;
   max-width: var(--gobo-max-width-primary);
 }
 
 @media ( min-width: 750px ) {
   .main-child {
-    padding: var(--gobo-height-spacer) var(--gobo-width-spacer) 0 var(--gobo-width-spacer);
+    padding: var(--gobo-height-spacer-flex) var(--gobo-width-spacer) 0 var(--gobo-width-spacer);
   }
 }
 
@@ -24,14 +24,6 @@
   margin: 0;
   padding: 0;
   padding-top: 4px;
-  padding-bottom: 0.25rem;
-  margin-bottom: var(--gobo-height-spacer);
-}
-
-@media ( max-width: 750px ) {
-  .main-child > header {
-    padding: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex) 0 var(--gobo-width-spacer-flex)
-  }
 }
 
 .main-child > header > .header-row  {

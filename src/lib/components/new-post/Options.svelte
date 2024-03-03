@@ -5,12 +5,13 @@
   import "@shoelace-style/shoelace/dist/components/input/input.js";
   import "@shoelace-style/shoelace/dist/components/checkbox/checkbox.js";
   import { onMount } from "svelte";
-  import { State, Options, Identity } from "$lib/engines/draft.js";
+  import { State, Options, Identity, Lock } from "$lib/engines/draft.js";
 
-  let options, hasMastodon, hasReddit, hasSmalltown;
+  let heading, options, hasMastodon, hasReddit, hasSmalltown;
   const Render = State.make();
 
   Render.cleanup = () => {
+    heading = "Identity Specific Options"
     options = {};
     hasMastodon = false;
     hasReddit = false;
@@ -18,6 +19,12 @@
   };
 
   Render.cycle = ( draft ) => {
+    if ( Lock.isRequired() ) {
+      heading = "Options";
+    } else {
+      heading = "Identity Specific Options";
+    }
+
     options = draft.options;
   };
 
@@ -67,7 +74,7 @@
 
 {#if hasMastodon || hasReddit || hasSmalltown }
   <section class="panel">
-    <h2>Identity Specific Options</h2>
+    <h2>{heading}</h2>
   </section>
   
   

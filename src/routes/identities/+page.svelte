@@ -33,14 +33,14 @@
       </sl-button>
     </nav>
 
-    <section class="gobo-copy">
-      <p>
-        Control which identities you would like to include in your Gobo feed. 
-        You can add identities from Bluesky, Mastodon, and Reddit.
-      </p> 
-    </section>
-
   </BackLink>
+
+  <section class="gobo-copy">
+    <p>
+      Control which identities you would like to include in your Gobo feed. 
+      You can add identities from Bluesky, Mastodon, and Reddit.
+    </p> 
+  </section>
   
   
   {#await loadIdentities()}

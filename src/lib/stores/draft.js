@@ -1,6 +1,5 @@
 import { writable } from "svelte/store";
 
-
 const createStore = function () {
   let event = null;
 
@@ -11,12 +10,9 @@ const createStore = function () {
     put: ( value ) => {
       update(() => value );
     },
-    update: ( data ) => console.warn("deprecated draft update", data),
-    clear: () => console.warn("deprecated draft clear"),
   };
 };
 
-const draftStore = createStore();
 
 const draftStores = {
   content: createStore(),
@@ -25,6 +21,7 @@ const draftStores = {
   reply: createStore(),
   quote: createStore(),
   options: createStore(),
+  alert: createStore(),
 };
 
-export { draftStore, draftStores }
+export { draftStores }

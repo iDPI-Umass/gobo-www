@@ -32,6 +32,8 @@
     margin: 0;
     padding: 0;
     padding-top: var(--gobo-height-spacer-half);
+    padding-bottom: 0;
+    padding-left: var(--gobo-width-spacer-half);
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;

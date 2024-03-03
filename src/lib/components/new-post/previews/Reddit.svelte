@@ -2,46 +2,43 @@
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
-  import { onDestroy, onMount } from "svelte";
-  import { browser } from "$app/environment";
-  import { draftStore } from "$lib/stores/draft.js";
-  import { render } from "$lib/helpers/markdown.js";
+  import { onMount } from "svelte";
+  import { State, Identity, Media } from "$lib/engines/draft.js";
+  import * as markdown from "$lib/helpers/markdown.js";
 
-  let draftData, unsubscribeDraft;
-  let identity = {};
-  let options = {};
-  let content;
-  let displayedFiles = [];
+  let identity, options, content, displayedFiles, mediaFrameChildren;
   let mediaFrame;
-  let mediaFrameChildren = {};
+  const Render = State.make();
 
-  const setIdentities = function () {
-    for ( const key in draftData.identities ) {
-      const value = draftData.identities[ key ];
-      if (( value.platform === "reddit" ) && ( value.active === true )) {
-        identity = value;
-        return;
-      }
-    }
+  Render.cleanup = () => {
+    identity = {};
+    options = {};
+    content = null;
+    displayedFiles = [];
+    mediaFrameChildren = {};
   };
 
-  const setOptions = function () {
-    options = draftData.options;
+
+  Render.identity = ( draft ) => {
+    identity = Identity.findActive( "reddit" ) ?? {};
   };
 
-  const setContent = function () {
-    content = render( draftData.content );
+  Render.options = ( draft ) => {
+    options = draft.options;
   };
 
-  const setFiles = function () {
-    let hasVideo = false;
+  Render.content = ( draft ) => {
+    content = markdown.render( draft.content );
+  };
+
+  Render.attachments = ( draft ) => {
     const oldLength = displayedFiles.length;
     let files = [];
-    for ( const attachment of draftData.attachments.slice( 0, 20 ) ) {
-      files.push(attachment.file);
+    for ( const attachment of draft.attachments.slice( 0, 20 ) ) {
+      files.push( attachment.file );
     }
 
-    let videoFile = files.find( f => draftStore.isVideo( f ) );
+    let videoFile = files.find( f => Media.isVideo( f ) );
     if ( videoFile != null ) {
       displayedFiles = [ videoFile ];
     } else {
@@ -70,37 +67,36 @@
     mediaFrame.style.height = "unset";
   };
 
-  const handleImageLoad = function ( event ) {
+  
+  
+  
+  const Handle = {};
+  Handle.singleImage = ( event ) => {
     let previewWidth = event.target.width;
     let naturalWidth = event.target.naturalWidth;
     let naturalHeight = event.target.naturalHeight;
     let ratio = naturalHeight / naturalWidth;
     let previewHeight = previewWidth * ratio;
 
-
     if ( previewHeight > 512 ) {
       mediaFrame.style.height = "512px";
     } else {
       mediaFrame.style.height = "unset";
     }
-  }
+  };
  
-  if ( browser ) {
-    onMount( function () {
-      unsubscribeDraft = draftStore.subscribe( function ( draft ) {
-        draftData = draft;
-        setIdentities();
-        setOptions();
-        setContent();
-        setFiles();
-      });
-    });;
 
-    onDestroy( function () {
-      unsubscribeDraft();
-    });
-  }
 
+  Render.reset();
+  onMount(() => {
+    Render.listen( "identities", Render.identity );
+    Render.listen( "options", Render.options );
+    Render.listen( "content", Render.content );
+    Render.listen( "attachments", Render.attachments );
+    return () => {
+      Render.reset();
+    };
+  });
 </script>
 
 <article class="outer-frame">
@@ -159,14 +155,14 @@
 
         {#each displayedFiles as file (file.name)}
           <div class="image-box">
-            {#if draftStore.isImage( file )}
+            {#if Media.isImage( file )}
               <img
                 bind:this={mediaFrameChildren[ file.name ]}
                 src={URL.createObjectURL( file )}
                 alt="uploaded"
-                on:load={handleImageLoad}>
+                on:load={Handle.singleImage}>
             {/if}
-            {#if draftStore.isVideo( file )}
+            {#if Media.isVideo( file )}
               <!-- svelte-ignore a11y-media-has-caption -->
               <video 
                 loop 

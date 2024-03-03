@@ -2,62 +2,58 @@
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
-  import { onDestroy, onMount } from "svelte";
-  import { browser } from "$app/environment";
-  import { draftStore } from "$lib/stores/draft.js";
+  import { onMount } from "svelte";
+  import { State, Identity, Media } from "$lib/engines/draft.js";
+  import * as markdown from "$lib/helpers/markdown.js";
 
-  let draftData, unsubscribeDraft;
-  let identity = {};
-  let options = {};
-  let content;
-  let displayedFiles = [];
-  let sensitiveOverride = false;
+  let identity, options, content, displayedFiles, sensitiveOverride;
+  const Render = State.make();
 
-  const setIdentities = function () {
-    for ( const key in draftData.identities ) {
-      const value = draftData.identities[ key ];
-      if (( value.platform === "smalltown" ) && ( value.active === true )) {
-        identity = value;
-        return;
-      }
-    }
+  Render.cleanup = () => {
+    identity = {};
+    options = {};
+    content = null;
+    displayedFiles = [];
+    sensitiveOverride = false;  
   };
 
-  const setOptions = function () {
-    options = draftData.options;
+  Render.identity = ( draft ) => {
+    identity = Identity.findActive( "smalltown" ) ?? {};
   };
 
-  const setContent = function () {
-    content = draftData.content;
+  Render.options = ( draft ) => {
+    options = draft.options;
   };
 
-  const setFiles = function () {
-    const _files = [];
-    for ( const attachment of draftData.attachments.slice( 0, 4 ) ) {
-      _files.push(attachment.file);
-    }
-    displayedFiles = _files;
+  Render.content = ( draft ) => {
+    content = markdown.render( draft.content );
   };
 
-  const toggleSensitive = function () {
+  Render.attachments = ( draft ) => {
+    displayedFiles = draft.attachments
+      .slice( 0, 4 )
+      .map( attachment => attachment.file );
+  };
+
+
+
+  const Handle = {};
+  Handle.sensitive = () => {
     sensitiveOverride = !sensitiveOverride;
   };
- 
-  if ( browser ) {
-    onMount( function () {
-      unsubscribeDraft = draftStore.subscribe( function ( draft ) {
-        draftData = draft;
-        setIdentities();
-        setOptions();
-        setContent();
-        setFiles();
-      });
-    });;
 
-    onDestroy( function () {
-      unsubscribeDraft();
-    });
-  }
+
+
+  Render.reset();
+  onMount(() => {
+    Render.listen( "identities", Render.identity );
+    Render.listen( "options", Render.options );
+    Render.listen( "content", Render.content );
+    Render.listen( "attachments", Render.attachments );
+    return () => {
+      Render.reset();
+    }
+  });
 
 </script>
 
@@ -87,8 +83,8 @@
         {#if (options.sensitive === true) && ( sensitiveOverride === true )}
           <div 
             class="media-hide"
-            on:click={toggleSensitive}
-            on:keypress={toggleSensitive}
+            on:click={Handle.sensitive}
+            on:keypress={Handle.sensitive}
             tabindex="0"
             role="button">
             <sl-icon src="/icons/eye-slash.svg"></sl-icon>
@@ -97,8 +93,8 @@
         {#if (options.sensitive === true) && ( sensitiveOverride === false )}
           <div 
             class="media-sensitive"
-            on:click={toggleSensitive}
-            on:keypress={toggleSensitive}
+            on:click={Handle.sensitive}
+            on:keypress={Handle.sensitive}
             tabindex="0"
             role="button">
             <div>
@@ -109,11 +105,11 @@
 
         <div class="left">
           <div class="image-box">
-            {#if draftStore.isImage( displayedFiles[0] )}
+            {#if Media.isImage( displayedFiles[0] )}
               <img 
                 src={URL.createObjectURL( displayedFiles[0] )}
                 alt="uploaded">
-            {:else if draftStore.isVideo( displayedFiles[0] )}
+            {:else if Media.isVideo( displayedFiles[0] )}
               <!-- svelte-ignore a11y-media-has-caption -->
               <video loop controls>
                 <source 
@@ -129,8 +125,8 @@
         {#if (options.sensitive === true) && ( sensitiveOverride === true )}
           <div 
             class="media-hide"
-            on:click={toggleSensitive}
-            on:keypress={toggleSensitive}
+            on:click={Handle.sensitive}
+            on:keypress={Handle.sensitive}
             tabindex="0"
             role="button">
             <sl-icon src="/icons/eye-slash.svg"></sl-icon>
@@ -139,8 +135,8 @@
         {#if (options.sensitive === true) && ( sensitiveOverride === false )}
           <div 
             class="media-sensitive"
-            on:click={toggleSensitive}
-            on:keypress={toggleSensitive}
+            on:click={Handle.sensitive}
+            on:keypress={Handle.sensitive}
             tabindex="0"
             role="button">
             <div>
@@ -151,11 +147,11 @@
 
         <div class="left">
           <div class="image-box">
-            {#if draftStore.isImage( displayedFiles[0] )}
+            {#if Media.isImage( displayedFiles[0] )}
               <img 
                 src={URL.createObjectURL( displayedFiles[0] )}
                 alt="uploaded">
-            {:else if draftStore.isVideo( displayedFiles[0] )}
+            {:else if Media.isVideo( displayedFiles[0] )}
               <!-- svelte-ignore a11y-media-has-caption -->
               <video loop controls>
                 <source 
@@ -168,11 +164,11 @@
 
         <div class="right">
           <div class="image-box">
-            {#if draftStore.isImage( displayedFiles[1] )}
+            {#if Media.isImage( displayedFiles[1] )}
               <img 
                 src={URL.createObjectURL( displayedFiles[1] )}
                 alt="uploaded">
-            {:else if draftStore.isVideo( displayedFiles[1] )}
+            {:else if Media.isVideo( displayedFiles[1] )}
               <!-- svelte-ignore a11y-media-has-caption -->
               <video loop controls>
                 <source 
@@ -188,8 +184,8 @@
         {#if (options.sensitive === true) && ( sensitiveOverride === true )}
           <div 
             class="media-hide"
-            on:click={toggleSensitive}
-            on:keypress={toggleSensitive}
+            on:click={Handle.sensitive}
+            on:keypress={Handle.sensitive}
             tabindex="0"
             role="button">
             <sl-icon src="/icons/eye-slash.svg"></sl-icon>
@@ -198,8 +194,8 @@
         {#if (options.sensitive === true) && ( sensitiveOverride === false )}
           <div 
             class="media-sensitive"
-            on:click={toggleSensitive}
-            on:keypress={toggleSensitive}
+            on:click={Handle.sensitive}
+            on:keypress={Handle.sensitive}
             tabindex="0"
             role="button">
             <div>
@@ -210,11 +206,11 @@
 
         <div class="left">
           <div class="image-box">
-            {#if draftStore.isImage( displayedFiles[0] )}
+            {#if Media.isImage( displayedFiles[0] )}
               <img 
                 src={URL.createObjectURL( displayedFiles[0] )}
                 alt="uploaded">
-            {:else if draftStore.isVideo( displayedFiles[0] )}
+            {:else if Media.isVideo( displayedFiles[0] )}
               <!-- svelte-ignore a11y-media-has-caption -->
               <video loop controls>
                 <source 
@@ -228,11 +224,11 @@
         <div class="right">
           <div class="top">
             <div class="image-box">
-              {#if draftStore.isImage( displayedFiles[1] )}
+              {#if Media.isImage( displayedFiles[1] )}
                 <img 
                   src={URL.createObjectURL( displayedFiles[1] )}
                   alt="uploaded">
-              {:else if draftStore.isVideo( displayedFiles[1] )}
+              {:else if Media.isVideo( displayedFiles[1] )}
                 <!-- svelte-ignore a11y-media-has-caption -->
                 <video loop controls>
                   <source 
@@ -244,11 +240,11 @@
           </div>
           <div class="bottom">
             <div class="image-box">
-              {#if draftStore.isImage( displayedFiles[2] )}
+              {#if Media.isImage( displayedFiles[2] )}
                 <img 
                   src={URL.createObjectURL( displayedFiles[2] )}
                   alt="uploaded">
-              {:else if draftStore.isVideo( displayedFiles[2] )}
+              {:else if Media.isVideo( displayedFiles[2] )}
                 <!-- svelte-ignore a11y-media-has-caption -->
                 <video loop controls>
                   <source 
@@ -266,8 +262,8 @@
         {#if (options.sensitive === true) && ( sensitiveOverride === true )}
           <div 
             class="media-hide"
-            on:click={toggleSensitive}
-            on:keypress={toggleSensitive}
+            on:click={Handle.sensitive}
+            on:keypress={Handle.sensitive}
             tabindex="0"
             role="button">
             <sl-icon src="/icons/eye-slash.svg"></sl-icon>
@@ -276,8 +272,8 @@
         {#if (options.sensitive === true) && ( sensitiveOverride === false )}
           <div 
             class="media-sensitive"
-            on:click={toggleSensitive}
-            on:keypress={toggleSensitive}
+            on:click={Handle.sensitive}
+            on:keypress={Handle.sensitive}
             tabindex="0"
             role="button">
             <div>
@@ -289,11 +285,11 @@
         <div class="left">
           <div class="top">
             <div class="image-box">
-              {#if draftStore.isImage( displayedFiles[0] )}
+              {#if Media.isImage( displayedFiles[0] )}
                 <img 
                   src={URL.createObjectURL( displayedFiles[0] )}
                   alt="uploaded">
-              {:else if draftStore.isVideo( displayedFiles[0] )}
+              {:else if Media.isVideo( displayedFiles[0] )}
                 <!-- svelte-ignore a11y-media-has-caption -->
                 <video loop controls>
                   <source 
@@ -305,11 +301,11 @@
           </div>
           <div class="bottom">
             <div class="image-box">
-              {#if draftStore.isImage( displayedFiles[2] )}
+              {#if Media.isImage( displayedFiles[2] )}
                 <img 
                   src={URL.createObjectURL( displayedFiles[2] )}
                   alt="uploaded">
-              {:else if draftStore.isVideo( displayedFiles[2] )}
+              {:else if Media.isVideo( displayedFiles[2] )}
                 <!-- svelte-ignore a11y-media-has-caption -->
                 <video loop controls>
                   <source 
@@ -324,11 +320,11 @@
         <div class="right">
           <div class="top">
             <div class="image-box">
-              {#if draftStore.isImage( displayedFiles[1] )}
+              {#if Media.isImage( displayedFiles[1] )}
                 <img 
                   src={URL.createObjectURL( displayedFiles[1] )}
                   alt="uploaded">
-              {:else if draftStore.isVideo( displayedFiles[1] )}
+              {:else if Media.isVideo( displayedFiles[1] )}
                 <!-- svelte-ignore a11y-media-has-caption -->
                 <video loop controls>
                   <source 
@@ -340,11 +336,11 @@
           </div>
           <div class="bottom">
             <div class="image-box">
-              {#if draftStore.isImage( displayedFiles[3] )}
+              {#if Media.isImage( displayedFiles[3] )}
                 <img 
                   src={URL.createObjectURL( displayedFiles[3] )}
                   alt="uploaded">
-              {:else if draftStore.isVideo( displayedFiles[3] )}
+              {:else if Media.isVideo( displayedFiles[3] )}
                 <!-- svelte-ignore a11y-media-has-caption -->
                 <video loop controls>
                   <source 

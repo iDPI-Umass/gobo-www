@@ -56,7 +56,7 @@
     const _files = fileInput.files;
     if ( _files.length > 0 ) {
       for ( const file of _files ) {
-        addFile( file );
+        File.add( file );
       }
       fileInput.value = null;
     }
@@ -84,13 +84,13 @@
         // If dropped items aren't files, reject them
         if ( item.kind === "file" ) {
           const file = item.getAsFile();
-          addFile( file );
+          File.add( file );
         }
       });
 
     } else {
       [ ...event.dataTransfer.files ].forEach(( file ) => {
-        addFile( file );
+        File.add( file );
       });
     }
   };

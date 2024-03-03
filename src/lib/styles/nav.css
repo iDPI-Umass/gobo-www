@@ -5,7 +5,6 @@ nav.gobo-nav {
   flex-wrap: nowrap;
   justify-content: flex-start;
   max-width: var(--gobo-max-width-primary);
-  margin-bottom: var(--gobo-height-spacer);
   padding: 0;
 }
 

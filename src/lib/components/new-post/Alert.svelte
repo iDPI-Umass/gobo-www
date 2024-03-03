@@ -1,41 +1,51 @@
 <script>
   import "@shoelace-style/shoelace/dist/components/alert/alert.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
-  import { draftStore } from "$lib/stores/draft.js";
   import { onMount } from "svelte";
+  import { Draft, State } from "$lib/engines/draft.js";
 
-  let alert;
-  let message = null;
+  let alert, message;
+  const Render = State.make();
 
-  onMount( function () {
-    const unsubscribeDraft = draftStore.subscribe( function ( draft ) {
-      if ( draft?.alert != null ) {
-        message = draft.alert;
-        alert.show();
-      }
-    });
+  Render.cleanup = () => {
+    message = null;
+  };
 
-    const listener = function () {
-      draftStore.update({ alert: null });
-    };
+  Render.alert = ( draft ) => {
+    if ( draft.alert == null ) {
+      console.log("hiding");
+      alert.hide();
+      message = null;
+    } else {
+      message = draft.alert;
+      alert.show();
+    }
+  };
 
-    alert.addEventListener( "sl-hide", listener );
 
-    return function () {
-      unsubscribeDraft();
-      alert.removeEventListener( "sl-hide", listener );
+  const Handle = {};
+  Handle.dismiss = () => Draft.updateAspect( "alert", null );
+
+
+  Render.reset();
+  onMount(() => {
+    Render.listen( "alert", Render.alert );
+    alert.addEventListener( "sl-hide", Handle.dismiss );
+    return () => {
+      Render.reset();
+      alert.removeEventListener( "sl-hide", Handle.dismiss );
     };
   });
 </script>
 
 
 <sl-alert
-  bind:this={alert}
+  bind:this={ alert }
   variant="danger"
   closable 
   class="alert">
   <sl-icon slot="icon" src="/icons/exclamation-circle.svg"></sl-icon>
-  {message}
+  { message }
 </sl-alert>
 
 

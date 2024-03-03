@@ -8,148 +8,155 @@ import { draftStores } from "$lib/stores/draft.js";
 
 let singletonDraft;
 
-const Draft = {
-  make: () => {
-    return {
-      alert: null,
-      identities: [],
-      attachments: [],
-      options: {
-        spoiler: false,
-        spoilerText: null,
-        sensitive: false,
-        visibility: "public",
-        title: null,
-        subreddit: null
-      },
-      content: null,
-      reply: null,
-      quote: null
-    };
-  },
+const Draft = {};
+Draft.make = () => {
+  return {
+    alert: null,
+    identities: [],
+    attachments: [],
+    options: {
+      spoiler: false,
+      spoilerText: null,
+      sensitive: false,
+      visibility: "public",
+      title: null,
+      subreddit: null
+    },
+    content: null,
+    reply: null,
+    quote: null
+  };
+};
 
-  read: () => {
-    if ( singletonDraft == null ) {
-      let draft = LS.read( "gobo-draft" );
-      if ( draft == null ) {
-        draft = Draft.make();
-      }
-      draft.identities ??= [];
-      draft.attachments ??= [];
-      singletonDraft = draft;
+Draft.read = () => {
+  if ( singletonDraft == null ) {
+    let draft = LS.read( "gobo-draft" );
+    if ( draft == null ) {
+      draft = Draft.make();
     }
-    
-    return singletonDraft;
-  },
-
-  write: () => LS.write( "gobo-draft", singletonDraft ),
-
-
-  // Handle broadcast and listening coordination among components.
-  subscribe: ( store, f ) => draftStores[ store ].subscribe( f ),
-  put: ( store, value ) =>  draftStores[ store ].put( value ),
+    draft.identities ??= [];
+    draft.attachments ??= [];
+    singletonDraft = draft;
+  }
   
-  // Which brings us to a widefield broadcast function to make sure everyone
-  // has the latest data. Useful at the page level and for broad changes.
-  load: () => {
-    const draft = Draft.read();
-    Draft.put( "content", draft );
-    Draft.put( "identities", draft );
-    Draft.put( "attachments", draft );
-    Draft.put( "reply", draft );
-    Draft.put( "quote", draft );
-    Draft.put( "options", draft );
-    return draft;
-  },
+  return singletonDraft;
+};
+
+Draft.write = () => LS.write( "gobo-draft", singletonDraft );
 
 
-  clear: () => {
+// Handle broadcast and listening coordination among components.
+Draft.subscribe = ( store, f ) => draftStores[ store ].subscribe( f );
+Draft.put = ( store, value ) =>  draftStores[ store ].put( value );
+  
+// Which brings us to a widefield broadcast function to make sure everyone
+// has the latest data. Useful at the page level and for broad changes.
+Draft.load = () => {
+  const draft = Draft.read();
+  Draft.put( "content", draft );
+  Draft.put( "identities", draft );
+  Draft.put( "attachments", draft );
+  Draft.put( "reply", draft );
+  Draft.put( "quote", draft );
+  Draft.put( "options", draft );
+  Draft.put( "alert", draft );
+  return draft;
+};
+
+
+Draft.clear = async () => {
     singletonDraft = Draft.make();
+    singletonDraft.identities = await Identity.sync();
     Draft.write();
     Draft.load();
-  },
-  update: ( data ) => {
-    const draft = Draft.read();
-    Object.assign( draft, data );
-    Draft.write();
-    Draft.load();
-  },
-  updateAspect: ( aspect, value ) => {
-    const draft = Draft.read();
-    Object.assign( draft, { [aspect]: value });
-    Draft.write();
-    Draft.put( aspect, draft );
-  },
+};
+Draft.update = ( data ) => {
+  const draft = Draft.read();
+  Object.assign( draft, data );
+  Draft.write();
+  Draft.load();
+};
+Draft.updateAspect = ( aspect, value ) => {
+  const draft = Draft.read();
+  Object.assign( draft, { [aspect]: value });
+  Draft.write();
+  Draft.put( aspect, draft );
+};
 
 
-  loadReply: async () => {
-    let { reply } = Draft.read();
-    if ( reply == null ) {
-      return;
-    }
-    reply.data = await Post.get( reply );
+Draft.loadReply = async () => {
+  let { reply } = Draft.read();
+  if ( reply == null ) {
+    return;
+  }
+  reply.data = await Post.get( reply );
+  Draft.updateAspect( "reply", reply );
+};
+
+Draft.loadQuote = async () => {
+  let { quote } = Draft.read();
+  if ( quote == null ) {
+    return;
+  }
+  quote.data = await Post.get( quote );
+  Draft.updateAspect( "quote", quote );
+};
+
+Draft.publish = Post.publish;
+
+// This is unfortunately hacky. For replies and quotes, the post data is
+// stowed in the draft store, including local storage. However, on page
+// reloads, the memory cache of the any resource in the graph connected to
+// that post is lost. This speaks to a need for a component-centered
+// realignment that can use fine-grained HTTP caching. But there's some
+// awkwardness from Svelte and time constraints. The more simple solution
+// for now is to prune the cached graph data from the draft, forcing the
+// component to wait for the application cache to be authoritative.
+Draft.pruneGraph = () => {
+  const { reply, quote } = Draft.read();
+  if ( reply != null ) {
+    reply.data = null;
     Draft.updateAspect( "reply", reply );
-  },
-
-  loadQuote: async () => {
-    let { quote } = Draft.read();
-    if ( quote == null ) {
-      return;
-    }
-    quote.data = await Post.get( quote );
+  }
+  if ( quote != null ) {
+    quote.data = null;
     Draft.updateAspect( "quote", quote );
-  },
-
-  publish: Post.publish,
-
-  // This is unfortunately hacky. For replies and quotes, the post data is
-  // stowed in the draft store, including local storage. However, on page
-  // reloads, the memory cache of the any resource in the graph connected to
-  // that post is lost. This speaks to a need for a component-centered
-  // realignment that can use fine-grained HTTP caching. But there's some
-  // awkwardness from Svelte and time constraints. The more simple solution
-  // for now is to prune the cached graph data from the draft, forcing the
-  // component to wait for the application cache to be authoritative.
-  pruneGraph: () => {
-    const { reply, quote } = Draft.read();
-    if ( reply != null ) {
-      reply.data = null;
-      Draft.updateAspect( "reply", reply );
-    }
-    if ( quote != null ) {
-      quote.data = null;
-      Draft.updateAspect( "quote", quote );
-    }
-  },
+  }
 };
 
 
 
 
 const Identity = {};
-Identity.load = async () => {
+Identity.sync = async () => {
   const draft = Draft.read();
-  let current = draft.identities.map(( identity ) => identity.id );
-
+  let current = draft.identities.map( identity => identity.id );
+  
   const engine = await FeedSaver.getEngine();
   const canon = engine.getIdentities();
   const target = canon.map(( identity ) => identity.id );
 
-  if ( !Value.equal( current, target )) {
-    const actives = {};
-    for ( const { id, active } of draft.identities ) {
-      actives[ id ] = active;
-    }
-    
-    const identities = [];
-    for ( const _identity of canon ) {
-      const identity = Value.clone( _identity );
-      identity.active = actives[ identity.id ] ?? false;
-      identities.push( identity );
-    }
-    
-    Draft.updateAspect( "identities", identities );
+  if ( Value.equal( current, target )) {
+    return draft.identities;
   }
+  
+  const actives = {};
+  for ( const { id, active } of draft.identities ) {
+    actives[ id ] = active;
+  }
+  
+  const identities = [];
+  for ( const _identity of canon ) {
+    const identity = Value.clone( _identity );
+    identity.active = actives[ identity.id ] ?? false;
+    identities.push( identity );
+  }
+  return identities;
+};
+
+Identity.load = async () => {
+  const identities = await Identity.sync();
+  Draft.updateAspect( "identities", identities );
 };
 
 Identity.find = ( target ) => {
@@ -189,6 +196,12 @@ const Lock = {
   },
 
   isRequired: () => Lock.find() != null,
+
+  getIdentity: () => {
+    const { identities } = Draft.read();
+    const id = Lock.find();
+    return identities.find( i => i.id === id );
+  },
   
   close: ( target ) => {
     const { identities } = Draft.read();

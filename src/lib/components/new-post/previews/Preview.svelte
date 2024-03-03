@@ -48,12 +48,12 @@
   <Bluesky></Bluesky>
 {/if}
 
-<!-- {#if hasMastodon}
+{#if hasMastodon}
   <h3 class="preview-header">Mastodon</h3>
   <Mastodon></Mastodon>
 {/if}
 
-{#if hasReddit}
+<!-- {#if hasReddit}
   <h3 class="preview-header">Reddit</h3>
   <Reddit></Reddit>
 {/if}

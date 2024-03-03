@@ -3,6 +3,8 @@
   import Spinner from "$lib/components/primitives/Spinner.svelte";
   import Reference from "$lib/components/quote/Reference.svelte";
   import Body from "$lib/components/new-post/Body.svelte";
+  import Options from "$lib/components/new-post/Options.svelte";
+  import Alert from "$lib/components/new-post/Alert.svelte";
   import Publish from "$lib/components/quote/Publish.svelte";
   import { onMount } from "svelte";
   import { Identity, Draft, Lock } from "$lib/engines/draft.js";
@@ -29,9 +31,17 @@
 </script>
 
 <div class="main-child">
-  <header>
-    <BackLink heading="New Quote Post"></BackLink>
-  </header>
+  <BackLink heading="New Quote">
+
+    <nav class="gobo-nav">
+      <sl-button
+        href="/new-post"
+        pill>
+        Advanced
+      </sl-button>
+    </nav>
+  
+  </BackLink>
   
   <form class="gobo-form">
     {#await once}
@@ -47,35 +57,24 @@
       </section>
 
       <section class="panel">
+        <Options></Options>
+      </section>
+
+      <section class="panel warning">
+        <Alert></Alert>
+      </section>
+
+      <section class="panel">
         <Publish></Publish>
       </section>
     {/await}
-
-   
-    <!-- <section class="panel">
-      <NewPostOptions></NewPostOptions>
-    </section>
-    
-    <section class="panel extra-wide">
-      <NewPostPreview></NewPostPreview>
-    </section>
-
-    <section class="panel warning">
-      <Alert></Alert>
-    </section>
-  
-    <section class="panel publish">
-      <NewPostPublish></NewPostPublish>     
-    </section> -->
-  
   </form>
 </div>
 
 
 <style>
-
   .gobo-form {
-    margin-top: 0;
+    margin-top: var(--gobo-height-spacer-flex);
     padding: 0;
   }
 

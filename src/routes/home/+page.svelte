@@ -12,8 +12,8 @@
 
   // As a temporary measure, we reset the draft when we go home. This keeps
   // us from resetting on all navigations, like the image pages.
-  onMount( function () {
-    Draft.clear();
+  onMount(async () => {
+    await Draft.clear();
   });
 </script>
 
@@ -26,14 +26,4 @@
 
 
 <style>
-  .main-child {
-    max-width: unset;
-    max-height: 100%;
-    padding-top: 0;
-  }
-  @media ( max-width: 750px ) {
-    .main-child {
-      padding: 0;
-    }
-}
 </style>
