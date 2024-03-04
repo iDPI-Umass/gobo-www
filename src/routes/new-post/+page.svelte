@@ -4,7 +4,7 @@
   import Reference from "$lib/components/new-post/Reference.svelte";
   import Body from "$lib/components/new-post/Body.svelte";
   import Media from "$lib/components/new-post/Media.svelte";
-  import NewPostIdentities from "$lib/components/new-post/NewPostIdentities.svelte";
+  import Identities from "$lib/components/new-post/Identities.svelte";
   import Options from "$lib/components/new-post/Options.svelte";
   import NewPostPreview from "$lib/components/new-post/previews/Preview.svelte";
   import Publish from "$lib/components/new-post/Publish.svelte";
@@ -77,7 +77,7 @@
   
   
     <section class="panel">
-      <NewPostIdentities></NewPostIdentities>
+      <Identities></Identities>
     </section>
 
     <section class="panel">

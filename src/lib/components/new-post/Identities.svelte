@@ -162,7 +162,7 @@
   .identity .label sl-icon {
     font-size: 1.5rem;
     margin-right: 1rem;
-    min-width: max-content;
+    min-width: min-content;
   }
 
   .identity .label span {
