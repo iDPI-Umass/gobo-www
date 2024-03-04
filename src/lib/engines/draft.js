@@ -263,17 +263,17 @@ const Name = {
     
     for ( const c of name ) {
       if ( c === "@" ) {
-        output.push( current.join("") + "@" );
-        current = [];
+        output.push( current.join( "" ));
+        current = [ "@" ];
       } else if ( c === "." ) {
-        output.push( current.join("") + "." );
-        current = [];
+        output.push( current.join( "" ));
+        current = [ "." ];
       } else {
         current.push( c );
       }
     }
   
-    output.push( current.join("") );
+    output.push( current.join( "" ));
     return output;
   }
 };

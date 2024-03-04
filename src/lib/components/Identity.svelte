@@ -2,10 +2,10 @@
   import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/switch/switch.js";
+  import { onMount } from "svelte";
   import * as Identity from "$lib/resources/identity.js";
   import * as FeedSaver from "$lib/engines/feed-singleton.js";
-  import { onMount } from "svelte";
-
+  import { Name } from "$lib/engines/draft.js";
 
   export let identity;
   
@@ -45,7 +45,7 @@
 
 <section>
   
-  <section>
+  <div>
     <sl-switch
       bind:this={activeSwitch}
       checked={identity.active}
@@ -63,15 +63,17 @@
       src="/icons/trash.svg">
     </sl-icon-button>
 
-  </section>
+  </div>
+
+
+  <h2>
+    <sl-icon src={logo} class="{identity.platform}"></sl-icon>
+    { identity.platform }
+  </h2>
+
 
   <figure>
-    <h2>
-      <sl-icon src={logo} class="{identity.platform}"></sl-icon>
-      { identity.platform }
-    </h2>
 
-    
     <img 
       src={identity.profile_image} 
       alt="profile picture for {identity.prettyName}">
@@ -82,7 +84,11 @@
         <p class="slot1">{ nameSlot1 }</p>
       {/if}
 
-      <p class="slot2">{ nameSlot2 }</p>
+      <p class="slot2">
+        {#each Name.split(nameSlot2) as part}
+          <span>{ part }</span>
+        {/each}
+      </p>
     </figcaption>
     
   </figure>
@@ -117,8 +123,8 @@
     margin: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex);
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: flex-start;
+    flex-wrap: nowrap;
+    justify-content: start;
     align-items: center;
   }
 
@@ -137,7 +143,7 @@
     align-items: flex-start;
   }
 
-  figure h2 {
+  h2 {
     flex: 1 0 100%;
     font-size: 1rem;
     font-weight: var(--gobo-font-weight-black);
@@ -147,10 +153,11 @@
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: center;
-    margin-bottom: var(--gobo-height-spacer-flex);
+    margin-top: var(--gobo-height-spacer-flex);
+    padding-left: var(--gobo-width-spacer-flex);
   }
 
-  figure h2 sl-icon {
+  h2 sl-icon {
     font-size: 1.25rem;
     margin-right: 0.5rem;
   }
@@ -166,12 +173,18 @@
     font-size: var(--gobo-font-size-copy);
     font-weight: var(--gobo-font-weight-regular);
     display: flex;
+    flex-wrap: wrap;
     justify-content: flex-start;
     align-items: center;
   }
 
+  figcaption .slot2 span {
+    flex: 0 0 auto;
+    margin: 0;
+    word-break: break-all;
+  }
 
-  section > section {
+  section > div {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -184,14 +197,14 @@
     border-radius: var(--gobo-border-radius) var(--gobo-border-radius) 0 0;
   }
 
-  section > section > sl-switch {
+  section > div > sl-switch {
     margin-bottom: 0;
     /* Allow switch to have better alignment with below image. */
     margin-left: 0.25rem
   }
 
-  section > section > sl-icon-button::part(base),
-  section > section > sl-icon-button::part(base):hover {
+  section > div > sl-icon-button::part(base),
+  section > div > sl-icon-button::part(base):hover {
     color: var(--gobo-color-danger);
   }
 
