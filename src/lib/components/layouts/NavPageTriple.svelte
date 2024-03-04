@@ -45,10 +45,11 @@
 
   main {
     flex: 0 1 calc( var(--gobo-max-width-primary) + (2 * var(--gobo-width-spacer-flex)) );
+    display: flex;
     margin: 0;
-    overflow-y: scroll;
     padding: 4px;
     max-width: calc( var(--gobo-max-width-primary) + (2 * var(--gobo-width-spacer-flex)) );
+    overflow: hidden;
   }
 
   @media ( max-width: 680px ) {

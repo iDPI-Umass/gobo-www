@@ -120,6 +120,7 @@
 
 <style>
   section.feed {
+    flex-grow: 1;
     overflow-y: scroll;
     padding: var(--gobo-height-spacer) 2px 5rem 2px;
     max-height: 100%;

@@ -131,6 +131,7 @@
   }
 
   section.feed {
+    flex-grow: 1;
     overflow-y: scroll;
     padding: var(--gobo-height-spacer) 0 5rem 0;
     max-height: 100%;
