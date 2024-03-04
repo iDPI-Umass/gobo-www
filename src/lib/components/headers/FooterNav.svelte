@@ -107,6 +107,7 @@
     width: 100vw;
     background: var(--gobo-color-panel);
     border-top: var(--gobo-border-panel);
+    z-index: 10;
   }
 
 

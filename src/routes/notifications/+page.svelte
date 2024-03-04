@@ -10,12 +10,9 @@
   import Feed from "$lib/components/Notification/Feed.svelte";
 </script>
 
-<div class="main-child">
-  <BackLink heading="Notifications" ></BackLink>
-  <MobileFilters></MobileFilters>
-  <Feed></Feed>
-</div>
-
+<BackLink heading="Notifications" ></BackLink>
+<MobileFilters></MobileFilters>
+<Feed></Feed>
 
 <style>
 </style>

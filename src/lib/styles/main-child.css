@@ -1,12 +1,14 @@
 /* Baseline styles for the wraper div that makes up a page in some layouts */
 
 .main-child {
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
   justify-content: flex-start;
   padding: 0 0 10rem 0;
   max-width: var(--gobo-max-width-primary);
+  overflow: scroll;
 }
 
 @media ( min-width: 750px ) {

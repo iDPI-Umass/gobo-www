@@ -17,12 +17,9 @@
   });
 </script>
 
-<div class="main-child">
 
-  <MobileFilters></MobileFilters>
-  <Feed></Feed>
-
-</div>
+<MobileFilters></MobileFilters>
+<Feed></Feed>
 
 
 <style>

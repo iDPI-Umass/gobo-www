@@ -122,13 +122,12 @@
   section.feed {
     flex-grow: 1;
     overflow-y: scroll;
-    padding: var(--gobo-height-spacer) 2px 5rem 2px;
-    max-height: 100%;
+    max-height: calc(100dvh - 5rem);
   }
 
-  @media( max-width: 988px ) {
+  @media( min-width: 680px ) {
     section.feed {
-      padding: 2px;
+      padding: var(--gobo-height-spacer) var(--gobo-width-spacer) 15rem var(--gobo-width-spacer); 
     }
   }
 

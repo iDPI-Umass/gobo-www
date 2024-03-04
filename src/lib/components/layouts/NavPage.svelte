@@ -25,8 +25,10 @@
   main {
     flex: 1 1 100%;
     margin: 0;
-    overflow-y: scroll;
+    overflow: hidden;
     padding: 4px;
+    display: flex;
+    flex-direction: column;
   }
 
   @media ( max-width: 680px ) {
