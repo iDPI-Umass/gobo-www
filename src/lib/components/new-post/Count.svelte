@@ -32,7 +32,7 @@
   const Render = State.make();
   Render.cleanup = () => {
     count = 0;
-    maximum = Model?.limit ?? 1;
+    maximum = Model?.characterLimit ?? 1;
     progress = 0;
     remaining = 0;
   };

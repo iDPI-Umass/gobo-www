@@ -4,9 +4,40 @@
 		<meta charset="utf-8" />
 		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
 		<meta name="viewport" content="width=device-width" />
+    <noscript>
+      <style>
+        body {
+          padding: 1rem;
+          font-family: sans-serif;
+        }
+        body p {
+          max-width: 40rem;
+          font-size: 1.25rem;
+          line-height: 1.5rem;
+        }
+      </style>
+    </noscript>
+
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
+    <noscript>
+      <h1>Welcome to Gobo!</h1>
+      <p>
+        This application is a project of 
+        
+        <a 
+          href="https://publicinfrastructure.org/"
+          target="_blank" 
+          rel="noopener noreferrer nofollow">
+        iDPI</a>
+
+        focused on allowing people to
+        shape their own social experiences online. Gobo requires the use of
+        JavaScript to function properly, but it appears that JavaScript is not
+        currently available in this browser.
+      </p>
+    </noscript>
 		<div style="display: contents">%sveltekit.body%</div>
 	</body>
 </html>

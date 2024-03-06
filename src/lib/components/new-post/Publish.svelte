@@ -24,6 +24,7 @@
     }
 
     if ( !Validate.isValid() ) {
+      publishButton.loading = false;
       return;
     }
     

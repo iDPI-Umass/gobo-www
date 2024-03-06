@@ -360,36 +360,56 @@ Validate.hasContent = () => {
 };
 
 Validate.bluesky = () => {
-  if ( Identity.hasBluesky() && Bluesky.contentLength() > 300 ) {
+  if ( !Identity.hasBluesky() ) {
+    return true;
+  }
+
+  if ( Bluesky.contentLength() > Bluesky.characterLimit ) {
+    const number = new Intl.NumberFormat().format( Bluesky.characterLimit );
     Draft.updateAspect( "alert",
-      "Bluesky does not accept posts with more than 300 characters." );
+      `Bluesky does not accept posts with more than ${ number } characters.` );
     return false;
   }
   return true;
 };
 
 Validate.mastodon = () => {
-  if ( Identity.hasMastodon() && Mastodon.contentLength() > 500 ) {
-    Draft.updateAspect( "alert", 
-      "Mastodon does not accept posts with more than 500 characters." );
+  if ( !Identity.hasMastodon() ) {
+    return true;
+  }
+
+  if ( Mastodon.contentLength() > Mastodon.characterLimit ) {
+    const number = new Intl.NumberFormat().format( Mastodon.characterLimit );
+    Draft.updateAspect( "alert",
+      `Mastodon does not accept posts with more than ${ number } characters.` );
     return false;
   }
   return true;
 };
 
 Validate.reddit = () => {
-  if ( Identity.hasReddit() && Reddit.contentLength() > 40000 ) {
-    Draft.updateAspect( "alert", 
-      "Reddit does not accept posts with more than 40,000 characters." );
+  if ( !Identity.hasReddit() ) {
+    return true;
+  }
+
+  if ( Reddit.contentLength() > Reddit.characterLimit ) {
+    const number = new Intl.NumberFormat().format( Reddit.characterLimit );
+    Draft.updateAspect( "alert",
+      `Reddit does not accept posts with more than ${ number } characters.` );
     return false;
   }
   return true;
 };
 
 Validate.smalltown = () => {
-  if ( Identity.hasSmalltown() && Smalltown.contentLength() > 500 ) {
-    Draft.updateAspect( "alert", 
-      "Smalltown does not accept posts with more than 500 characters." );
+  if ( !Identity.hasSmalltown() ) {
+    return true;
+  }
+
+  if ( Smalltown.contentLength() > Smalltown.characterLimit ) {
+    const number = new Intl.NumberFormat().format( Smalltown.characterLimit );
+    Draft.updateAspect( "alert",
+      `Smalltown does not accept posts with more than ${ number } characters.` );
     return false;
   }
   return true;
@@ -398,7 +418,7 @@ Validate.smalltown = () => {
 
 
 const Bluesky = {};
-Bluesky.limit = 300;
+Bluesky.characterLimit = 300;
 Bluesky.contentLength = () => {
   const draft = Draft.read();
   if ( draft.content == null ) {
@@ -429,7 +449,7 @@ Bluesky.contentLength = () => {
 // From: https://docs.joinmastodon.org/user/posting/
 // "All links are counted as 23 characters, no matter how long they actually are"
 const Mastodon = {};
-Mastodon.limit = 500;
+Mastodon.characterLimit = 500;
 Mastodon.contentLength = () => {
   const draft = Draft.read();
   if ( draft.content == null ) {
@@ -449,7 +469,7 @@ Mastodon.contentLength = () => {
 
 
 const Reddit = {};
-Reddit.limit = 40000;
+Reddit.characterLimit = 40000;
 Reddit.contentLength = () => {
   const draft = Draft.read();
   return draft.content?.length ?? 0;
@@ -457,7 +477,7 @@ Reddit.contentLength = () => {
 
 
 const Smalltown = {};
-Smalltown.maximum = 500;
+Smalltown.characterLimit = 500;
 Smalltown.contentLength = () => {
   const draft = Draft.read();
   return draft.content?.length ?? 0;
