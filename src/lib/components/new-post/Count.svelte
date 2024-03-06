@@ -61,7 +61,7 @@
 
   <sl-progress-ring
     style="
-      --size: 32px;
+      --size: 24px;
       --track-color: var(--gobo-color-border-panel);
       --indicator-color: var(--gobo-color-primary);
     "
