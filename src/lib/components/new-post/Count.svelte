@@ -39,7 +39,7 @@
 
   Render.count = () => {
     count = Model.contentLength();
-    progress = Math.floor(100 * count / maximum);
+    progress = Math.min( 100, Math.floor(100 * count / maximum ));
     remaining = new Intl.NumberFormat()
       .format( maximum - count );
   };
@@ -61,11 +61,10 @@
 
   <sl-progress-ring
     style="
-      --size: 1.5rem;
+      --size: 32px;
       --track-color: var(--gobo-color-border-panel);
       --indicator-color: var(--gobo-color-primary);
     "
-    variant="primary"
     value="{ progress }">
   </sl-progress-ring>
 </div>
@@ -76,5 +75,11 @@
     display: flex;
     align-items: center;
     gap: 0.25rem;
+  }
+
+  div span {
+    display: flex;
+    justify-content: center;
+    min-width: 1.5rem;
   }
 </style>
