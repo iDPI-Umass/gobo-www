@@ -3,7 +3,6 @@
   
   export let title = null;
   export let content = "";
-  export let fullPage = false;
   export let styles = {};
 
   let renderedContent = render( content );

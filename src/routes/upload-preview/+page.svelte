@@ -44,10 +44,6 @@
     background: #333;
   }
 
-  header {
-    width: 95%;
-  }
-
   img {
     height: 90%;
     width: 95%;

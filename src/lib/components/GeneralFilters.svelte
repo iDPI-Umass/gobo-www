@@ -110,8 +110,4 @@
     border: var(--gobo-border-panel);
     color: var(--gobo-color-button-lens);
   }
-
-  p {
-    margin-top: 1rem;
-  }
 </style>

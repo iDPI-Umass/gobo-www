@@ -35,11 +35,10 @@
   export let created;
   export let updated;
   export let marginTop = "0";
-  export let terminal = false;
 
   export let fullPage = false;
 
-  let unused = [ platform_id, visibility, created, updated, url, proxyURL, threads ];
+  let unused = [ base_url, platform_id, visibility, created, updated, url, proxyURL, threads ];
   let source = Cache.getSource( source_id );
   let sharedPost = h.getShare( shares );
   let logo = h.getLogo( platform );
@@ -134,7 +133,6 @@
             {centerID}
             {...sharedPost}
             marginTop="1rem"
-            terminal={true}
           />
         {/if}
       {/if}

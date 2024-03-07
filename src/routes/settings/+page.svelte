@@ -20,11 +20,3 @@
     <NavLink href="#" action={logout}>Logout</NavLink>
   </VerticalNav>
 </div>
-
-
-<style>
-  h1 {
-    font-size: var(--sl-font-size-x-large);
-    font-weight: var(--sl-font-weight-bold);
-  }
-</style>

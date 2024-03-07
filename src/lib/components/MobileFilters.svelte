@@ -102,12 +102,6 @@
     font-size: 1.25rem;
   }
 
-  nav sl-button sl-icon.logo {
-    width: 1.25rem;
-    margin-right: 0.25rem;
-  }
-
-
   @media( min-width: 988px ) {
     nav {
       display: none;
