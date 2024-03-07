@@ -4,6 +4,7 @@ import * as linkify from "linkifyjs";
 import * as LS from "$lib/helpers/local-storage.js";
 import * as Random from "$lib/helpers/random.js";
 import * as Post from "$lib/resources/post.js";
+import * as Image from "$lib/resources/draft-image.js";
 import * as FeedSaver from "$lib/engines/feed-singleton.js";
 import { draftStores } from "$lib/stores/draft.js";
 import { RichText, BskyAgent, UnicodeString } from "@atproto/api";
@@ -112,8 +113,6 @@ Draft.loadQuote = async () => {
   quote.data = await Post.get( quote );
   Draft.updateAspect( "quote", quote );
 };
-
-Draft.publish = Post.publish;
 
 // This is unfortunately hacky. For replies and quotes, the post data is
 // stowed in the draft store, including local storage. However, on page
@@ -629,6 +628,84 @@ Metadata.build = async ( identity, draft ) => {
 
 
 
+const Publish = {};
+
+Publish.build = ( draft ) => {
+  const post = {};
+  post.content = draft.content;
+  post.title = draft.options?.title ?? undefined;
+  // post.poll = {};
+  return post;
+};
+
+
+Publish.uploadAttachments = async ( draft ) => {
+  const ids = [];
+  for ( const attachment of draft.attachments ) {
+    const image = await Image.create( attachment );
+    ids.push( image.id );
+  }
+  return ids;
+};
+
+
+Publish.buildTargets = async ( draft ) => {
+  const targets = [];
+  for ( const identity of draft.identities ) {
+    if ( identity.active === true ) {
+      try {
+        const metadata = await Metadata.build( identity, draft );
+        targets.push({ identity: identity.id, metadata });
+      } catch ( error ) {
+        console.error( error );
+        Draft.pushAlert( `Unable to prepare post for platform ${ identity?.platform }.` );
+        targets.push( false );
+      }
+    }
+  }
+  return targets;
+};
+
+
+Publish.flow = async function ( draft ) {
+  let post, targets;
+  
+  try {
+    post = Publish.build( draft );
+  } catch ( error ) {
+    console.error( error );
+    Draft.pushAlert( "Unable to build post base." );
+    return { success: false };
+  }
+
+  try {
+    post.attachments = await Publish.uploadAttachments( draft );
+  } catch ( error ) {
+    console.error( error );
+    Draft.pushAlert( "Failed to upload images." );
+    return { success: false };
+  }
+  
+  targets = await Publish.buildTargets( draft );
+  if ( targets.includes( false )) {
+    return { success: false };
+  }
+ 
+  try {
+    await Post.publish( post, targets );
+    return { success: true };
+  } catch ( error ) {
+    console.error( error );
+    Draft.pushAlert( "Failed to submit post to Gobo API." );
+    return { success: false };
+  }
+};
+
+Draft.publish = Publish.flow;
+
+
+
+
 export {
   Draft,
   Identity,
@@ -647,5 +724,6 @@ export {
   Reddit,
   Smalltown,
 
-  Metadata
+  Metadata,
+  Publish
 }
