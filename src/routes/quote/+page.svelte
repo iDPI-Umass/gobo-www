@@ -4,7 +4,7 @@
   import Reference from "$lib/components/quote/Reference.svelte";
   import Body from "$lib/components/new-post/Body.svelte";
   import Options from "$lib/components/new-post/Options.svelte";
-  import Alert from "$lib/components/new-post/Alert.svelte";
+  import Alerts from "$lib/components/new-post/Alerts.svelte";
   import Publish from "$lib/components/quote/Publish.svelte";
   import { onMount } from "svelte";
   import { Identity, Draft, Lock } from "$lib/engines/draft.js";
@@ -61,7 +61,7 @@
       </section>
 
       <section class="panel warning">
-        <Alert></Alert>
+        <Alerts></Alerts>
       </section>
 
       <section class="panel">

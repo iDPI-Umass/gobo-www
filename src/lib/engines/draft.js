@@ -2,16 +2,19 @@ import * as Value from "@dashkite/joy/value";
 import * as Type from "@dashkite/joy/type";
 import * as linkify from "linkifyjs";
 import * as LS from "$lib/helpers/local-storage.js";
+import * as Random from "$lib/helpers/random.js";
 import * as Post from "$lib/resources/post.js";
 import * as FeedSaver from "$lib/engines/feed-singleton.js";
 import { draftStores } from "$lib/stores/draft.js";
+import { RichText, BskyAgent, UnicodeString } from "@atproto/api";
+
 
 let singletonDraft;
 
 const Draft = {};
 Draft.make = () => {
   return {
-    alert: null,
+    alerts: [],
     identities: [],
     attachments: [],
     options: {
@@ -59,7 +62,7 @@ Draft.load = () => {
   Draft.put( "reply", draft );
   Draft.put( "quote", draft );
   Draft.put( "options", draft );
-  Draft.put( "alert", draft );
+  Draft.put( "alerts", draft );
   return draft;
 };
 
@@ -81,6 +84,14 @@ Draft.updateAspect = ( aspect, value ) => {
   Object.assign( draft, { [aspect]: value });
   Draft.write();
   Draft.put( aspect, draft );
+};
+Draft.pushAlert = ( message ) => {
+  const draft = Draft.read();
+  draft.alerts.push({
+    key: Random.address(),
+    message
+  });
+  Draft.put( "alerts", draft );
 };
 
 
@@ -338,7 +349,11 @@ Validate.isValid = () => {
     Validate.smalltown,
   ];
 
-  return tests.every( test => test() === true );
+  const results = [];
+  for ( const test of tests ) {
+    results.push( test() );
+  }
+  return results.every( result => result === true );
 };
 
 
@@ -346,8 +361,7 @@ Validate.active = () => {
   const draft = Draft.read();
   const actives = draft.identities.filter( i => i.active === true );
   if ( actives.length === 0 ) {
-    Draft.updateAspect( "alert", 
-      "Must select an identity to publish this post.");
+    Draft.pushAlert( "Must select an identity to publish this post." );
     return false;
   }
   return true;
@@ -366,8 +380,9 @@ Validate.bluesky = () => {
 
   if ( Bluesky.contentLength() > Bluesky.characterLimit ) {
     const number = new Intl.NumberFormat().format( Bluesky.characterLimit );
-    Draft.updateAspect( "alert",
-      `Bluesky does not accept posts with more than ${ number } characters.` );
+    Draft.pushAlert(
+      `Bluesky does not accept posts with more than ${ number } characters.`
+    );
     return false;
   }
   return true;
@@ -380,8 +395,9 @@ Validate.mastodon = () => {
 
   if ( Mastodon.contentLength() > Mastodon.characterLimit ) {
     const number = new Intl.NumberFormat().format( Mastodon.characterLimit );
-    Draft.updateAspect( "alert",
-      `Mastodon does not accept posts with more than ${ number } characters.` );
+    Draft.pushAlert(
+      `Mastodon does not accept posts with more than ${ number } characters.`
+    );
     return false;
   }
   return true;
@@ -394,8 +410,9 @@ Validate.reddit = () => {
 
   if ( Reddit.contentLength() > Reddit.characterLimit ) {
     const number = new Intl.NumberFormat().format( Reddit.characterLimit );
-    Draft.updateAspect( "alert",
-      `Reddit does not accept posts with more than ${ number } characters.` );
+    Draft.pushAlert(
+      `Reddit does not accept posts with more than ${ number } characters.`
+    );
     return false;
   }
   return true;
@@ -408,8 +425,9 @@ Validate.smalltown = () => {
 
   if ( Smalltown.contentLength() > Smalltown.characterLimit ) {
     const number = new Intl.NumberFormat().format( Smalltown.characterLimit );
-    Draft.updateAspect( "alert",
-      `Smalltown does not accept posts with more than ${ number } characters.` );
+    Draft.pushAlert(
+      `Smalltown does not accept posts with more than ${ number } characters.`
+    );
     return false;
   }
   return true;
@@ -419,6 +437,8 @@ Validate.smalltown = () => {
 
 const Bluesky = {};
 Bluesky.characterLimit = 300;
+Bluesky.agent = new BskyAgent({ service: "https://bsky.app" });
+
 Bluesky.contentLength = () => {
   const draft = Draft.read();
   if ( draft.content == null ) {
@@ -446,6 +466,85 @@ Bluesky.contentLength = () => {
 };
 
 
+// Bluesky truncates URLs into a "domain plus 16" format that will ellide
+// URLs that go over the limit while leaving short URLs unchanged.
+Bluesky.shortURL = ( _url ) => {
+  const url = new URL( _url );
+  const target = url.pathname + url.search + url.hash;
+  if ( target.length > 15 ) {
+    return url.host + target.slice( 0, 13 ) + "...";
+  }
+  return url.host + target;
+}
+
+
+Bluesky.findLink = ( facet ) => {
+  const type = "app.bsky.richtext.facet#link";
+  return facet.features.find( f => f.$type === type );
+};
+
+Bluesky.isLink = ( facet ) => {
+  return Bluesky.findLink( facet ) != null;
+}
+
+Bluesky.shortenLink = ( rt, facet ) => {
+  const { byteStart, byteEnd } = facet.index;
+  const url = rt.unicodeText.slice( byteStart, byteEnd );
+  const shortened = new UnicodeString( Bluesky.shortURL( url ));
+  
+  // insert the shortened URL
+  rt.insert( byteStart, shortened.utf16 );
+  
+  // update the facet to cover the new shortened URL
+  facet.index.byteStart = byteStart;
+  facet.index.byteEnd = byteStart + shortened.length;
+
+  // remove the old URL, now placed after the inserted short URL.
+  rt.delete( byteStart + shortened.length, byteEnd + shortened.length );
+}
+
+// TODO: Do we need to perform this extraction?
+// 1. We can hand-code what validation stuff we need, then use the Bluesky 
+//    affordance of accepting a plain string to avoid all this.
+//    Right now, the atproto library makes network requests to Bluesky to come
+//    up with facets, but we still have to do tedious string calculations. So
+//    we take on heft and asynchronicity, but we get little value in exchange.
+//    We're allowed to submit simple strings to Bluesky. We could return to that
+//    if we can handle our own validation needs sufficiently.
+// 
+// 2. Or we can bring the validation Bluesky block into alignment with this and
+//    try to involve the atproto library for a higher fidelity check.
+Bluesky.extractFacets = async ( content ) => {
+  if ( content == null || content == "" ) {
+    return { text: "", facets: [] };
+  }
+
+  const rt = new RichText({ text: content });
+  await rt.detectFacets( Bluesky.agent );
+  let facets = rt.facets ?? [];
+  
+  // Go through each facet and update the rich text instance.
+  for ( const facet of facets ) {
+    if ( Bluesky.isLink( facet )) {
+      Bluesky.shortenLink( rt, facet );
+    }
+  }
+
+  // Return the resulting text computation.
+  return { facets, text: rt.text };
+};
+
+Bluesky.build = async ( draft ) => {
+  const { facets, text } = await Bluesky.extractFacets( draft.content );
+  return {
+    reply: draft.reply?.data ?? undefined,
+    quote: draft.quote?.data ?? undefined,
+    facets: facets,
+    text: text
+  };
+};
+
+
 // From: https://docs.joinmastodon.org/user/posting/
 // "All links are counted as 23 characters, no matter how long they actually are"
 const Mastodon = {};
@@ -467,6 +566,14 @@ Mastodon.contentLength = () => {
   return length - surplus;
 };
 
+Mastodon.build = ( draft ) => {
+  return {
+    sensitive: draft.options.sensitive,
+    spoiler: draft.options.spoilerText,
+    reply: draft.reply?.data ?? undefined
+  };
+};
+
 
 const Reddit = {};
 Reddit.characterLimit = 40000;
@@ -475,12 +582,48 @@ Reddit.contentLength = () => {
   return draft.content?.length ?? 0;
 };
 
+Reddit.build = ( draft ) => {
+  return {
+    title: draft.options.title,
+    subreddit: draft.options.subreddit,
+    nsfw: draft.options.sensitive,
+    spoiler: draft.options.spoiler,
+    reply: draft.reply?.data ?? undefined
+  };
+};
+
 
 const Smalltown = {};
 Smalltown.characterLimit = 500;
 Smalltown.contentLength = () => {
   const draft = Draft.read();
   return draft.content?.length ?? 0;
+};
+
+Smalltown.build = ( draft ) => {
+  return {
+    sensitive: draft.options.sensitive,
+    spoiler: draft.options.spoilerText,
+    reply: draft.reply?.data ?? undefined
+  };
+};
+
+
+
+const Metadata = {};
+Metadata.build = async ( identity, draft ) => {
+  switch ( identity.platform ) {
+    case "bluesky":
+      return await Bluesky.build( draft );
+    case "mastodon":
+      return Mastodon.build( draft );
+    case "reddit":
+      return Reddit.build( draft );
+    case "smalltown":
+      return Smalltown.build( draft );
+    default:
+      throw new Error("unknown platform type");
+  }
 };
 
 
@@ -502,5 +645,7 @@ export {
   Bluesky,
   Mastodon,
   Reddit,
-  Smalltown
+  Smalltown,
+
+  Metadata
 }

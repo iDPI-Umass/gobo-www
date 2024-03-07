@@ -1,20 +1,9 @@
 import { getGOBOClient, logout } from "$lib/helpers/account";
 import { Cache } from "$lib/resources/cache.js";
-import * as Draft from "$lib/resources/draft-image.js";
+import * as Image from "$lib/resources/draft-image.js";
 import * as FeedSaver from "$lib/engines/feed-singleton.js";
-import { RichText, BskyAgent, UnicodeString } from "@atproto/api"
+import { Draft, Metadata } from "$lib/engines/draft.js";
 
-const agent = new BskyAgent({ service: "https://bsky.app"});
-
-const shortURL = function (url) {
-  const url_ = new URL(url);
-  const path =
-    (url_.pathname === '/' ? '' : url_.pathname) + url_.search + url_.hash
-  if (path.length > 15) {
-    return url_.host + path.slice(0, 13) + '...'
-  }
-  return url_.host + path
-}
 
 const get = async function ({ identity, id }) {
   if ( Cache.hasPostCenter(id) ) {
@@ -55,102 +44,91 @@ const get = async function ({ identity, id }) {
   }
 };
 
-const buildMetadata = async function ( identity, draft ) {
-  const { options } = draft;
 
-  switch ( identity.platform ) {
-    case "bluesky":
-      let facets = [];
-      let text = "";
-      if ( draft.content != null ) {
-        const rt = new RichText({ text: draft.content });
-        await rt.detectFacets( agent );
-        facets = rt.facets ?? [];
-        for (const facet of facets) { 
-          if (facet.features.find(
-            f => f.$type === 'app.bsky.richtext.facet#link',
-          )){
-            const { byteStart, byteEnd } = facet.index;
-            const url = rt.unicodeText.slice(byteStart, byteEnd);
-            const shortened = new UnicodeString(shortURL(url));
-            // insert the shortened URL
-            rt.insert(byteStart, shortened.utf16);
-            // update the facet to cover the new shortened URL
-            facet.index.byteStart = byteStart;
-            facet.index.byteEnd = byteStart + shortened.length;
-            // remove the old URL
-            rt.delete(byteStart + shortened.length, byteEnd + shortened.length);
-          }
-        }
-        text = rt.text;
-      }
-      return {
-        reply: draft.reply?.data ?? undefined,
-        quote: draft.quote?.data ?? undefined,
-        facets: facets,
-        text: text
-      }
-    case "mastodon":
-      return {
-        sensitive: options.sensitive,
-        spoiler: options.spoilerText,
-        reply: draft.reply?.data ?? undefined
-      }
-    case "reddit":
-      return {
-        title: options.title,
-        subreddit: options.subreddit,
-        nsfw: options.sensitive,
-        spoiler: options.spoiler,
-        reply: draft.reply?.data ?? undefined
-      }
-    case "smalltown":
-      return {
-        sensitive: options.sensitive,
-        spoiler: options.spoilerText,
-        reply: draft.reply?.data ?? undefined
-      }
-    default:
-      throw new Error("unknown platform type");
-  }
-};
 
-const uploadAttachments = async function ( attachments ) {
-  const draftIDs = [];
-  for ( const attachment of attachments ) {
-    const draft = await Draft.create( attachment );
-    draftIDs.push( draft.id );
-  }
-  return draftIDs;
-};
+const Post = {};
 
-const publish = async function ( draft ) {
-  const options = draft.options ?? {};
-
+Post.build = ( draft ) => {
   const post = {};
   post.content = draft.content;
-  post.title = options.title ?? undefined;
-  post.attachments = await uploadAttachments( draft.attachments );
+  post.title = draft.options?.title ?? undefined;
   // post.poll = {};
+  return post;
+};
 
+
+Post.uploadAttachments = async ( draft ) => {
+  const ids = [];
+  for ( const attachment of draft.attachments ) {
+    const image = await Image.create( attachment );
+    ids.push( image.id );
+  }
+  return ids;
+};
+
+
+Post.buildTargets = async ( draft ) => {
   const targets = [];
   for ( const identity of draft.identities ) {
     if ( identity.active === true ) {
-      targets.push({
-        identity: identity.id,
-        metadata: await buildMetadata( identity, draft )
-      });
+      try {
+        const metadata = await Metadata.build( identity, draft );
+        targets.push({ identity: identity.id, metadata });
+      } catch ( error ) {
+        console.error( error );
+        Draft.pushAlert( `Unable to prepare post for platform ${ identity?.platform }.` );
+        targets.push( false );
+      }
     }
   }
+  return targets;
+};
 
+
+Post.submit = async ( post, targets ) => {
   const client = await getGOBOClient();
   await client.personPosts.post({ 
-    parameters: {
-      person_id: client.id
-    },
+    parameters: { person_id: client.id },
     content: { post, targets }   
   });
 };
+
+
+
+const publish = async function ( draft ) {
+  let post, targets;
+  
+  try {
+    post = Post.build( draft );
+  } catch ( error ) {
+    console.error( error );
+    Draft.pushAlert( "Unable to build post base." );
+    return { success: false };
+  }
+
+  try {
+    post.attachments = await Post.uploadAttachments( draft );
+  } catch ( error ) {
+    console.error( error );
+    Draft.pushAlert( "Failed to upload images." );
+    return { success: false };
+  }
+  
+  targets = await Post.buildTargets( draft );
+  if ( targets.includes( false )) {
+    return { success: false };
+  }
+ 
+  try {
+    await Post.submit( post, targets );
+    return { success: true };
+  } catch ( error ) {
+    console.error( error );
+    Draft.pushAlert( "Failed to submit post to Gobo API." );
+    return { success: false };
+  }
+};
+
 
 export {
   get,

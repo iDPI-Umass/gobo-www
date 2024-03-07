@@ -53,7 +53,7 @@
   <Mastodon></Mastodon>
 {/if}
 
-<!-- {#if hasReddit}
+{#if hasReddit}
   <h3 class="preview-header">Reddit</h3>
   <Reddit></Reddit>
 {/if}
@@ -61,7 +61,7 @@
 {#if hasSmalltown}
   <h3 class="preview-header">Smalltown</h3>
   <Smalltown></Smalltown>
-{/if} -->
+{/if}
 
 
 <style>

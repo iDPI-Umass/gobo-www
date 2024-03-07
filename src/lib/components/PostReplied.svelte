@@ -40,7 +40,7 @@
 
   export let fullPage = false;
 
-  let unused = [ platform_id, visibility, url, created, updated, proxyURL, threads ];
+  let unused = [ base_url, platform_id, visibility, url, created, updated, proxyURL, threads ];
   let source = Cache.getSource( source_id );
   let sharedPost = h.getShare( shares );
   let actionTarget = h.getActionTarget({ id, content, sharedPost });

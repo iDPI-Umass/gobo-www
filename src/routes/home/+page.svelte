@@ -20,7 +20,3 @@
 
 <MobileFilters></MobileFilters>
 <Feed></Feed>
-
-
-<style>
-</style>

@@ -11,6 +11,9 @@ dependencies:
   '@auth0/auth0-spa-js':
     specifier: ^2.0.3
     version: 2.1.3
+  '@dashkite/bake':
+    specifier: ^0.0.6
+    version: 0.0.6
   '@dashkite/joy':
     specifier: ^0.3.16
     version: 0.3.16
@@ -40,9 +43,6 @@ dependencies:
     version: 3.1.1
 
 devDependencies:
-  '@dashkite/bake':
-    specifier: ^0.0.6
-    version: 0.0.6
   '@dashkite/dolores':
     specifier: github:dashkite/dolores#gobo
     version: github.com/dashkite/dolores/9104dc452bb488b3322f9e99ac59be67b2a40145
@@ -4973,11 +4973,9 @@ packages:
       '@dashkite/base64': 1.0.1
       '@dashkite/joy': 0.3.16
       '@dashkite/utf8': 1.0.1
-    dev: true
 
   /@dashkite/base64@1.0.1:
     resolution: {integrity: sha512-7O3HajSgWaie/kme1bcdXQnVsMXn4A5m9YOaxWnEZ8z9LCrnJ8BGnpTgFJUqSC4mv0Z/0NBcwTmeGCoEc9VYoA==}
-    dev: true
 
   /@dashkite/joy@0.3.16:
     resolution: {integrity: sha512-dsU0us4j1Pb+zceoBvLbnZ2PbmULkJUtM2vtWLxKmoc1DE4w9SVTiPTe6JWvF0A0vk90ldv+Lc9qEA5x3O+DtQ==}
@@ -5002,7 +5000,6 @@ packages:
 
   /@dashkite/utf8@1.0.1:
     resolution: {integrity: sha512-58HZrEijYUG9p8SAf4o/NR7U3qUq//9XbkQ7T5cHIY/RFjCVg9vpWZlHXkcbZp7v3CAMJgEGVXt/5/upvOBQAw==}
-    dev: true
 
   /@esbuild/android-arm64@0.18.20:
     resolution: {integrity: sha512-Nz4rJcchGDtENV0eMKUNa6L12zz2zBDXuhj/Vjh18zGqB44Bi7MBMSXjgunJgjRhCmKOjnPuZp4Mb6OKqtMHLQ==}

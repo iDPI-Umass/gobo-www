@@ -21,7 +21,7 @@ const draftStores = {
   reply: createStore(),
   quote: createStore(),
   options: createStore(),
-  alert: createStore(),
+  alerts: createStore(),
 };
 
 export { draftStores }

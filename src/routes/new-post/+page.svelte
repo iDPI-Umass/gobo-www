@@ -8,7 +8,7 @@
   import Options from "$lib/components/new-post/Options.svelte";
   import NewPostPreview from "$lib/components/new-post/previews/Preview.svelte";
   import Publish from "$lib/components/new-post/Publish.svelte";
-  import Alert from "$lib/components/new-post/Alert.svelte";
+  import Alerts from "$lib/components/new-post/Alerts.svelte";
   import { onMount } from "svelte";
   import { State, Draft, Identity, Lock } from "$lib/engines/draft.js";
 
@@ -89,7 +89,7 @@
     </section>
 
     <section class="panel warning">
-      <Alert></Alert>
+      <Alerts></Alerts>
     </section>
   
     <section class="panel publish">
