@@ -1,28 +1,28 @@
 <script>
-  import { onDestroy, onMount } from "svelte";
-  import { browser } from "$app/environment";
-  import { previewStore } from "$lib/stores/image-preview.js";
   import BackLink from "$lib/components/primitives/BackLink.svelte";
+  import { onMount } from "svelte";
+  import { State } from "$lib/engines/store.js";
+  import { previewStore } from "$lib/stores/image-preview.js";
 
-  let previewImage, unsubscribePreview;
+  let previewImage;
+  const Render = State.make();
 
-  if ( browser ) {
-    onMount( function() {
-      unsubscribePreview = previewStore.subscribe( function ( attachment ) {
-        if ( attachment.file.name != null ) {
-          if ( previewImage.src !== "#" ) {
-            URL.revokeObjectURL( previewImage.src );
-          }
-          previewImage.src = URL.createObjectURL( attachment.file );
-        }
-      });
-    });
+  Render.attachment = ( attachment ) => {
+    if ( attachment.file.name != null ) {
+      if ( previewImage.src !== "#" ) {
+        URL.revokeObjectURL( previewImage.src );
+      }
+      previewImage.src = URL.createObjectURL( attachment.file );
+    }
+  };
 
-    onDestroy( function () {
-      unsubscribePreview();
-    });
-  }
-
+  Render.reset();
+  onMount(() => {
+    Render.listen( previewStore, Render.attachment );
+    return () => {
+      Render.reset();
+    }
+  });
 </script>
 
 <div class="frame">

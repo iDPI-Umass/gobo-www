@@ -45,7 +45,7 @@
   export let showWhy = true;
 
   let unused = [ base_url, platform_id, visibility, created, updated ];
-  let footer = { platform, proxyURL, url };
+  let footer = { id, identity, platform, proxyURL, url };
   let source = Cache.getSource( source_id );
   let sharedPost = h.getShare( shares );
   let threadPosts = h.getThreads( threads );

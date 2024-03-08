@@ -16,7 +16,7 @@
   {#if showWhy === true}
     <a
       class="why"
-      href="/why-am-i-seeing-this">
+      href="/reason/{post.identity}/{post.id}">
       <sl-icon src="/icons/question-circle.svg"></sl-icon>
     </a>
   {/if}

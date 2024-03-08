@@ -266,26 +266,25 @@ Options.update = ( name, value ) => {
 
 
 
-const Name = {
-  split: ( name ) => {
-    const output = [];
-    let current = [];
-    
-    for ( const c of name ) {
-      if ( c === "@" ) {
-        output.push( current.join( "" ));
-        current = [ "@" ];
-      } else if ( c === "." ) {
-        output.push( current.join( "" ));
-        current = [ "." ];
-      } else {
-        current.push( c );
-      }
-    }
+const Name = {};
+Name.split = ( name ) => {
+  const output = [];
+  let current = [];
   
-    output.push( current.join( "" ));
-    return output;
+  for ( const c of name ) {
+    if ( c === "@" ) {
+      output.push( current.join( "" ));
+      current = [ "@" ];
+    } else if ( c === "." ) {
+      output.push( current.join( "" ));
+      current = [ "." ];
+    } else {
+      current.push( c );
+    }
   }
+
+  output.push( current.join( "" ));
+  return output;
 };
 
 
