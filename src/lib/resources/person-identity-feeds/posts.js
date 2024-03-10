@@ -1,3 +1,6 @@
+import { Identity } from "$lib/engines/identity.js";
+import { Filter } from "$lib/engines/filter.js";
+import { Weave } from "$lib/engines/weave.js";
 import * as Posts from "$lib/resources/person-identity-feeds/_posts.js";
 import { Cache } from "$lib/resources/cache.js";
 
@@ -8,7 +11,7 @@ import { Cache } from "$lib/resources/cache.js";
 
 
 class Reader {
-  constructor ({ identity, per_page, filterEngine }) {
+  constructor ({ identity, per_page }) {
     this.identity = identity;
     this.id = identity.id
     this.per_page = per_page ?? 50;
@@ -16,13 +19,11 @@ class Reader {
     this.tail = null;
     this.queue = [];
     this.unlocksAt = null;
-    this.filterEngine = filterEngine;
-    this.filterEngine.getRunners();
   }
 
-  static async create ({ identity, per_page, filterEngine }) {
+  static async make ({ identity, per_page }) {
     per_page = per_page ?? 50;
-    return new Reader({ identity, per_page, filterEngine });
+    return new Reader({ identity, per_page });
   }
 
   getOptions () {
@@ -41,7 +42,7 @@ class Reader {
         return; // Bail if we run into an authorization problem.
       }
 
-      const removals = this.filterEngine.filterPrimary( graph );
+      const removals = await Filter.primary( graph );
       console.log( "filtered graph", graph );
       
       // This logic allows us to continue pulling if everything is filtered.
@@ -53,8 +54,8 @@ class Reader {
         continue;
       }
 
-      weave = this.filterEngine.weaveGraph( graph );
-      this.filterEngine.filterTraversals( weave );
+      weave = Weave.make( graph );
+      Weave.trimTraversals( weave );
       
       // Another check after we've applied higher-order filters.
       if ( weave.feed.length === 0 && graph.feed.length > 0 ) {
@@ -147,17 +148,19 @@ class Reader {
 }
 
 
-
+// TODO: I started by mimicking an iterator interface, but that's the giveaway
+// that this should probably be a true iterator.
 
 class Feed {
   constructor ({ readers }) {
     this.readers = readers;
   }
 
-  static async create ({ identities, filterEngine }) {
+  static async make () {
+    const identities = await Identity.findActive();
     const readers = [];
     for ( const identity of identities ) {
-      readers.push( await Reader.create({ identity, filterEngine }) );
+      readers.push( await Reader.make({ identity }));
     }
 
     return new Feed({ readers });

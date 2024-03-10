@@ -2,34 +2,41 @@
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/badge/badge.js";
-  import { feedStore } from "$lib/stores/feed.js";
-  import { countStore } from "$lib/stores/notifications/count.js";
-  import { feedStore as notificationStore} from "$lib/stores/notification-feed.js";
   import { onMount } from "svelte";
+  import { State } from "$lib/engines/store.js";
+  import { Feed } from "$lib/engines/feed.js";
+  import { Feed as Notifications } from "$lib/engines/notifications.js";
+  import { countStore } from "$lib/stores/notifications/count.js";
+  import { allyEvent } from "$lib/helpers/event";
 
   export let current;
 
-  let notificationCount = 0;
+  let notificationCount;
+  const Render = State.make();
+  Render.cleanup = () => {
+    notificationCount = 0;
+  };
 
-  const handleHomeReset = function () {
+  Render.count = ( value ) => {
+    notificationCount = value.count;
+  }
+
+
+  const Handle = {};
+  Handle.refresh = allyEvent(() => {
     if ( current === "home" ) {
-      feedStore.push({ command: "reset" });
+      Feed.refresh();
     }
-  };
-
-  const handleNotificationReset = function () {
     if ( current === "notifications" ) {
-      notificationStore.push({ command: "reset" });
+      Notifications.refresh();
     }
-  };
+  });
 
-  onMount( function () {
-    const unsubscribeCount = countStore.subscribe( function ( event ) {
-      notificationCount = event?.count ?? 0;
-    });
-
-    return function () {
-      unsubscribeCount();
+  Render.reset();
+  onMount(() => {
+    Render.listen( countStore, Render.count );
+    return () => {
+      Render.reset();
     };
   });
 </script>
@@ -40,8 +47,8 @@
       pill
       href="/home"
       class="{current === "home" ? "current" : ""}"
-      on:click={handleHomeReset}
-      on:keypress={handleHomeReset}>
+      on:click={Handle.refresh}
+      on:keypress={Handle.refresh}>
       <div slot="prefix">
         <sl-icon src="/icons/home.svg"></sl-icon>
       </div>
@@ -51,8 +58,8 @@
       pill
       href="/notifications"
       class="notifications {current === "notifications" ? "current" : ""}"
-      on:click={handleNotificationReset}
-      on:keypress={handleNotificationReset}>
+      on:click={Handle.refresh}
+      on:keypress={Handle.refresh}>
       <div slot="prefix">
         <sl-icon src="/icons/bell.svg" slot="prefix"></sl-icon>
         {#if notificationCount > 0}

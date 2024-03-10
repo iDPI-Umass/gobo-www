@@ -5,7 +5,7 @@ import * as LS from "$lib/helpers/local-storage.js";
 import * as Random from "$lib/helpers/random.js";
 import * as Post from "$lib/resources/post.js";
 import * as Image from "$lib/resources/draft-image.js";
-import * as FeedSaver from "$lib/engines/feed-singleton.js";
+import * as IdentityEngine from "$lib/engines/identity.js";
 import { draftStores } from "$lib/stores/draft.js";
 import { RichText, BskyAgent, UnicodeString } from "@atproto/api";
 
@@ -142,8 +142,7 @@ Identity.sync = async () => {
   const draft = Draft.read();
   let current = draft.identities.map( identity => identity.id );
   
-  const engine = await FeedSaver.getEngine();
-  const canon = engine.getIdentities();
+  const canon = await IdentityEngine.list();
   const target = canon.map(( identity ) => identity.id );
 
   if ( Value.equal( current, target )) {

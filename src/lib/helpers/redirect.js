@@ -133,7 +133,7 @@ const handleAddIdentityCallback = async function ( query ) {
       bluesky_login: login ?? undefined,
       bluesky_secret: secret ?? undefined
     }});
-    LS.write("fetching", true);
+    LS.write("gobo-building-feed", true);
     return goto( "/identities" );
   }
   catch (error) {

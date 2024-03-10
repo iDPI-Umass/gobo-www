@@ -3,26 +3,32 @@
   import "@shoelace-style/shoelace/dist/components/switch/switch.js";
   import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
-  import { feedStore } from "$lib/stores/feed.js";
+  import { onMount } from "svelte";
+  import { State } from "$lib/engines/store.js";
+  import { Filter } from "$lib/engines/filter.js";
+  import { Feed } from "$lib/engines/feed.js";
+  import { filterStore } from "$lib/stores/filter.js";
   import { allyEvent } from "$lib/helpers/event";
 
-  export let engine;
   export let category;
 
-  let filters = [];
-  const getFilters = function () {
-    filters = engine.getFilters().filter( f => f.category === category );
-  }
+  let filters;
+  const Render = State.make();
+  Render.cleanup = () => {
+    filters = [];
+  };
 
-  getFilters();
+  Render.filters = async () => {
+    filters = await Filter.findCategory( category );
+  };
 
 
-  const removeFilter = function ( filter ) {
-    return allyEvent(function () {
+  const Handle = {};
+  Handle.remove = ( filter ) => {
+    return allyEvent(() => {
       try {
-        engine.filterEngine.removeFilter(filter);
-        getFilters();
-        feedStore.push({ command: "reset" });
+        Filter.remove( filter );
+        Feed.refresh();
       } catch ( error ) {
         // TODO: Visually represent an error here.
         console.error( error );
@@ -30,19 +36,27 @@
     });
   };
 
-  const toggleFilter = function ( filter ) {
-    return allyEvent(function () {
+  Handle.toggle = ( filter ) => {
+    return allyEvent(() => {
       try {
         filter.active = !filter.active;
-        engine.filterEngine.updateFilter(filter);
-        getFilters();
-        feedStore.push({ command: "reset" });
+        Filter.update( filter );
+        Feed.refresh();
       } catch ( error ) {
         // TODO: Visually represent an error here.
         console.error( error );
       }
     });
   };
+
+
+  Render.reset();
+  onMount(() => {
+    Render.listen( filterStore, Render.filters );
+    return () => {
+      Render.reset();
+    }
+  })
 
 </script>
 
@@ -58,15 +72,15 @@
             <sl-switch
               size="medium"
               checked="{filter.active}"
-              on:click={toggleFilter({ ...filter })}
-              on:keypress={toggleFilter({ ...filter })}>
+              on:click={Handle.toggle( filter )}
+              on:keypress={Handle.toggle( filter )}>
             </sl-switch>
 
           </span>
           <span class="phrase">{ filter.configuration.value }</span>
           <sl-icon-button
-            on:click={removeFilter({ ...filter })}
-            on:keypress={removeFilter({ ...filter })}
+            on:click={Handle.remove( filter )}
+            on:keypress={Handle.remove( filter )}
             label="Delete Filter" 
             src="/icons/trash.svg">
           </sl-icon-button>

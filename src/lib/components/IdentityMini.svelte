@@ -2,29 +2,31 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/switch/switch.js";
   import { onMount } from "svelte";
-  import * as FeedSaver from "$lib/engines/feed-singleton.js";
-  import { feedStore } from "$lib/stores/feed.js";
-  import { feedStore as notificationStore } from "$lib/stores/notification-feed.js";
-
+  import { State } from "$lib/engines/store.js";
+  import { Identity } from "$lib/engines/identity.js";
+  import { Feed } from "$lib/engines/feed.js";
+  import { Feed as Notifications } from "$lib/engines/notifications.js";
 
   export let identity;
   
   let activeSwitch;
   let logo = `/icons/${ identity.platform }.svg`;
+  const Render = State.make();
+
+  
+  const Handle = {};
+  Handle.switch = async ( event ) => {
+    const active = event.target.checked
+    Identity.updateActive({ ...identity, active });
+    Feed.refresh();
+    Notifications.refresh();
+  };
 
 
-  onMount( function () {
-    const listener = async function ( event ) {
-      const engine = await FeedSaver.getEngine();
-      engine.setActiveState( identity, event.target.checked );
-      feedStore.push({ command: "reset" });
-      notificationStore.push({ command: "reset" });
-    };
-
-    activeSwitch.addEventListener( "sl-change", listener );
-
-    return function () {
-      activeSwitch.removeEventListener( "sl-change", listener );
+  Render.reset();
+  onMount(() => {
+    return () => {
+      Render.reset();
     };
   });
 </script>
@@ -39,6 +41,7 @@
   <sl-switch
     bind:this={activeSwitch}
     checked={identity.active}
+    on:sl-change={Handle.switch}
     size="medium">
   </sl-switch>
 

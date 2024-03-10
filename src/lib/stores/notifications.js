@@ -16,8 +16,10 @@ const createStore = function () {
 
 const singleton = createStore();
 const command = createStore();
+const count = createStore();
 
 export { 
   singleton,
-  command
+  command,
+  count
 }

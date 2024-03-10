@@ -73,7 +73,8 @@ const remove = handleUnauthorized( async function ( identity ) {
 });
 
 
-const setActiveState = async function ( identity, active ) {
+const setActiveState = async function ( identity ) {
+  const active = identity.active;
   const client = await getGOBOClient();
   return await client.personIdentity.post({
     parameters: identity,

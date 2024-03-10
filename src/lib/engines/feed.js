@@ -1,7 +1,5 @@
-import { Feed } from "$lib/resources/person-identity-feeds/posts.js";
-import { IdentityEngine } from "$lib/engines/identities.js";
-import { FilterEngine } from "$lib/engines/filters.js";
-
+import { Feed as Weaver } from "$lib/resources/person-identity-feeds/posts.js";
+import * as stores from "$lib/stores/feed.js";
 
 /***
 While the classes within "$lib/resources/feed" are focused on a more formal
@@ -30,88 +28,160 @@ a new empty one. I'm handling that with a flag for right now, but that's
 a strong indication that this would be more clearly expressed as a state machine.
 ***/
 
-class FeedEngine {
-  constructor ({ feed, identityEngine, filterEngine }) {
-    this.feed = feed;
-    this.identityEngine = identityEngine;
-    this.filterEngine = filterEngine;
-    this.replies = new Set();
-    this.nextPosts = [];
+
+// Careful about the engine state here. We want to enforce a singleton interface.
+// But we have asynchronous instantiation behavior. Assign promise before falling
+// through to resolving the promise.
+
+let singletonFeed;
+
+const Feed = {};
+
+Feed.make = async () => {
+  return {
+    posts: [],
+    scroll: 0,
+    weaver: await Weaver.make(),
+    isStopped: false,
+    replies: new Set(),
+  };
+};
+
+Feed.write = () => {
+  singletonFeed;
+};
+
+Feed.read = async () => {
+  if ( singletonFeed == null ) {
+    singletonFeed = await Feed.make();
   }
+  return singletonFeed;
+};
 
-  static async create () {
-    const identityEngine = await IdentityEngine.create();
-    const filterEngine = await FilterEngine.create();
-    const identities = identityEngine.getActiveIdentities();
-    const feed = await Feed.create({ identities, filterEngine });
-    return new FeedEngine({ feed, identityEngine, filterEngine });
+Feed.put = () => {
+  stores.singleton.put( singletonFeed );
+};
+
+Feed.command = ( name ) => {
+  stores.command.put({ name });
+};
+
+Feed.update = () => {
+  Feed.write();
+  Feed.put();
+};
+
+Feed.halt = () => {
+  if ( singletonFeed != null ) {
+    singletonFeed.isStopped = true;
   }
+};
 
-  async reset () {
-    this.isStopped = true;
-    const identityEngine = this.identityEngine;
-    const filterEngine = this.filterEngine;
-    const identities = identityEngine.getActiveIdentities();
-    const feed = await Feed.create({ identities, filterEngine });
-    return new FeedEngine({ feed, identityEngine, filterEngine });
-  }
+Feed.clear = async () => {
+  // Halt feed weaver pulling before discarding old object.
+  Feed.halt();
+  singletonFeed = await Feed.make();
+};
 
-  async pull ( count ) {
-    const results = [];
-    let current = 0;
+Feed.refresh = async () => {
+  await Feed.clear();
+  Feed.command( "refresh" );
+};
 
-    while ( current < count ) {
-      if ( this.isStopped === true ) {
-        return [];
-      }
 
-      const result = await this.feed.next();
-      if ( result == null ) {
-        // We're at the bottom of the feed.
-        // TODO: This would be different for non time-based feed sorting.
-        break;
-      
-      } else {
-        const { post } = result;
-        // Skip posts that start reply chains that we've already seen.
-        if ( this.replies.has(post.id) ) {
-          continue;
-        }
+Feed.next = async () => {
+  const feed = await Feed.read();
+  return await feed.weaver.next();
+};
 
-        for ( const id of post.threads ?? [] ) {
-          this.replies.add( id );
-        }
+Feed.pull = async ( count ) => {
+  const results = [];
+  let current = 0;
 
-        results.push( result );
-        current++;
-      }
+  while ( current < count ) {
+    if ( Feed.isStopped === true ) {
+      return;
     }
-   
-    if ( this.isStopped === true ) {
-      return [];
-    }
+
+    const result = await Feed.next();
+    if ( result == null ) {
+      // We're at the bottom of the feed.
+      // TODO: Responding to this condition would be different for non-time-based feed sorting.
+      break;
     
-    return results;
-  }
+    } else {
+      const { post } = result;
+      // Skip posts that start reply chains that we've already seen.
+      if ( await Reply.has( post.id )) {
+        continue;
+      }
 
-  getIdentities () {
-    return this.identityEngine.identities;
-  }
+      for ( const id of post.threads ?? [] ) {
+        await Reply.add( id );
+      }
 
-  getActiveIdentities () {
-    return this.identityEngine.getActiveIdentities();
+      results.push( result );
+      current++;
+    }
   }
+ 
+  if ( Feed.isStopped === true ) {
+    return;
+  }
+  
+  await Posts.push( results );
+};
 
-  setActiveState ( identity, active ) {
-    this.identityEngine.setActiveState( identity, active );
-  }
 
-  getFilters () {
-    return this.filterEngine.filters;
-  }
-}
+const Posts = {};
+
+Posts.read = async () => {
+  const feed = await Feed.read();
+  return feed.posts;
+};
+
+Posts.update = async ( posts ) => {
+  const feed = await Feed.read();
+  feed.posts = posts;
+  Feed.update();
+};
+
+Posts.push = async ( posts ) => {
+  const feed = await Feed.read();
+  feed.posts.push( ...posts );
+  Feed.update();
+};
+
+
+const Position = {};
+
+Position.read = async () => {
+  const feed = await Feed.read();
+  return feed.position;
+};
+
+Position.write = async ( position ) => {
+  const feed = await Feed.read();
+  feed.position = position;
+};
+
+
+const Reply = {};
+
+Reply.has = async ( id ) => {
+  const feed = await Feed.read();
+  return feed.replies.has( id ); 
+};
+
+Reply.add = async ( id ) => {
+  const feed = await Feed.read();
+  feed.replies.add( id );
+};
 
 
 export {
-  FeedEngine
+  Feed,
+  Posts,
+  Position,
+  Reply,
 }

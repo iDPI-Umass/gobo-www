@@ -1,5 +1,4 @@
 <script>
-  import * as FeedSaver from "$lib/engines/notification-singleton.js";
   import * as h from "$lib/engines/post.js";
 
   export let baseURL;

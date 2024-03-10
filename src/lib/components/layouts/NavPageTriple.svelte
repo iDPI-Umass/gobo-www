@@ -1,26 +1,9 @@
 <script>
   import LeftNav from "$lib/components/headers/LeftNav.svelte";
-  import { scrollStore } from "$lib/stores/scroll.js";
-  import { onMount } from "svelte";
   export let current;
-
-  let panels;
-
-  // onMount(() => {
-  //   const listener = function ( event ) {
-  //     // event.preventDefault();
-  //     scrollStore.push( event );
-  //   };
-
-  //   panels.addEventListener( "wheel", listener );
-
-  //   return function () {
-  //     panels.removeEventListener( "wheel", listener );
-  //   };
-  // });
 </script>
 
-<div class="panels" bind:this={panels}>
+<div class="panels">
   <LeftNav {current}></LeftNav>
   
   <main class="main">

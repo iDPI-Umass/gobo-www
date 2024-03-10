@@ -1,22 +1,23 @@
 import { writable } from "svelte/store";
 
 const createStore = function () {
-  let event = {};
+  let event = null;
 
   const { subscribe, update } = writable( event );
 
   return {
     subscribe,
-    push: function ( value ) {
-      if ( value == null ) {
-        return;
-      }
-      update( function () {
-        return value;
-      });
-    }
+    put: ( value ) => {
+      update(() => value );
+    },
   };
 };
 
 
-export const scrollStore = createStore();
+const feed = createStore();
+const notifications = createStore();
+
+export { 
+  feed,
+  notifications,
+}

@@ -14,10 +14,6 @@ const createStore = function () {
 };
 
 
-const singleton = createStore();
-const command = createStore();
+const identityStore = createStore();
 
-export { 
-  singleton,
-  command
-}
+export { identityStore }

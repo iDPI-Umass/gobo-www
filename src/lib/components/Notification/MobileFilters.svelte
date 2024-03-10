@@ -3,23 +3,38 @@
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
-  import * as FeedSaver from "$lib/engines/feed-singleton.js";
-  import * as Lens from "$lib/resources/filter.js";
+  import { onMount } from "svelte";
+  import { State } from "$lib/engines/store.js";
+  import { Identity } from "$lib/engines/identity.js";
+  import { identityStore } from "$lib/stores/identity";
 
-  let identities = [];
-
-  const loadFilters = async function () {
-    const engine = await FeedSaver.getEngine();
-    identities = engine.getActiveIdentities();
+  let identities, state;
+  const Render = State.make();
+  Render.cleanup = () => {
+    identities = [];
+    state = "loading";
   };
+
+  Render.active = async () => {
+    identities = await Identity.findActive();
+    state = "ready";
+  };
+
+  Render.reset();
+  onMount(() => {
+    Render.listen( identityStore, Render.active );
+    return () => {
+      Render.reset();
+    };
+  });
 </script>
 
 <nav>
-  {#await loadFilters()}
+  {#if state === "loading" }
   
     <Spinner></Spinner>
   
-  {:then}
+  {:else if state === "ready" }
   
     <sl-button 
       href="/identities"
@@ -34,7 +49,7 @@
       {identities.length}
     </sl-button>
   
-  {/await}
+  {/if}
 </nav>
 
 
