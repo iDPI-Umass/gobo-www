@@ -5,8 +5,8 @@
   import { onMount } from "svelte";
   import { State } from "$lib/engines/store.js";
   import { Feed } from "$lib/engines/feed.js";
-  import { Feed as Notifications } from "$lib/engines/notifications.js";
-  import { countStore } from "$lib/stores/notifications/count.js";
+  import { Feed as Notifications } from "$lib/engines/notification.js";
+  import * as notificationStores from "$lib/stores/notification.js";
   import { allyEvent } from "$lib/helpers/event";
 
   export let current;
@@ -34,7 +34,9 @@
 
   Render.reset();
   onMount(() => {
-    Render.listen( countStore, Render.count );
+    Render.listen( notificationStores.count, Render.count );
+    Feed.load();
+    Notifications.load();
     return () => {
       Render.reset();
     };

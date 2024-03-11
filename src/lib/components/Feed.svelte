@@ -1,8 +1,8 @@
 <script>
   import Spinner from "$lib/components/primitives/Spinner.svelte";
   import Post from "$lib/components/Post.svelte";
-  import { onMount, tick } from "svelte";
 
+  import { onMount, tick } from "svelte";
   import { Feed, Position } from "$lib/engines/feed.js";
   import { State } from "$lib/engines/store.js";
   import { Scroll } from "$lib/engines/scroll.js";
@@ -51,7 +51,7 @@
 
   const Handle = {};
   Handle.command = async ( event ) => {
-    switch ( event.command ) {
+    switch ( event.name ) {
       case "refresh":
         state = "loading";
         await Feed.pull( 25 );
@@ -81,6 +81,7 @@
     Render.listen( feedStores.command, Handle.command );
     _feed.addEventListener( "scroll", Handle.scroll );
     _feed.addEventListener( "gobo-infinite-scroll", Handle.infiniteScroll );
+    Feed.load();
     return () => {
       _feed.removeEventListener( "scroll", Handle.scroll );
       _feed.removeEventListener( "gobo-infinite-scroll", Handle.infiniteScroll );
@@ -107,7 +108,7 @@
     </section>
   {:else if state === "ready"}
     {#each posts as { identity, post } }
-      <Post {identity} {...post}></Post>
+      <Post {identity} id={post.id}></Post>
     {/each}
   {:else}
     <section class="gobo-copy">

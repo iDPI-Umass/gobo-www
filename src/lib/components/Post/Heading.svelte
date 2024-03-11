@@ -1,11 +1,10 @@
 <script>
-  import * as h from "$lib/engines/post.js";
+  import { Source } from "$lib/engines/post.js";
 
   export let source;
 
-  let url = source.proxyURL ?? source.url;
-  let { headingSlot1, headingSlot2 } = h.getHeadingSlots( source );
-
+  let url = Source.href( source );
+  let { headingSlot1, headingSlot2 } = Source.headings( source );
 </script>
 
 <a 

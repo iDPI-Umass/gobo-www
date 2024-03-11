@@ -2,23 +2,37 @@
   import BackLink from "$lib/components/primitives/BackLink.svelte";
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
-  import Identity from "$lib/components/Identity.svelte";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
-  import * as FeedSaver from "$lib/engines/feed-singleton.js";
-  
-  let identities = [];
-  let allEmpty = true;
+  import Identity from "$lib/components/Identity.svelte";
+  import { onMount } from "svelte";
+  import { State } from "$lib/engines/store.js";
+  import { Identity as IdentityEngine } from "$lib/engines/identity.js";
+  import * as identityStores from "$lib/stores/identity.js";
 
-  const loadIdentities = async function () {
-    const engine = await FeedSaver.getEngine();
-    identities = engine.getIdentities();
-    
+  let state, identities;
+  const Render = State.make();
+  Render.cleanup = () => {
+    state = "loading";
+    identities = [];
+  };
+  
+  Render.identities = ( list ) => {
+    identities = list;
     if ( identities.length === 0 ) {
-      allEmpty = true;
+      state = "empty";
     } else {
-      allEmpty = false;
+      state = "ready";
     }
   };
+
+  Render.reset();
+  onMount(() => {
+    Render.listen( identityStores.singleton, Render.identities );
+    IdentityEngine.load();
+    return () => {
+      Render.reset();
+    }
+  });
 </script>
   
 <div class="main-child">
@@ -42,22 +56,24 @@
     </p> 
   </section>
   
-  
-  {#await loadIdentities()}
-  
-    <Spinner></Spinner>
-  
-  {:then}
+  <section class="identities">
+    {#if state === "error"}
+      <p>There was a problem displaying your identities.</p>
 
-    <section class="identities">
-      {#each identities as identity (identity.key)}  
+    {:else if state === "loading"}
+      <Spinner></Spinner>
+    
+    {:else if state === "empty"}
+      <p>No identities at this time.</p>
+
+    {:else if state === "ready"}
+      {#each identities as identity (identity.id)}  
         <Identity {identity}></Identity>
       {/each}
-    </section>
+    
+    {/if}
 
-  {/await}
-
-  
+  </section>  
 </div>
 
 <style>

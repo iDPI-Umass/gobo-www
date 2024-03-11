@@ -71,6 +71,11 @@ Feed.update = () => {
   Feed.put();
 };
 
+Feed.load = async () => {
+  await Feed.read();
+  Feed.update();
+};
+
 Feed.halt = () => {
   if ( singletonFeed != null ) {
     singletonFeed.isStopped = true;

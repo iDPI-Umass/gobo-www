@@ -14,6 +14,8 @@ const createStore = function () {
 };
 
 
-const identityStore = createStore();
+const singleton = createStore();
 
-export { identityStore }
+export {
+  singleton
+}

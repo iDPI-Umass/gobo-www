@@ -1,6 +1,7 @@
 import { Feed as Weaver } from "$lib/resources/person-identity-feeds/notifications.js";
-import * as stores from "$lib/stores/notifications.js";
-import { Poll, Events as PollEvents } from "$lib/polling/notifications.js";
+import * as stores from "$lib/stores/notification.js";
+import { Poll } from "$lib/polling/notifications.js";
+import { Cache } from "$lib/resources/cache.js";
 
 
 // Notifications have similar needs to the main post feed, so we use similar
@@ -10,11 +11,14 @@ let singletonFeed;
 
 const Feed = {};
 
-Feed.make = async () => {
+Feed.make = async ( context = {}) => {
+  const view = context.view ?? "all";
+
   return {
     notifications: [],
     scroll: 0,
-    weaver: await Weaver.make(),
+    view: view,
+    weaver: await Weaver.make({ view }),
     isStopped: false,
     count: 0,
   };
@@ -44,23 +48,27 @@ Feed.update = () => {
   Feed.put();
 };
 
+Feed.load = async () => {
+  await Feed.read();
+  Feed.update();
+};
+
 Feed.halt = () => {
   if ( singletonFeed != null ) {
     singletonFeed.isStopped = true;
   }
 };
 
-Feed.clear = async () => {
+Feed.clear = async ({ view }) => {
   // Halt feed weaver pulling before discarding old object.
   Feed.halt();
-  singletonFeed = await Feed.make();
+  singletonFeed = await Feed.make({ view });
 };
 
-Feed.refresh = async ({ count } = {}) => {
+Feed.refresh = async ( context = {}) => {
+  const view = context.view ?? "all";
+  await Feed.clear({ view });
   Feed.command( "refresh" );
-  await Feed.clear();
-  await Feed.pull( count ?? 25 );
-  Feed.command( "ready" );
 };
 
 
@@ -115,6 +123,16 @@ Notifications.push = async ( notifications ) => {
   const feed = await Feed.read();
   feed.notifications.push( ...notifications );
   Feed.update();
+};
+
+
+const Notification = {};
+Notification.source = ( notification ) => {
+  const source = Cache.getSource( notification.source_id );
+  if ( source == null ) {
+    console.error(`engine notification: unable to fetch source ${ notification.source_id }`);
+  }
+  return source;
 };
 
 
@@ -175,12 +193,14 @@ Count.clear = async () => {
 });
 
 // Feed Polling state machine initial events to get started.
-PollEvents.push({ name: "start" });
-PollEvents.push({ name: "fetch" });
+Poll.event({ name: "start" });
+Poll.event({ name: "fetch" });
 
 
 export {
   Feed,
   Notifications,
+  Notification,
   Position,
+  Count
 }

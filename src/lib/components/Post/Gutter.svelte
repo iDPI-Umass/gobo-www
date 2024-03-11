@@ -1,15 +1,14 @@
 <script>
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
-  import * as h from "$lib/engines/post.js";
+  import { Source } from "$lib/engines/post.js";
 
   export let source;
   export let hasSpine = false;
 
-  let url = source.proxyURL ?? source.url;
-  let avatar = h.getAvatar( source );
-  let avatarFallback = h.getAvatarFallback( source );
-  let { headingSlot1 } = h.getHeadingSlots( source );
-
+  let url = Source.href( source );
+  let avatar = Source.avatar( source );
+  let fallback = Source.fallback( source );
+  let { headingSlot1 } = Source.headings( source );
 </script>
 
 <div class="gutter">
@@ -21,7 +20,7 @@
       <img 
         src="{ avatar }" 
         alt={`avatar for ${ headingSlot1 }`}
-        onerror="this.onerror=null;this.src='{ avatarFallback }'">
+        onerror="this.onerror=null;this.src='{ fallback }'">
 
   </a>
 

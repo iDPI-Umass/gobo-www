@@ -14,6 +14,8 @@ const createStore = function () {
 };
 
 
-const filterStore = createStore();
+const singleton = createStore();
 
-export { filterStore }
+export { 
+  singleton
+}

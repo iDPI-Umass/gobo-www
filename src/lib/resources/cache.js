@@ -63,6 +63,7 @@ class Cache {
     Cache.putSources( weave.sources );
     Cache.decorateMastodon( Object.keys(weave.posts) );
     Cache.putPostEdges( identity.id, weave.postEdges );
+    Cache.putNotifications( weave.notifications ?? {} );
   }
 }
 

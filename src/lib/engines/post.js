@@ -1,14 +1,20 @@
-import { Cache } from "$lib/resources/cache.js";
 import * as Type from "@dashkite/joy/type";
+import { Filter } from "$lib/engines/filter.js";
+import { Weave } from "$lib/engines/weave.js";
+import { Cache } from "$lib/resources/cache.js";
+import * as Resource from "$lib/resources/post.js";
+import * as Random from "$lib/helpers/random.js";
+import { humanize } from "$lib/helpers/humanize.js";
+import { render } from "$lib/helpers/markdown.js";
 
 class FilteredPost {
   constructor ({ id }) {
     this.id = id;
   }
 
-  static create() {
+  static make() {
     // TODO: This should eventually hold the hidden post data.
-    const id = Math.random().toString();
+    const id = Random.address();
     return new FilteredPost({ id });
   }
 
@@ -17,15 +23,163 @@ class FilteredPost {
   }
 }
 
-const isFilteredPost = function ( value ) {
-  return FilteredPost.isType( value );
-}
 
-const getLogo = function ( platform ) {
-  return `/icons/${ platform }.svg`;
+
+const Post = {};
+
+Post.get = async ({ identity, id }, options = {}) => {
+  try {
+    if ( Cache.hasPostCenter(id) ) {
+      return Cache.getPost( id );
+    }
+    
+    const graph = await Resource.get({ identity, id });
+    await Filter.primary( graph );
+    const weave = Weave.make( graph );
+    Weave.trimTraversals( weave );
+    Cache.mergeWeave({ id: identity }, weave );
+    return weave.posts[ weave.feed[0] ];
+
+  } catch ( error ) {
+    console.error( error );
+    return;
+  }
 };
 
-const getHeadingSlots = function ( source ) {
+Post.source = ( post ) => {
+  const source = Cache.getSource( post.source_id );
+  if ( source == null ) {
+    console.error(`engine post: unable to fetch source ${ post.source_id }`);
+  }
+  return source;
+};
+
+Post.copy = ( post ) => {
+  let copy;
+  switch ( post.platform ) {
+    case "bluesky":
+      copy = "View on Bluesky";
+      break;
+    case "mastodon":
+      // Specialize this to name the server?
+      copy = "View on Mastodon";
+      break;
+    case "reddit":
+      copy = "View on Reddit";
+      break;
+    case "smalltown":
+      // Specialize this to name the server?
+      copy = "View on Smalltown";
+      break;
+    default:
+      throw new Error( "unknown platform" );
+  }
+
+  return copy;
+};
+
+Post.isFiltered = ( value ) => FilteredPost.isType( value );
+
+Post.href = ( post ) => post.proxyURL ?? post.url;
+
+Post.logo = ( post ) => `/icons/${ post.platform }.svg`;
+
+Post.content = ( post ) => render( post.content );
+
+Post.published = ( post ) => humanize( post.published );
+
+Post.embeds = ( post ) => {
+  const ax = post.attachments ?? [];
+  return {
+    media: ax.filter( a => /^(image|video)\//.test( a.type )),
+    text: ax.filter( a => /^application\/json/.test( a.type ))
+  };
+};
+
+Post.share = ( post ) => {
+  post.shares ??= [];
+  const share = post.shares[0];
+  if ( share == null ) {
+    return;
+  }
+
+  if ( share === "gobo-filtered-post" ) {
+    return FilteredPost.make();
+  }
+
+  return { id: share };
+};
+
+Post.thread = ( post ) => {
+  post.threads ??= [];
+  const result = [];
+  for( const id of post.threads ) {
+    if ( id === "gobo-filtered-post" ) {
+      result.push( FilteredPost.make() );
+      continue;
+    }
+
+    result.push({ id });
+  }
+
+  return result;
+};
+
+Post.actionTarget = ( post ) => {
+  if ( post.shares[0] != null && post.content == null ) {
+    return post.shares[0];
+  } else {
+    return post.id;
+  }
+};
+
+Post.styles = ( post, options = {} ) => {
+  const styles = {};
+  if ( options.fullPage === true ) {
+    styles.cursor = "inherit";
+  } else {
+    styles.cursor = "pointer";
+  }
+  
+  styles.maxHeight = "15rem";
+  styles.gradientStop = "10rem";
+  if ( options.fullPage === true ) {
+    styles.gradient = "none"
+  } else {
+    styles.gradient = "linear-gradient( 180deg, #000 var(--gradient-stop), transparent )"
+  }
+
+  return styles;
+};
+
+
+
+
+
+
+const Source = {};
+
+Source.get = ( id ) => {
+  const source = Cache.getSource( id );
+}
+
+Source.href = ( source ) => source.proxyURL ?? source.url;
+
+Source.avatar = ( source ) => source.icon_url ?? Source.fallback( source );
+
+Source.fallback = ( source ) => {
+  switch ( source.platform ) {
+    case "mastodon":
+    case "smalltown":
+      return "/icons/mastodon-avatar.png";
+    case "bluesky":
+      return "/icons/bluesky-avatar.png";
+    case "reddit":
+      return "/icons/reddit-avatar.png";
+  }
+};
+
+Source.headings = ( source ) => {
   let headingSlot1, headingSlot2;
   switch ( source.platform ) {
     case "bluesky":
@@ -53,117 +207,15 @@ const getHeadingSlots = function ( source ) {
   return { headingSlot1, headingSlot2 };
 };
 
-const getSourceCopy = function ( platform ) {
-  let sourceCopy;
-  switch ( platform ) {
-    case "bluesky":
-      sourceCopy = "View on Bluesky";
-      break;
-    case "mastodon":
-      // Specialize this to name the server?
-      sourceCopy = "View on Mastodon";
-      break;
-    case "reddit":
-      sourceCopy = "View on Reddit";
-      break;
-    case "smalltown":
-      // Specialize this to name the server?
-      sourceCopy = "View on Smalltown";
-      break;
-    default:
-      throw new Error( "unknown platform" );
-  }
-
-  return sourceCopy;
-};
-
-const getAvatarFallback = function ( source ) {
-  switch ( source.platform ) {
-    case "mastodon":
-    case "smalltown":
-      return "/icons/mastodon-avatar.png";
-    case "bluesky":
-      return "/icons/bluesky-avatar.png";
-    case "reddit":
-      return "/icons/reddit-avatar.png";
-  }
-};
-
-const getAvatar = function ( source ) {
-  return source.icon_url ?? getAvatarFallback( source );
-};
+Source.copy = Post.copy;
 
 
 
 
-const getShare = function ( shares ) {
-  const share = shares[0];
-  if ( share == null ) {
-    return;
-  }
-
-  if ( share === "gobo-filtered-post" ) {
-    return FilteredPost.create();
-  }
-
-  const post = Cache.getPost( share );
-  if ( post == null ) {
-    console.error(`expected post ${share}, but it appears to be missing from graph`);
-  }
-  return post;
-};
-
-const getReply = function ( reply ) {
-  if ( reply == null ) {
-    return;
-  }
-
-  if ( reply === "gobo-filtered-post" ) {
-    return FilteredPost.create();
-  }
-
-  const post = Cache.getPost( reply );
-  if ( post == null ) {
-    console.error(`expected post ${reply}, but it appears to be missing from graph`);
-  }
-  return post;
-};
-
-const getThreads = function ( ids ) {
-  const result = [];
-  for( const id of ids ) {
-    if ( id === "gobo-filtered-post" ) {
-      result.push( FilteredPost.create() );
-      continue;
-    }
-
-    const post = Cache.getPost( id );
-    if ( post == null ) {
-      console.error(`expected post ${id}, but it appears to be missing from graph`);
-      continue;
-    }
-    result.push( post );
-  }
-
-  return result;
-};
-
-
-const getActionTarget = function ({ id, content, sharedPost }) {
-  let actionTarget = null;
-  if ( sharedPost != null && content == null ) {
-    actionTarget = sharedPost.id;
-  } else {
-    actionTarget = id;
-  }
-
-  return actionTarget;
-};
-
-
+const Click = {};
 
 // Trace DOM parents until we get to overall post article.
-const hasLinkParent = function ( element ) {
+Click.hasLinkParent = ( element ) => {
   if ( element.parentNode.tagName === "A" ) {
     return true;
   } else if ( element.parentNode.tagName === "ARTICLE" ) {
@@ -171,9 +223,9 @@ const hasLinkParent = function ( element ) {
   } else {
     return hasLinkParent( element.parentNode );
   }
-}
+};
 
-const isLink = function ( element ) {
+Click.isLink = ( element ) => {
   if ( element.tagName === "A" ) {
     return true;
   } else if ( element.tagName === "ARTICLE" ) {
@@ -181,9 +233,9 @@ const isLink = function ( element ) {
   } else {
     return hasLinkParent( element )
   }
-}
+};
 
-const hasButtonParent = function ( element ) {
+Click.hasButtonParent = ( element ) => {
   if ( element.parentNode.tagName === "SL-BUTTON" ) {
     return true;
   } else if ( element.parentNode.tagName === "ARTICLE" ) {
@@ -193,7 +245,7 @@ const hasButtonParent = function ( element ) {
   }
 };
 
-const isButton = function ( element ) {
+Click.isButton = ( element ) => {
   if ( element.tagName === "SL-BUTTON" ) {
     return true;
   } else if ( element.tagName === "ARTICLE" ) {
@@ -203,7 +255,7 @@ const isButton = function ( element ) {
   }
 };
 
-const hasVideoParent = function ( element ) {
+Click.hasVideoParent = ( element ) => {
   if ( element.parentNode.tagName === "VIDEO" ) {
     return true;
   } else if ( element.parentNode.tagName === "ARTICLE" ) {
@@ -213,7 +265,7 @@ const hasVideoParent = function ( element ) {
   }
 };
 
-const isVideo = function ( element ) {
+Click.isVideo = ( element ) => {
   if ( element.tagName === "VIDEO" ) {
     return true;
   } else if ( element.tagName === "ARTICLE" ) {
@@ -223,9 +275,7 @@ const isVideo = function ( element ) {
   }
 };
 
-
-
-const filterClickEvent = function ( fullPage, event ) {
+Click.passes = ( fullPage, event ) => {
   // Bail if this is a non-Enter key press event.
   if ( (event.type === "keydown") && (event.key !== "Enter") ) {
     return false;
@@ -237,17 +287,17 @@ const filterClickEvent = function ( fullPage, event ) {
   }
 
   // Bail if agent clicked a legit link.
-  if ( isLink(event.target) ) {
+  if ( Click.isLink(event.target) ) {
     return false;
   }
 
   // Bail if agent clicked a button.
-  if ( isButton(event.target) ) {
+  if ( Click.isButton(event.target) ) {
     return false;
   }
 
   // Bail if agent clicked a video.
-  if ( isVideo(event.target) ) {
+  if ( Click.isVideo(event.target) ) {
     return false;
   }
 
@@ -257,23 +307,16 @@ const filterClickEvent = function ( fullPage, event ) {
   }
 
   return true;
-}
+};
+
+
+
 
 
 export {
-  isFilteredPost,
+  FilteredPost,
 
-  getHeadingSlots,
-  getLogo,
-  getSourceCopy,
-  getAvatarFallback,
-  getAvatar,
-
-  getShare,
-  getReply,
-  getThreads,
-  getActionTarget,
-
-
-  filterClickEvent
+  Post,
+  Source,
+  Click
 }

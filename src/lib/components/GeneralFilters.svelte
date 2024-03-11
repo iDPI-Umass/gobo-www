@@ -3,15 +3,7 @@
   import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
-  import Spinner from "$lib/components/primitives/Spinner.svelte";
   import FilterGroup from "$lib/components/GeneralFilterMiniGroup.svelte";
-  import * as FeedSaver from "$lib/engines/feed-singleton.js";
-
-  let engine;
-
-  const loadFilters = async function () {
-    engine = await FeedSaver.getEngine();    
-  };
 </script>
 
 
@@ -35,31 +27,18 @@
 
   
   <section class="inner-frame">
-    {#await loadFilters()}
-  
-      <Spinner></Spinner>
-  
-    {:then}
-
-      <h3>Block Keyword</h3>
-      <FilterGroup
-        {engine}
-        category="block-keyword">
-      </FilterGroup>
-
-      <h3>Block Username</h3>
-      <FilterGroup
-        {engine}
-        category="block-username">
-      </FilterGroup>
-
-      <h3>Block Domain</h3>
-      <FilterGroup
-        {engine}
-        category="block-domain">
-      </FilterGroup>
     
-    {/await}
+    <h3>Block Keyword</h3>
+    <FilterGroup category="block-keyword">
+    </FilterGroup>
+
+    <h3>Block Username</h3>
+    <FilterGroup category="block-username">
+    </FilterGroup>
+
+    <h3>Block Domain</h3>
+    <FilterGroup category="block-domain">
+    </FilterGroup>
 
   </section>
 

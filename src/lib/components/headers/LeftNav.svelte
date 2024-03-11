@@ -4,9 +4,11 @@
   import "@shoelace-style/shoelace/dist/components/badge/badge.js";
   import { onMount } from "svelte";
   import { State } from "$lib/engines/store.js";
+  import { Identity } from "$lib/engines/identity.js";
+  import { Filter } from "$lib/engines/filter.js";
   import { Feed } from "$lib/engines/feed.js";
-  import { Feed as Notifications } from "$lib/engines/notifications.js";
-  import { countStore } from "$lib/stores/notifications/count.js";
+  import { Feed as Notifications } from "$lib/engines/notification.js";
+  import * as notificationStores from "$lib/stores/notification.js";
   import { allyEvent } from "$lib/helpers/event";
 
   export let current;
@@ -17,9 +19,18 @@
     notificationCount = 0;
   };
 
+  Render.load = async () => {
+    await Identity.load();
+    await Filter.load();
+    await Promise.all([
+      Feed.load(),
+      Notifications.load(),
+    ]);
+  };
+
   Render.count = ( value ) => {
     notificationCount = value.count;
-  }
+  };
 
 
   const Handle = {};
@@ -34,7 +45,8 @@
 
   Render.reset();
   onMount(() => {
-    Render.listen( countStore, Render.count );
+    Render.listen( notificationStores.count, Render.count );
+    Render.load();
     return () => {
       Render.reset();
     };

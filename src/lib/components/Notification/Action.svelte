@@ -1,16 +1,15 @@
 <script>
   import { humanize } from "$lib/helpers/humanize.js";
-  import * as h from "$lib/engines/post.js";
+  import { Source } from "$lib/engines/post.js";
 
   export let source;
   export let notification;
 
   let { type, notified } = notification;
 
-  let logo = h.getLogo( source.platform );
-  let { headingSlot1 } = h.getHeadingSlots( source );
-  let avatar = h.getAvatar( source );
-  let avatarFallback = h.getAvatarFallback( source );
+  let { headingSlot1 } = Source.headings( source );
+  let avatar = Source.avatar( source );
+  let fallback = Source.fallback( source );
 
   let action;
   switch ( type ) {
@@ -38,7 +37,7 @@
     <img 
       src="{avatar}" 
       alt={`avatar for ${ headingSlot1 }`}
-      onerror="this.onerror=null;this.src='{avatarFallback}'"
+      onerror="this.onerror=null;this.src='{fallback}'"
     >
     <time datetime="notified">{ humanize( notified ) }</time>
   </div>

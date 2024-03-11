@@ -1,5 +1,5 @@
 import * as Resource from "$lib/resources/filter.js";
-import { filterStore } from "$lib/stores/filter.js";
+import * as filterStores from "$lib/stores/filter.js";
 
 /***
 Filters have a serialized form we can pass around as state with the
@@ -48,7 +48,7 @@ Filter.write = () => {
 };
 
 Filter.put = () => {
-  filterStore.put( singletonList );
+  filterStores.singleton.put( singletonList );
 };
 
 
@@ -92,26 +92,31 @@ Filter.updateAll = () => {
   Filter.put();
 };
 
+Filter.load = async () => {
+  await Filter.read();
+  Filter.updateAll();
+};
+
 // These blend our instantiated runners with the need to use the HTTP interface.
 // filter.filter is funky, but that awkwardness should be contained here.
 Filter.update = async ( filter ) => {
-  const list = await Identity.read();
-  const index = await Identity.findIndex( filter.id );
+  const list = await Filter.read();
+  const index = await Filter.findIndex( filter.id );
   list.splice( index, 1, Filter.make( filter.filter ));
   Filter.updateAll();
   await Resource.put( filter.filter );
 };
 
 Filter.remove = async ( filter ) => {
-  const list = await Identity.read();
-  const index = await Identity.findIndex( filter.id );
+  const list = await Filter.read();
+  const index = await Filter.findIndex( filter.id );
   list.splice( index, 1 );
   Filter.updateAll();
   await Resource.remove( filter.filter );
 };
 
 Filter.add = async ( category, configuration ) => {
-  const list = await Identity.read();
+  const list = await Filter.read();
   const resource = await Resource.add( category, configuration );
   list.unshift( Filter.make( resource ));
   Filter.updateAll();
@@ -259,6 +264,10 @@ class Frame {
   get value() {
     return this.filter.configuration.value;
   }
+
+  set value ( value ) {
+    this.filter.configuration.value = value;
+  }
 }
 
 class BlockKeyword extends Frame {
@@ -269,7 +278,7 @@ class BlockKeyword extends Frame {
   }
 
   static make ({ filter }) {
-    return BlockKeyword({ filter });
+    return new BlockKeyword({ filter });
   }
 
   check ({ post }) {
@@ -328,7 +337,7 @@ class BlockUsername extends Frame {
   }
 
   static make ({ filter }) {
-    return BlockUsername({ filter });
+    return new BlockUsername({ filter });
   }
 
   check ({ post, sources }) {
@@ -370,7 +379,7 @@ class BlockDomain extends Frame {
   }
 
   static make ({ filter }) {
-    return BlockDomain({ filter });
+    return new BlockDomain({ filter });
   }
 
   check ({ post }) {

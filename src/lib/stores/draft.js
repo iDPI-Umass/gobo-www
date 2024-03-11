@@ -14,14 +14,20 @@ const createStore = function () {
 };
 
 
-const draftStores = {
-  content: createStore(),
-  identities: createStore(),
-  attachments: createStore(),
-  reply: createStore(),
-  quote: createStore(),
-  options: createStore(),
-  alerts: createStore(),
-};
+const content = createStore();
+const identities = createStore();
+const attachments = createStore();
+const reply = createStore();
+const quote = createStore();
+const options = createStore();
+const alerts = createStore();
 
-export { draftStores }
+export {
+  content,
+  identities,
+  attachments,
+  reply,
+  quote,
+  options,
+  alerts
+}

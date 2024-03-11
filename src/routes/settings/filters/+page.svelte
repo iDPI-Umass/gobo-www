@@ -1,17 +1,6 @@
 <script>
   import FilterTable from "$lib/components/FilterTable.svelte";
   import BackLink from "$lib/components/primitives/BackLink.svelte";
-  import Spinner from "$lib/components/primitives/Spinner.svelte";
-  import * as FeedSaver from "$lib/engines/feed-singleton.js";
-  import { allyEvent } from "$lib/helpers/event";
-  import { onMount } from "svelte";
-
-  let engine;
-
-  const loadFilters = async function () {
-    engine = await FeedSaver.getEngine();
-  };
-
 </script>
 
 <div class="main-child">
@@ -33,29 +22,14 @@
 
   </BackLink>
 
+  <h2>Block Keyword</h2>
+  <FilterTable category="block-keyword"></FilterTable>
 
-  {#await loadFilters()}
-    <Spinner></Spinner>
-  {:then}
-    <h2>Block Keyword</h2>
-    <FilterTable
-      {engine}
-      category="block-keyword">
-    </FilterTable>
+  <h2>Block Username</h2>
+  <FilterTable category="block-username"></FilterTable>
 
-    <h2>Block Username</h2>
-    <FilterTable
-      {engine}
-      category="block-username">
-    </FilterTable>
-
-    <h2>Block Domain</h2>
-    <FilterTable
-      {engine}
-      category="block-domain">
-    </FilterTable>
-
-  {/await}  
+  <h2>Block Domain</h2>
+  <FilterTable category="block-domain"></FilterTable>
 
 </div>
 

@@ -3,52 +3,81 @@
   import "@shoelace-style/shoelace/dist/components/switch/switch.js";
   import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
-  import { feedStore } from "$lib/stores/feed.js";
-  import { allyEvent } from "$lib/helpers/event";
+  import Spinner from "$lib/components/primitives/Spinner.svelte";
+  import { onMount } from "svelte";
+  import { State } from "$lib/engines/store.js";
+  import { Filter } from "$lib/engines/filter.js";
+  import { Feed } from "$lib/engines/feed.js";
+  import * as filterStores from "$lib/stores/filter.js";
 
-  export let engine;
   export let category;
 
   let activeSwitch;
+  let filters, state;
+  const Render = State.make();
+  Render.cleanup = () => {
+    state = "loading";
+    filters = [];
+  };
 
-  let filters = [];
-  const getFilters = function () {
-    filters = engine.getFilters().filter( f => f.category === category );
-  }
+  Render.filters = async () => {
+    filters = await Filter.findCategory( category );
 
-  getFilters();
+    if ( filters.length === 0 ) {
+      state = "empty"
+    } else {
+      state = "ready";
+    }
+  };
 
-
-  const toggleFilter = function ( filter ) {
-    return allyEvent(function () {
+  
+  const Handle = {};
+  Handle.error = ( f ) => {
+    return async ( event ) => {
       try {
-        filter.active = !filter.active;
-        engine.filterEngine.updateFilter(filter);
-        getFilters();
-        feedStore.push({ command: "reset" });
+        await f( event );
       } catch ( error ) {
         // TODO: Visually represent an error here.
-        console.error( error );
+        console.error( error );        
       }
+    }
+  };
+
+  Handle.toggle = ( filter ) => {
+    return Handle.error( async () => {
+      filter.active = !filter.active;
+      Filter.update( filter );
+      Feed.refresh();
     });
   };
+
+
+  Render.reset();
+  onMount(() => {
+    Render.listen( filterStores.singleton, Render.filters );
+    return () => {
+      Render.reset();
+    };
+  });
 
 </script>
 
 <section class="filter-group">
-  {#if filters.length === 0}
+  {#if state === "loading"}
+    <Spinner></Spinner>
+  
+  {:else if state === "empty"}
     <p>No filters in this category. </p>
-
-  {:else}
+  
+  {:else if state === "ready"}
     {#each filters as filter (filter.id)}
       <section>
-        <span>{ filter.configuration.value }</span>
+        <span>{ filter.value }</span>
 
         <sl-switch
           bind:this={activeSwitch}
           checked={filter.active}
-          on:click={toggleFilter({ ...filter })}
-          on:keypress={toggleFilter({ ...filter })}
+          on:sl-change={Handle.toggle( filter )}
           size="medium">
         </sl-switch>
       

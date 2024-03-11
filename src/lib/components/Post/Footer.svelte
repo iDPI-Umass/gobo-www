@@ -1,13 +1,14 @@
 <script>
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
-  import * as h from "$lib/engines/post.js";
+  import { Post } from "$lib/engines/post.js";
 
+  export let identity;
   export let post;
   export let showWhy;
 
-  let logo = h.getLogo( post.platform );
-  let sourceCopy = h.getSourceCopy( post.platform );
-  let url = post.proxyURL ?? post.url;
+  let logo = Post.logo( post );
+  let copy = Post.copy( post );
+  let url = Post.href( post );
 
 </script>
 
@@ -16,7 +17,7 @@
   {#if showWhy === true}
     <a
       class="why"
-      href="/reason/{post.identity}/{post.id}">
+      href="/reason/{identity}/{post.id}">
       <sl-icon src="/icons/question-circle.svg"></sl-icon>
     </a>
   {/if}
@@ -29,7 +30,7 @@
     target="_blank" 
     rel="noopener noreferrer nofollow">
     <sl-icon src="{ logo }" class="{ post.platform }"></sl-icon>
-    <span>{ sourceCopy }</span>     
+    <span>{ copy }</span>     
   </a>
  
 </footer>

@@ -30,7 +30,7 @@
 
 
   const Handle = {};
-  Handle.switchIdentity = ( identity ) => {
+  Handle.toggle = ( identity ) => {
     return ( event ) => {
       identity.active = event.target.checked;
       Draft.updateAspect( "identities", identities );
@@ -107,7 +107,7 @@
           <sl-switch
             checked={identity.active}
             disabled={false}
-            on:sl-change={Handle.switchIdentity( identity )}
+            on:sl-change={Handle.toggle( identity )}
             size="medium">
           </sl-switch>
         

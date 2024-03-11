@@ -1,57 +1,110 @@
 <script>
-  import * as h from "$lib/engines/post.js";
+  import Spinner from "$lib/components/primitives/Spinner.svelte";
+  import { onMount } from "svelte";
+  import { State } from "$lib/engines/store.js";
+  import { Identity } from "$lib/engines/identity.js";
+  import { Post, Source } from "$lib/engines/post.js";
 
-  export let baseURL;
-  export let notification;
-  export let source;
+  export let identity = null;
+  export let notification = null;
+  export let source = null;
   export let post = {};
 
-  const { platform, type } = notification;
-  
-  let logo = h.getLogo( platform );
-  let sourceCopy = h.getSourceCopy( platform );
+  let state, logo, copy, url;
+  const Render = State.make();
+  Render.cleanup = () => {
+    state = "loading";
+    logo = null;
+    copy = null;
+    url = "#";
+  };
 
-  const getDirectMessageURL = () => {    
+  Render.footer = async () => {
+    if ( identity == null ) {
+      console.error("render notification footer: identity is null");
+      state = "error";
+      return;
+    }
+
+    if ( notification == null ) {
+      console.error("render notification footer: notification is null");
+      state = "error";
+      return;
+    }
+
+    if ( source == null ) {
+      console.error("render notification footer: source is null");
+      state = "error";
+      return;
+    }
+
+    logo = Post.logo( source );
+    copy = Post.copy( source );
+    url = await Render.url();
+    if ( url == null ) {
+      console.error("problem rendering url for notification footer");
+      state = "error";
+      return;
+    }
+    state = "ready";
+  };
+
+  Render.directMessageURL = async () => {
+    let match, baseURL;
     switch ( platform ) {
       case "mastodon":
+        match = await Identity.find( identity );
+        baseURL = match.base_url; 
         return new URL( "/conversations", baseURL ).href;
       default:
         console.error(`we do not yet support building a URL for the in-platform location of direct messages for platform ${platform}`);
-        return "#"
+        return;
     }
   };
 
-  let url;
-  switch ( type ) {
-    case "repost":
-    case "like":
-      url = post.proxyURL ?? post.url;
-      break;
-    case "follow":
-      url = source.url;
-      break;
-    case "direct message":
-      url = getDirectMessageURL();
-      break;
-    default:
-      url = "#";
-      console.error("unable to match notification to appropriate frame.");
-  }
+  Render.url = async () => {
+    switch ( type ) {
+      case "repost":
+      case "like":
+        return Post.href( post );
+      case "follow":
+        return Source.href( source );
+      case "direct message":
+        return await getDirectMessageURL();
+      default:
+        console.error("unable to match notification to appropriate frame.");
+        return;
+    }
+  };
 
+
+  Render.reset();
+  onMount(() => {
+    Render.footer();
+    return () => {
+      Render.reset();
+    }
+  });
 </script>
 
 
 <footer>
-
-  <a
-    class="source-link"
-    href="{ url }"
-    target="_blank" 
-    rel="noopener noreferrer nofollow">
-    <sl-icon src="{ logo }" class="{ platform }"></sl-icon>
-    <span>{ sourceCopy }</span>     
-  </a>
- 
+  {#if state === "error"}
+    <p>There was a problem rendering this view.</p>
+  
+  {:else if state === "loading"}
+    <Spinner></Spinner>
+  
+  {:else if state === "ready"}
+    <a
+      class="source-link"
+      href="{ url }"
+      target="_blank" 
+      rel="noopener noreferrer nofollow">
+      <sl-icon src="{ logo }" class="{ source.platform }"></sl-icon>
+      <span>{ copy }</span>     
+    </a>
+  {/if}
 </footer>
 
 

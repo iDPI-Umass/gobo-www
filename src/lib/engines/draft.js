@@ -5,8 +5,8 @@ import * as LS from "$lib/helpers/local-storage.js";
 import * as Random from "$lib/helpers/random.js";
 import * as Post from "$lib/resources/post.js";
 import * as Image from "$lib/resources/draft-image.js";
-import * as IdentityEngine from "$lib/engines/identity.js";
-import { draftStores } from "$lib/stores/draft.js";
+import { Identity as IdentityEngine } from "$lib/engines/identity.js";
+import * as draftStores from "$lib/stores/draft.js";
 import { RichText, BskyAgent, UnicodeString } from "@atproto/api";
 
 
@@ -198,6 +198,9 @@ Identity.clear = () => {
 };
 
 
+const Name = IdentityEngine.Name;
+
+
 const Lock = {
   find: () => {
     const draft = Draft.read();
@@ -263,28 +266,6 @@ Options.update = ( name, value ) => {
 
 
 
-
-
-const Name = {};
-Name.split = ( name ) => {
-  const output = [];
-  let current = [];
-  
-  for ( const c of name ) {
-    if ( c === "@" ) {
-      output.push( current.join( "" ));
-      current = [ "@" ];
-    } else if ( c === "." ) {
-      output.push( current.join( "" ));
-      current = [ "." ];
-    } else {
-      current.push( c );
-    }
-  }
-
-  output.push( current.join( "" ));
-  return output;
-};
 
 
 const Media = {
@@ -707,13 +688,11 @@ Draft.publish = Publish.flow;
 export {
   Draft,
   Identity,
+  Name,
   Lock,
 
   Options,
-
-  Name,
   Media,
-
   State,
 
   Validate,

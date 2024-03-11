@@ -1,30 +1,80 @@
 <script>
-  import { render } from "$lib/helpers/markdown.js";
-  
-  export let title = null;
-  export let content = "";
+  import Spinner from "$lib/components/primitives/Spinner.svelte";
+  import { onMount } from "svelte";
+  import { State } from "$lib/engines/store.js";
+  import { Post } from "$lib/engines/post.js";
+
+  export let identity = null;
+  export let id = null;
   export let styles = {};
 
-  let renderedContent = render( content );
-  
-  styles.marginTop ??= "0";
-  styles.maxHeight ??= "unset"
+  let state, post, content;
+  const Render = State.make();
+  Render.cleanup = () => {
+    state = "loading";
+    post = null;
+    content = null;
+  };
+
+  Render.post = async () => {
+    if ( identity == null ) {
+      console.error("render post: identity is null");
+      state = "error";
+      return;
+    }
+
+    if ( id == null ) {
+      console.error("render post: post ID is null");
+      state = "error";
+      return;
+    }
+
+    post = await Post.get({ identity, id });
+    if ( post == null ) {
+      state = "error";
+      return;
+    }
+
+    content = Post.content( post );
+    styles.marginTop ??= "0";
+    styles.maxHeight ??= "unset"
+    state = "ready";
+  };
+
+  Render.reset();
+  onMount(() => {
+    Render.post();
+    return () => {
+      Render.reset();
+    }
+  })
 </script>
 
 
-<section
-  class="content"
-  style:max-height={styles.maxHeight}
-  style:margin-top={styles.marginTop}
-  >
-  {#if title != null}
-    <h2>{title}</h2>
-  {/if}
+{#if state === "error"}
+  <section>
+    <p>There was a problem displaying this post content.</p>
+  </section>
 
-  {#if renderedContent}
-    {@html renderedContent}
-  {/if}          
-</section>
+{:else if state === "loading"}
+  <Spinner></Spinner>
+
+{:else if state === "ready"}
+  <section
+    class="content"
+    style:max-height={styles.maxHeight}
+    style:margin-top={styles.marginTop}
+    >
+    {#if post.title != null}
+      <h2>{post.title}</h2>
+    {/if}
+
+    {#if content}
+      {@html content}
+    {/if}          
+  </section>
+
+{/if}
 
 
 <style>

@@ -1,3 +1,5 @@
+import { Identity } from "$lib/engines/identity.js";
+import { Weave } from "$lib/engines/weave.js";
 import * as Notifications from "$lib/resources/person-identity-feeds/_notifications.js";
 import { Cache } from "$lib/resources/cache.js";
 
@@ -8,7 +10,7 @@ import { Cache } from "$lib/resources/cache.js";
 
 
 class Reader {
-  constructor ({ identity, per_page, client, view }) {
+  constructor ({ identity, per_page, view }) {
     this.identity = identity;
     this.id = identity.id
     this.per_page = per_page ?? 50;
@@ -40,15 +42,10 @@ class Reader {
     }
 
     // Prepare the raw graph for integration into application state.
-    const weave = weaveGraph( graph );
+    const weave = Weave.make( graph );
 
     // Store graph state in the application cache.
-    Cache.putPosts( weave.posts );
-    Cache.putSources( weave.sources );
-    Cache.decorateMastodon( Object.keys(weave.posts) );
-    Cache.putPostEdges( this.id, weave.postEdges );
-    Cache.putNotifications( weave.notifications );
-
+    Cache.mergeWeave( this.identity, weave );
 
     // Almost done. Place results into outer interface and ready next cycle.
     const feed = [];
@@ -125,7 +122,6 @@ class Reader {
     this.head = this.queue[0]?.notified;
     return { 
       identity: this.id, 
-      baseURL: this.identity.base_url,
       notification 
     };
   }
@@ -139,8 +135,9 @@ class Feed {
     this.readers = readers;
   }
 
-  static async create ({ identities, view }) {
+  static async make ({ view }) {
     const readers = [];
+    const identities = await Identity.findActive();
     for ( const identity of identities ) {
       readers.push( await Reader.create({ identity, view }) );
     }
@@ -191,47 +188,6 @@ class Feed {
     }
   }
 }
-
-
-// TODO: I copied this from the filter engine interface and modififed. This needs
-// to be a part of the refactor.
-const weaveGraph = function ( graph ) {
-  const feed = [ ...graph.feed ];
-  const posts = {};
-  const sources = {};
-  const postEdges = {};
-  const notifications = {};
-
-  for ( const post of graph.posts ) {
-    posts[ post.id ] = post;
-  }
-  for ( const share of graph.shares ?? [] ) {
-    posts[ share[0] ].shares ??= [];
-    posts[ share[0] ].shares.push( share[1] );
-  }
-  for ( const thread of graph.threads ?? [] ) {
-    posts[ thread[0] ].threads ??= [];
-    posts[ thread[0] ].threads.push( thread[1] );
-  }
-  for ( const source of graph.sources ) {
-    sources[ source.id ] = source;
-  }
-  for ( const edge of graph.post_edges ?? [] ) {
-    postEdges[ edge[0] ] ??= new Set();
-    postEdges[ edge[0] ].add( edge[1] );
-  }
-  for ( const notification of graph.notifications ?? [] ) {
-    notifications[ notification.id ] = notification;
-  }
-
-  return {
-    feed,
-    posts,
-    sources,
-    postEdges,
-    notifications
-  };
-};
 
 
 export {

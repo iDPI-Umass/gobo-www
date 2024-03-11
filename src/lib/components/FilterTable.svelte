@@ -7,7 +7,7 @@
   import { State } from "$lib/engines/store.js";
   import { Filter } from "$lib/engines/filter.js";
   import { Feed } from "$lib/engines/feed.js";
-  import { filterStore } from "$lib/stores/filter.js";
+  import * as filterStores from "$lib/stores/filter.js";
   import { allyEvent } from "$lib/helpers/event";
 
   export let category;
@@ -24,35 +24,36 @@
 
 
   const Handle = {};
-  Handle.remove = ( filter ) => {
-    return allyEvent(() => {
+  Handle.error = ( f ) => {
+    return async ( event ) => {
       try {
-        Filter.remove( filter );
-        Feed.refresh();
+        await f( event );
       } catch ( error ) {
         // TODO: Visually represent an error here.
-        console.error( error );
+        console.error( error );        
       }
-    });
+    }
+  };
+
+  Handle.remove = ( filter ) => {
+    return Handle.error( allyEvent( async () => {
+      await Filter.remove( filter );
+      await Feed.refresh();
+    }));
   };
 
   Handle.toggle = ( filter ) => {
-    return allyEvent(() => {
-      try {
-        filter.active = !filter.active;
-        Filter.update( filter );
-        Feed.refresh();
-      } catch ( error ) {
-        // TODO: Visually represent an error here.
-        console.error( error );
-      }
+    return Handle.error( async () => {
+      filter.active = !filter.active;
+      await Filter.update( filter );
+      await Feed.refresh();
     });
   };
 
 
   Render.reset();
   onMount(() => {
-    Render.listen( filterStore, Render.filters );
+    Render.listen( filterStores.singleton, Render.filters );
     return () => {
       Render.reset();
     }
@@ -72,8 +73,7 @@
             <sl-switch
               size="medium"
               checked="{filter.active}"
-              on:click={Handle.toggle( filter )}
-              on:keypress={Handle.toggle( filter )}>
+              on:sl-change={Handle.toggle( filter )}>
             </sl-switch>
 
           </span>

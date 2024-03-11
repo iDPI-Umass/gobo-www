@@ -10,72 +10,84 @@
   import "@shoelace-style/shoelace/dist/components/option/option.js";
   import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
   import  "@shoelace-style/shoelace/dist/components/icon/icon.js";
+  import Spinner from "$lib/components/primitives/Spinner.svelte";
   import BackLink from "$lib/components/primitives/BackLink.svelte";
-  import * as FeedSaver from "$lib/engines/feed-singleton.js";
-  import { feedStore } from "$lib/stores/feed.js";
-  import { goto } from "$app/navigation";
   import { onMount } from "svelte";
+  import { goto } from "$app/navigation";
+  import { State } from "$lib/engines/store.js";
+  import { Filter } from "$lib/engines/filter.js";
+  import { Feed } from "$lib/engines/feed.js";
 
   export let data;
-  let form, button, select, currentCategory = "block-keyword";
 
-  const addKeyword = async function () {
+  let form, button, select;
+  let category, copy;
+  const Render = State.make();
+  Render.cleanup = () => {
+    copy = "";
+    category = "block-keyword";
+  };
+
+  Render.form = () => {
+    Render.copy();
+  };
+
+  Render.copy = () => {
+    switch ( category ) {
+      case "block-keyword":
+        copy = "Gobo will exclude posts from your feed that include this word or phrase.";
+        break;
+      case "block-username":
+        copy = "Gobo will exclude posts from your feed by this username (e.g., @gobo.bsky.social or r/idpi).";
+        break;
+      case "block-domain":
+        copy = "Gobo will exclude posts from your feed that include links to this domain (e.g., publicinfrastructure.com)."; 
+        break;
+      default:
+        copy = "";
+    }
+  };
+
+
+  const Handle = {};
+  Handle.add = async ( event ) => {
+    event.preventDefault();
+    if ( button.loading === true ) {
+       return;
+    }
+
+    button.loading = true;
     const data = new FormData( form );
     const category = data.get( "category" );
     const configuration = {
       value: data.get( "word" )
     };
-    
+
     try {
-      const engine = await FeedSaver.getEngine();
-      await engine.filterEngine.addFilter( category, configuration );
+      await Filter.add( category, configuration );
       form.reset();
-      select.value = "block-keyword";
-      feedStore.push({ command: "reset" });
+      select.value = currentCategory;
+      await Feed.refresh();
+      button.loading = false;
       goto( "/settings/filters" );
     } catch ( error ) {
       // TODO: Visually represent an error here.
       console.error( error );
+      button.loading = false;
     }
-
-    button.loading = false;
   };
 
-  const getHintCopy = function ( category ) {
-    switch ( category ) {
-      case "block-keyword":
-        return "Gobo will exclude posts from your feed that include this word or phrase.";
-      case "block-username":
-        return "Gobo will exclude posts from your feed by this username (e.g., @gobo.bsky.social or r/idpi).";
-      case "block-domain":
-        return "Gobo will exclude posts from your feed that include links to this domain (e.g., publicinfrastructure.com)."; 
-      default:
-        console.warn( "unknown category, cannot provide hint copy." )
-        return "";
-    }
+  Handle.category = ( event ) => {
+    currentCategory = event.target.value;
+    Render.copy();
   };
 
   
-
-  onMount( function () {
-    const listener = async function ( event ) {
-      event.preventDefault();
-      if ( button.loading !== true ) {
-        button.loading = true;
-        await addKeyword();
-      }
-    };
-
-    const selectListener = function ( event ) {
-      currentCategory = event.target.value;
-    };
-
-    form.addEventListener( "submit", listener );
-    select.addEventListener( "sl-change", selectListener );
-
-    return function () {
-      form.removeEventListener( "submit", listener );
-      select.removeEventListener( "sl-change", selectListener );
+  Render.reset();
+  onMount(() => {
+    Render.form();
+    return () => {
+      Render.reset();
     };
   });
 </script>
@@ -89,9 +101,10 @@
     </p>
   {/if}
 
-  <form class="gobo-form" bind:this={form}>
+  <form class="gobo-form" bind:this={form} on:submit={Handle.add}>
     <sl-select
       bind:this={select}
+      on:sl-change={Handle.category}
       name="category"
       value="block-keyword"
       label="Category"
@@ -105,7 +118,7 @@
     <sl-input
       name="word"
       label="Pattern"
-      help-text={getHintCopy(currentCategory)}
+      help-text={copy}
       autocomplete="off"
       size="medium">
     </sl-input>

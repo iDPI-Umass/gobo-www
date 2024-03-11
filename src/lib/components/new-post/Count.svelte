@@ -2,13 +2,13 @@
 <script>
   import "@shoelace-style/shoelace/dist/components/progress-ring/progress-ring.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
-  import * as h from "$lib/engines/post.js";
   import { onMount } from "svelte";
+  import { Post } from "$lib/engines/post.js";
   import { State, Bluesky, Mastodon, Smalltown, Reddit } from "$lib/engines/draft.js";
 
   export let platform;
   
-  let logo = h.getLogo( platform );
+  let logo = Post.logo({ platform });
   let Model = Bluesky;
   switch ( platform ) {
     case "bluesky":

@@ -4,21 +4,36 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
   import IdentityMini from "$lib/components/IdentityMini.svelte";
-  import * as FeedSaver from "$lib/engines/feed-singleton.js";
+  import { onMount } from "svelte";
+  import { State } from "$lib/engines/store.js";
+  import * as identityStores from "$lib/stores/identity.js";
+    import { Filter } from "$lib/engines/filter";
 
-  let identities = [];
-  let allEmpty = true;
+  let identities, state;
+  const Render = State.make();
+  Render.cleanup = () => {
+    identities = [];
+    state = "loading";
+  };
 
-  const loadIdentities = async function () {
-    const engine = await FeedSaver.getEngine();
-    identities = engine.getIdentities();
-    
+  Render.identities = ( list ) => {
+    identities = list;
+  
     if ( identities.length === 0 ) {
-      allEmpty = true;
+      state = "empty";
     } else {
-      allEmpty = false;
+      state = "ready";
     }
   };
+
+
+  Render.reset();
+  onMount(() => {
+    Render.listen( identityStores.singleton, Render.identities );
+    return () => {
+      Render.reset();
+    };
+  });
 </script>
 
 <section class="outer-frame">
@@ -27,23 +42,22 @@
     <h2>Identities</h2>
   </header>
 
-  {#await loadIdentities()}
-  
+  {#if state === "loading"}
     <Spinner></Spinner>
   
-  {:then}
-
+  {:else if state === "emtpy"}
     <section class="inner-frame">
-      {#if allEmpty === true}
-        <p>No identities currently registered.</p>
-      {/if}
-
+      <p>No identities currently registered.</p>
+    </section>
+  
+  {:else if state === "ready"}
+    <section class="inner-frame">
       {#each identities as identity (identity.id)}  
         <IdentityMini {identity}></IdentityMini>
       {/each}
     </section>
 
-  {/await}
+  {/if}
 
 </section>
 

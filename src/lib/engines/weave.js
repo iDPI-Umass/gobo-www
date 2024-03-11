@@ -9,6 +9,7 @@ Weave.make = ( graph ) => {
   const posts = {};
   const sources = {};
   const postEdges = {};
+  const notifications = {};
 
   for ( const post of graph.posts ) {
     posts[ post.id ] = post;
@@ -28,12 +29,16 @@ Weave.make = ( graph ) => {
     postEdges[ edge[0] ] ??= new Set();
     postEdges[ edge[0] ].add( edge[1] );
   }
+  for ( const notification of graph.notifications ?? [] ) {
+    notifications[ notification.id ] = notification;
+  }
 
   return {
     feed,
     posts,
     sources,
-    postEdges
+    postEdges,
+    notifications
   };
 };
 

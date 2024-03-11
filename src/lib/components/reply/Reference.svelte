@@ -8,7 +8,7 @@
   const Render = State.make();
 
   Render.cycle = async ( draft ) => {
-    if ( draft.reply?.data == null ) {
+    if ( draft.reply == null ) {
       state = "waiting";
       return;
     }
@@ -37,7 +37,7 @@
   {:else}
     <Post
       identity={reference.identity}
-      {...reference.data}
+      id={reference.id}
       fullPage={true}>
     </Post>
   {/if}

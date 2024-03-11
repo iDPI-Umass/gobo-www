@@ -3,123 +3,115 @@
   import "@shoelace-style/shoelace/dist/components/tab/tab.js";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
   import Notification from "$lib/components/Notification/Notification.svelte";
+  
   import { onMount, tick } from "svelte";
+  import { Feed, Position, Count } from "$lib/engines/notification.js";
+  import { State } from "$lib/engines/store.js";
+  import { Scroll } from "$lib/engines/scroll.js";
+  // import * as scrollStores from "$lib/stores/scroll.js";
+  import * as notificationStores from "$lib/stores/notification.js";
 
-  import * as FeedSaver from "$lib/engines/notification-singleton.js";
-  import { ScrollSmoother } from "$lib/helpers/infinite-scroll.js";
-  import { scrollStore } from "$lib/stores/notification-scroll.js";
-  import { feedStore } from "$lib/stores/notification-feed.js";
-  import { countStore } from "$lib/stores/notifications/count.js";
+  let _feed, _tabs;
+  let notifications, state, scroll, view;
+  const Render = State.make();
+  Render.cleanup = () => {
+    notifications = [];
+    state = "loading";
+    scroll = undefined;
+    view = "all";
+  };
 
-  let tabs, feed, engine;
-  let items = [];
-  let loaded = false;
-  let view = "all";
 
-  const pull = async function ( count, marker ) {
-    const current = await engine.pull( count, marker );
-    if ( current.length > 0 ) {
-      const _items = [ ...items, ...current ];
-      FeedSaver.setFeed( _items );
-      items = _items;
+  Render.feed = async ( feed ) => {
+    notifications = feed.notifications;
+    Render.state();
+    Render.scroll( feed );
+    Count.clear();
+  };
+
+  Render.state = () => {    
+    if ( notifications.length === 0 ) {
+      state = "empty";
+    } else {
+      state = "ready";
     }
   };
 
-  const loadFeed = async function () {
-    engine = await FeedSaver.getEngine({ view });
-    items = FeedSaver.getFeed();
-    if ( items.length === 0 ) {
-      await pull( 25 );
-    }
-    loaded = true;
+  Render.scroll = async ( feed ) => {
     await tick();
-    feed.scrollTo( 0, FeedSaver.getScrollPosition() );
-  };  
-  
-  onMount( function () {
-    countStore.clear();
-    const smoother = ScrollSmoother.create({ element: feed });
-
-    const rawListener = function ( event ) {
-      event.preventDefault();
-      scrollStore.push( event );
-    };
-
-    const smoothListener = async function ( event ) {
-      await pull( 25 );
-    };
-
-    feed.addEventListener( "scroll", rawListener );
-    feed.addEventListener( "gobo-smooth-scroll", smoothListener );
-
-    const unsubscribeScroll = scrollStore.subscribe( function ( event ) {
-      if ( engine == null || event == null ) {
-        return;
-      }
-      feed.scrollBy( 0, event.deltaY );
-      FeedSaver.setScrollPosition( feed.scrollTop );
-      smoother.update( event );
-      scrollStore.push(null); // We're using store as message queue, clear out old message.
-    });
-
-    const unsubscribeFeed = feedStore.subscribe( async function ( event ) {
-      const command = event?.command;
-      if ( command == null ) {
-        return;
-      }
-
-      switch ( command ) {
-        case "reset":
-          loaded = false;
-          smoother.stop();
-          items = [];
-          countStore.clear();
-          await FeedSaver.reset({ view });
-          await loadFeed();
-          smoother.start();
-          feedStore.push({}); // We're using store as message queue, clear out old message.
-          break;
-      }
-    });
-
-    
-    tabs.addEventListener("sl-tab-show", function ( event ) {
-        view = event.detail.name;
-        feedStore.push({ command: "reset" });
-    });
+    _feed.scrollTo( 0, feed.position );
+    scroll.listen();
+  };
 
 
-    smoother.start();
-    loadFeed();
+  const Handle = {};
+  Handle.command = async ( event ) => {
+    switch ( event.name ) {
+      case "refresh":
+        state = "loading";
+        await Feed.pull( 25 );
+        Feed.command( "ready" );
+        break;
+      case "ready":
+        break; // no-op
+      default:
+        console.warn("unrecognized feed command", event);
+    }
+  };
+
+  Handle.tab = async ( event ) => {
+    view = event.detail.name;
+    Feed.refresh({ view });
+  };
+
+  Handle.scroll = ( event ) => {
+    scroll.event( event );
+    Position.write( _feed.scrollTop );
+  };
+
+  Handle.infiniteScroll = ( event ) => {
+    Feed.pull( 25 );
+  };
 
 
-    return function () {
-      feed.removeEventListener( "scroll", rawListener );
-      feed.removeEventListener( "gobo-smooth-scroll", smoothListener );
-      smoother.stop();
-      unsubscribeScroll();
-      unsubscribeFeed();
-    };
+  Render.reset();
+  onMount(() => {
+    scroll = Scroll.make({ element: _feed });
+    Render.listen( notificationStores.singleton, Render.feed );
+    Render.listen( notificationStores.command, Handle.command );
+    _feed.addEventListener( "scroll", Handle.scroll );
+    _feed.addEventListener( "gobo-infinite-scroll", Handle.infiniteScroll );
+    return () => {
+      _feed.removeEventListener( "scroll", Handle.scroll );
+      _feed.removeEventListener( "gobo-infinite-scroll", Handle.infiniteScroll );
+      scroll.halt();
+      Render.reset();
+    }
   });
-
 </script>
 
-<sl-tab-group bind:this={tabs}>
+<sl-tab-group bind:this={_tabs} on:sl-tab-show={Handle.tab}>
   <sl-tab slot="nav" panel="all">All</sl-tab>
   <sl-tab slot="nav" panel="mentions">Mentions</sl-tab>
 </sl-tab-group>
   
-<section class="feed" bind:this={feed}>
-  {#if loaded === false }
+<section class="feed" bind:this={_feed}>
+  {#if state === "loading"}
     <Spinner></Spinner>
-  {:else if items.length > 0}
-    {#each items as { identity, baseURL, notification } }
-      <Notification {identity} {baseURL} {notification}></Notification>
-    {/each}
-  {:else if items.length === 0 }
+  {:else if state === "empty"}
     <section class="gobo-copy">
       <p>
         No notifications at this time.
+      </p> 
+    </section>
+  {:else if state === "ready"}
+    {#each notifications as { identity, notification } (notification.id) }
+      <Notification {identity} {notification}></Notification>
+    {/each}
+  {:else}
+    <section class="gobo-copy">
+      <p>
+        There was a problem displaying your notifications.
       </p> 
     </section>
   {/if}

@@ -2,6 +2,7 @@
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
+  import Spinner from "$lib/components/primitives/Spinner.svelte";
   import Gutter from "$lib/components/Post/Gutter.svelte";
   import Heading from '$lib/components/Post/Heading.svelte';
   import PostMedia from "$lib/components/PostMedia.svelte";
@@ -14,73 +15,85 @@
   import PostConnector from "$lib/components/PostConnector.svelte";
   import PostActions from "$lib/components/PostActions.svelte";
   import Footer from "$lib/components/Post/Footer.svelte";
-  import { humanize } from "$lib/helpers/humanize.js";
-  import { render } from "$lib/helpers/markdown.js";
+
+  import { onMount } from "svelte";
   import { goto } from "$app/navigation";
-  import { Cache } from "$lib/resources/cache.js";
-  import * as h from "$lib/engines/post.js";
+  import { State } from "$lib/engines/store.js";
+  import { Post, Click } from "$lib/engines/post.js";
 
-  export let identity;
-
-  export let id;
-  export let platform;
-  export let source_id;
-  export let base_url;
-  export let title = null;
-  export let content = null;
-  export let url;
-  export let proxyURL = null;
-  export let published;
-  export let attachments = [];
-  export let shares = [];
-  export let threads = [];
-  export let poll = null;
-
-  export let platform_id;
-  export let visibility = null;
-  export let created;
-  export let updated;
-
+  export let identity = null;
+  export let id = null;
   export let fullPage = false;
   export let showWhy = true;
 
-  let unused = [ base_url, platform_id, visibility, created, updated ];
-  let footer = { id, identity, platform, proxyURL, url };
-  let source = Cache.getSource( source_id );
-  let sharedPost = h.getShare( shares );
-  let threadPosts = h.getThreads( threads );
-  let actionTarget = h.getActionTarget({ id, content, sharedPost });
-  let { headingSlot1, headingSlot2 } = h.getHeadingSlots( source );
-  let avatar = h.getAvatar( source );
-  let avatarFallback = h.getAvatarFallback( source );
-  let renderedContent = render( content );
-  let mediaEmbeds = attachments.filter( a => /^(image|video)\//.test(a.type) );
-  let textEmbeds = attachments.filter( a => /^application\/json/.test(a.type) );
-  let clickURL = `/post/${ identity }/${ id }`
+  let state, post, source, content, published;
+  let share, thread, actionTarget, embeds, styles;
+  let clickURL = `/post/${ identity }/${ id }`;
+  const Render = State.make();
+  Render.cleanup = () => {
+    state = "loading";
+    post = null;
+    source = null;
+    content = null;
+    published = null;
+    share = null;
+    thread = [];
+    actionTarget = null;
+    embeds = {};
+    styles = {};
+  };
 
-  const styles = {}
-  if ( fullPage === true ) {
-    styles.cursor = "inherit";
-  } else {
-    styles.cursor = "pointer";
-  }
-  
-  styles.maxHeight = "15rem";
-  styles.gradientStop = "10rem";
-  if ( fullPage === true ) {
-    styles.gradient = "none"
-  } else {
-    styles.gradient = "linear-gradient( 180deg, #000 var(--gradient-stop), transparent )"
-  }
+  Render.post = async () => {
+    if ( identity == null ) {
+      console.error("render post: identity is null");
+      state = "error";
+      return;
+    }
+
+    if ( id == null ) {
+      console.error("render post: post ID is null");
+      state = "error";
+      return;
+    }
+
+    post = await Post.get({ identity, id });
+    if ( post == null ) {
+      state = "error";
+      return;
+    }
+
+    source = Post.source( post );
+    if ( source == null ) {
+      state = "error";
+      return;
+    }
+
+    content = Post.content( post );
+    published = Post.published( post );
+    share = Post.share( post );
+    thread = Post.thread( post );
+    actionTarget = Post.actionTarget( post );
+    embeds = Post.embeds( post );
+    styles = Post.styles( post, { fullPage });
+    state = "ready";
+  };
 
 
-  const handleClick = function ( event ) {
-    const doesPass = h.filterClickEvent( fullPage, event );
-    if ( doesPass ) {
-      // Go to the post's main page.
+  const Handle = {};
+  Handle.click = ( event ) => {
+    if ( state === "ready" && Click.passes( fullPage, event )) {
       goto( clickURL );
     }
   };
+
+
+  Render.reset();
+  onMount(() => {
+    Render.post();
+    return () => {
+      Render.reset();
+    };
+  })
 
 </script>
 
@@ -95,131 +108,143 @@
   style:--gradient-stop="{styles.gradientStop}"
   style:--gradient="{styles.gradient}"
   style:margin-top="{fullPage ? '2rem' : '0'}" 
-  on:click={handleClick}
-  on:keydown={handleClick}>
+  on:click={Handle.click}
+  on:keydown={Handle.click}>
 
-  {#if fullPage === true}
-
-    {#each threadPosts as threadPost (threadPost.id)}
-      {#if h.isFilteredPost(threadPost)}
-        <PostRepliedFiltered></PostRepliedFiltered>
-      {:else}
-        <PostReplied 
-          {identity} 
-          centerID={id}
-          {...threadPost}
-          {fullPage}>
-        </PostReplied>
-      {/if}
-      
-    {/each}
+  {#if state === "error"}
+    <p>There was a problem displaying this post.</p>
   
-  {:else}
+  {:else if state === "loading"}
+    <Spinner></Spinner>
+  
+  {:else if state === "ready"}
+    {#if fullPage === true}
 
-    {#if threadPosts.length > 2}
-
-      {#if h.isFilteredPost(threadPosts.at(0))}
-        <PostRepliedFiltered></PostRepliedFiltered>
-      {:else}
-        <PostReplied 
-          {identity} 
-          centerID={id}
-          {...threadPosts.at(0)}
-          {fullPage}>
-        </PostReplied>
-      {/if}
-    
-      <PostConnector url={clickURL}></PostConnector>
-
-      {#if h.isFilteredPost(threadPosts.at(-1))}
-        <PostRepliedFiltered></PostRepliedFiltered>
-      {:else}
-        <PostReplied 
-          {identity} 
-          centerID={id}
-          {...threadPosts.at(-1)}
-          {fullPage}>
-        </PostReplied>
-      {/if}
-    
-    {:else}
-
-      {#each threadPosts as threadPost (threadPost.id)}
-        {#if h.isFilteredPost(threadPost)}
+      {#each thread as ref (ref.id)}
+        {#if Post.isFiltered( ref )}
           <PostRepliedFiltered></PostRepliedFiltered>
         {:else}
           <PostReplied 
             {identity} 
             centerID={id}
-            {...threadPost}
+            id={ref.id}
             {fullPage}>
           </PostReplied>
         {/if}
+        
       {/each}
+    
+    {:else}
+
+      {#if thread.length > 2}
+
+        {#if Post.isFiltered(thread.at(0))}
+          <PostRepliedFiltered></PostRepliedFiltered>
+        {:else}
+          <PostReplied 
+            {identity} 
+            centerID={id}
+            id={thread.at(0).id}
+            {fullPage}>
+          </PostReplied>
+        {/if}
+      
+        <PostConnector url={clickURL}></PostConnector>
+
+        {#if Post.isFiltered(thread.at(-1))}
+          <PostRepliedFiltered></PostRepliedFiltered>
+        {:else}
+          <PostReplied 
+            {identity} 
+            centerID={id}
+            id={thread.at(-1).id}
+            {fullPage}>
+          </PostReplied>
+        {/if}
+      
+      {:else}
+
+        {#each thread as ref (ref.id)}
+          {#if Post.isFiltered(ref)}
+            <PostRepliedFiltered></PostRepliedFiltered>
+          {:else}
+            <PostReplied 
+              {identity} 
+              centerID={id}
+              id={ref.id}
+              {fullPage}>
+            </PostReplied>
+          {/if}
+        {/each}
+
+      {/if}
 
     {/if}
 
-  {/if}
+    <div class="inner-frame">
+      <Gutter {source}></Gutter>
 
-  <div class="inner-frame">
-    <Gutter {source}></Gutter>
+      <div class="main">
+        
+        <header>
+          <Heading {source} ></Heading>
+          <time datetime="published">{ published }</time>
+        </header>
 
-    <div class="main">
-      
-      <header>
-        <Heading {source} ></Heading>
-        <time datetime="published">{ humanize( published ) }</time>
-      </header>
+        <section class="content" style={fullPage === true ? "max-height:unset" : ""}>
+          {#if post.title != null}
+            <h2>{post.title}</h2>
+          {/if}
 
-      <section class="content" style={fullPage === true ? "max-height:unset" : ""}>
-        {#if title != null}
-          <h2>{title}</h2>
+          {#if content}
+            {@html content}
+          {/if}          
+        </section>
+
+        {#if embeds.media.length > 0}
+          <div class="media">
+            <PostMedia {identity} {id} attachments={embeds.media}></PostMedia>
+          </div>
+        {:else if embeds.text.length > 0}
+          <div class="text-embed">
+            <PostSyndication attachments={embeds.text}></PostSyndication>
+          </div>
         {/if}
 
-        {#if renderedContent}
-          {@html renderedContent}
-        {/if}          
-      </section>
-
-      {#if mediaEmbeds.length > 0}
-        <div class="media">
-          <PostMedia {identity} {id} attachments={mediaEmbeds}></PostMedia>
-        </div>
-      {:else if textEmbeds.length > 0}
-        <div class="text-embed">
-          <PostSyndication attachments={textEmbeds}></PostSyndication>
-        </div>
-      {/if}
-
-      {#if poll}
-        <div class="poll">
-          <PostPoll {poll}></PostPoll>
-        </div>
-      {/if}
-
-      {#if sharedPost}
-        {#if h.isFilteredPost(sharedPost)}
-          <PostSharedFiltered></PostSharedFiltered>
-        {:else}
-          <PostShared
-            {identity} 
-            centerID={id}
-            {...sharedPost}
-            marginTop={content ? "1rem" : "6.5px"}
-            {fullPage}>
-          </PostShared>
+        {#if post.poll}
+          <div class="poll">
+            <PostPoll poll={post.poll}></PostPoll>
+          </div>
         {/if}
-      {/if}
 
-      <PostActions {platform} {identity} post={actionTarget}></PostActions>
+        {#if share}
+          {#if Post.isFiltered(share)}
+            <PostSharedFiltered></PostSharedFiltered>
+          {:else}
+            <PostShared
+              {identity} 
+              centerID={id}
+              id={share.id}
+              marginTop={content ? "1rem" : "6.5px"}
+              {fullPage}>
+            </PostShared>
+          {/if}
+        {/if}
+
+        <PostActions 
+          {identity}
+          platform={post.platform}
+          post={actionTarget}>
+        </PostActions>
+
+      </div>
 
     </div>
 
-  </div>
 
+    <Footer {identity} {post} {showWhy}></Footer>
 
-  <Footer post={footer} {showWhy}></Footer>
-
+  {/if}
 </article>
 
 <style>

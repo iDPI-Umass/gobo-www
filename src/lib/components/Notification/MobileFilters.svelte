@@ -6,7 +6,7 @@
   import { onMount } from "svelte";
   import { State } from "$lib/engines/store.js";
   import { Identity } from "$lib/engines/identity.js";
-  import { identityStore } from "$lib/stores/identity";
+  import * as identityStores from "$lib/stores/identity";
 
   let identities, state;
   const Render = State.make();
@@ -22,7 +22,7 @@
 
   Render.reset();
   onMount(() => {
-    Render.listen( identityStore, Render.active );
+    Render.listen( identityStores.singleton, Render.active );
     return () => {
       Render.reset();
     };

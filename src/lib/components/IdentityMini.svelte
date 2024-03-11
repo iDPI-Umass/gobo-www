@@ -5,7 +5,7 @@
   import { State } from "$lib/engines/store.js";
   import { Identity } from "$lib/engines/identity.js";
   import { Feed } from "$lib/engines/feed.js";
-  import { Feed as Notifications } from "$lib/engines/notifications.js";
+  import { Feed as Notifications } from "$lib/engines/notification.js";
 
   export let identity;
   
@@ -15,9 +15,9 @@
 
   
   const Handle = {};
-  Handle.switch = async ( event ) => {
+  Handle.toggle = async ( event ) => {
     const active = event.target.checked
-    Identity.updateActive({ ...identity, active });
+    Identity.update({ ...identity, active });
     Feed.refresh();
     Notifications.refresh();
   };
@@ -41,7 +41,7 @@
   <sl-switch
     bind:this={activeSwitch}
     checked={identity.active}
-    on:sl-change={Handle.switch}
+    on:sl-change={Handle.toggle}
     size="medium">
   </sl-switch>
 

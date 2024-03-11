@@ -2,99 +2,136 @@
   import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/switch/switch.js";
+  import Spinner from "$lib/components/primitives/Spinner.svelte";
   import { onMount } from "svelte";
-  import * as Identity from "$lib/resources/identity.js";
-  import * as FeedSaver from "$lib/engines/feed-singleton.js";
-  import { Name } from "$lib/engines/draft.js";
+  import { State } from "$lib/engines/store.js";
+  import { Identity, Name } from "$lib/engines/identity.js";
+  import { Filter } from "$lib/engines/filter";
+  import * as identityStores from "$lib/stores/identity.js";
+  import { allyEvent } from "$lib/helpers/event";
 
   export let identity;
   
-  let deleteButton, activeSwitch;
+  let deleteButton;
   let logo = `/icons/${ identity.platform }.svg`;
-  let nameSlot1 = identity.name;
-  let nameSlot2 = identity.prettyName;
+  let state, names;
+  const Render = State.make();
+  Render.cleanup = () => {
+    state = "loading";
+    names = [];
+  };
 
-
-  const deleteIdentity = async function ( event ) {
-    event.preventDefault();
-    if ( deleteButton.loading === true ) {
+  Render.identity = ( list ) => {
+    const match = list.find( i => i.id === identity.id );
+    if ( match == null ) {
       return;
     }
 
-    deleteButton.loading = true;
-    await Identity.remove( identity );
+    names = [
+      identity.name,
+      Name.split( identity.prettyName ),
+    ];
 
-    // TODO: Figure out how to do this in svelte. I keep getting search results
-    // for invalidate, but I don't think it's what we need.
-    location.reload();
+    state = "ready";
   };
 
-  onMount( function () {
-    const listener = async function ( event ) {
-      const engine = await FeedSaver.getEngine();
-      engine.setActiveState( identity, event.target.checked );
-    };
+  
+  const Handle = {};
+  Handle.error = ( f ) => {
+    return async ( event ) => {
+      try {
+        await f( event );
+      } catch ( error ) {
+        // TODO: Visually represent an error here.
+        console.error( error );        
+      }
+    }
+  };
 
-    activeSwitch.addEventListener( "sl-change", listener );
+  Handle.remove = () => {
+    return Handle.error( allyEvent( async ( event ) => {
+      event.preventDefault();
+      if ( deleteButton.loading === true ) {
+        return;
+      }
 
-    return function () {
-      activeSwitch.removeEventListener( "sl-change", listener );
+      deleteButton.loading = true;
+      await Identity.remove( identity );
+
+      // TODO: Check if there's a Svelte preference for this.
+      location.reload();
+    }));
+  };
+
+  Handle.toggle = Handle.error( async ( event ) => {
+    identity.active = event.target.checked;
+    await Identity.update( identity );
+  });
+
+
+  Render.reset();
+  onMount(() => {
+    Render.listen( identityStores.singleton, Render.identity );
+    return () => {
+      Render.reset();
     };
   });
 </script>
 
 <section>
+  {#if state === "loading"}
+    <Spinner></Spinner>
   
-  <div>
-    <sl-switch
-      bind:this={activeSwitch}
-      checked={identity.active}
-      size="medium">
-      Active
-    </sl-switch>
+  {:else if state === "ready"}
+    <div>
+      <sl-switch
+        on:sl-change={Handle.toggle}
+        checked={identity.active}
+        size="medium">
+        Active
+      </sl-switch>
 
 
-    <sl-icon-button
-      bind:this={deleteButton}
-      variant="danger"
-      on:click={deleteIdentity}
-      on:keypress={deleteIdentity}
-      size="medium"
-      src="/icons/trash.svg">
-    </sl-icon-button>
+      <sl-icon-button
+        bind:this={deleteButton}
+        variant="danger"
+        on:click={Handle.remove}
+        on:keypress={Handle.remove}
+        size="medium"
+        src="/icons/trash.svg">
+      </sl-icon-button>
 
-  </div>
-
-
-  <h2>
-    <sl-icon src={logo} class="{identity.platform}"></sl-icon>
-    { identity.platform }
-  </h2>
+    </div>
 
 
-  <figure>
-
-    <img 
-      src={identity.profile_image} 
-      alt="profile picture for {identity.prettyName}">
-    
-    <figcaption>
-
-      {#if nameSlot1 != null}
-        <p class="slot1">{ nameSlot1 }</p>
-      {/if}
-
-      <p class="slot2">
-        {#each Name.split(nameSlot2) as part}
-          <span>{ part }</span>
-        {/each}
-      </p>
-    </figcaption>
-    
-  </figure>
+    <h2>
+      <sl-icon src={logo} class="{identity.platform}"></sl-icon>
+      { identity.platform }
+    </h2>
 
 
+    <figure>
 
+      <img 
+        src={identity.profile_image} 
+        alt="profile picture for {identity.prettyName}">
+      
+      <figcaption>
+
+        {#if names[0] != null}
+          <p class="slot1">{ names[0] }</p>
+        {/if}
+
+        <p class="slot2">
+          {#each names[1] as part}
+            <span>{ part }</span>
+          {/each}
+        </p>
+      </figcaption>
+      
+    </figure>
+  
+  {/if}
 </section>
 
 <style>

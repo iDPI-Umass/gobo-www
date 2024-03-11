@@ -2,78 +2,90 @@
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
+  import Spinner from "$lib/components/primitives/Spinner.svelte";
   import SharedHeading from "$lib/components/Post/SharedHeading.svelte";
   import PostSharedFiltered from "$lib/components/PostSharedFiltered.svelte";
   import PostMedia from "$lib/components/PostMedia.svelte";
   import PostSyndication from "$lib/components/PostSyndication.svelte";
   import PostPoll from "$lib/components/PostPoll.svelte";
-  import { humanize } from "$lib/helpers/humanize.js";
-  import { render } from "$lib/helpers/markdown.js";
+  import { onMount } from "svelte";
   import { goto } from "$app/navigation";
-  import { Cache } from "$lib/resources/cache.js";
-  import * as h from "$lib/engines/post.js";
+  import { State } from "$lib/engines/store.js";
+  import { Post, Click } from "$lib/engines/post.js";
 
-  export let identity;
   export let centerID;
-
-  export let id;
-  export let platform;
-  export let source_id;
-  export let base_url;
-  export let title = null;
-  export let content = null;
-  export let url;
-  export let proxyURL = null;
-  export let published;
-  export let attachments = [];
-  export let shares = [];
-  export let threads = null;
-  export let poll = null;
-
-  export let platform_id;
-  export let visibility = null;
-  export let created;
-  export let updated;
+  export let identity = null;
+  export let id = null;
+  export let fullPage = false;
   export let marginTop = "0";
 
-  export let fullPage = false;
+  let state, post, source, content, published;
+  let share, thread, actionTarget, embeds, styles;
+  const Render = State.make();
+  Render.cleanup = () => {
+    state = "loading";
+    post = null;
+    source = null;
+    content = null;
+    published = null;
+    share = null;
+    thread = [];
+    actionTarget = null;
+    embeds = {};
+    styles = {};
+  };
 
-  let unused = [ base_url, platform_id, visibility, created, updated, url, proxyURL, threads ];
-  let source = Cache.getSource( source_id );
-  let sharedPost = h.getShare( shares );
-  let logo = h.getLogo( platform );
-  let { headingSlot1, headingSlot2 } = h.getHeadingSlots( source );
-  let avatar = h.getAvatar( source );
-  let avatarFallback = h.getAvatarFallback( source );
-  let sourceCopy = h.getSourceCopy( platform );
-  let renderedContent = render( content );
-  let mediaEmbeds = attachments.filter( a => /^(image|video)\//.test(a.type) );
-  let textEmbeds = attachments.filter( a => /^application\/json/.test(a.type) );
+  Render.post = async () => {
+    if ( identity == null ) {
+      console.error("render post: identity is null");
+      state = "error";
+      return;
+    }
 
-  const styles = {}
-  if ( fullPage === true ) {
-    styles.cursor = "inherit";
-  } else {
-    styles.cursor = "pointer";
-  }
-  
-  styles.maxHeight = "15rem";
-  styles.gradientStop = "10rem";
-  if ( fullPage === true ) {
-    styles.gradient = "none"
-  } else {
-    styles.gradient = "linear-gradient( 180deg, #000 var(--gradient-stop), transparent )"
-  }
+    if ( id == null ) {
+      console.error("render post: post ID is null");
+      state = "error";
+      return;
+    }
+
+    post = await Post.get({ identity, id });
+    if ( post == null ) {
+      state = "error";
+      return;
+    }
+
+    source = Post.source( post );
+    if ( source == null ) {
+      state = "error";
+      return;
+    }
+
+    content = Post.content( post );
+    published = Post.published( post );
+    share = Post.share( post );
+    thread = Post.thread( post );
+    actionTarget = Post.actionTarget( post );
+    embeds = Post.embeds( post );
+    styles = Post.styles( post, { fullPage });
+    state = "ready";
+  };
 
 
-  const handleClick = function ( event ) {
-    const doesPass = h.filterClickEvent( fullPage, event );
-    if ( doesPass ) {
-      // Go to the post's main page.
+  const Handle = {};
+  Handle.click = ( event ) => {
+    if ( state === "ready" && Click.passes( fullPage, event )) {
       goto( `/post/${ identity }/${ centerID }`);
     }
   };
+  
 
+  Render.reset();
+  onMount(() => {
+    Render.post();
+    return () => {
+      Render.reset();
+    };
+  });
 </script>
 
 <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
@@ -86,59 +98,69 @@
   style:--max-height="{styles.maxHeight}"
   style:--gradient-stop="{styles.gradientStop}"
   style:--gradient="{styles.gradient}" 
-  on:click={handleClick}
-  on:keydown={handleClick}>
+  on:click={Handle.click}
+  on:keydown={Handle.click}>
+
+  {#if state === "error"}
+    <p>There was a problem displaying this post.</p>
+  
+  {:else if state === "loading"}
+    <Spinner></Spinner>
+  
+  {:else if state === "ready"}
 
 
-  <div class="inner-frame" style:--margin-top="{marginTop}">
-    <div class="main">
-      
-      <header>
-        <SharedHeading {source} ></SharedHeading>
-        <time datetime="published">{ humanize( published ) }</time>
-      </header>
+    <div class="inner-frame" style:--margin-top="{marginTop}">
+      <div class="main">
+        
+        <header>
+          <SharedHeading {source} ></SharedHeading>
+          <time datetime="published">{ published }</time>
+        </header>
 
-      <section class="content" style={fullPage === true ? "max-height:unset" : ""}>
-        {#if title != null}
-          <h2>{title}</h2>
+        <section class="content" style={fullPage === true ? "max-height:unset" : ""}>
+          {#if post.title != null}
+            <h2>{post.title}</h2>
+          {/if}
+
+          {#if content}
+            {@html content}
+          {/if}
+        </section>
+
+        {#if embeds.media.length > 0}
+          <div class="media">
+            <PostMedia {identity} {id} attachments={embeds.media}></PostMedia>
+          </div>
+        {:else if embeds.text.length > 0}
+          <div class="text-embed">
+            <PostSyndication attachments={embeds.text}></PostSyndication>
+          </div>
         {/if}
 
-        {#if renderedContent}
-          {@html renderedContent}
+        {#if post.poll}
+          <div class="poll">
+            <PostPoll poll={post.poll}></PostPoll>
+          </div>
         {/if}
-      </section>
 
-      {#if mediaEmbeds.length > 0}
-        <div class="media">
-          <PostMedia {identity} {id} attachments={mediaEmbeds}></PostMedia>
-        </div>
-      {:else if textEmbeds.length > 0}
-        <div class="text-embed">
-          <PostSyndication attachments={textEmbeds}></PostSyndication>
-        </div>
-      {/if}
-
-      {#if poll}
-        <div class="poll">
-          <PostPoll {poll}></PostPoll>
-        </div>
-      {/if}
-
-      {#if sharedPost}
-        {#if h.isFilteredPost(sharedPost)}
-          <PostSharedFiltered></PostSharedFiltered>
-        {:else}
-          <svelte:self
-            {identity}
-            {centerID}
-            {...sharedPost}
-            marginTop="1rem"
-          />
+        {#if share}
+          {#if Post.isFiltered(share)}
+            <PostSharedFiltered></PostSharedFiltered>
+          {:else}
+            <svelte:self
+              {identity}
+              {centerID}
+              id={share.id}
+              marginTop="1rem"
+            />
+          {/if}
         {/if}
-      {/if}
+      </div>
+
     </div>
 
-  </div>
+  {/if}
 
 </article>
 

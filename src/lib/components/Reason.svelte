@@ -2,91 +2,69 @@
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
-  import * as Post from "$lib/resources/post.js";
-  import * as FeedSaver from "$lib/engines/feed-singleton.js";
+  import { onMount } from "svelte";
   import { State } from "$lib/engines/store.js";
-  import { Name } from "$lib/engines/draft.js";
+  import { Identity, Name } from "$lib/engines/identity.js";
+  import { Post } from "$lib/engines/post.js";
+  import { Filter } from "$lib/engines/filter.js";
 
   export let bindings;
 
-  let identity, post, filters;
+  let state, identity, post, keywords, usernames, domains;
   const Render = State.make();
   Render.cleanup = () => {
+    state = "loading";
     identity = null;
     post = null;
-    filters = [];
+    keywords = [];
+    usernames = [];
+    domains = [];
   };
 
   Render.reason = async () => {
     const results = await Promise.all([
-      Render.identity(),
-      Render.post(),
-      Render.filters(),
+      Identity.find( bindings.identity ),
+      Post.get( bindings ),
+      Filter.findCategory( "block-keyword" ),
+      Filter.findCategory( "block-username" ),
+      Filter.findCategory( "block-domain" )
     ]);
-    
-    for ( const result of results ) {
-      if ( result == null ) {
-        throw new Error("unable to fetch either identity or post from IDs.");
-      }
-    }
-   
+
     identity = results[0];
+    if ( identity == null ) {
+      state = "error";
+      console.error("render reason: identity is undefined");
+      return;
+    }
     post = results[1];
-    filters = results[2];
-  };
-
-  Render.getIdentity = async ( id ) => {
-    const engine = await FeedSaver.getEngine();
-    const identities = engine.getIdentities();
-    return identities.find(( identity ) => identity.id == id );
-  };
-
-  Render.identity = async () => {
-    let identity;
-    try {
-      identity = await Render.getIdentity( bindings.identity );
-    } catch ( error ) {
-      console.error( error );
+    if ( post == null ) {
+      state = "error";
+      console.error("render reason: post is undefined");
+      return;
     }
-    return identity;
+    keywords = results[2].slice(0, 3);
+    usernames = results[3].slice(0, 3);
+    domains = results[4].slice(0, 3);
+    state = "ready";
   };
 
-  Render.post = async () => {
-    let post;
-    try {
-      post = await Post.get( bindings );
-    } catch ( error ) {
-      console.error( error );
-    }
-    return post;
-  };
-
-  Render.getFilterCategory = async ( category ) => {
-    const engine = await FeedSaver.getEngine();
-    const filters = engine.getFilters();
-    return filters
-      .filter( f => (f.category === category) && (f.active === true) )
-      .map( f => f.configuration.value );
-  };
-
-  Render.filters = async () => {
-    let filters;
-    try {
-      filters = await Render.getFilterCategory( "block-keyword" );
-    } catch ( error ) {
-      console.error( error );
-    }
-    return filters;
-  }
 
   Render.reset();
+  onMount(() => {
+    Render.reason();
+    return () => {
+      Render.reset();
+    };
+  })
 </script>
 
 
 <section class="gobo-copy"> 
-  {#await Render.reason()}
+  {#if state === "error"}
+    <p>There was a problem displaying this reason.</p>
+  {:else if state === "loading"}
     <Spinner></Spinner>
-  {:then}
+  {:else if state === "ready"}
     <p>
       Gobo allows you to configure your feed and control which posts you see.
       You see this post for the following reasons:
@@ -94,7 +72,7 @@
 
     <h2>Selected Identity</h2>
     <p>
-      Your feed is includes posts from
+      Your feed is configured to include posts from
       <a 
         href={identity.profile_url}
         class="profile"
@@ -110,27 +88,37 @@
     </p>
 
 
-    {#if filters.length > 0}
-      <h2>Passed Filters</h2>
+    {#if keywords.length > 0}
+      <h2>Passed Keyword Filters</h2>
       <p>
         This post passed your keyword filters, like 
-        "{filters.join("\" and \"")}".
+        "{keywords.join("\" and \"")}".
       </p>
-    {/if}  
+    {/if} 
+    
+    {#if usernames.length > 0}
+      <h2>Passed Username Filters</h2>
+      <p>
+        This post passed your username filters, like 
+        "{usernames.join("\" and \"")}".
+      </p>
+    {/if} 
+
+    {#if domains.length > 0}
+      <h2>Passed Domain Filters</h2>
+      <p>
+        This post passed your domain filters, like 
+        "{domains.join("\" and \"")}".
+      </p>
+    {/if} 
     
     <h2>Feed Sorting</h2>
     <p>
       This post's location is controlled by your feed sort, 
       currently reverse-chronological order.
     </p>
-
-
-  {:catch}
-    <!-- TODO: Do we need something here for 404 reponses to post graphs or identities? -->
-    <p>There was a problem rendering this visibility reason.</p>
-  {/await}
-
-
+  
+  {/if}
 
   <nav class="two-button">
     

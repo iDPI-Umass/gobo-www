@@ -83,6 +83,8 @@ const machine = Talos.Machine.make( "notification polling", {
 // Setup talos run instance.
 Poll.reactor = Talos.Async.start( machine, Events.buildReactor() );
 
+// Setup interface to accept incoming events.
+Poll.event = ( event ) => Events.push( event );
 
 // Export the Poll interface so we can pipe the count value around with Svelte.
-export { Poll, Events }
+export { Poll }
