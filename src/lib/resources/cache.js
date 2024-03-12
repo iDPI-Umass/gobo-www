@@ -1,71 +1,55 @@
-const cache = {
+const singleton = {
   posts: {},
-  postCenters: new Set(),
   sources: {},
   notifications: {},
   postEdges: {}
 };
 
-class Cache {
-  static hasPostCenter ( id ) {
-    return cache.postCenters.has( id );
-  }
+const Cache = {};
 
-  static addPostCenter ( id ) {
-    cache.postCenters.add( id );
-  }
+Cache.getPost = ( id ) => {
+  return singleton.posts[ id ];
+};
 
-  static getPost ( id ) {
-    return cache.posts[ id ];
-  }
+Cache.putPosts = ( posts ) => {
+  Object.assign( singleton.posts, posts );
+};
 
-  static putPosts ( posts ) {
-    Object.assign( cache.posts, posts );
-  }
+Cache.getSource = ( id ) => {
+  return singleton.sources[ id ];
+};
 
-  static getSource ( id ) {
-    return cache.sources[ id ];
-  }
+Cache.putSources = ( sources ) => {
+  Object.assign( singleton.sources, sources );
+};
 
-  static putSources ( sources ) {
-    Object.assign( cache.sources, sources );
-  }
+Cache.getNotification = ( id ) => {
+  return singleton.notifications[ id ];
+};
 
-  static getNotification( id ) {
-    return cache.notifications[ id ];
-  }
+Cache.putNotifications = ( notifications ) => {
+  Object.assign( singleton.notifications, notifications );
+};
 
-  static putNotifications ( notifications ) {
-    Object.assign( cache.notifications, notifications );
-  }
+Cache.getPostEdge = ( identity, post ) => {
+  singleton.postEdges[ identity ][ post ] ??= new Set();
+  return singleton.postEdges[ identity ][ post ];
+};
 
-  static getPostEdge ( identity, post ) {
-    cache.postEdges[ identity ][ post ] ??= new Set();
-    return cache.postEdges[ identity ][ post ];
-  }
+Cache.putPostEdges = ( id, edges ) => {
+  singleton.postEdges[ id ] ??= {};
+  Object.assign( singleton.postEdges[id], edges );
+};
 
-  static putPostEdges ( id, edges ) {
-    cache.postEdges[ id ] ??= {};
-    Object.assign( cache.postEdges[id], edges );
+Cache.mergeWeave = ( identity, weave ) => {
+  Cache.putPosts( weave.posts );
+  Cache.putSources( weave.sources );
+  for ( const id of Object.keys( weave.posts )) {
+    Mastodon.decorate( id );
   }
-
-  static decorateMastodon ( ids ) {
-    for ( const id of ids ) {
-      decorateMastodon( id );
-    }
-  }
-
-  static mergeWeave ( identity, weave ) {
-    for ( const id of weave.feed ) {
-      Cache.addPostCenter( id );
-    }
-    Cache.putPosts( weave.posts );
-    Cache.putSources( weave.sources );
-    Cache.decorateMastodon( Object.keys(weave.posts) );
-    Cache.putPostEdges( identity.id, weave.postEdges );
-    Cache.putNotifications( weave.notifications ?? {} );
-  }
-}
+  Cache.putPostEdges( identity.id, weave.postEdges );
+  Cache.putNotifications( weave.notifications ?? {} );
+};
 
 
 // Special case for Mastodon and Smalltown. Because they are federated, their posts
@@ -77,7 +61,9 @@ class Cache {
 //        generally in Mastodon's federation model. They're not true aliases
 //        because the resource is "deeply copied" across the federation.
 
-const decorateMastodon = function ( id ) {
+const Mastodon = {};
+
+Mastodon.decorate = ( id ) => {
   const post = Cache.getPost( id );
   const source = Cache.getSource( post.source_id );
 
@@ -102,7 +88,7 @@ const decorateMastodon = function ( id ) {
 
 
 export {
-  cache,
+  singleton,
   Cache,
-  decorateMastodon
+  Mastodon
 }

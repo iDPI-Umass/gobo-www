@@ -1,19 +1,17 @@
 <script>
-  import { allyEvent } from "$lib/helpers/event";
   import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
   export let heading;
 
-  const handleClick = allyEvent( function () {
-    history.back();
-  });
+  const Handle = {};
+  Handle.click = () => history.back();
 </script>
 
 <header>
   
   <div class="heading">
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
     <sl-icon-button 
-      on:click={handleClick}
-      on:keypress={handleClick}
+      on:click={Handle.click}
       src="/icons/arrow-left.svg">
     </sl-icon-button>
   

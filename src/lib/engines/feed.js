@@ -1,5 +1,7 @@
 import { Feed as Weaver } from "$lib/resources/person-identity-feeds/posts.js";
 import * as stores from "$lib/stores/feed.js";
+import * as Account from "$lib/helpers/account.js";
+
 
 /***
 While the classes within "$lib/resources/feed" are focused on a more formal
@@ -53,9 +55,9 @@ Feed.write = () => {
 
 Feed.read = async () => {
   if ( singletonFeed == null ) {
-    singletonFeed = await Feed.make();
+    singletonFeed = Feed.make();
   }
-  return singletonFeed;
+  return singletonFeed = await singletonFeed;
 };
 
 Feed.put = () => {
@@ -85,7 +87,8 @@ Feed.halt = () => {
 Feed.clear = async () => {
   // Halt feed weaver pulling before discarding old object.
   Feed.halt();
-  singletonFeed = await Feed.make();
+  singletonFeed = Feed.make();
+  await singletonFeed;
 };
 
 Feed.refresh = async () => {
@@ -182,6 +185,18 @@ Reply.add = async ( id ) => {
   const feed = await Feed.read();
   feed.replies.add( id );
 };
+
+
+
+
+// Special instantiation, when logged in, to pull data and send to listeners.
+// This cuts down on requests to the API, manages race conditions, and helps
+// mitigate what appear to be service worker effects on the singleton.
+(async () => {
+  if ( (await Account.isLoggedIn()) === true ) {
+    await Feed.refresh();
+  }
+})();
 
 
 export {

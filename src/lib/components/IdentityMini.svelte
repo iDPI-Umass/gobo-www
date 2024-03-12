@@ -17,7 +17,7 @@
   const Handle = {};
   Handle.toggle = async ( event ) => {
     const active = event.target.checked
-    Identity.update({ ...identity, active });
+    await Identity.update({ ...identity, active });
     Feed.refresh();
     Notifications.refresh();
   };

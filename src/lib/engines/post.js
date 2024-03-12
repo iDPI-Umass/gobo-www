@@ -29,8 +29,9 @@ const Post = {};
 
 Post.get = async ({ identity, id }, options = {}) => {
   try {
-    if ( Cache.hasPostCenter(id) ) {
-      return Cache.getPost( id );
+    const post = Cache.getPost( id );
+    if ( post != null ) {
+      return post;
     }
     
     const graph = await Resource.get({ identity, id });
@@ -221,7 +222,7 @@ Click.hasLinkParent = ( element ) => {
   } else if ( element.parentNode.tagName === "ARTICLE" ) {
     return false;
   } else {
-    return hasLinkParent( element.parentNode );
+    return Click.hasLinkParent( element.parentNode );
   }
 };
 
@@ -231,7 +232,7 @@ Click.isLink = ( element ) => {
   } else if ( element.tagName === "ARTICLE" ) {
     return false;
   } else {
-    return hasLinkParent( element )
+    return Click.hasLinkParent( element )
   }
 };
 
@@ -241,7 +242,7 @@ Click.hasButtonParent = ( element ) => {
   } else if ( element.parentNode.tagName === "ARTICLE" ) {
     return false;
   } else {
-    return hasButtonParent( element.parentNode );
+    return Click.hasButtonParent( element.parentNode );
   }
 };
 
@@ -251,7 +252,7 @@ Click.isButton = ( element ) => {
   } else if ( element.tagName === "ARTICLE" ) {
     return false;
   } else {
-    return hasButtonParent( element )
+    return Click.hasButtonParent( element )
   }
 };
 
@@ -261,7 +262,7 @@ Click.hasVideoParent = ( element ) => {
   } else if ( element.parentNode.tagName === "ARTICLE" ) {
     return false;
   } else {
-    return hasVideoParent( element.parentNode );
+    return Click.hasVideoParent( element.parentNode );
   }
 };
 
@@ -271,7 +272,7 @@ Click.isVideo = ( element ) => {
   } else if ( element.tagName === "ARTICLE" ) {
     return false;
   } else {
-    return hasVideoParent( element )
+    return Click.hasVideoParent( element )
   }
 };
 

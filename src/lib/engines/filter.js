@@ -1,5 +1,6 @@
 import * as Resource from "$lib/resources/filter.js";
 import * as filterStores from "$lib/stores/filter.js";
+import * as Account from "$lib/helpers/account.js";
 
 /***
 Filters have a serialized form we can pass around as state with the
@@ -38,9 +39,9 @@ Filter.list = async () => {
 
 Filter.read = async () => {
   if ( singletonList == null ) {
-    singletonList = await Filter.list(); 
+    singletonList = Filter.list(); 
   }
-  return singletonList;
+  return singletonList = await singletonList;
 };
 
 Filter.write = () => {
@@ -104,7 +105,7 @@ Filter.update = async ( filter ) => {
   const index = await Filter.findIndex( filter.id );
   list.splice( index, 1, Filter.make( filter.filter ));
   Filter.updateAll();
-  await Resource.put( filter.filter );
+  await Resource.update( filter.filter );
 };
 
 Filter.remove = async ( filter ) => {
@@ -408,6 +409,18 @@ class BlockDomain extends Frame {
     return true;
   }
 }
+
+
+
+
+// Special instantiation, when logged in, to pull data and send to listeners.
+// This cuts down on requests to the API, manages race conditions, and helps
+// mitigate what appear to be service worker effects on the singleton.
+(async () => {
+  if ( (await Account.isLoggedIn()) === true ) {
+    await Filter.load();
+  }
+})();
 
 
 export {

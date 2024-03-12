@@ -3,7 +3,6 @@
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import { State, Draft, Name, Validate } from "$lib/engines/draft.js";
-  import { allyEvent } from "$lib/helpers/event";
 
   let publishButton, nameParts;
   const Render = State.make();
@@ -18,7 +17,7 @@
 
 
   const Handle = {};
-  Handle.publish = allyEvent(async function () {
+  Handle.publish = async function () {
     if ( publishButton.loading === true ) {
       return;
     }
@@ -37,11 +36,11 @@
       await Draft.clear();
       goto("/home");
     }
-  });
+  };
 
-  Handle.discard = allyEvent(async () => {
+  Handle.discard = async () => {
     await Draft.clear();
-  });
+  };
 
 
   Render.reset();
@@ -60,19 +59,19 @@
 </p>
 
 <div class="buttons">
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
   <sl-button
     on:click={Handle.discard}
-    on:keypress={Handle.discard}
     class="cancel"
     size="medium"
     pill>
     Discard Draft
   </sl-button>
 
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
   <sl-button
     bind:this={publishButton}
     on:click={Handle.publish}
-    on:keypress={Handle.publish}
     class="submit"
     size="medium"
     pill>

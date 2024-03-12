@@ -21,55 +21,51 @@
   // Now we can setup the store stuff with Svelte
   import Spinner from "$lib/components/primitives/Spinner.svelte";
   import { beforeUpdate, onDestroy } from "svelte";
-  import { browser } from "$app/environment";
   import { themeStore } from "$lib/stores/theme.js";
   import { handleRedirect } from "$lib/helpers/redirect.js";
 
-  if ( browser ) {
-    let unsubscribeTheme;
-    
-    beforeUpdate( function() {
-      unsubscribeTheme = themeStore.subscribe( function ( config ) {
+  let unsubscribeTheme;
+  
+  beforeUpdate(() => {
+    unsubscribeTheme = themeStore.subscribe( function ( config ) {
 
-        const html = document.querySelector( "html" )
-        if ( config.dark === true ) {
-          html.classList.add( "gobo-theme-dark", "sl-theme-dark" );
-        } else {
-          html.classList.remove( "gobo-theme-dark", "sl-theme-dark" );
-        }
+      const html = document.querySelector( "html" )
+      if ( config.dark === true ) {
+        html.classList.add( "gobo-theme-dark", "sl-theme-dark" );
+      } else {
+        html.classList.remove( "gobo-theme-dark", "sl-theme-dark" );
+      }
 
-        if ( config.arial === true ) {
-          html.classList.add( "gobo-font-arial" );
-        } else {
-          html.classList.remove( "gobo-font-arial" );
-        }
+      if ( config.arial === true ) {
+        html.classList.add( "gobo-font-arial" );
+      } else {
+        html.classList.remove( "gobo-font-arial" );
+      }
 
-        switch( config.fontSize ) {
-          case "1":
-            html.style.fontSize = "12px";
-            break;
-          case "2":
-            html.style.fontSize = "14px";
-            break;
-          case "3":
-            html.style.fontSize = "16px";
-            break;
-          case "4":
-            html.style.fontSize = "18px";
-            break;
-          case "5":
-            html.style.fontSize = "20px";  
-            break;
-        }
-      });
-
+      switch( config.fontSize ) {
+        case "1":
+          html.style.fontSize = "12px";
+          break;
+        case "2":
+          html.style.fontSize = "14px";
+          break;
+        case "3":
+          html.style.fontSize = "16px";
+          break;
+        case "4":
+          html.style.fontSize = "18px";
+          break;
+        case "5":
+          html.style.fontSize = "20px";  
+          break;
+      }
     });
 
-    onDestroy( function () {
-      unsubscribeTheme();
-    });
+  });
 
-  }
+  onDestroy(() => {
+    unsubscribeTheme();
+  });
 </script>
 
 <div class="page-wrapper">

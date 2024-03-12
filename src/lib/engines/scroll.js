@@ -15,15 +15,10 @@ Web browsers.
 const When = {};
 When.wait = ( talos, event ) => event.name === "wait";
 When.listen = ( talos, event ) => event.name === "listen";
-
 When.scroll = ( talos, event ) => event.name === "scroll";
-When.downward = ( talos, event ) => event?.deltaY <= 0;
 
 When.nearBottom = ( talos, event ) => {
   if ( !When.scroll( talos, event )) {
-    return false;
-  }
-  if ( !When.downward( talos, event )) {
     return false;
   }
 
@@ -88,13 +83,22 @@ Scroll.make = ({ element }) => {
     }
   };
 
-  const reactor = Talos.Async.start( machine, buildReactor() )
+  const reactor = Talos.Async.start( machine, buildReactor() );
+  const pull = async () => {
+    for await ( const talos of reactor) {
+      if ( talos.failure ) {
+        console.error( talos.error );
+        return;
+      }
+    }
+  };
 
   // Prepare a handle the caller can keep in scope for as long as it needs.
   const handle = {
     reactor,
+    runner: pull(),
     push,
-    listen: () => push({ name: "listen "}),
+    listen: () => push({ name: "listen"}),
     wait: () => push({ name: "wait" }),
     event: ( event ) => push({ name: "scroll", event }),
     halt: () => push({ name: "halt" }),

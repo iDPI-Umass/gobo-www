@@ -55,16 +55,11 @@ const sort = function ( identities ) {
 };
 
 const list = handleUnauthorized( async function () {
-  try {
-    const client = await getGOBOClient();
-    const identities = await client.personIdentities.get({ 
-      person_id: client.id
-    });
-    return sort( identities );
-  } catch ( error ) {
-    console.error( error );
-    return [];
-  }
+  const client = await getGOBOClient();
+  const identities = await client.personIdentities.get({ 
+    person_id: client.id
+  });
+  return sort( identities );
 });
 
 const remove = handleUnauthorized( async function ( identity ) {

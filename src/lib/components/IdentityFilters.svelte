@@ -6,8 +6,8 @@
   import IdentityMini from "$lib/components/IdentityMini.svelte";
   import { onMount } from "svelte";
   import { State } from "$lib/engines/store.js";
+  import { Identity } from "$lib/engines/identity.js";
   import * as identityStores from "$lib/stores/identity.js";
-    import { Filter } from "$lib/engines/filter";
 
   let identities, state;
   const Render = State.make();

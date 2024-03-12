@@ -120,10 +120,12 @@ class Reader {
     await this.checkQueue()
     const notification = this.queue.shift();
     this.head = this.queue[0]?.notified;
-    return { 
-      identity: this.id, 
-      notification 
-    };
+    if ( notification == null ) {
+      return null; // protection, but we should generally not get here.
+    } else {
+      const key = `${this.id}/${notification.id}`;
+      return { identity: this.id, notification, key };
+    }
   }
 }
 

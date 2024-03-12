@@ -9,7 +9,6 @@
   import { Feed } from "$lib/engines/feed.js";
   import { Feed as Notifications } from "$lib/engines/notification.js";
   import * as notificationStores from "$lib/stores/notification.js";
-  import { allyEvent } from "$lib/helpers/event";
 
   export let current;
 
@@ -19,34 +18,28 @@
     notificationCount = 0;
   };
 
-  Render.load = async () => {
-    await Identity.load();
-    await Filter.load();
-    await Promise.all([
-      Feed.load(),
-      Notifications.load(),
-    ]);
-  };
-
   Render.count = ( value ) => {
     notificationCount = value.count;
   };
 
 
   const Handle = {};
-  Handle.refresh = allyEvent(() => {
+
+  Handle.refreshHome = () => {
     if ( current === "home" ) {
       Feed.refresh();
     }
+  };
+  
+  Handle.refreshNotifications = () => {
     if ( current === "notifications" ) {
       Notifications.refresh();
     }
-  });
+  };
 
   Render.reset();
   onMount(() => {
     Render.listen( notificationStores.count, Render.count );
-    Render.load();
     return () => {
       Render.reset();
     };
@@ -54,24 +47,24 @@
 </script>
 
 <nav>
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
   <sl-button
     class="home {current === 'home' ? "current" : ""}"
     pill
     href="/home"
-    on:click={Handle.refresh}
-    on:keypress={Handle.refresh}>
+    on:click={Handle.refreshHome}>
     <div slot="prefix">
       <sl-icon class="home" src="/icons/home.svg" slot="prefix"></sl-icon>
     </div>
     Home
   </sl-button>
 
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
   <sl-button
     class="notifications {current === "notifications" ? "current" : ""}"
     pill
     href="/notifications"
-    on:click={Handle.refresh}
-    on:keypress={Handle.refresh}>
+    on:click={Handle.refreshNotifications}>
     <div slot="prefix">
       <sl-icon class="notifications" src="/icons/bell.svg" slot="prefix"></sl-icon>
       {#if notificationCount > 0}

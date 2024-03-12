@@ -12,7 +12,6 @@
   };
 
   Render.alerts = ( draft ) => {
-    console.log("new alerts", draft.alerts );
     alerts = draft.alerts;
   };
 

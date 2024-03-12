@@ -42,9 +42,9 @@
       console.error("render reason: post is undefined");
       return;
     }
-    keywords = results[2].slice(0, 3);
-    usernames = results[3].slice(0, 3);
-    domains = results[4].slice(0, 3);
+    keywords = results[2].slice(0, 3).map( f => f.value );
+    usernames = results[3].slice(0, 3).map( f => f.value );
+    domains = results[4].slice(0, 3).map( f => f.value );
     state = "ready";
   };
 

@@ -8,7 +8,6 @@
   import { Identity, Name } from "$lib/engines/identity.js";
   import { Filter } from "$lib/engines/filter";
   import * as identityStores from "$lib/stores/identity.js";
-  import { allyEvent } from "$lib/helpers/event";
 
   export let identity;
   
@@ -49,7 +48,7 @@
   };
 
   Handle.remove = () => {
-    return Handle.error( allyEvent( async ( event ) => {
+    return Handle.error( async ( event ) => {
       event.preventDefault();
       if ( deleteButton.loading === true ) {
         return;
@@ -60,7 +59,7 @@
 
       // TODO: Check if there's a Svelte preference for this.
       location.reload();
-    }));
+    });
   };
 
   Handle.toggle = Handle.error( async ( event ) => {
@@ -92,11 +91,11 @@
       </sl-switch>
 
 
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
       <sl-icon-button
         bind:this={deleteButton}
         variant="danger"
         on:click={Handle.remove}
-        on:keypress={Handle.remove}
         size="medium"
         src="/icons/trash.svg">
       </sl-icon-button>

@@ -39,7 +39,8 @@
 
   Render.scroll = async ( feed ) => {
     await tick();
-    _feed.scrollTo( 0, feed.position );
+    // TODO: Scroll restoration.
+    // _feed.scrollTo( 0, feed.position );
     scroll.listen();
   };
 
@@ -49,6 +50,7 @@
     switch ( event.name ) {
       case "refresh":
         state = "loading";
+        scroll.wait();
         await Feed.pull( 25 );
         Feed.command( "ready" );
         break;
@@ -105,7 +107,7 @@
       </p> 
     </section>
   {:else if state === "ready"}
-    {#each notifications as { identity, notification } (notification.id) }
+    {#each notifications as { identity, notification, key } (key) }
       <Notification {identity} {notification}></Notification>
     {/each}
   {:else}
@@ -132,12 +134,19 @@
     section.feed {
       padding: var(--gobo-height-spacer) var(--gobo-width-spacer) 10rem var(--gobo-width-spacer); 
     }
+    sl-tab-group {
+      padding: var(--gobo-height-spacer) var(--gobo-width-spacer) 0 var(--gobo-width-spacer); 
+    }
   }
 
   @media ( max-width: 680px ) {
     section.feed {
       padding: var(--gobo-height-spacer) 0 10rem 0;
     }
+    sl-tab-group {
+      padding: var(--gobo-height-spacer) 0 0 0;
+    }
+
     .gobo-copy {
       margin-left: var(--gobo-width-spacer-flex);
       margin-right: var(--gobo-width-spacer-flex);

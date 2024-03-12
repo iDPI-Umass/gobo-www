@@ -5,7 +5,6 @@
   import { onMount } from "svelte";
   import { State, Draft } from "$lib/engines/draft.js";
   import { altStore } from "$lib/stores/alt-store";
-  import { allyEvent } from "$lib/helpers/event";
 
   let alt, attachments, file;
   let form, previewImage;
@@ -37,9 +36,9 @@
   const Handle = {};
   Handle.alt = ( event ) => alt = event.target.value;
   
-  Handle.cancel = allyEvent(() => {
+  Handle.cancel = () => {
     goto("/new-post");
-  });
+  };
 
   Handle.submit = ( event ) => {
     event.preventDefault();
@@ -60,18 +59,16 @@
   Render.reset();
   onMount(() => {
     Render.listen( "attachments", Render.attachments );
-    form.addEventListener( "submit", Handle.submit );
     Render.closers.push( altStore.subscribe( Render.preview ));
     return () => {
       Render.reset();
-      form.removeEventListener( "submit", Handle.submit );
     };
   });
 </script>
 
 <div class="main-child">
   
-  <form class="gobo-form" bind:this={form}>
+  <form class="gobo-form" bind:this={form} on:submit={Handle.submit}>
     
     <h2>Image Configuration</h2>
 
@@ -91,9 +88,9 @@
     </sl-textarea>
 
     <section class="buttons">
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
       <sl-button
         on:click={Handle.cancel}
-        on:keydown={Handle.cancel}
         class="cancel"
         type="cancel"
         size="medium"

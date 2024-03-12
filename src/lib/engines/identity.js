@@ -1,5 +1,6 @@
 import * as Resource from "$lib/resources/identity.js";
 import * as identityStores from "$lib/stores/identity.js";
+import * as Account from "$lib/helpers/account.js";
 
 let singletonList;
 
@@ -12,9 +13,9 @@ Identity.list = async () => {
 
 Identity.read = async () => {
   if ( singletonList == null ) {
-    singletonList = await Identity.list();
+    singletonList = Identity.list();
   }
-  return singletonList;
+  return singletonList = await singletonList;
 };
 
 Identity.write = () => {
@@ -59,7 +60,6 @@ Identity.load = async () => {
 };
 
 Identity.update = async ( identity ) => {
-  console.log("updating")
   const match = await Identity.find( identity.id );
   Object.assign( match, identity );
   Identity.updateAll();
@@ -96,6 +96,18 @@ Name.split = ( name ) => {
   output.push( current.join( "" ));
   return output;
 };
+
+
+// Special instantiation, when logged in, to pull data and send to listeners.
+// This cuts down on requests to the API, manages race conditions, and helps
+// mitigate what appear to be service worker effects on the singleton.
+(async () => {
+  if ( (await Account.isLoggedIn()) === true ) {
+    await Identity.load();
+  }
+})();
+
+
 
 
 export {

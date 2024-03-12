@@ -8,7 +8,7 @@
   export let identity = null;
   export let notification = null;
   export let source = null;
-  export let post = {};
+  export let post = null;
 
   let state, logo, copy, url;
   const Render = State.make();
@@ -51,7 +51,7 @@
 
   Render.directMessageURL = async () => {
     let match, baseURL;
-    switch ( platform ) {
+    switch ( notification.platform ) {
       case "mastodon":
         match = await Identity.find( identity );
         baseURL = match.base_url; 
@@ -63,14 +63,15 @@
   };
 
   Render.url = async () => {
-    switch ( type ) {
+    switch ( notification.type ) {
       case "repost":
       case "like":
+        post = await Post.get({ identity, id: post });
         return Post.href( post );
       case "follow":
         return Source.href( source );
       case "direct message":
-        return await getDirectMessageURL();
+        return await Render.directMessageURL();
       default:
         console.error("unable to match notification to appropriate frame.");
         return;

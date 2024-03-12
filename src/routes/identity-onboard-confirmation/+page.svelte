@@ -5,19 +5,14 @@
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import { goto } from "$app/navigation";
-  import { allyEvent } from "$lib/helpers/event";
 
   export let data;
   let unused = [ data ];
 
-
-  const markWelcomeComplete = async function () {
+  const Handle = {};
+  Handle.complete = () => {
     goto("/identities");
   }
-
-  const handle = allyEvent( markWelcomeComplete );
-
-
 </script>
 
 <PlainHeader></PlainHeader>
@@ -32,9 +27,9 @@
         Refresh your feed to see if it's ready.
       </p>
       <nav>
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
         <sl-button
-          on:click={handle}
-          on:keypress={handle}
+          on:click={Handle.complete}
           class="submit"
           size="medium"
           pill>

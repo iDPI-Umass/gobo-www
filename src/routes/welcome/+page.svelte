@@ -5,17 +5,13 @@
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import { goto } from "$app/navigation";
-  import { allyEvent } from "$lib/helpers/event";
   import * as Welcome from "$lib/helpers/welcome.js";
 
-  const markWelcomeComplete = async function () {
+  const Handle = {};
+  Handle.complete = async () => {
     await Welcome.put();
     goto("/identities");
-  }
-
-  const handle = allyEvent( markWelcomeComplete );
-
-
+  };
 </script>
 
 <Center>
@@ -30,9 +26,9 @@
         cross-post to different platforms.
       </p>
       <nav>
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
         <sl-button
-          on:click={handle}
-          on:keypress={handle}
+          on:click={Handle.complete}
           class="submit"
           size="medium"
           pill>

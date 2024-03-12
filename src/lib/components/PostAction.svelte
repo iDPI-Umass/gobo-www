@@ -3,7 +3,6 @@
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
   import { createEventDispatcher } from "svelte";
-  import { allyEvent } from "$lib/helpers/event";
 
 
   export let name;
@@ -12,9 +11,9 @@
   
   const dispatch = createEventDispatcher();
 
-  const handle = allyEvent(async function () {
+  const handle = () => {
     dispatch( "toggle", { name } );
-  });
+  };
 
   let iconURL;
   iconURL = "/icons/heart.svg";
@@ -57,9 +56,9 @@
 {:else}
   <sl-tooltip content={name}>
     
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
     <sl-button
       on:click={handle}
-      on:keypress={handle}
       circle
       size="small"
       class="{isActive ? "submit" : "hollow"} {name}">

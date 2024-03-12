@@ -6,7 +6,6 @@
   import Identity from "$lib/components/Identity.svelte";
   import { onMount } from "svelte";
   import { State } from "$lib/engines/store.js";
-  import { Identity as IdentityEngine } from "$lib/engines/identity.js";
   import * as identityStores from "$lib/stores/identity.js";
 
   let state, identities;
@@ -28,7 +27,6 @@
   Render.reset();
   onMount(() => {
     Render.listen( identityStores.singleton, Render.identities );
-    IdentityEngine.load();
     return () => {
       Render.reset();
     }

@@ -44,7 +44,8 @@
 
   Render.scroll = async ( feed ) => {
     await tick();
-    _feed.scrollTo( 0, feed.position );
+    // TODO: Scroll restoration.    
+    // _feed.scrollTo( 0, feed.position );
     scroll.listen();
   };
 
@@ -54,6 +55,7 @@
     switch ( event.name ) {
       case "refresh":
         state = "loading";
+        scroll.wait();
         await Feed.pull( 25 );
         Feed.command( "ready" );
         break;
@@ -81,7 +83,6 @@
     Render.listen( feedStores.command, Handle.command );
     _feed.addEventListener( "scroll", Handle.scroll );
     _feed.addEventListener( "gobo-infinite-scroll", Handle.infiniteScroll );
-    Feed.load();
     return () => {
       _feed.removeEventListener( "scroll", Handle.scroll );
       _feed.removeEventListener( "gobo-infinite-scroll", Handle.infiniteScroll );
@@ -107,7 +108,7 @@
       </p> 
     </section>
   {:else if state === "ready"}
-    {#each posts as { identity, post } }
+    {#each posts as { identity, post, key } (key) }
       <Post {identity} id={post.id}></Post>
     {/each}
   {:else}

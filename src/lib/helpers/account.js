@@ -123,15 +123,23 @@ const handleUnauthorized = function ( f ) {
   }
 };
 
-const isLoggedOut = function () {
-  return Cache.read( "account" ) == null;
+const isLoggedIn = async () => {
+  const client = await getAuth0Client();
+  return await client.isAuthenticated() === true;
 };
+
+const isLoggedOut = async () => {
+  return !(await isLoggedIn());
+};
+
+
 
 export { 
   getAccount,
   getGOBOClient,
   getProfile,
   logout,
+  isLoggedIn,
   isLoggedOut,
   handleUnauthorized
 }

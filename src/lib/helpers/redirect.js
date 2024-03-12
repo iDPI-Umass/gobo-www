@@ -66,11 +66,11 @@ const successfulAuth = async function () {
   }
 }
 
-const handleAuthCallback = async function ( query ) {
+const handleAuthCallback = async ( query ) => {
   console.log( "Starting primary authentication callback", query );
   const { state, code, error } = query;
 
-  if ( Account.isLoggedOut() === true ) {
+  if ( (await Account.isLoggedOut()) === true ) {
     try {
       // Establishing the client is asynchronous, await the possible promise here.
       const client = await getAuth0Client();

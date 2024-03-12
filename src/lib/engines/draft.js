@@ -5,7 +5,7 @@ import * as LS from "$lib/helpers/local-storage.js";
 import * as Random from "$lib/helpers/random.js";
 import * as Post from "$lib/resources/post.js";
 import * as Image from "$lib/resources/draft-image.js";
-import { Identity as IdentityEngine } from "$lib/engines/identity.js";
+import { Identity as IdentityEngine, Name } from "$lib/engines/identity.js";
 import * as draftStores from "$lib/stores/draft.js";
 import { RichText, BskyAgent, UnicodeString } from "@atproto/api";
 
@@ -142,7 +142,7 @@ Identity.sync = async () => {
   const draft = Draft.read();
   let current = draft.identities.map( identity => identity.id );
   
-  const canon = await IdentityEngine.list();
+  const canon = await IdentityEngine.read();
   const target = canon.map(( identity ) => identity.id );
 
   if ( Value.equal( current, target )) {
@@ -197,8 +197,6 @@ Identity.clear = () => {
   return Identity.load({ identities: [] });
 };
 
-
-const Name = IdentityEngine.Name;
 
 
 const Lock = {

@@ -143,7 +143,12 @@ class Reader {
     await this.checkQueue()
     const post = this.queue.shift();
     this.head = this.queue[0]?.published;
-    return { identity: this.id, post };
+    if ( post == null ) {
+      return null; // protection, but we should generally not get here.
+    } else {
+      const key = `${this.id}/${post.id}`;
+      return { identity: this.id, post, key };
+    }
   }
 }
 

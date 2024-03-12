@@ -66,7 +66,7 @@
     try {
       await Filter.add( category, configuration );
       form.reset();
-      select.value = currentCategory;
+      select.value = category;
       await Feed.refresh();
       button.loading = false;
       goto( "/settings/filters" );
@@ -78,7 +78,7 @@
   };
 
   Handle.category = ( event ) => {
-    currentCategory = event.target.value;
+    category = event.target.value;
     Render.copy();
   };
 
