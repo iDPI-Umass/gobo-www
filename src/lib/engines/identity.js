@@ -68,10 +68,26 @@ Identity.update = async ( identity ) => {
 
 Identity.remove = async ( identity ) => {
   const list = await Identity.read();
-  const index = await Identity.findIndex( filter.id );
+  const index = await Identity.findIndex( identity.id );
   list.splice( index, 1 );
   Identity.updateAll();
   await Resource.remove( identity );
+};
+
+Identity.avatar = ( identity ) => {
+  return identity.profile_image ?? Identity.fallback( identity );
+};
+
+Identity.fallback = ( identity ) => {
+  switch ( identity.platform ) {
+    case "mastodon":
+    case "smalltown":
+      return "/icons/mastodon-avatar.png";
+    case "bluesky":
+      return "/icons/bluesky-avatar.png";
+    case "reddit":
+      return "/icons/reddit-avatar.png";
+  }
 };
 
 

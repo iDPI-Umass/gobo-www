@@ -13,11 +13,13 @@
   
   let deleteButton;
   let logo = `/icons/${ identity.platform }.svg`;
-  let state, names;
+  let state, names, avatar, fallback;
   const Render = State.make();
   Render.cleanup = () => {
     state = "loading";
     names = [];
+    avatar = "";
+    fallback = "";
   };
 
   Render.identity = ( list ) => {
@@ -31,6 +33,8 @@
       Name.split( identity.prettyName ),
     ];
 
+    avatar = Identity.avatar( match );
+    fallback = Identity.fallback( match );
     state = "ready";
   };
 
@@ -47,20 +51,17 @@
     }
   };
 
-  Handle.remove = () => {
-    return Handle.error( async ( event ) => {
-      event.preventDefault();
-      if ( deleteButton.loading === true ) {
-        return;
-      }
+  Handle.remove = Handle.error( async ( event ) => {
+    if ( deleteButton.loading === true ) {
+      return;
+    }
 
-      deleteButton.loading = true;
-      await Identity.remove( identity );
+    deleteButton.loading = true;
+    await Identity.remove( identity );
 
-      // TODO: Check if there's a Svelte preference for this.
-      location.reload();
-    });
-  };
+    // TODO: Check if there's a Svelte preference for this.
+    location.reload();
+  });
 
   Handle.toggle = Handle.error( async ( event ) => {
     identity.active = event.target.checked;
@@ -78,7 +79,10 @@
 </script>
 
 <section>
-  {#if state === "loading"}
+  {#if state === "error"}
+    <p>There was a problem displaying this identity.</p>
+
+  {:else if state === "loading"}
     <Spinner></Spinner>
   
   {:else if state === "ready"}
@@ -111,9 +115,10 @@
 
     <figure>
 
-      <img 
-        src={identity.profile_image} 
-        alt="profile picture for {identity.prettyName}">
+      <img
+        src="{avatar}" 
+        alt="profile picture for {identity.prettyName}"
+        onerror="this.onerror=null;this.src='{fallback}'">
       
       <figcaption>
 
