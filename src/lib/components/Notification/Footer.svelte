@@ -19,7 +19,22 @@
     url = "#";
   };
 
-  Render.footer = async () => {
+
+  const Handle = {};
+
+  Handle.error = ( f ) => {
+    return async () => {
+      try {
+        await f()
+      } catch ( error ) {
+        console.error( error );
+        state = "error";
+      }
+    };
+  };
+
+
+  Render.footer = Handle.error( async () => {
     if ( identity == null ) {
       console.error("render notification footer: identity is null");
       state = "error";
@@ -47,7 +62,7 @@
       return;
     }
     state = "ready";
-  };
+  });
 
   Render.directMessageURL = async () => {
     let match, baseURL;
@@ -66,8 +81,11 @@
     switch ( notification.type ) {
       case "repost":
       case "like":
-        post = await Post.get({ identity, id: post });
-        return Post.href( post );
+        let value = await Post.get({ identity, id: post });
+        if ( value == null ) {
+          throw new Error( `unable to load post data for ${identity}/${post}` );
+        }
+        return Post.href( value );
       case "follow":
         return Source.href( source );
       case "direct message":

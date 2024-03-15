@@ -72,7 +72,12 @@
 
     <h2>Selected Identity</h2>
     <p>
-      Your feed is configured to include posts from
+      Your feed is configured to include posts from your
+
+      <span class="platform">{identity.platform}</span>
+
+      identity,
+
       <a 
         href={identity.profile_url}
         class="profile"
@@ -81,10 +86,8 @@
         
         {#each Name.split(identity.prettyName) as part}
           <span>{part}</span>
-        {/each}      
+        {/each}   
       </a>
-
-      on <span class="platform">{identity.platform}</span>.
     </p>
 
 
