@@ -9,8 +9,6 @@
   import { onMount } from "svelte";
   import { browser } from "$app/environment";
   import { sleep } from "@dashkite/joy/time";
-  import { scrollStore } from "$lib/stores/scroll.js";
-  import posts from "$lib/stores/posts.js";
   
   export let data;
   let form, button;
@@ -28,10 +26,6 @@
     let search = formData.get( "search" );
     console.log( `searching for ${search}` );
     await sleep( 500 );
-    
-    if ( isValidString( search ) ) {
-      results = [ posts[0] ];
-    }
     
     loading = false;
     button.loading = false;
@@ -59,15 +53,8 @@
         await submit();
       }
 
-      const unsubscribeScroll = scrollStore.subscribe( function ({ deltaY }) {
-        if ( resultsSection != null ) {
-          resultsSection.scrollBy( 0, deltaY );
-        }
-      });
-
       return function () {
         form.removeEventListener( "submit", listener );
-        unsubscribeScroll();
       };
     });
   }
