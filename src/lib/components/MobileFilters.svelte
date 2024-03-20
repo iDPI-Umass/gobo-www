@@ -82,13 +82,7 @@
     flex-wrap: wrap;
     justify-content: flex-start;
     align-items: center;
-    padding-top: var(--gobo-height-spacer);
-  }
-
-  @media ( max-width: 750px ) {
-    nav {
-      padding: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex) 0 var(--gobo-width-spacer-flex)
-    }
+    padding: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex) 0 var(--gobo-width-spacer-flex)
   }
 
   nav > sl-button {

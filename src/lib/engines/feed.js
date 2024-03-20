@@ -42,7 +42,6 @@ const Feed = {};
 Feed.make = async () => {
   return {
     posts: [],
-    scroll: 0,
     weaver: await Weaver.make(),
     isStopped: false,
     replies: new Set(),
@@ -94,6 +93,14 @@ Feed.clear = async () => {
 Feed.refresh = async () => {
   await Feed.clear();
   Feed.command( "refresh" );
+};
+
+Feed.hide = async () => {
+  Feed.command( "hide" );
+};
+
+Feed.show = async () => {
+  Feed.command( "show" );
 };
 
 
@@ -161,18 +168,6 @@ Posts.push = async ( posts ) => {
 };
 
 
-const Position = {};
-
-Position.read = async () => {
-  const feed = await Feed.read();
-  return feed.position;
-};
-
-Position.write = async ( position ) => {
-  const feed = await Feed.read();
-  feed.position = position;
-};
-
 
 const Reply = {};
 
@@ -202,6 +197,5 @@ Reply.add = async ( id ) => {
 export {
   Feed,
   Posts,
-  Position,
   Reply,
 }

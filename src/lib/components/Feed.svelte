@@ -3,7 +3,7 @@
   import Post from "$lib/components/Post.svelte";
 
   import { onMount, tick } from "svelte";
-  import { Feed, Position } from "$lib/engines/feed.js";
+  import { Feed } from "$lib/engines/feed.js";
   import { State } from "$lib/engines/store.js";
   import { Scroll } from "$lib/engines/scroll.js";
   // import * as scrollStores from "$lib/stores/scroll.js";
@@ -11,7 +11,7 @@
   import * as LS from "$lib/helpers/local-storage.js";
 
   let _feed;
-  let posts, state, scroll;
+  let posts, state, scroll, styles;
   const Render = State.make();
   Render.cleanup = () => {
     posts = [];
@@ -60,7 +60,10 @@
         Feed.command( "ready" );
         break;
       case "ready":
-        break; // no-op
+        break; // no-op to save good and ready state.
+      case "hide":
+      case "show":
+        break; // no-ops handled at the overlay level.
       default:
         console.warn("unrecognized feed command", event);
     }
@@ -68,7 +71,6 @@
 
   Handle.scroll = ( event ) => {
     scroll.event( event );
-    Position.write( _feed.scrollTop );
   };
 
   Handle.infiniteScroll = ( event ) => {

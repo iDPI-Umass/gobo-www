@@ -20,6 +20,7 @@
     flex-direction: row;
     flex-wrap: nowrap;
     align-items: stretch;
+    z-index: 5;
   }
 
   main {

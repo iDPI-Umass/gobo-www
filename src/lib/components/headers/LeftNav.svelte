@@ -116,6 +116,7 @@
     align-items: flex-start;
     margin: 0;
     padding: var(--gobo-width-spacer);
+    z-index: 10;
   }
 
   nav > sl-button {

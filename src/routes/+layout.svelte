@@ -20,6 +20,8 @@
 
   // Now we can setup the store stuff with Svelte
   import Spinner from "$lib/components/primitives/Spinner.svelte";
+  import NavPageTriple from "$lib/components/layouts/NavPageTriple.svelte";
+  import FeedOverlay from "$lib/components/layouts/FeedOverlay.svelte";
   import { beforeUpdate, onDestroy } from "svelte";
   import { themeStore } from "$lib/stores/theme.js";
   import { handleRedirect } from "$lib/helpers/redirect.js";
@@ -73,6 +75,7 @@
     <Spinner></Spinner>
   {:then}
     <slot></slot>
+    <FeedOverlay></FeedOverlay>
   {:catch}
     <p>There was a problem with your login.</p>
   {/await}
@@ -80,4 +83,7 @@
 
 
 <style>
+  .page-wrapper {
+    position: fixed;
+  }
 </style>

@@ -12,17 +12,6 @@
   <MainHeader></MainHeader>
   <NavPageTriple current="home">
     <slot slot="main"></slot>
-    <div slot="aside">
-      <IdentityFilters></IdentityFilters>
-      <GeneralFilters></GeneralFilters>
-    </div>
   </NavPageTriple>
   <FooterNav current="home"></FooterNav>
 </GuardFrame>
-
-<style>
-  div {
-    max-height: calc(100dvh - 4rem);
-    overflow-y: scroll;
-  }
-</style>
