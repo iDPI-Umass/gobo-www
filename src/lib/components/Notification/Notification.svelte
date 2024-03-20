@@ -124,7 +124,7 @@
 <style>
   section {
     width: 100%;
-    margin-top: var(--gobo-height-spacer);
+    margin-top: var(--gobo-height-spacer-flex);
   }
 
   section:first-child {
