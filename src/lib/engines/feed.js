@@ -42,7 +42,7 @@ const Feed = {};
 Feed.make = async () => {
   return {
     posts: [],
-    scroll: 0,
+    position: 0,
     weaver: await Weaver.make(),
     isStopped: false,
     replies: new Set(),
