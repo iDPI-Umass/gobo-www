@@ -5,7 +5,7 @@
   import Icon from "$lib/components/Notification/Icon.svelte";
   import Action from "$lib/components/Notification/Action.svelte"
   import Footer from "$lib/components/Notification/Footer.svelte";
-  import Content from "$lib/components/Post/Content.svelte";
+  import Content from "$lib/components/Notification/Content.svelte";
   import { onMount } from "svelte";
   import { State } from "$lib/engines/store.js";
   import { Notification } from "$lib/engines/notification.js";
@@ -47,6 +47,8 @@
       glamor = "post";
     } else if ( Conditions.attributed.includes( notification.type )) {
       glamor = "attribution";
+    } else if ( Conditions.attributedPost.includes( notification.type )) {
+      glamor = "attribution with post";
     } else {
       glamor = "error";
     }
@@ -64,10 +66,13 @@
   ];
 
   Conditions.attributed = [
-    "repost",
-    "like",
     "follow",
     "direct message"
+  ];
+
+  Conditions.attributedPost = [
+    "repost",
+    "like"
   ];
 
   const styles = {
@@ -105,9 +110,16 @@
       <Icon slot="gutter" name={notification.type}></Icon>
       <div slot="content" class="attributed">
         <Action {source} {notification}></Action>
-        {#if post != null}
-          <Content {identity} id={post} {styles}></Content>
-        {/if}
+      </div>
+      <Footer slot="footer" {identity} {notification} {source} {post} ></Footer>
+    </Frame>
+
+  {:else if glamor === "attribution with post"}
+    <Frame>
+      <Icon slot="gutter" name={notification.type}></Icon>
+      <div slot="content" class="attributed">
+        <Action {source} {notification}></Action>
+        <Content {identity} id={post} {styles}></Content>
       </div>
       <Footer slot="footer" {identity} {notification} {source} {post} ></Footer>
     </Frame>

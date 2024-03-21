@@ -1,6 +1,7 @@
 <script>
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
+  import "@shoelace-style/shoelace/dist/components/alert/alert.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
   import SharedHeading from "$lib/components/Post/SharedHeading.svelte";
@@ -43,7 +44,6 @@
     }
 
     if ( id == null ) {
-      console.error("render post: post ID is null");
       state = "error";
       return;
     }
@@ -102,7 +102,10 @@
   on:keydown={Handle.click}>
 
   {#if state === "error"}
-    <p>There was a problem displaying this post.</p>
+    <sl-alert variant="danger" open>
+      <sl-icon slot="icon" src="/icons/exclamation-circle.svg"></sl-icon>
+      There was a problem displaying this post.
+    </sl-alert>
   
   {:else if state === "loading"}
     <Spinner></Spinner>
@@ -280,6 +283,10 @@
 
   .outer-frame .inner-frame .main .content :global(pre) {
     white-space: pre-wrap;
+  }
+
+  sl-alert::part(base) {
+    margin: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex);
   }
 </style>
 

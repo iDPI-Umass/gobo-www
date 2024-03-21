@@ -5,9 +5,13 @@
 
   let iconURL;
 
+  // TODO: Can we do away with icon nudge hacks?
+  let modify = "";
+
   switch ( name ) {
     case "like":
       iconURL = "/icons/heart-fill.svg";
+      modify = "a";
       break;
     case "repost":
       iconURL = "/icons/repeat.svg";
@@ -33,10 +37,14 @@
 
 </script>
 
-<sl-icon src={iconURL}></sl-icon>
+<sl-icon src={iconURL} class="{modify}"></sl-icon>
 
 <style>
   sl-icon {
     font-size: 2rem;
+  }
+
+  sl-icon.a {
+    margin-top: 0.125rem;
   }
 </style>

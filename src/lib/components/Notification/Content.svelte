@@ -1,4 +1,6 @@
 <script>
+  import "@shoelace-style/shoelace/dist/components/alert/alert.js";
+  import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
   import { onMount } from "svelte";
   import { State } from "$lib/engines/store.js";
@@ -24,11 +26,9 @@
     }
 
     if ( id == null ) {
-      console.error("render post: post ID is null");
       state = "error";
       return;
     }
-
     post = await Post.get({ identity, id });
     if ( post == null ) {
       state = "error";
@@ -52,9 +52,10 @@
 
 
 {#if state === "error"}
-  <section>
-    <p>There was a problem displaying this post content.</p>
-  </section>
+  <sl-alert variant="danger" open>
+    <sl-icon slot="icon" src="/icons/exclamation-circle.svg"></sl-icon>
+    There was a problem displaying this post content.
+  </sl-alert>
 
 {:else if state === "loading"}
   <Spinner></Spinner>
@@ -119,5 +120,9 @@
 
   .content :global(pre) {
     white-space: pre-wrap;
+  }
+
+  sl-alert {
+    margin-top: var(--gobo-height-spacer-flex);
   }
 </style>

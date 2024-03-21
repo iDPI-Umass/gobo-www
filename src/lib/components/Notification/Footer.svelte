@@ -77,15 +77,46 @@
     }
   };
 
+  // TODO: It just turns out that all the platforms use /notifications.
+  //    perhaps formally breaking them all out is overkill.
+  Render.fallbackURL = async () => {
+    let match, baseURL;
+    switch ( notification.platform ) {
+      case "bluesky":
+        match = await Identity.find( identity );
+        baseURL = match.base_url; 
+        return new URL( "/notifications", baseURL ).href;
+      case "mastodon":
+        match = await Identity.find( identity );
+        baseURL = match.base_url; 
+        return new URL( "/notifications", baseURL ).href;
+      case "reddit":
+        match = await Identity.find( identity );
+        baseURL = match.base_url; 
+        return new URL( "/notifications", baseURL ).href;
+      case "smalltown":
+        match = await Identity.find( identity );
+        baseURL = match.base_url; 
+        return new URL( "/notifications", baseURL ).href;
+      default:
+        console.error(`we do not yet support building a URL for the in-platform location of notifications for platform ${platform}`);
+        return;
+    }
+  };
+
   Render.url = async () => {
     switch ( notification.type ) {
       case "repost":
       case "like":
-        let value = await Post.get({ identity, id: post });
-        if ( value == null ) {
-          throw new Error( `unable to load post data for ${identity}/${post}` );
+        let value;
+        if ( post != null ) {
+          value = await Post.get({ identity, id: post });
         }
-        return Post.href( value );
+        if ( value != null ) {
+          return Post.href( value );
+        } else {
+          return await Render.fallbackURL();
+        }
       case "follow":
         return Source.href( source );
       case "direct message":

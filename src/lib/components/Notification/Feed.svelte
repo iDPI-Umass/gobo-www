@@ -25,8 +25,8 @@
   Render.feed = async ( feed ) => {
     notifications = feed.notifications;
     Render.state();
-    Render.scroll( feed );
-    Count.clear();
+    await Render.scroll( feed );
+    await Render.count( feed )
   };
 
   Render.state = () => {    
@@ -39,10 +39,15 @@
 
   Render.scroll = async ( feed ) => {
     await tick();
-    // TODO: Scroll restoration.
-    // _feed.scrollTo( 0, feed.position );
     scroll.listen();
   };
+
+  Render.count = async ( feed ) => {
+    if ( feed.count !== 0 ) {
+      await Feed.refresh();
+      await Count.clear();
+    }
+  }
 
 
   const Handle = {};

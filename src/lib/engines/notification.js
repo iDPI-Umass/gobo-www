@@ -17,7 +17,7 @@ Feed.make = async ( context = {} ) => {
 
   return {
     notifications: [],
-    scroll: 0,
+    position: 0,
     view: view,
     weaver: await Weaver.make({ view }),
     isStopped: false,
@@ -186,13 +186,14 @@ Count.clear = async () => {
 // Pulls on the Polling state machine reactor.
 (async () => {
   for await ( const talos of Poll.reactor ) {
+    console.log("polling", talos.state)
     if ( talos.failure ) {
       console.error( talos.error );
       return;
     }
     Count.pulse();
   }
-});
+})();
 
 // Feed Polling state machine initial events to get started.
 Poll.event({ name: "start" });

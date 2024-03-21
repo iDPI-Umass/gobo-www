@@ -44,8 +44,7 @@
       on:sl-hide={ Handle.dismiss( a.key )}
       variant="danger"
       open
-      closable 
-      class="alert">
+      closable>
       <sl-icon slot="icon" src="/icons/exclamation-circle.svg"></sl-icon>
       { a.message }
     </sl-alert>
