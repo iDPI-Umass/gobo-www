@@ -31,11 +31,7 @@ const publish = async function () {
   const files = await Task.Directory.read( "build" );
   await Task.Bucket.check( config );
   await Task.Bucket.sync( config, files );
-
-  // Only cache invalidate for environments that use caching.
-  if ( config.edge.ttl.default > 0 ) {
-    await Task.Edge.invalidate( config );
-  }
+  await Task.Edge.invalidate( config );
 };
 
 

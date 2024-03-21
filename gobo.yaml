@@ -18,7 +18,7 @@ production-www:
       - gobo.social
       - www.gobo.social
     ttl:
-      default: 0
+      default: 86400
       min: 0
       max: 31536000 # 1 year
 
