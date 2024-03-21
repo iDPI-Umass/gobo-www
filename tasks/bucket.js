@@ -105,6 +105,7 @@ const sync = async function( config, files ) {
           Key: operation.key,
           ContentMD5: operation.file.hash64,
           ContentType: operation.file.type,
+          CacheControl: "max-age=60, s-maxage=31536000",
           Body: operation.file.content
         });
 
@@ -116,6 +117,7 @@ const sync = async function( config, files ) {
           Key: operation.key,
           ContentMD5: operation.file.hash64,
           ContentType: operation.file.type,
+          CacheControl: "max-age=60, s-maxage=31536000",
           Body: operation.file.content
         });
       
