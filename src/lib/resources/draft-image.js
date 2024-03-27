@@ -1,4 +1,4 @@
-import { getGOBOClient, logout } from "$lib/helpers/account";
+import { Gobo, App } from "$lib/engines/account.js";
 
 
 const create = async function ({ file, alt }) {
@@ -8,7 +8,7 @@ const create = async function ({ file, alt }) {
   form.append("alt", alt );
   
   try {
-    const client = await getGOBOClient();
+    const client = await Gobo.get();
     return await client.personDraftImages.post({
       parameters: { person_id: client.id },
       content: form,
@@ -16,7 +16,7 @@ const create = async function ({ file, alt }) {
 
   } catch ( error ) {
     if ( error.status === 401 ) {
-      return await logout();
+      return await App.logout();
     }
   }
 };
@@ -24,14 +24,14 @@ const create = async function ({ file, alt }) {
 
 const remove = async function ( draft ) {
   try {
-    const client = await getGOBOClient();
+    const client = await Gobo.get();
     return await client.personDraftImage.delete({
       person_id: client.id,
       id: draft.id
     });
   } catch ( error ) {
     if ( error.status === 401 ) {
-      return await logout();
+      return await App.logout();
     }
     if ( error.status === 404 ) {
       console.warn( `The draft image ${ draft.id } is not found` );

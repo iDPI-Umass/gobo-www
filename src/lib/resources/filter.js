@@ -1,4 +1,4 @@
-import { getGOBOClient, handleUnauthorized } from "$lib/helpers/account";
+import { Gobo, App } from "$lib/engines/account.js";
 
 
 const label = function ( filter ) {
@@ -22,8 +22,8 @@ const sort = function ( filters ) {
   return filters;
 }
 
-const list = handleUnauthorized( async function () {
-  const client = await getGOBOClient();
+const list = App.unauthorized( async function () {
+  const client = await Gobo.get();
 
   const filters = [];
   let page = 1;
@@ -47,8 +47,8 @@ const list = handleUnauthorized( async function () {
 });
 
 
-const add = handleUnauthorized( async function ( category, configuration ) {
-  const client = await getGOBOClient();
+const add = App.unauthorized( async function ( category, configuration ) {
+  const client = await Gobo.get();
   const filter = await client.personFilters.post({
     parameters: {
       person_id: client.id
@@ -63,14 +63,14 @@ const add = handleUnauthorized( async function ( category, configuration ) {
   return filter;
 });
 
-const update = handleUnauthorized( async function ( filter ) {
-  const client = await getGOBOClient();
+const update = App.unauthorized( async function ( filter ) {
+  const client = await Gobo.get();
   filter = await client.personFilter.put( filter ); 
   return filter;
 }); 
 
-const remove = handleUnauthorized( async function ( filter ) {
-  const client = await getGOBOClient();
+const remove = App.unauthorized( async function ( filter ) {
+  const client = await Gobo.get();
   await client.personFilter.delete({
     person_id: client.id,
     id: filter.id

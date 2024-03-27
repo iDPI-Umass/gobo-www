@@ -1,9 +1,9 @@
-import { getGOBOClient, handleUnauthorized } from "$lib/helpers/account.js";
+import { Gobo, App } from "$lib/engines/account.js";
 
 
-const get = handleUnauthorized( async function ( name ) {  
+const get = App.unauthorized( async function ( name ) {  
   try {
-    const client = await getGOBOClient();
+    const client = await Gobo.get();
     const store = await client.personStore.get({ 
       person_id: client.id,
       name: name
@@ -19,8 +19,8 @@ const get = handleUnauthorized( async function ( name ) {
   }
 });
 
-const put = handleUnauthorized( async function ( name, content ) {
-  const client = await getGOBOClient();
+const put = App.unauthorized( async function ( name, content ) {
+  const client = await Gobo.get();
   const store = await client.personStore.put({
     person_id: client.id,
     name: name,

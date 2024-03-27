@@ -50,9 +50,13 @@ document.addEventListener( "visibilitychange", () => {
 // Completes conversion of push-based events into pull-based reactor.
 Events.buildReactor = async function* () {
   while ( true ) {
-    yield await Events.wait();
+    const event = await Events.wait();
+    if ( event.name === "halt" ) {
+      return;
+    }
+    yield event; 
   }
-}
+};
 
 
 const When = {
@@ -63,7 +67,10 @@ const When = {
 
 
 const machine = Talos.Machine.make( "notification polling", {
-  start: "listen",
+  start: {
+    listen: When.listen,
+    wait: When.wait,
+  },
   listen: {
     fetch: {
       when: When.fetch,

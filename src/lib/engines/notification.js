@@ -2,7 +2,7 @@ import { Feed as Weaver } from "$lib/resources/person-identity-feeds/notificatio
 import * as stores from "$lib/stores/notification.js";
 import { Poll } from "$lib/polling/notifications.js";
 import { Cache } from "$lib/resources/cache.js";
-import * as Account from "$lib/helpers/account.js";
+import { App } from "$lib/engines/account.js";
 
 
 // Notifications have similar needs to the main post feed, so we use similar
@@ -64,7 +64,7 @@ Feed.clear = async ({ view }) => {
   // Halt feed weaver pulling before discarding old object.
   Feed.halt();
   singletonFeed = Feed.make({ view });
-  await singletonFeed
+  singletonFeed = await singletonFeed
 };
 
 Feed.refresh = async ( context = {} ) => {
@@ -195,19 +195,27 @@ Count.clear = async () => {
   }
 })();
 
-// Feed Polling state machine initial events to get started.
-Poll.event({ name: "start" });
-Poll.event({ name: "fetch" });
-
 
 // Special instantiation, when logged in, to pull data and send to listeners.
 // This cuts down on requests to the API, manages race conditions, and helps
 // mitigate what appear to be service worker effects on the singleton.
-(async () => {
-  if ( (await Account.isLoggedIn()) === true ) {
+Feed.startup = async () => {
+  if ( (await App.isAllowedAccess()) ) {
+    // Feed Polling state machine initial events to get started.
+    Poll.event({ name: "listen" });
+    Poll.event({ name: "fetch" });
+    
+    // Pull down feed data.
     await Feed.refresh();
+  
+  } else {
+    // Halt polling reactor.
+    Poll.event({ name: "halt" });
   }
-})();
+};
+
+App.register( Feed.startup );
+Feed.startup();
 
 
 export {

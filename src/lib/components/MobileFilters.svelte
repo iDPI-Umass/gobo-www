@@ -7,6 +7,7 @@
   import { State } from "$lib/engines/store.js";
   import { Identity } from "$lib/engines/identity.js";
   import { Filter } from "$lib/engines/filter.js";
+  import * as identityStores from "$lib/stores/identity.js";
 
   let state, identities, filters;
   const Render = State.make();
@@ -28,7 +29,7 @@
 
   Render.reset();
   onMount(() => {
-    Render.menu();
+    Render.listen( identityStores.singleton, Render.menu );
     return () => {
       Render.reset();
     }

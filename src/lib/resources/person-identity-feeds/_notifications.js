@@ -1,8 +1,8 @@
-import { getGOBOClient, handleUnauthorized } from "$lib/helpers/account.js";
+import { Gobo, App } from "$lib/engines/account.js";
 
 
-const list = handleUnauthorized( async function ( options ) {
-  const client = await getGOBOClient();
+const list = App.unauthorized( async function ( options ) {
+  const client = await Gobo.get();
   return await client.personNotifications.get({ 
     person_id: client.id,
     id: options.id,

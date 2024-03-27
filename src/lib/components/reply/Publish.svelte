@@ -93,7 +93,7 @@
   }
 
   p span {
-    display: inline-flex;
+    display: inline;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: start;

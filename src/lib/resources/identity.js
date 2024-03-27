@@ -1,4 +1,4 @@
-import { getGOBOClient, handleUnauthorized } from "$lib/helpers/account.js";
+import { Gobo, App } from "$lib/engines/account.js";
 
 
 const getPrettyName = function ( identity ) {
@@ -54,23 +54,23 @@ const sort = function ( identities ) {
   return [ ...blueskys, ...mastodons, ...reddits, ...smalltowns ];
 };
 
-const list = handleUnauthorized( async function () {
-  const client = await getGOBOClient();
+const list = App.unauthorized( async function () {
+  const client = await Gobo.get();
   const identities = await client.personIdentities.get({ 
     person_id: client.id
   });
   return sort( identities );
 });
 
-const remove = handleUnauthorized( async function ( identity ) {
-  const client = await getGOBOClient();
+const remove = App.unauthorized( async function ( identity ) {
+  const client = await Gobo.get();
   await client.personIdentity.delete( identity );
 });
 
 
 const setActiveState = async function ( identity ) {
   const active = identity.active;
-  const client = await getGOBOClient();
+  const client = await Gobo.get();
   return await client.personIdentity.post({
     parameters: identity,
     content: { active }

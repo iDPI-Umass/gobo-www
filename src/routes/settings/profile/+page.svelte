@@ -4,9 +4,10 @@
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import BackLink from "$lib/components/primitives/BackLink.svelte";
   import "$lib/styles/buttons.css";
-  import { profileStore } from "$lib/stores/profile";
-  import { getGOBOClient } from "$lib/helpers/account";
   import { onMount } from "svelte";
+  import { Gobo } from "$lib/engines/account.js";
+  import { profileStore } from "$lib/stores/profile";
+
   let profile;
   let form, button, nameInput;
 
@@ -15,7 +16,7 @@
   };
 
   const issueRequest = async function () {
-    const client = await getGOBOClient();
+    const client = await Gobo.get();
     const data = new FormData( form );
     profile.name = data.get( "name" );
     profile.person_id = profile.id;

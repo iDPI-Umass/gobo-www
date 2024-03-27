@@ -1,9 +1,7 @@
 import { goto } from "$app/navigation";
-import { browser } from "$app/environment";
 import * as LS from  "$lib/helpers/local-storage.js";
-import * as Account from "$lib/helpers/account.js";
+import { App, Clients, Gobo } from "$lib/engines/account.js";
 import * as Welcome from "$lib/helpers/welcome.js";
-import { getAuth0Client } from "$lib/helpers/auth0.js";
 
 const exists = function ( value ) {
   return value != null;
@@ -24,56 +22,48 @@ const handleCallbackError = async function () {
   goto( "/callback-error" );
 };
 
-
-const toAuthenticationPage = async function () {
-  const client = await getAuth0Client();
-  await client.loginWithRedirect()
-};
-
-
 // TODO: We need to be careful this doesn't create a routing infinite loop with
 //   the guard redirect functionality.
-const handleRootRedirect = async function () {
-  const client = await getAuth0Client();
-  if ( await client.isAuthenticated() !== true ) {
+const handleRootRedirect = async () => {
+  if ( (await App.isLoggedOut()) ) {
     // We can stop here.
   } else {
     try {
-      const account = await Account.getAccount();
-      if ( account.permissions.has("general") ) {
-        // This person is allowed access to application features. Redirect them home.
+      if ( (await App.isAllowedAccess()) ) {
+        // This person is allowed access to application features.
         return goto( "/home" );
       } else {
         return goto( "/permissions" );
       }
     } catch ( error ) {
       console.error( error );
-      await Account.logout();
+      await App.logout();
     }
   }
-}
+};
 
-const successfulAuth = async function () {
-  const account = await Account.getAccount();
-  if ( !account.permissions.has("general") ) {
+const successfulAuth = async () => {
+  if ( !(await App.isAllowedAccess()) ) {
     return goto( "/permissions" );
   }
+
+  await App.startup();
   const welcome = await Welcome.get();
   if ( welcome == null ) {
-    return goto("/welcome");
+    return goto( "/welcome" );
   } else {
-    return goto("/home");
+    return goto( "/home" );
   }
-}
+};
 
 const handleAuthCallback = async ( query ) => {
   console.log( "Starting primary authentication callback", query );
   const { state, code, error } = query;
 
-  if ( (await Account.isLoggedOut()) === true ) {
+  if ( (await App.isLoggedOut()) ) {
     try {
       // Establishing the client is asynchronous, await the possible promise here.
-      const client = await getAuth0Client();
+      const client = await Clients.getAuth0();
 
       if ( exists(state) && ( exists(code) || exists(error) )) {
         await client.handleRedirectCallback();
@@ -94,7 +84,7 @@ const handleAuthCallback = async ( query ) => {
 };
 
 // Handles callbacks from third-party platforms. We need to hold onto the 
-const handleAddIdentityCallback = async function ( query ) {
+const handleAddIdentityCallback = async ( query ) => {
   console.log( "Starting add identity callback", query );
   // console.log({
   //   base_url: baseURL,
@@ -116,7 +106,7 @@ const handleAddIdentityCallback = async function ( query ) {
      return goto( "/identities" );
   }
   
-  const client = await Account.getGOBOClient();
+  const client = await Gobo.get();
   const login = LS.read( "gobo-bluesky-login" );
   const secret = LS.read( "gobo-bluesky-secret" );
   LS.remove(  "gobo-bluesky-login" );
@@ -145,7 +135,7 @@ const handleAddIdentityCallback = async function ( query ) {
 
 
 // Detect and handle any redirect or callback.
-const handleRedirect = async function () {
+const handleRedirect = async () => {
   try {
     const url = new URL( document.location );
     const query = extractQuery( url );

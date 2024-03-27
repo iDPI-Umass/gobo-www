@@ -1,8 +1,8 @@
-import { getGOBOClient, logout } from "$lib/helpers/account";
+import { Gobo, App } from "$lib/engines/account.js";
 
 
 const put = async function ({ identity, post, name }) {
-  const client = await getGOBOClient();
+  const client = await Gobo.get();
   let edge;
   try {
     edge = await client.personPostEdge.put({ 
@@ -13,7 +13,7 @@ const put = async function ({ identity, post, name }) {
     });
   } catch ( error ) {
     if ( error.status === 401 ) {
-      await logout();
+      await App.logout();
       return {};
     } else {
       throw error;
@@ -24,7 +24,7 @@ const put = async function ({ identity, post, name }) {
 }
 
 const remove = async function ({ identity, post, name }) {
-  const client = await getGOBOClient();
+  const client = await Gobo.get();
   try {
     await client.personPostEdge.delete({
       person_id: client.id,
@@ -34,7 +34,7 @@ const remove = async function ({ identity, post, name }) {
     });
   } catch ( error ) {
     if ( error.status === 401 ) {
-      await logout();
+      await App.logout();
       return {};
     } else {
       throw error;

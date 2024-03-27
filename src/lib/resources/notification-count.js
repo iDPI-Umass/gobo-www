@@ -1,4 +1,4 @@
-import { getGOBOClient } from "$lib/helpers/account.js";
+import { Gobo } from "$lib/engines/account.js";
 
 const handleError = function ( f ) {
   return async function ( ...args ) {
@@ -12,7 +12,7 @@ const handleError = function ( f ) {
 };
 
 const get = handleError(async function () {
-  const client = await getGOBOClient();
+  const client = await Gobo.get();
   return await client.personNotificationCount.get({ 
     person_id: client.id
   });
@@ -20,7 +20,7 @@ const get = handleError(async function () {
 
 
 const put = handleError( async function ( count = 0 ) {
-  const client = await getGOBOClient();
+  const client = await Gobo.get();
   return await client.personNotificationCount.put({ 
     person_id: client.id,
     count

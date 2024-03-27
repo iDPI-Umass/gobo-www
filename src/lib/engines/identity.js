@@ -1,6 +1,6 @@
 import * as Resource from "$lib/resources/identity.js";
 import * as identityStores from "$lib/stores/identity.js";
-import * as Account from "$lib/helpers/account.js";
+import { App } from "$lib/engines/account.js";
 
 let singletonList;
 
@@ -117,11 +117,14 @@ Name.split = ( name ) => {
 // Special instantiation, when logged in, to pull data and send to listeners.
 // This cuts down on requests to the API, manages race conditions, and helps
 // mitigate what appear to be service worker effects on the singleton.
-(async () => {
-  if ( (await Account.isLoggedIn()) === true ) {
+Identity.startup = async () => {
+  if ( (await App.isAllowedAccess()) ) {
     await Identity.load();
   }
-})();
+};
+
+App.register( Identity.startup );
+Identity.startup();
 
 
 

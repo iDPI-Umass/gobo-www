@@ -1,6 +1,6 @@
 import * as Resource from "$lib/resources/filter.js";
 import * as filterStores from "$lib/stores/filter.js";
-import * as Account from "$lib/helpers/account.js";
+import { App } from "$lib/engines/account.js";
 
 /***
 Filters have a serialized form we can pass around as state with the
@@ -416,11 +416,14 @@ class BlockDomain extends Frame {
 // Special instantiation, when logged in, to pull data and send to listeners.
 // This cuts down on requests to the API, manages race conditions, and helps
 // mitigate what appear to be service worker effects on the singleton.
-(async () => {
-  if ( (await Account.isLoggedIn()) === true ) {
+Filter.startup = async () => {
+  if ( (await App.isAllowedAccess()) ) {
     await Filter.load();
   }
-})();
+};
+
+App.register( Filter.startup );
+Filter.startup();
 
 
 export {

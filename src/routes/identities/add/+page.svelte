@@ -8,7 +8,7 @@
   import BackLink from "$lib/components/primitives/BackLink.svelte";
   import { onMount } from "svelte";
   import * as LS from "$lib/helpers/local-storage.js";
-  import { getGOBOClient } from "$lib/helpers/account.js";
+  import { Gobo } from "$lib/engines/account.js";
 
   export let data;
   let form, select, button;
@@ -29,7 +29,7 @@
   const submit = async function () {
     try {
       let baseURL;
-      const client = await getGOBOClient();
+      const client = await Gobo.get();
       const data = new FormData( form );
       const platform = data.get( "platform" );
 

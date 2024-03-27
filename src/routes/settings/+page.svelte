@@ -2,11 +2,11 @@
   import BackLink from "$lib/components/primitives/BackLink.svelte";
   import VerticalNav from "$lib/components/primitives/VerticalNav.svelte";
   import NavLink from "$lib/components/primitives/NavLink.svelte";
-  import * as Account from "$lib/helpers/account.js"; 
+  import { App } from "$lib/engines/account.js"; 
 
   const logout = async function ( event ) {
     event.preventDefault();
-    await Account.logout();
+    await App.logout();
   };
 </script>
 

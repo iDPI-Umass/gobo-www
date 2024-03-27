@@ -1,8 +1,8 @@
-import { getGOBOClient, handleUnauthorized } from "$lib/helpers/account";
+import { Gobo, App } from "$lib/engines/account.js";
 
 
-const get = handleUnauthorized(async ({ identity, id }) => {
-  const client = await getGOBOClient();
+const get = App.unauthorized(async ({ identity, id }) => {
+  const client = await Gobo.get();
   return await client.personIdentityPost.get({ 
     person_id: client.id,
     identity_id: identity,
@@ -12,8 +12,8 @@ const get = handleUnauthorized(async ({ identity, id }) => {
 
 
 
-const publish = handleUnauthorized(async ( post, targets ) => {
-  const client = await getGOBOClient();
+const publish = App.unauthorized(async ( post, targets ) => {
+  const client = await Gobo.get();
   await client.personPosts.post({ 
     parameters: { person_id: client.id },
     content: { post, targets }   

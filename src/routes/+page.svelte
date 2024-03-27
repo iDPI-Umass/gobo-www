@@ -2,17 +2,17 @@
   import PlainHeader from "$lib/components/headers/PlainHeader.svelte"
   import CenterAlt from "$lib/components/layouts/CenterAlt.svelte"
   import "@shoelace-style/shoelace/dist/components/button/button.js";
-  import { getAuth0Client } from "$lib/helpers/auth0.js";
+  import { Clients } from "$lib/engines/account.js";
 
   const login = async function ( event ) {
     event.preventDefault();
-    const client = await getAuth0Client();
+    const client = await Clients.getAuth0();
     client.loginWithRedirect();
   };
 
   const signup = async function ( event ) {
     event.preventDefault();
-    const client = await getAuth0Client();
+    const client = await Clients.getAuth0();
     client.loginWithRedirect({ authorizationParams: { screen_hint: "signup" } });
   };
 </script>

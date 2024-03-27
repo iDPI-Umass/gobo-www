@@ -1,6 +1,6 @@
 import { Feed as Weaver } from "$lib/resources/person-identity-feeds/posts.js";
 import * as stores from "$lib/stores/feed.js";
-import * as Account from "$lib/helpers/account.js";
+import { App } from "$lib/engines/account.js";
 
 
 /***
@@ -87,7 +87,7 @@ Feed.clear = async () => {
   // Halt feed weaver pulling before discarding old object.
   Feed.halt();
   singletonFeed = Feed.make();
-  await singletonFeed;
+  singletonFeed = await singletonFeed;
 };
 
 Feed.refresh = async () => {
@@ -187,11 +187,14 @@ Reply.add = async ( id ) => {
 // Special instantiation, when logged in, to pull data and send to listeners.
 // This cuts down on requests to the API, manages race conditions, and helps
 // mitigate what appear to be service worker effects on the singleton.
-(async () => {
-  if ( (await Account.isLoggedIn()) === true ) {
+Feed.startup = async () => {
+  if ( (await App.isAllowedAccess()) ) {
     await Feed.refresh();
   }
-})();
+};
+
+App.register( Feed.startup );
+Feed.startup();
 
 
 export {
