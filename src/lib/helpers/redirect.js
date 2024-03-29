@@ -139,6 +139,7 @@ const handleRedirect = async () => {
   try {
     const url = new URL( document.location );
     const query = extractQuery( url );
+    App.startup();
     
     switch ( url.pathname ) {
       case "/":

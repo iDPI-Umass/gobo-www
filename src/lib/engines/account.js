@@ -13,7 +13,7 @@ import {
 
 
 
-const singletonClients = {};
+let singletonClients = {};
 
 const Clients = {};
 
@@ -49,6 +49,10 @@ Clients.getGobo = async () => {
   return singletonClients.gobo = await singletonClients.gobo;
 };
 
+Clients.logout = () => {
+  singletonClients = {};
+};
+
 
 
 let singletonAccount;
@@ -66,6 +70,10 @@ Account.read = async () => {
   }
 
   return singletonAccount = await singletonAccount;
+};
+
+Account.logout = () => {
+  singletonAccount = null;
 };
 
 
@@ -156,6 +164,10 @@ Token.isAllowedAccess = async () => {
   return bundle.allowedAccess;
 };
 
+Token.logout = () => {
+  singletonToken = null;
+};
+
 
 
 let singletonGobo;
@@ -201,6 +213,10 @@ Gobo.get = async () => {
   return bundle.client;
 }
 
+Gobo.logout = () => {
+  singletonGobo = null;
+}
+
 
 let singletonProfile;
 const Profile = {};
@@ -242,8 +258,14 @@ Profile.update = ( profile ) => {
 };
 
 Profile.load = async () => {
-  const profile = await Profile.read();
-  Profile.update( profile );
+  if ( (await App.isAllowedAccess()) ) {
+    const profile = await Profile.read();
+    Profile.update( profile );
+  }
+};
+
+Profile.logout = () => {
+  singletonProfile = null;
 };
 
 
@@ -253,6 +275,11 @@ const App = {};
 App.logout = async () => {
   profileStore.logout();
   const client = await Clients.getAuth0();
+  Clients.logout();
+  Account.logout();
+  Token.logout();
+  Gobo.logout();
+  Profile.logout();
   client.logout({
     logoutParams: {
       returnTo: PUBLIC_AUTH_LOGOUT_URL
@@ -303,6 +330,7 @@ App.startup = async () => {
   await Promise.all( promises );
 };
 
+App.register( Profile.load );
 
 
 export {
