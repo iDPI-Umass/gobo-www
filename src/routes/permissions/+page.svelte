@@ -8,6 +8,10 @@
   import { App } from "$lib/engines/account.js";
   import { Actions } from "$lib/engines/actions.js";
 
+  // TODO: Do we want to handle verification email resend from here?
+  // We have an endpoint configured in the API, but it's a spam vector
+  // here for unverified personas without some extra protections.
+
   let sendButton;
   let state;
   const Render = State.make();
@@ -63,16 +67,11 @@
       <p>
         In order to use Gobo, you'll need to first verify your email address.
         You should have gotten an email containing a verification request when
-        you signed up. Click the verify link in that email, then login again
-        to Gobo.
+        you signed up. Click the verify link in that email, and then you'll be
+        granted full access to your Gobo account.
       </p>
 
-      <p>
-        If you'd like us to send us to send you another verification email, 
-        you can click the "Resend" button below.
-      </p>
-
-      {#if state === "success"}
+      <!-- {#if state === "success"}
         <sl-alert variant="success" open closable on:sl-hide={Handle.dismiss}>
           <sl-icon slot="icon" src="/icons/check2-circle.svg"></sl-icon>
           Successfully sent verification email.
@@ -82,10 +81,10 @@
           <sl-icon slot="icon" src="/icons/exclamation-circle.svg"></sl-icon>
           There was a problem sending the verification email.
         </sl-alert>
-      {/if}
+      {/if} -->
 
       <div class="buttons">
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- svelte-ignore a11y-click-events-have-key-events
         <sl-button
           bind:this={sendButton}
           on:click={Handle.resend}
@@ -93,7 +92,7 @@
           size="medium"
           pill>
           Resend Verification
-        </sl-button>
+        </sl-button> -->
 
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <sl-button
@@ -120,7 +119,7 @@
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
     margin-top: 2rem;
     border-top: none;

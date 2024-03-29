@@ -43,11 +43,13 @@ const handleRootRedirect = async () => {
 };
 
 const successfulAuth = async () => {
+  App.refresh();
+  await App.startup();
+  
   if ( !(await App.isAllowedAccess()) ) {
     return goto( "/permissions" );
   }
 
-  await App.startup();
   const welcome = await Welcome.get();
   if ( welcome == null ) {
     return goto( "/welcome" );
@@ -57,6 +59,13 @@ const successfulAuth = async () => {
 };
 
 const handleAuthCallback = async ( query ) => {
+  // We're sent back to the callback origin after verifying our email address.
+  // This will force a logout so the member can login again with an
+  // email verification claim that's true.
+  if ( query.logout === "true" ) {
+    return await App.logout();
+  }
+
   console.log( "Starting primary authentication callback", query );
   const { state, code, error } = query;
 
