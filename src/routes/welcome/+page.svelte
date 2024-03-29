@@ -19,7 +19,7 @@
     <section class="gobo-copy">
       <header>
         <h1>Welcome to Gobo!</h1>
-        <h2>A loyal social media client</h2>
+        <h2>A Loyal Social Media Client</h2>
       </header>
       <p>Gobo enables you to aggregate your social media feeds, 
         control the algorithms applied to your feeds, and 
