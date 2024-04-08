@@ -108,7 +108,8 @@ Token.decode = ( token ) => {
   determination within a custom claim. We check for that claim here.
 */
 Token.confirmAccess = ( claims ) => {
-  const isVerified = claims[ "https://gobo.social/verified" ] ?? false;
+  // const isVerified = claims[ "https://gobo.social/verified" ] ?? false;
+  const isVerified = false;
   const permissions = new Set( claims.permissions );
   return isVerified || permissions.has( "general" );
 };
