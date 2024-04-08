@@ -26,7 +26,8 @@
     border: var(--gobo-border-panel);
     border-radius: var(--gobo-border-radius);
     box-sizing: border-box;
-    margin-top: var(--gobo-height-spacer);
+    margin-top: var(--gobo-height-spacer-flex);
+    margin-bottom: 0;
   }
 
   .main {

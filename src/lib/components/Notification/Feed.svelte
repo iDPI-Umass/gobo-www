@@ -132,7 +132,7 @@
   section.feed {
     flex-grow: 1;
     overflow-y: scroll;
-    max-height: calc(100dvh - 5rem);
+    max-height: calc(100dvh - 7.5rem);
   }
 
   @media( min-width: 680px ) {

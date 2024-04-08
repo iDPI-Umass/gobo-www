@@ -137,6 +137,7 @@
   section {
     width: 100%;
     margin-top: var(--gobo-height-spacer-flex);
+    margin-bottom: 0;
   }
 
   section:first-child {
