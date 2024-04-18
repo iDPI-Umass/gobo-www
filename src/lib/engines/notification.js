@@ -215,7 +215,6 @@ Feed.startup = async () => {
 };
 
 App.register( Feed.startup );
-Feed.startup();
 
 
 export {

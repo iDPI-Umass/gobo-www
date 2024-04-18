@@ -29,7 +29,7 @@
   main {
     flex: 0 1 calc( var(--gobo-max-width-primary) + (2 * var(--gobo-width-spacer-flex)) );
     margin: 0;
-    padding: 4px;
+    padding: 0;
     max-width: calc( var(--gobo-max-width-primary) + (2 * var(--gobo-width-spacer-flex)) );
     overflow: hidden;
   }

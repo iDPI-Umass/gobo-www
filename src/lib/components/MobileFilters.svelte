@@ -83,7 +83,8 @@
     flex-wrap: wrap;
     justify-content: flex-start;
     align-items: center;
-    padding: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex) 0 var(--gobo-width-spacer-flex)
+    padding: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex) 0 var(--gobo-width-spacer-flex);
+    background-color: var(--gobo-color-null);
   }
 
   nav > sl-button {
