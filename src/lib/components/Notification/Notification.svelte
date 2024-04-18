@@ -6,6 +6,8 @@
   import Action from "$lib/components/Notification/Action.svelte"
   import Footer from "$lib/components/Notification/Footer.svelte";
   import Content from "$lib/components/Notification/Content.svelte";
+  import DirectMessageAction from "$lib/components/Notification/DirectMessageAction.svelte";
+  import DirectMessageFooter from "$lib/components/Notification/DirectMessageFooter.svelte";
   import { onMount } from "svelte";
   import { State } from "$lib/engines/store.js";
   import { Notification } from "$lib/engines/notification.js";
@@ -43,7 +45,9 @@
 
     post = notification.post_id;
 
-    if ( Conditions.showPost.includes( notification.type )) {
+    if ( Conditions.isDirectMessage( notification )) {
+      glamor = "direct message";
+    } else if ( Conditions.showPost.includes( notification.type )) {
       glamor = "post";
     } else if ( Conditions.attributed.includes( notification.type )) {
       glamor = "attribution";
@@ -58,6 +62,12 @@
 
 
   const Conditions = {};
+  
+  Conditions.isDirectMessage = ( notification ) => {
+    return (notification.type === "direct message") || 
+      (notification.post_meta?.is_direct_message === true);
+  };
+  
   Conditions.showPost = [
     "quote",
     "reply",
@@ -66,8 +76,7 @@
   ];
 
   Conditions.attributed = [
-    "follow",
-    "direct message"
+    "follow"
   ];
 
   Conditions.attributedPost = [
@@ -122,6 +131,15 @@
         <Content {identity} id={post} {styles}></Content>
       </div>
       <Footer slot="footer" {identity} {notification} {source} {post} ></Footer>
+    </Frame>
+
+  {:else if glamor === "direct message"}
+    <Frame>
+      <Icon slot="gutter" name={notification.type}></Icon>
+      <div slot="content" class="attributed">
+        <DirectMessageAction {source} {notification}/>
+      </div>
+      <DirectMessageFooter slot="footer" {identity} {notification} {source} {post} />
     </Frame>
 
   {:else}
