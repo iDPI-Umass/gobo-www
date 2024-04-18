@@ -27,7 +27,7 @@
     flex: 1 1 100%;
     margin: 0;
     overflow: hidden;
-    padding: 4px;
+    padding: 0;
     display: flex;
     flex-direction: column;
   }

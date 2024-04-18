@@ -26,7 +26,7 @@
     justify-content: flex-start;
     align-items: center;
     margin: 0;
-    padding: 4px;
+    padding: 0;
   }
 
   .right-panel {
@@ -36,7 +36,7 @@
     justify-content: center;
     align-items: center;
     margin: 0;
-    padding: 4px;
+    padding: 0;
   }
 
   @media ( min-width: 750px ) {
