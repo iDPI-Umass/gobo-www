@@ -1,10 +1,10 @@
 import { Gobo, App } from "$lib/engines/account.js";
 
 
-const create = async function ({ file, alt }) {
+const create = async function ({ file, name, alt }) {
   const form = new FormData();
-  form.append("image", file, { filename: file.name });
-  form.append("name", file.name );
+  form.append("image", file, { filename: name ?? file.name });
+  form.append("name", name ?? file.name );
   form.append("alt", alt );
   
   try {

@@ -17,6 +17,7 @@ html {
   --gobo-color-button-lens: #313751;
 
   --gobo-color-sl-panel-background: #FBFBFB;
+  --gobo-color-preview-link: #3A88E2;
 
 
   --gobo-color-primary-text: #FFFFFF;
@@ -46,6 +47,7 @@ html.gobo-theme-dark {
 
 
   --gobo-color-sl-panel-background: #131620;
+  --gobo-color-preview-link: #3A88E2;
 }
 
 html.gobo-font-arial {

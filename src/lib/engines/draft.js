@@ -27,6 +27,7 @@ Draft.make = () => {
       subreddit: null
     },
     content: null,
+    linkPreview: {},
     reply: null,
     quote: null
   };
@@ -58,6 +59,7 @@ Draft.put = ( store, value ) =>  draftStores[ store ].put( value );
 Draft.load = () => {
   const draft = Draft.read();
   Draft.put( "content", draft );
+  Draft.put( "linkPreview", draft );
   Draft.put( "identities", draft );
   Draft.put( "attachments", draft );
   Draft.put( "reply", draft );
@@ -451,7 +453,12 @@ Bluesky.shortURL = ( _url ) => {
     return url.host + target.slice( 0, 13 ) + "...";
   }
   return url.host + target;
-}
+};
+
+// This is focused only on how URLs appear in the preview. Currently, it matches
+// the shortURL facet calculation, but that might diverge somehow, as it does
+// in Mastodon. This provides interface uniformity. Maybe move this elsewhere.
+Bluesky.urlGlamor = Bluesky.shortURL;
 
 
 Bluesky.findLink = ( facet ) => {
@@ -510,21 +517,86 @@ Bluesky.extractFacets = async ( content ) => {
   return { facets, text: rt.text };
 };
 
+Bluesky.fetchCardImage = async ( url ) => {
+  const response = await fetch( url );
+  const mime = response.headers.get( "content-type" ) ?? "image/jpeg";
+  const blob = await response.blob();
+  return { mime, blob };
+};
+
+Bluesky.uploadCardImage = async ( file ) => {
+  const draftImage = await Image.create({
+    file,
+    name: "link-card-image",
+    alt: ""
+  });
+  return draftImage.id;
+};
+
+Bluesky.buildCard = async ( context ) => {
+  if ( context.url == null ) {
+    return;
+  }
+
+  const linkCard = {
+    url: context.url,
+    title: context.title,
+    description: context.description
+  };
+
+  if ( context.image != null && context.image.length > 0 ) {
+    const image = await Bluesky.fetchCardImage( context.image );
+    const id = await Bluesky.uploadCardImage( image.blob );
+    linkCard.image = { id, mime: image.mime };
+  }
+
+  return linkCard;
+};
+
 Bluesky.build = async ( draft ) => {
+  let reply;
+  if ( draft.reply?.data != null ) {
+    const id = draft.reply.data.feed[0];
+    reply = draft.reply.data.posts.find( p => p.id == id );
+  }
+
+  let quote;
+  if ( draft.quote?.data != null ) {
+    const id = draft.quote.data.feed[0];
+    quote = draft.quote.data.posts.find( p => p.id == id );
+  }
+
   const { facets, text } = await Bluesky.extractFacets( draft.content );
+  const linkCard = await Bluesky.buildCard( draft.linkPreview );
+  
   return {
-    reply: draft.reply?.data ?? undefined,
-    quote: draft.quote?.data ?? undefined,
-    facets: facets,
-    text: text
+    reply,
+    quote,
+    facets,
+    linkCard,
+    text
   };
 };
 
 
-// From: https://docs.joinmastodon.org/user/posting/
-// "All links are counted as 23 characters, no matter how long they actually are"
+
 const Mastodon = {};
 Mastodon.characterLimit = 500;
+
+// This is unrelated to the character length calcluation below.
+// This aims to emperically mimic the visual representation of URLs in the
+// Mastodon client. They show more characters and remove the scheme.
+Mastodon.urlGlamor = ( _url ) => {
+  const url = new URL( _url );
+  let string = url.host + url.pathname;
+  if ( string.length > 30 ) {
+    string = string.slice( 0, 30 ) + "…";
+  }  
+  return string;
+};
+
+// From: https://docs.joinmastodon.org/user/posting/
+// "All links are counted as 23 characters, no matter how long they actually are"
 Mastodon.contentLength = () => {
   const draft = Draft.read();
   if ( draft.content == null ) {
@@ -543,10 +615,16 @@ Mastodon.contentLength = () => {
 };
 
 Mastodon.build = ( draft ) => {
+  let reply;
+  if ( draft.reply?.data != null ) {
+    const id = draft.reply.data.feed[0];
+    reply = draft.reply.data.posts[ id ];
+  }
+
   return {
     sensitive: draft.options.sensitive,
     spoiler: draft.options.spoilerText,
-    reply: draft.reply?.data ?? undefined
+    reply
   };
 };
 
@@ -559,28 +637,40 @@ Reddit.contentLength = () => {
 };
 
 Reddit.build = ( draft ) => {
+  let reply;
+  if ( draft.reply?.data != null ) {
+    const id = draft.reply.data.feed[0];
+    reply = draft.reply.data.posts[ id ];
+  }
+
   return {
     title: draft.options.title,
     subreddit: draft.options.subreddit,
     nsfw: draft.options.sensitive,
     spoiler: draft.options.spoiler,
-    reply: draft.reply?.data ?? undefined
+    reply
   };
 };
 
 
 const Smalltown = {};
 Smalltown.characterLimit = 500;
-Smalltown.contentLength = () => {
-  const draft = Draft.read();
-  return draft.content?.length ?? 0;
-};
+
+// For now, these are based on the Mastodon helpers.
+Smalltown.urlGlamor = Mastodon.urlGlamor;
+Smalltown.contentLength = Mastodon.contentLength;
 
 Smalltown.build = ( draft ) => {
+  let reply;
+  if ( draft.reply?.data != null ) {
+    const id = draft.reply.data.feed[0];
+    reply = draft.reply.data.posts[ id ];
+  }
+
   return {
     sensitive: draft.options.sensitive,
     spoiler: draft.options.spoilerText,
-    reply: draft.reply?.data ?? undefined
+    reply
   };
 };
 

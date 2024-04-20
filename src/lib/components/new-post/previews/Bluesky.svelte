@@ -2,19 +2,23 @@
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
+  import LinkPreview from "$lib/components/new-post/previews/LinkPreview.svelte";
   import { onMount } from "svelte";
-  import { State, Identity, Media } from "$lib/engines/draft.js";
+  import { State, Identity, Media, Bluesky } from "$lib/engines/draft.js";
   import * as markdown from "$lib/helpers/markdown.js";
 
-  let identity, options, content, displayedFiles, sensitiveOverride;
-  const Render = State.make();
+  const parser = new DOMParser();
+  const serializer = new XMLSerializer();
 
+  let identity, options, content;
+  let displayedFiles, sensitiveOverride;
+  const Render = State.make();
   Render.cleanup = () => {
     identity = {};
     options = {};
     content = null;
     displayedFiles = [];
-    sensitiveOverride = false;  
+    sensitiveOverride = false;
   };
 
   Render.identity = ( draft ) => {
@@ -26,7 +30,20 @@
   };
 
   Render.content = ( draft ) => {
-    content = markdown.render( draft.content );
+    if ( draft.content == null || draft.content == "" ) {
+      content = null;
+      return;
+    }
+
+    const html = markdown.render( draft.content );
+
+    const dom = parser.parseFromString( `<div>${ html }</div>`, "text/html" );    
+    const links = dom.querySelectorAll( "a" );
+    for ( const link of links ) {
+      link.text = Bluesky.urlGlamor( link.text );
+    }
+    
+    content = serializer.serializeToString( dom.querySelector( "div" ));
   };
 
   Render.attachments = ( draft ) => {
@@ -93,7 +110,10 @@
       {/if}
     </section>
 
-    {#if displayedFiles.length === 1}
+    {#if displayedFiles.length === 0}
+      <LinkPreview height="200px"></LinkPreview>
+
+    {:else if displayedFiles.length === 1}
       <div class="media-single">
         <div class="image-box">
           {#if (options.sensitive === true) && (sensitiveOverride === true)}
@@ -413,7 +433,6 @@
   .outer-frame {
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
     justify-content: flex-start;
     align-items: stretch;
     margin-bottom: 2rem;
@@ -425,6 +444,7 @@
   }
 
   .outer-frame > .gutter {
+    flex: 0 0 48px;
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
@@ -441,7 +461,8 @@
   }
 
   .outer-frame > .main {
-    flex: 1;
+    flex: 1 1 0;
+    min-width: 0;
     margin-bottom: 12px;
   }
 
@@ -484,6 +505,10 @@
 
   .outer-frame > .main > header > .spacer {
     flex: 1 1 auto;
+  }
+
+  .outer-frame > .main :global(a) {
+    color: var(--gobo-color-preview-link);
   }
 
 

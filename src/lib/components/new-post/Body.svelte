@@ -4,6 +4,7 @@
   import Count from "$lib/components/new-post/Count.svelte"
   import { onMount } from "svelte";
   import { State, Draft } from "$lib/engines/draft.js";
+  import { Preview } from "$lib/engines/link-preview.js";
 
   let content, placeholder, platforms;
   const Render = State.make();
@@ -16,6 +17,7 @@
 
   Render.content = ( draft ) => {
     content = draft.content;
+    Preview.fromContent( draft.content );
   };
 
   Render.shouldTrack = ( platforms, identity ) => {

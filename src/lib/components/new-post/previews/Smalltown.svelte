@@ -2,12 +2,15 @@
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
+  import LinkPreview from "$lib/components/new-post/previews/LinkPreview.svelte";
   import { onMount } from "svelte";
-  import { State, Identity, Media } from "$lib/engines/draft.js";
+  import { State, Identity, Media, Smalltown } from "$lib/engines/draft.js";
   import * as markdown from "$lib/helpers/markdown.js";
 
   let identity, options, content, displayedFiles, sensitiveOverride;
   const Render = State.make();
+  const parser = new DOMParser();
+  const serializer = new XMLSerializer();
 
   Render.cleanup = () => {
     identity = {};
@@ -26,7 +29,20 @@
   };
 
   Render.content = ( draft ) => {
-    content = markdown.render( draft.content );
+    if ( draft.content == null || draft.content == "" ) {
+      content = null;
+      return;
+    }
+
+    const html = markdown.render( draft.content );
+
+    const dom = parser.parseFromString( `<div>${ html }</div>`, "text/html" );    
+    const links = dom.querySelectorAll( "a" );
+    for ( const link of links ) {
+      link.text = Smalltown.urlGlamor( link.text );
+    }
+    
+    content = serializer.serializeToString( dom.querySelector( "div" ));
   };
 
   Render.attachments = ( draft ) => {
@@ -78,7 +94,10 @@
     <section> {@html content} </section>
   
 
-    {#if displayedFiles.length === 1}
+    {#if displayedFiles.length === 0}
+      <LinkPreview height="300px"></LinkPreview>
+
+    {:else if displayedFiles.length === 1}
       <div class="media">
         {#if (options.sensitive === true) && ( sensitiveOverride === true )}
           <div 
@@ -463,6 +482,10 @@
     font-family: var(--sl-font-family-sans);
     color: #000;
     margin-bottom: 16px;
+  }
+
+  .outer-frame > section :global(a) {
+    color: var(--gobo-color-preview-link);
   }
 
   .outer-frame > .media {

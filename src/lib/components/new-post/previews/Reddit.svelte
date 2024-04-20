@@ -340,6 +340,10 @@
     overflow-y: hidden;
   }
 
+  .outer-frame > .main > section :global(a) {
+    color: var(--gobo-color-preview-link);
+  }
+
   .outer-frame > .main > .media {
     position: relative;
     margin: 10px 0 0 0;
