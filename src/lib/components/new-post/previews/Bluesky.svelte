@@ -120,7 +120,7 @@
             <div class="media-hide">
               <div
                 on:click={Handle.sensitive}
-                on:keypress={Handle.sensitive}
+                on:keydown={Handle.sensitive}
                 tabindex="0"
                 role="button">
                 <span>Hide</span>
@@ -135,7 +135,7 @@
               <p>The Tweet author flagged this Tweet as showing sensitive content.</p>
               <div
                 on:click={Handle.sensitive}
-                on:keypress={Handle.sensitive}
+                on:keydown={Handle.sensitive}
                 tabindex="0"
                 role="button">
                 <span>Show</span>
@@ -168,7 +168,7 @@
           <div class="media-hide">
             <div
               on:click={Handle.sensitive}
-              on:keypress={Handle.sensitive}
+              on:keydown={Handle.sensitive}
               tabindex="0"
               role="button">
               <span>Hide</span>
@@ -183,7 +183,7 @@
             <p>The Tweet author flagged this Tweet as showing sensitive content.</p>
             <div
               on:click={Handle.sensitive}
-              on:keypress={Handle.sensitive}
+              on:keydown={Handle.sensitive}
               tabindex="0"
               role="button">
               <span>Show</span>
@@ -231,7 +231,7 @@
           <div class="media-hide">
             <div
               on:click={Handle.sensitive}
-              on:keypress={Handle.sensitive}
+              on:keydown={Handle.sensitive}
               tabindex="0"
               role="button">
               <span>Hide</span>
@@ -246,7 +246,7 @@
             <p>The Tweet author flagged this Tweet as showing sensitive content.</p>
             <div
               on:click={Handle.sensitive}
-              on:keypress={Handle.sensitive}
+              on:keydown={Handle.sensitive}
               tabindex="0"
               role="button">
               <span>Show</span>
@@ -313,7 +313,7 @@
           <div class="media-hide">
             <div
               on:click={Handle.sensitive}
-              on:keypress={Handle.sensitive}
+              on:keydown={Handle.sensitive}
               tabindex="0"
               role="button">
               <span>Hide</span>
@@ -328,7 +328,7 @@
             <p>The Tweet author flagged this Tweet as showing sensitive content.</p>
             <div
               on:click={Handle.sensitive}
-              on:keypress={Handle.sensitive}
+              on:keydown={Handle.sensitive}
               tabindex="0"
               role="button">
               <span>Show</span>

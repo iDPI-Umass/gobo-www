@@ -1,4 +1,7 @@
 <script>
+  import "@shoelace-style/shoelace/dist/components/button/button.js";
+  import "@shoelace-style/shoelace/dist/components/icon/icon.js";
+  import { replaceState } from "$app/navigation";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
   import BackLink from "$lib/components/primitives/BackLink.svelte";
   import { onMount } from "svelte";
@@ -8,46 +11,128 @@
   
   export let data;
   
-  let state, media;
+  let state, bindings, post, attachments, media, show;
   const Render = State.make();
   Render.cleanup = () => {
     state = "loading";
+    bindings = {};
+    post = null;
+    attachments = [];
     media = {};
+    show = {};
   };
 
-  Render.media = async () => {
-    const post = await Post.get({
-      identity: data.bindings.identity,
-      id: data.bindings.post
-    });
-    
+  Render.bindings = async ( value ) => {
+    bindings = {
+      identity: value.identity,
+      post: value.post,
+      media: Number( value.media )
+    };
+
+    if ( post == null || post.id !== value.post ) {
+      post = await Post.get({
+        identity: bindings.identity,
+        id: bindings.post
+      });
+
+      attachments = post
+        .attachments
+        .filter( a => /^(image|video)\//.test(a.type) );
+    }
+
+    Render.page();
+  };
+
+  Render.page = () => {
+    Render.media();
+    if ( state === "error" ) {
+      return;
+    }
+    Render.nav();
+    state = "ready";
+  };
+
+  Render.media = () => {
     if ( post == null ) {
       state = "error";
       return;
     }
 
-    let id = Number( data.bindings.media );
-    let match = post
-      .attachments
-      .filter( a => /^(image|video)\//.test(a.type) )
-      [ id ];
-
-    if ( match != null ) {
-      media = match;
-      state = "ready";
-    } else {
+    const match = attachments[ bindings.media ];
+    if ( match == null ) {
       state = "error";
+      return;
     }
+    
+    media = match;
+  };
+
+  Render.nav = async () => {
+    if ( attachments.length <= 1 ) {
+      show = { left: false, right: false };
+      return;
+    }
+
+    const current = bindings.media;
+    let left, right;
+    if ( current === 0 ) {
+      left = false;
+    }
+    if ( current >= (attachments.length - 1) ) {
+      right = false;
+    }
+
+    left ??= true;
+    right ??= true;
+    show = { left, right };
+  };
+
+
+  const Handle = {};
+
+  Handle.keydown = ( event ) => {
+    if ( state === "loading" ) {
+      return;
+    }
+
+    if ( (event.key === "ArrowLeft") && (show.left === true) ) {
+      state = "loading";
+      Handle.left();
+    }
+    if ( (event.key === "ArrowRight") && (show.right === true) ) {
+      state = "loading";
+      Handle.right();
+    }
+  };
+
+  Handle.buildPath = () => {
+    const { identity, post, media } = bindings;
+    return `/display/${ identity }/${ post }/${ media }`
+  };
+
+  Handle.left = () => {
+    bindings.media -= 1;
+    replaceState( Handle.buildPath() );
+    Render.page();
+  };
+
+  Handle.right = () => {
+    bindings.media += 1;
+    replaceState( Handle.buildPath() );
+    Render.page();
   };
 
 
   Render.reset();
   onMount(() => {
-    Render.media();
+    document.addEventListener( "keydown", Handle.keydown );
     return () => {
+      document.removeEventListener( "keydown", Handle.keydown );
       Render.reset();
     };
   });
+
+  $: Render.bindings( data.bindings );
 </script>
 
 
@@ -76,9 +161,29 @@
     {/if}
   </div>
 
+{/if}
+
+<nav>
+  {#if show.left === true}
+    <sl-button
+      on:click={Handle.left}
+      class="left"
+      size="large"
+      circle>
+      <sl-icon src="/icons/arrow-left.svg"></sl-icon>
+    </sl-button>
   {/if}
-
-
+  
+  {#if show.right === true}
+    <sl-button 
+      on:click={Handle.right}
+      class="right"
+      size="large"
+      circle>
+      <sl-icon src="/icons/arrow-right.svg"></sl-icon>
+    </sl-button>
+  {/if}
+</nav>
 
 <style>
   .frame {
@@ -87,6 +192,8 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    position: relative;
+    z-index: 1;
   }
 
   img {
@@ -99,5 +206,39 @@
     height: 95%;
     width: 95%;
     object-fit: contain;
+  }
+
+  nav sl-button {
+    position: fixed;
+    top: 50%;
+    z-index: 2;
+  }
+
+  nav sl-button.left {
+    left: 1rem;
+  }
+
+  nav sl-button.right {
+    right: 1rem;
+  }
+
+  nav sl-button::part(base) {
+    background-color: #222;
+    border: none;
+  }
+
+  nav sl-button:hover::part(base) {
+    border: none;
+  }
+
+  nav sl-button::part(label) {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  nav sl-button sl-icon {
+    font-size: 1.5rem;
+    color: #fff;
   }
 </style>

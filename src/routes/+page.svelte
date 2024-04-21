@@ -26,7 +26,7 @@
         variant="primary"
         size=medium
         on:click={login}
-        on:keypress={login}>
+        on:keydown={login}>
         Log in
       </sl-button>
 
@@ -34,7 +34,7 @@
         variant="primary"
         size=medium
         on:click={signup}
-        on:keypress={signup}>
+        on:keydown={signup}>
         Sign up
       </sl-button>
     </section>

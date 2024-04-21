@@ -107,7 +107,7 @@
           <div 
             class="media-hide"
             on:click={Handle.sensitive}
-            on:keypress={Handle.sensitive}
+            on:keydown={Handle.sensitive}
             tabindex="0"
             role="button">
             <sl-icon src="/icons/eye-slash.svg"></sl-icon>
@@ -117,7 +117,7 @@
           <div 
             class="media-sensitive"
             on:click={Handle.sensitive}
-            on:keypress={Handle.sensitive}
+            on:keydown={Handle.sensitive}
             tabindex="0"
             role="button">
             <div>
@@ -149,7 +149,7 @@
           <div 
             class="media-hide"
             on:click={Handle.sensitive}
-            on:keypress={Handle.sensitive}
+            on:keydown={Handle.sensitive}
             tabindex="0"
             role="button">
             <sl-icon src="/icons/eye-slash.svg"></sl-icon>
@@ -159,7 +159,7 @@
           <div 
             class="media-sensitive"
             on:click={Handle.sensitive}
-            on:keypress={Handle.sensitive}
+            on:keydown={Handle.sensitive}
             tabindex="0"
             role="button">
             <div>
@@ -208,7 +208,7 @@
           <div 
             class="media-hide"
             on:click={Handle.sensitive}
-            on:keypress={Handle.sensitive}
+            on:keydown={Handle.sensitive}
             tabindex="0"
             role="button">
             <sl-icon src="/icons/eye-slash.svg"></sl-icon>
@@ -218,7 +218,7 @@
           <div 
             class="media-sensitive"
             on:click={Handle.sensitive}
-            on:keypress={Handle.sensitive}
+            on:keydown={Handle.sensitive}
             tabindex="0"
             role="button">
             <div>
@@ -286,7 +286,7 @@
           <div 
             class="media-hide"
             on:click={Handle.sensitive}
-            on:keypress={Handle.sensitive}
+            on:keydown={Handle.sensitive}
             tabindex="0"
             role="button">
             <sl-icon src="/icons/eye-slash.svg"></sl-icon>
@@ -296,7 +296,7 @@
           <div 
             class="media-sensitive"
             on:click={Handle.sensitive}
-            on:keypress={Handle.sensitive}
+            on:keydown={Handle.sensitive}
             tabindex="0"
             role="button">
             <div>

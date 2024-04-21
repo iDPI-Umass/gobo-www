@@ -113,7 +113,7 @@
   Handle.delete = ( attachment ) => {
     return ( event ) => {
       event.preventDefault();
-      if ( event.type === "keypress" && event.key !== "Enter" ) {
+      if ( event.type === "keydown" && event.key !== "Enter" ) {
         return;
       }
 
@@ -128,7 +128,7 @@
   Handle.edit = ( attachment ) => {
     return ( event ) => {
       event.preventDefault();
-      if ( event.type === "keypress" && event.key !== "Enter" ) {
+      if ( event.type === "keydown" && event.key !== "Enter" ) {
         return;
       }
       altStore.set( attachment );
@@ -171,7 +171,7 @@
       <a
         href="/upload-preview"
         on:click={Handle.preview( attachment )}
-        on:keypress={Handle.preview( attachment )}>
+        on:keydown={Handle.preview( attachment )}>
         { attachment.file.name }
       </a>
       <sl-icon-button
@@ -179,14 +179,14 @@
         label="Delete File" 
         src="/icons/trash.svg"
         on:click={Handle.delete( attachment )}
-        on:keypress={Handle.delete( attachment )}>>
+        on:keydown={Handle.delete( attachment )}>>
       </sl-icon-button>
       <sl-icon-button
         class="warning"
         label="Edit Alt" 
         src="/icons/pencil-square.svg"
         on:click={Handle.edit( attachment )}
-        on:keypress={Handle.edit( attachment )}>>
+        on:keydown={Handle.edit( attachment )}>>
       </sl-icon-button>
     </div>
   {/each}
@@ -202,7 +202,7 @@
 <div class="buttons">
   <sl-button
     on:click={Handle.fileChrome}
-    on:keypress={Handle.fileChromeKey}
+    on:keydown={Handle.fileChromeKey}
     size="medium"
     class="submit"
     pill>
