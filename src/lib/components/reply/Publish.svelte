@@ -9,6 +9,7 @@
 
   Render.cycle = ( draft ) => {
     const match = draft.identities?.find( i => i.active === true );
+    console.log({match})
     if ( match == null ) {
       return;
     }
@@ -57,8 +58,10 @@
 
 <h2>Reply</h2>
 <p>
-  You are replying as
-
+  <span>
+    You are replying as
+  </span>
+  
   <span>
     {#each nameParts as part}
       <span>{ part }</span>
@@ -90,10 +93,14 @@
 <style>
   p {
     margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 0.25rem;
+    row-gap: 0.5rem;
   }
 
-  p span {
-    display: inline;
+  p > span {
+    display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: start;

@@ -57,7 +57,9 @@
 
 <h2>Quote</h2>
 <p>
-  You are quote-posting as
+  <span>
+    You are quote-posting as
+  </span>
 
   <span>
     {#each nameParts as part}
@@ -90,10 +92,14 @@
 <style>
   p {
     margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 0.25rem;
+    row-gap: 0.5rem;
   }
 
-  p span {
-    display: inline-flex;
+  p > span {
+    display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: start;
