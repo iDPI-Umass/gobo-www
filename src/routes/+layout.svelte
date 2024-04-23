@@ -24,7 +24,7 @@
   import FeedOverlay from "$lib/components/layouts/FeedOverlay.svelte";
   import { beforeUpdate, onDestroy } from "svelte";
   import { themeStore } from "$lib/stores/theme.js";
-  import { handleRedirect } from "$lib/helpers/redirect.js";
+  import { Route } from "$lib/engines/route.js";
 
   let unsubscribeTheme;
   
@@ -71,7 +71,7 @@
 </script>
 
 <div class="page-wrapper">
-  {#await handleRedirect()}
+  {#await Route.handle()}
     <Spinner></Spinner>
   {:then}
     <slot></slot>

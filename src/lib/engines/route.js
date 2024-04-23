@@ -22,26 +22,6 @@ const handleCallbackError = async function () {
   goto( "/callback-error" );
 };
 
-// TODO: We need to be careful this doesn't create a routing infinite loop with
-//   the guard redirect functionality.
-const handleRootRedirect = async () => {
-  if ( (await App.isLoggedOut()) ) {
-    // We can stop here.
-  } else {
-    try {
-      if ( (await App.isAllowedAccess()) ) {
-        // This person is allowed access to application features.
-        return goto( "/home" );
-      } else {
-        return goto( "/permissions" );
-      }
-    } catch ( error ) {
-      console.error( error );
-      await App.logout();
-    }
-  }
-};
-
 const successfulAuth = async () => {
   App.refresh();
   await App.startup();
@@ -58,7 +38,9 @@ const successfulAuth = async () => {
   }
 };
 
-const handleAuthCallback = async ( query ) => {
+const Callback = {};
+
+Callback.auth = async ( query ) => {
   // We're sent back to the callback origin after verifying our email address.
   // This will force a logout so the member can login again with an
   // email verification claim that's true.
@@ -92,59 +74,82 @@ const handleAuthCallback = async ( query ) => {
   }
 };
 
-// Handles callbacks from third-party platforms. We need to hold onto the 
-const handleAddIdentityCallback = async ( query ) => {
-  console.log( "Starting add identity callback", query );
-  // console.log({
-  //   base_url: baseURL,
-  //   oauth_token: query.oauth_token,
-  //   oauth_verifier: query.oauth_verifier,
-  //   code: query.code,
-  //   state: query.state
-  // });
-  // return goto( "/identities" );
 
-  // We hold onto the base_url in local storage before redirecting. We need to
-  // provide this information to GOBO, but POST aren't idempotent, so we need to
-  // be careful about only applying this once.
-  const platform = LS.read( "gobo-platform" );
-  const baseURL = LS.read( "gobo-baseURL" );
+const Identity = {};
+
+// Housekeeping to prevent storing secret values inappropriately.
+Identity.clearStorage = () => {
+  LS.remove( "gobo-platform" );
   LS.remove( "gobo-baseURL" );
-  if ( baseURL == null ) {
-     // Passthrough if we've marked the base_url as missing.
-     return goto( "/identities" );
-  }
-  
-  const client = await Gobo.get();
-  const login = LS.read( "gobo-bluesky-login" );
-  const secret = LS.read( "gobo-bluesky-secret" );
-  LS.remove(  "gobo-bluesky-login" );
+  LS.remove( "gobo-bluesky-login" );
   LS.remove( "gobo-bluesky-secret" );
+};
 
-  try {
-    await client.actionOnboardIdentityCallback.post({ content: {
-      platform,
-      base_url: baseURL,
+// The HTTP API endpoint for this second step is robust enough to handle
+// all the possibilities shoved together. So provide all available information.
+Identity.add = async ( query ) => {
+  const client = await Gobo.get();
+
+  await client.actionOnboardIdentityCallback.post({ 
+    content: {
+      platform: LS.read( "gobo-platform" ),
+      base_url: LS.read( "gobo-baseURL" ),
+      bluesky_login: LS.read( "gobo-bluesky-login" ) ?? undefined,
+      bluesky_secret: LS.read( "gobo-bluesky-secret" ) ?? undefined,
       oauth_token: query.oauth_token ?? undefined,
       oauth_verifier: query.oauth_verifier ?? undefined,
       code: query.code ?? undefined,
       state: query.state ?? undefined,
-      bluesky_login: login ?? undefined,
-      bluesky_secret: secret ?? undefined
-    }});
-    LS.write("gobo-building-feed", true);
+  }});
+};
+
+// Handles callbacks from third-party platforms.
+Callback.identity = async ( query ) => {
+  console.log( "Starting add identity callback", query );
+
+  // POSTs aren't idempotent, so we use baseURL to detect duplication.
+  if ( LS.read( "gobo-baseURL" ) == null ) {
+    Identity.clearStorage();
     return goto( "/identities" );
   }
-  catch (error) {
-    console.error(error);
+  
+  try {
+    await Identity.add( query );
+    Identity.clearStorage();
+    LS.write( "gobo-building-feed", true );
+    return goto( "/identities" );
+  
+  } catch ( error ) {
+    console.error( error );
+    Identity.clearStorage();
     return goto( "/identities/add?failure=true" );
   }
 };
 
 
+const Route = {};
+
+// Take care to avoid an infinite routing loop.
+Route.default = async () => {
+  if ( (await App.isLoggedOut()) ) {
+    // We can stop here.
+  } else {
+    try {
+      if ( (await App.isAllowedAccess()) ) {
+        // This person is allowed access to application features.
+        return goto( "/home" );
+      } else {
+        return goto( "/permissions" );
+      }
+    } catch ( error ) {
+      console.error( error );
+      await App.logout();
+    }
+  }
+};
 
 // Detect and handle any redirect or callback.
-const handleRedirect = async () => {
+Route.handle = async () => {
   try {
     const url = new URL( document.location );
     const query = extractQuery( url );
@@ -153,15 +158,15 @@ const handleRedirect = async () => {
     switch ( url.pathname ) {
       case "/":
         // Logged in people need to be sent Home
-        await handleRootRedirect();
+        await Route.default();
         break;
       case "/auth-callback":
         // Callback from Auth0, primary application authentication
-        await handleAuthCallback( query );
+        await Callback.auth( query );
         break;
       case "/add-identity-callback":
         // Identity authentication from Mastodon, Reddit, and Twitter
-        await handleAddIdentityCallback( query );
+        await Callback.identity( query );
         break;
       default:
         // No-op passthrough
@@ -173,4 +178,6 @@ const handleRedirect = async () => {
   }
 };
 
-export { handleRedirect }
+export { 
+  Route
+}

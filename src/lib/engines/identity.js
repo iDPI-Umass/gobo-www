@@ -124,7 +124,6 @@ Identity.startup = async () => {
 };
 
 App.register( Identity.startup );
-Identity.startup();
 
 
 

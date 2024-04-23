@@ -45,7 +45,7 @@
       variant="danger"
       open
       closable>
-      <sl-icon slot="icon" src="/icons/exclamation-circle.svg"></sl-icon>
+      <sl-icon slot="icon" src="/icons/exclamation-octagon.svg"></sl-icon>
       { a.message }
     </sl-alert>
   

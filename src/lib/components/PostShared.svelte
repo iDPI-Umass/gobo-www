@@ -103,7 +103,7 @@
 
   {#if state === "error"}
     <sl-alert variant="danger" open>
-      <sl-icon slot="icon" src="/icons/exclamation-circle.svg"></sl-icon>
+      <sl-icon slot="icon" src="/icons/exclamation-octagon.svg"></sl-icon>
       There was a problem displaying this post.
     </sl-alert>
   
