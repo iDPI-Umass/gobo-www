@@ -169,7 +169,7 @@
       on:click={Handle.left}
       class="left"
       circle>
-      <sl-icon src="/icons/chevron-left.svg"></sl-icon>
+      <sl-icon src="/icons/chevron-nav-left.svg"></sl-icon>
     </sl-button>
   {/if}
   
@@ -178,7 +178,7 @@
       on:click={Handle.right}
       class="right"
       circle>
-      <sl-icon src="/icons/chevron-right.svg"></sl-icon>
+      <sl-icon src="/icons/chevron-nav-right.svg"></sl-icon>
     </sl-button>
   {/if}
 </nav>
@@ -220,17 +220,9 @@
     right: 0.5rem;
   }
 
-  nav sl-button.left::part(label) {
-    padding-right: 28px;
-  }
-
-  nav sl-button.right::part(label) {
-    padding-left: 28px;
-  }
-
   nav sl-button::part(base) {
-    height: 2rem;
-    width: 2rem;
+    height: 2.75rem;
+    width: 2.75rem;
     background-color: #222;
     border: none;
   }
@@ -246,7 +238,7 @@
   }
 
   nav sl-button sl-icon {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
     color: #fff;
   }
 
@@ -266,12 +258,12 @@
     }
 
     nav sl-button::part(base) {
-      height: 4rem;
-      width: 4rem;
+      height: 3.125rem;
+      width: 3.125rem;
     }
 
     nav sl-button sl-icon {
-      font-size: 2.25rem;
+      font-size: 2rem;
     }
   }
 </style>
