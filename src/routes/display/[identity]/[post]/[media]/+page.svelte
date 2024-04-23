@@ -242,12 +242,6 @@
     color: #fff;
   }
 
-  nav sl-button sl-icon::part(svg) {
-    stroke: #fff;
-    stroke-width: 0.75;
-  }
-
-
   @media( min-width: 768px ) {
     nav sl-button.left {
       left: 1rem;
