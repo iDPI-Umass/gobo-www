@@ -220,6 +220,14 @@
     right: 0.5rem;
   }
 
+  nav sl-button.left::part(label) {
+    padding-right: 28px;
+  }
+
+  nav sl-button.right::part(label) {
+    padding-left: 28px;
+  }
+
   nav sl-button::part(base) {
     height: 2rem;
     width: 2rem;
@@ -238,8 +246,13 @@
   }
 
   nav sl-button sl-icon {
-    font-size: 0.75rem;
+    font-size: 1.25rem;
     color: #fff;
+  }
+
+  nav sl-button sl-icon::part(svg) {
+    stroke: #fff;
+    stroke-width: 0.75;
   }
 
 
@@ -258,7 +271,7 @@
     }
 
     nav sl-button sl-icon {
-      font-size: 1.5rem;
+      font-size: 2.25rem;
     }
   }
 </style>
