@@ -167,18 +167,21 @@
   {#if show.left === true}
     <sl-button
       on:click={Handle.left}
-      class="left"
-      circle>
-      <sl-icon src="/icons/chevron-nav-left.svg"></sl-icon>
+      class="left">
+      <div class="chevron-circle">
+        <sl-icon src="/icons/chevron-left.svg"></sl-icon>
+      </div>
+      
     </sl-button>
   {/if}
   
   {#if show.right === true}
     <sl-button 
       on:click={Handle.right}
-      class="right"
-      circle>
-      <sl-icon src="/icons/chevron-nav-right.svg"></sl-icon>
+      class="right">
+      <div class="chevron-circle">
+        <sl-icon src="/icons/chevron-right.svg"></sl-icon>
+      </div>
     </sl-button>
   {/if}
 </nav>
@@ -206,9 +209,21 @@
     object-fit: contain;
   }
 
+  nav {
+    --button-width: 5rem;
+    --button-height: 20rem;
+  }
+
   nav sl-button {
     position: fixed;
-    top: 50%;
+    top: max( 
+      4rem, 
+      calc( 50% - (var(--button-height) / 2) )
+    );
+    bottom: max( 
+      0rem, 
+      calc( 50% - (var(--button-height) / 2) )
+    );
     z-index: 2;
   }
 
@@ -221,9 +236,9 @@
   }
 
   nav sl-button::part(base) {
-    height: 2.75rem;
-    width: 2.75rem;
-    background-color: #222;
+    width: var(--button-width);
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0);
     border: none;
   }
 
@@ -237,9 +252,27 @@
     justify-content: center;
   }
 
+  nav .chevron-circle {
+    background-color: rgba(0, 0, 0, 0.5);
+    width: 1.8rem;
+    height: 1.8rem;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  nav sl-button.left .chevron-circle sl-icon {
+    margin-right: 2px;
+  }
+
+  nav sl-button.right .chevron-circle sl-icon {
+    margin-left: 2px;
+  }
+
   nav sl-button sl-icon {
-    font-size: 1.5rem;
-    color: #fff;
+    font-size: 1.125rem;
+    color: rgba(255, 255, 255, 1)
   }
 
   @media( min-width: 768px ) {
@@ -251,13 +284,13 @@
       right: 1rem;
     }
 
-    nav sl-button::part(base) {
-      height: 3.125rem;
-      width: 3.125rem;
+    nav .chevron-circle {
+      width: 2.4rem;
+      height: 2.4rem;
     }
 
     nav sl-button sl-icon {
-      font-size: 2rem;
+      font-size: 1.5rem;
     }
   }
 </style>
