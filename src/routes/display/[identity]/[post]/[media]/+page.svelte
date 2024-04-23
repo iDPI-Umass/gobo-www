@@ -250,7 +250,9 @@
     border: none;
   }
 
+  nav sl-button:hover::part(base),
   nav sl-button:hover::part(base) {
+    background-color: rgba(0, 0, 0, 0);
     border: none;
   }
 
