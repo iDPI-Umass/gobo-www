@@ -136,103 +136,111 @@
 </script>
 
 
+<div class="outer">
+  <BackLink heading="Media"></BackLink>
 
-<BackLink heading="Media"></BackLink>
-
-{#if state === "error"}
-  <p>There was a problem loading this media</p>
-
-{:else if state === "loading"}
-  <Spinner></Spinner>
-
-{:else if state === "ready"}
-  <div class="frame">
-    {#if isImage( media )}
-      <img 
-        src="{ media.url }"
-        alt="full size">
-    {:else if isVideo( media )}
-      <!-- svelte-ignore a11y-media-has-caption -->
-      <video loop controls>
-        <source 
-          src={ media.url }
-          type={ media.type }>
-      </video>
-    {/if}
-  </div>
-
-{/if}
-
-<nav>
-  {#if show.left === true}
-    <sl-button
-      on:click={Handle.left}
-      class="left">
-      <div class="chevron-circle">
-        <sl-icon src="/icons/chevron-left.svg"></sl-icon>
-      </div>
-      
-    </sl-button>
-  {/if}
+  {#if state === "error"}
+    <p>There was a problem loading this media</p>
   
-  {#if show.right === true}
-    <sl-button 
-      on:click={Handle.right}
-      class="right">
-      <div class="chevron-circle">
-        <sl-icon src="/icons/chevron-right.svg"></sl-icon>
-      </div>
-    </sl-button>
+  {:else if state === "loading"}
+    <Spinner></Spinner>
+  
+  {:else if state === "ready"}
+    <div class="frame">
+      {#if isImage( media )}
+        <img 
+          src="{ media.url }"
+          alt="full size">
+      {:else if isVideo( media )}
+        <!-- svelte-ignore a11y-media-has-caption -->
+        <video loop controls>
+          <source 
+            src={ media.url }
+            type={ media.type }>
+        </video>
+      {/if}
+
+      <nav>
+        {#if show.left === true}
+          <sl-button
+            on:click={Handle.left}
+            class="left">
+            <div class="chevron-circle">
+              <sl-icon src="/icons/chevron-left.svg"></sl-icon>
+            </div>
+            
+          </sl-button>
+        {/if}
+        
+        {#if show.right === true}
+          <sl-button 
+            on:click={Handle.right}
+            class="right">
+            <div class="chevron-circle">
+              <sl-icon src="/icons/chevron-right.svg"></sl-icon>
+            </div>
+          </sl-button>
+        {/if}
+      </nav>
+    </div>
+  
   {/if}
-</nav>
+
+</div>
+
+
+
 
 <style>
+  .outer {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
   .frame {
-    height: calc(100vh - 6rem);
+    margin-top: var(--gobo-height-spacer-flex);
+    min-height: 0;
+    flex: 1 1 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-direction: column;
     position: relative;
-    z-index: 1;
   }
 
   img {
-    height: 95%;
-    width: 95%;
+    height: 100%;
+    width: 100%;
     object-fit: contain;
+    object-position: 50% 50%;
   }
 
   video {
-    height: 95%;
-    width: 95%;
+    height: 100%;
+    width: 100%;
     object-fit: contain;
+    object-position: 50% 50%;
   }
 
   nav {
     --button-width: 5rem;
     --button-height: 20rem;
+    --frame-height: calc( 100vh - 6rem )
   }
 
   nav sl-button {
-    position: fixed;
-    top: max( 
-      4rem, 
-      calc( 50% - (var(--button-height) / 2) )
-    );
-    bottom: max( 
-      0rem, 
-      calc( 50% - (var(--button-height) / 2) )
-    );
+    position: absolute;
+    top: 0;
+    bottom: 0;
     z-index: 2;
   }
 
   nav sl-button.left {
-    left: 0.5rem;
+    left: -0.75rem;
   }
 
   nav sl-button.right {
-    right: 0.5rem;
+    right: -0.75rem;
   }
 
   nav sl-button::part(base) {
@@ -250,6 +258,16 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+    padding: 0;
+    width: 100%;
+  }
+
+  nav sl-button.left::part(label) {
+    align-items: start;
+  }
+
+  nav sl-button.right::part(label) {
+    align-items: end;
   }
 
   nav .chevron-circle {
@@ -277,11 +295,11 @@
 
   @media( min-width: 768px ) {
     nav sl-button.left {
-      left: 1rem;
+      left: 0rem;
     }
 
     nav sl-button.right {
-      right: 1rem;
+      right: 0rem;
     }
 
     nav .chevron-circle {
