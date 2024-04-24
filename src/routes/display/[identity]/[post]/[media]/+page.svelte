@@ -162,24 +162,27 @@
 
       <nav>
         {#if show.left === true}
-          <sl-button
+          <button
             on:click={Handle.left}
             class="left">
-            <div class="chevron-circle">
-              <sl-icon src="/icons/chevron-left.svg"></sl-icon>
+            <div class="label">
+              <div class="chevron-circle">
+                <sl-icon src="/icons/chevron-left.svg"></sl-icon>
+              </div>
             </div>
-            
-          </sl-button>
+          </button>
         {/if}
         
         {#if show.right === true}
-          <sl-button 
+          <button 
             on:click={Handle.right}
             class="right">
-            <div class="chevron-circle">
-              <sl-icon src="/icons/chevron-right.svg"></sl-icon>
+            <div class="label">
+              <div class="chevron-circle">
+                <sl-icon src="/icons/chevron-right.svg"></sl-icon>
+              </div>
             </div>
-          </sl-button>
+          </button>
         {/if}
       </nav>
     </div>
@@ -228,35 +231,28 @@
     --frame-height: calc( 100vh - 6rem )
   }
 
-  nav sl-button {
+  nav button {
     position: absolute;
     top: 0;
     bottom: 0;
     z-index: 2;
-  }
 
-  nav sl-button.left {
-    left: -0.75rem;
-  }
-
-  nav sl-button.right {
-    right: -0.75rem;
-  }
-
-  nav sl-button::part(base) {
     width: var(--button-width);
     height: 100%;
     background-color: rgba(0, 0, 0, 0);
     border: none;
+    transition: none;
   }
 
-  nav sl-button:hover::part(base),
-  nav sl-button:hover::part(base) {
-    background-color: rgba(0, 0, 0, 0);
-    border: none;
+  nav button.left {
+    left: -0.75rem;
   }
 
-  nav sl-button::part(label) {
+  nav button.right {
+    right: -0.75rem;
+  }
+
+  nav button .label {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -264,11 +260,11 @@
     width: 100%;
   }
 
-  nav sl-button.left::part(label) {
+  nav button.left .label {
     align-items: start;
   }
 
-  nav sl-button.right::part(label) {
+  nav button.right .label {
     align-items: end;
   }
 
@@ -296,11 +292,11 @@
   }
 
   @media( min-width: 768px ) {
-    nav sl-button.left {
+    nav button.left {
       left: 0rem;
     }
 
-    nav sl-button.right {
+    nav button.right {
       right: 0rem;
     }
 
@@ -309,7 +305,7 @@
       height: 2.4rem;
     }
 
-    nav sl-button sl-icon {
+    nav button sl-icon {
       font-size: 1.5rem;
     }
   }
