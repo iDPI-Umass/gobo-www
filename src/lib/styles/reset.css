@@ -8,6 +8,7 @@ html, body {
   height: 100dvh;
   background: var(--gobo-color-null);
   color: var(--gobo-color-text);
+  -webkit-tap-highlight-color: transparent;
 }
 html {
   overflow: hidden;
