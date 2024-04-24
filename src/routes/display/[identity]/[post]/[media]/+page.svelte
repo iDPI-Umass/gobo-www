@@ -242,6 +242,7 @@
     background-color: rgba(0, 0, 0, 0);
     border: none;
     transition: none;
+    padding: 0;
   }
 
   nav button.left {
