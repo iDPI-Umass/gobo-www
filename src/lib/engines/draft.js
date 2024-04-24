@@ -1,13 +1,13 @@
 import * as Value from "@dashkite/joy/value";
 import * as Type from "@dashkite/joy/type";
 import * as linkify from "linkifyjs";
-import * as LS from "$lib/helpers/local-storage.js";
-import * as Random from "$lib/helpers/random.js";
+import { RichText, BskyAgent, UnicodeString } from "@atproto/api";
+import { Identity as IdentityEngine, Name } from "$lib/engines/identity.js";
 import * as Post from "$lib/resources/post.js";
 import * as Image from "$lib/resources/draft-image.js";
-import { Identity as IdentityEngine, Name } from "$lib/engines/identity.js";
 import * as draftStores from "$lib/stores/draft.js";
-import { RichText, BskyAgent, UnicodeString } from "@atproto/api";
+import * as LS from "$lib/helpers/local-storage.js";
+import * as Random from "$lib/helpers/random.js";
 
 
 let singletonDraft;
@@ -19,12 +19,21 @@ Draft.make = () => {
     identities: [],
     attachments: [],
     options: {
-      spoiler: false,
-      spoilerText: null,
-      sensitive: false,
-      visibility: "public",
-      title: null,
-      subreddit: null
+      mastodon: {
+        visibility: "public",
+        spoilerText: null,
+      },
+      reddit: {
+        subreddit: null,
+        title: null,
+        spoiler: false,
+      },
+      smalltown: {
+        spoilerText: null,
+      },
+      attachments: {
+        sensitive: false,
+      }
     },
     content: null,
     linkPreview: {},
@@ -228,22 +237,22 @@ const Lock = {
 
 
 const Options = {};
-Options.handle = ( name, event ) => {
+Options.handle = ( group, name, event ) => {
   if ( event?.target?.checked != null ) {
-    Options.checked( name, event );
+    Options.checked( group, name, event );
   } else {
-    Options.value( name, event );
+    Options.value( group, name, event );
   }
 };
 
-Options.checked = ( name, event ) => {
+Options.checked = ( group, name, event ) => {
   const value = event.target.checked;
-  Options.update( name, value );
+  Options.update( group, name, value );
 }
 
-Options.value = ( name, event ) => {
+Options.value = ( group, name, event ) => {
   const value = Options.nullEmpty( event.target.value );
-  Options.update( name, value );
+  Options.update( group, name, value );
 }
 
 Options.nullEmpty = ( value ) => {
@@ -258,9 +267,9 @@ Options.nullEmpty = ( value ) => {
   }
 };
 
-Options.update = ( name, value ) => {
+Options.update = ( group, name, value ) => {
   const { options } = Draft.read();
-  options[ name ] = value;
+  options[ group ][ name ] = value;
   Draft.updateAspect( "options", options );
 };
 
@@ -329,7 +338,7 @@ Validate.isValid = () => {
 
   const results = [];
   for ( const test of tests ) {
-    results.push( test() );
+    results.push( test( draft ));
   }
   return results.every( result => result === true );
 };
@@ -339,8 +348,13 @@ Validate.active = () => {
   const draft = Draft.read();
   const actives = draft.identities.filter( i => i.active === true );
   if ( actives.length === 0 ) {
-    Draft.pushAlert( "Must select an identity to publish this post." );
+    Draft.pushAlert( "You must select an identity to publish this post." );
     return false;
+  }
+  const reddits = actives.filter( i => i.platform === "reddit" );
+  if ( reddits.length > 1 ) {
+    Draft.pushAlert( "You may only publish with on Reddit identity at a time." );
+    return false;    
   }
   return true;
 };
@@ -381,7 +395,7 @@ Validate.mastodon = () => {
   return true;
 };
 
-Validate.reddit = () => {
+Validate.reddit = ( draft ) => {
   if ( !Identity.hasReddit() ) {
     return true;
   }
@@ -393,6 +407,22 @@ Validate.reddit = () => {
     );
     return false;
   }
+
+  const options = draft.options.reddit;
+  if ( !options.title ) {
+    Draft.pushAlert(
+      `Reddit requires a title for this post.`
+    );
+    return false;
+  }
+
+  if ( !options.subreddit ) {
+    Draft.pushAlert(
+      `Reddit requires a subreddit for this post.`
+    );
+    return false;
+  }
+
   return true;
 };
 
@@ -614,16 +644,32 @@ Mastodon.contentLength = () => {
   return length - surplus;
 };
 
+Mastodon.buildVisibility = ( draft ) => {
+  switch ( draft.options.mastodon.visibility ) {
+    case null:
+    case "public":
+      return "public";
+    case "unlisted":
+      return "unlisted";
+    case "private":
+    case "followers only":
+      return "private";
+    case "direct":
+      return "direct"
+  }
+};
+
 Mastodon.build = ( draft ) => {
   let reply;
   if ( draft.reply?.data != null ) {
     const id = draft.reply.data.feed[0];
-    reply = draft.reply.data.posts[ id ];
+    reply = draft.reply.data.posts.find( p => p.id == id );
   }
 
   return {
-    sensitive: draft.options.sensitive,
-    spoiler: draft.options.spoilerText,
+    visibility: Mastodon.buildVisibility( draft ),
+    spoiler: draft.options.mastodon.spoilerText,
+    sensitive: draft.options.attachments.sensitive,
     reply
   };
 };
@@ -640,14 +686,14 @@ Reddit.build = ( draft ) => {
   let reply;
   if ( draft.reply?.data != null ) {
     const id = draft.reply.data.feed[0];
-    reply = draft.reply.data.posts[ id ];
+    reply = draft.reply.data.posts.find( p => p.id == id );
   }
 
   return {
-    title: draft.options.title,
-    subreddit: draft.options.subreddit,
-    nsfw: draft.options.sensitive,
-    spoiler: draft.options.spoiler,
+    title: draft.options.reddit.title,
+    subreddit: draft.options.reddit.subreddit,
+    spoiler: draft.options.reddit.spoiler,
+    nsfw: draft.options.attachments.sensitive,
     reply
   };
 };
@@ -664,12 +710,12 @@ Smalltown.build = ( draft ) => {
   let reply;
   if ( draft.reply?.data != null ) {
     const id = draft.reply.data.feed[0];
-    reply = draft.reply.data.posts[ id ];
+    reply = draft.reply.data.posts.find( p => p.id == id );
   }
 
   return {
-    sensitive: draft.options.sensitive,
-    spoiler: draft.options.spoilerText,
+    sensitive: draft.options.attachments.sensitive,
+    spoiler: draft.options.smalltown.spoilerText,
     reply
   };
 };

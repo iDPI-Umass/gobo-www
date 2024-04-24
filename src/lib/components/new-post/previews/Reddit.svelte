@@ -7,6 +7,7 @@
   import * as markdown from "$lib/helpers/markdown.js";
 
   let identity, options, content, displayedFiles, mediaFrameChildren;
+  let spoilerOverride;
   let mediaFrame;
   const Render = State.make();
 
@@ -15,6 +16,7 @@
     options = {};
     content = null;
     displayedFiles = [];
+    spoilerOverride = false;
     mediaFrameChildren = {};
   };
 
@@ -24,7 +26,10 @@
   };
 
   Render.options = ( draft ) => {
-    options = draft.options;
+    options = {
+      ...draft.options.reddit,
+      ...draft.options.attachments
+    };
   };
 
   Render.content = ( draft ) => {
@@ -84,6 +89,10 @@
       mediaFrame.style.height = "unset";
     }
   };
+
+  Handle.spoiler = () => {
+    spoilerOverride = !spoilerOverride;
+  };
  
 
 
@@ -130,12 +139,15 @@
     {/if}
   
     {#if displayedFiles.length === 0}
-      {#if options.sensitive === true}
+      {#if options.spoiler === true && spoilerOverride !== true}
         <div class="text-sensitive">
-          <div>CLICK TO SEE SPOILER</div>
+          <div
+            on:click={Handle.spoiler}>
+            CLICK TO SEE SPOILER
+          </div>
         </div>
       {:else}
-        <section>
+        <section on:click={Handle.spoiler}>
           {#if content != null}
             {@html content}
           {/if}

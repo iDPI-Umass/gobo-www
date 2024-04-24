@@ -66,7 +66,7 @@
 
   const Handle = {};
   Handle.sensitive = ( event ) => {
-    Options.handle( "sensitive", event );
+    Options.handle( "attachments", "sensitive", event );
   };
   Handle.dragEnter = ( event ) => {
     event.preventDefault();

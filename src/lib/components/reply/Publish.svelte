@@ -34,10 +34,15 @@
     
     publishButton.loading = true;
     const draft = Draft.read();
-    await Draft.publish( draft );
-    await Draft.clear();
+    // const result = await Draft.publish( draft );
+    const result = { success: false };
+    console.log("reply publishing would happen here.")
     publishButton.loading = false;
-    goto("/home");
+    
+    if ( result.success === true ) {
+      await Draft.clear();
+      goto("/home");
+    }
   };
 
   Handle.discard = async () => {

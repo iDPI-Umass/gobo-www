@@ -7,7 +7,7 @@
   import { State, Identity, Media, Mastodon } from "$lib/engines/draft.js";
   import * as markdown from "$lib/helpers/markdown.js";
 
-  let identity, options, content, displayedFiles, sensitiveOverride;
+  let identity, options, content, displayedFiles, sensitiveOverride, spoilerOverride;
   const Render = State.make();
   const parser = new DOMParser();
   const serializer = new XMLSerializer();
@@ -17,7 +17,8 @@
     options = {};
     content = null;
     displayedFiles = [];
-    sensitiveOverride = false;  
+    sensitiveOverride = false;
+    spoilerOverride = false;
   };
 
   Render.identity = ( draft ) => {
@@ -25,7 +26,10 @@
   };
 
   Render.options = ( draft ) => {
-    options = draft.options;
+    options = {
+      ...draft.options.mastodon,
+      ...draft.options.attachments
+    };
   };
 
   Render.content = ( draft ) => {
@@ -54,9 +58,14 @@
 
 
   const Handle = {};
+  
   Handle.sensitive = () => {
     sensitiveOverride = !sensitiveOverride;
   };
+
+  Handle.spoiler = () => {
+    spoilerOverride = !spoilerOverride;
+  }
 
 
 
@@ -82,14 +91,23 @@
     <p class="timestamp">1 s</p>
   </header>
 
-  {#if options.spoilerText != null }
+  {#if options.spoilerText != null && spoilerOverride !== true }
     <div class="spoiler">
       <p>
         {options.spoilerText}
-        <span>SHOW MORE</span>
+        <span on:click={Handle.spoiler}>SHOW MORE</span>
       </p>
     </div>
+  
   {:else}
+    {#if options.spoilerText != null && spoilerOverride === true }
+      <div class="spoiler">
+        <p>
+          {options.spoilerText}
+          <span on:click={Handle.spoiler}>SHOW LESS</span>
+        </p>
+      </div>
+    {/if}
 
     <section>
       {#if content != null}
@@ -479,6 +497,7 @@
     background: #d9e1e8;
     color: #000;
     padding: 0 6px;
+    cursor: pointer;
   }
 
   .outer-frame > section {

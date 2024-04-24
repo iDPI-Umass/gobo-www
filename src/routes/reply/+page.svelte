@@ -18,6 +18,7 @@
       Identity.load(),
       Draft.loadReply(),
     ]);
+    Draft.load(); // reply can affect options.
     Lock.close();
   };
 

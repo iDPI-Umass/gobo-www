@@ -25,8 +25,9 @@
     identity = Identity.findActive( "bluesky" ) ?? {};
   };
 
+  // In this case, we only care about "sensitive" on attachments.
   Render.options = ( draft ) => {
-    options = draft.options;
+    options = draft.options.attachments;
   };
 
   Render.content = ( draft ) => {
