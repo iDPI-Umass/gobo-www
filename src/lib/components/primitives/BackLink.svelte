@@ -62,7 +62,8 @@
     margin-right: 2rem;
   }
 
-  sl-icon-button:focus-visible {
+  sl-icon-button:hover::part(base),
+  sl-icon-button:focus::part(base) {
     color: var(--gobo-color-text);
   }
 

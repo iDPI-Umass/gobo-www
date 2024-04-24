@@ -236,13 +236,21 @@
     top: 0;
     bottom: 0;
     z-index: 2;
-
     width: var(--button-width);
     height: 100%;
-    background-color: rgba(0, 0, 0, 0);
+    padding: 0;
     border: none;
     transition: none;
-    padding: 0;
+    text-decoration: none;
+    background-color: rgba(0, 0, 0, 0);
+    color: rgba(1, 1, 1, 1);
+    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
+  }
+
+  nav button:focus-visible {
+    outline: 3px solid var(--gobo-color-primary);
+    border-radius: var(--sl-border-radius-medium);
   }
 
   nav button.left {
@@ -279,15 +287,15 @@
     align-items: center;
   }
 
-  nav sl-button.left .chevron-circle sl-icon {
+  nav button.left .chevron-circle sl-icon {
     margin-right: 2px;
   }
 
-  nav sl-button.right .chevron-circle sl-icon {
+  nav button.right .chevron-circle sl-icon {
     margin-left: 2px;
   }
 
-  nav sl-button sl-icon {
+  nav button sl-icon {
     font-size: 1.125rem;
     color: rgba(255, 255, 255, 1)
   }
