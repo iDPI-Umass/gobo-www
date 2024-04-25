@@ -6,14 +6,15 @@
   import { State, Identity, Media } from "$lib/engines/draft.js";
   import * as markdown from "$lib/helpers/markdown.js";
 
-  let identity, options, content, displayedFiles, mediaFrameChildren;
+  let identity, options, subreddit, content;
+  let displayedFiles, mediaFrame, mediaFrameChildren;
   let spoilerOverride;
-  let mediaFrame;
   const Render = State.make();
 
   Render.cleanup = () => {
     identity = {};
     options = {};
+    subreddit = "";
     content = null;
     displayedFiles = [];
     spoilerOverride = false;
@@ -30,6 +31,13 @@
       ...draft.options.reddit,
       ...draft.options.attachments
     };
+
+    let value = options.subreddit;
+    if ( value != null && !value.startsWith( "r/" )) {
+      subreddit = "r/" + value;
+    } else {
+      subreddit = value;
+    }
   };
 
   Render.content = ( draft ) => {
@@ -124,8 +132,8 @@
   <div class="main">
     <header>
       <div class="pfp"></div>
-      {#if options.subreddit != null}
-        <span class="subreddit">{options.subreddit}</span>
+      {#if subreddit != null}
+        <span class="subreddit">{subreddit}</span>
       {/if}
       <span class="interpunct">·</span>
       <span class="account">Posted by {identity.prettyName}</span>

@@ -34,9 +34,9 @@
     allowed = allVisibilities.slice( index );
 
     const current = draft.options.mastodon.visibility;
-    const match = allVisibilities.find( v => v[0] === current );
+    const match = allowed.find( v => v[0] === current );
     if ( match == null ) {
-      Options.update( "mastodon", "visibility", allowed[0] );
+      Options.update( "mastodon", "visibility", allowed[0][0] );
     }
   };
 
@@ -109,7 +109,7 @@
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: center;
-    margin-top: var(--gobo-height-spacer-flex);
+    margin-top: 0;
   }
 
   .panel .subheading sl-icon {
@@ -134,5 +134,4 @@
   sl-select::part(combobox) {
     font-weight: var(--gobo-font-weight-medium);
   }
-
 </style>

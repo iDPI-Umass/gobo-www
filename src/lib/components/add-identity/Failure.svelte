@@ -14,7 +14,6 @@
 
   Render.failure = ( value ) => {
     failure = value.failure ?? false;
-    console.log({ failure });
   };
 
   const Handle = {};

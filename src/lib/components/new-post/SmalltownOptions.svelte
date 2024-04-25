@@ -61,7 +61,7 @@
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: center;
-    margin-top: var(--gobo-height-spacer-flex);
+    margin-top: 0;
   }
 
   .panel .subheading sl-icon {
@@ -77,5 +77,4 @@
   sl-input, sl-select {
     margin-top: var(--gobo-height-spacer-flex);
   }
-
 </style>

@@ -34,9 +34,7 @@
 
     publishButton.loading = true;
     const draft = Draft.read();
-    // const result = await Draft.publish( draft );
-    const result = { success: false };
-    console.log("quote publishing would happen here.")
+    const result = await Draft.publish( draft );
     publishButton.loading = false;
     
     if ( result.success === true ) {

@@ -41,6 +41,7 @@
     <p>
       <a 
         href={source.url}
+        target=”_blank”
         rel="noopener noreferrer nofollow">
           { headingSlot1 }
       </a>

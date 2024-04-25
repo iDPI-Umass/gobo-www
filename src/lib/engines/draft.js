@@ -19,13 +19,15 @@ Draft.make = () => {
     identities: [],
     attachments: [],
     options: {
+      general: {
+        title: null,
+      },
       mastodon: {
         visibility: "public",
         spoilerText: null,
       },
       reddit: {
         subreddit: null,
-        title: null,
         spoiler: false,
       },
       smalltown: {
@@ -33,7 +35,7 @@ Draft.make = () => {
       },
       attachments: {
         sensitive: false,
-      }
+      },
     },
     content: null,
     linkPreview: {},
@@ -409,16 +411,16 @@ Validate.reddit = ( draft ) => {
   }
 
   const options = draft.options.reddit;
-  if ( !options.title ) {
+  if ( !options.subreddit ) {
     Draft.pushAlert(
-      `Reddit requires a title for this post.`
+      `Please specify the subreddit for this Reddit post.`
     );
     return false;
   }
 
-  if ( !options.subreddit ) {
+  if ( !draft.options.general.title ) {
     Draft.pushAlert(
-      `Reddit requires a subreddit for this post.`
+      `Please provide a title for this Reddit post.`
     );
     return false;
   }
@@ -690,7 +692,6 @@ Reddit.build = ( draft ) => {
   }
 
   return {
-    title: draft.options.reddit.title,
     subreddit: draft.options.reddit.subreddit,
     spoiler: draft.options.reddit.spoiler,
     nsfw: draft.options.attachments.sensitive,
@@ -746,7 +747,7 @@ const Publish = {};
 Publish.build = ( draft ) => {
   const post = {};
   post.content = draft.content;
-  post.title = draft.options?.title ?? undefined;
+  post.title = draft.options?.general?.title ?? undefined;
   // post.poll = {};
   return post;
 };

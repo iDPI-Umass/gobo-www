@@ -15,21 +15,20 @@
 
 
   Render.cycle = ( draft ) => {
-    const options = draft.options.reddit;
-    inputs.title.value = options.title;
-    inputs.subreddit.value = options.subreddit;
-    inputs.spoiler.checked = options.spoiler;
+    inputs.subreddit.value = draft.options.reddit.subreddit;
+    inputs.spoiler.checked = draft.options.reddit.spoiler;
+    inputs.title.value = draft.options.general.title;
   };
 
 
   const Handle = {};
   
-  Handle.title = ( event ) => {
-    Options.handle( "reddit", "title", event );
-  };
-
   Handle.subreddit = ( event ) => {
     Options.handle( "reddit", "subreddit", event );
+  };
+
+  Handle.title = ( event ) => {
+    Options.handle( "general", "title", event );
   };
 
   Handle.spoiler = ( event ) => {
@@ -62,7 +61,7 @@
     label="Target Subreddit"
     help-text="This is the subreddit where Gobo will submit your post."
     size="medium"
-    required>
+    class="required">
   </sl-input>
 
   <sl-input
@@ -71,7 +70,7 @@
     label="Post Title"
     help-text="Provide a title that will appear in your Reddit post."
     size="medium"
-    required>
+    class="required">
   </sl-input>
 
   <sl-checkbox
@@ -89,8 +88,7 @@
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: flex-start;
-    align-items: center;
-    margin-top: var(--gobo-height-spacer-flex);
+    margin-top: 0;
   }
 
   .panel .subheading sl-icon {

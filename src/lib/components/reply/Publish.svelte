@@ -9,7 +9,6 @@
 
   Render.cycle = ( draft ) => {
     const match = draft.identities?.find( i => i.active === true );
-    console.log({match})
     if ( match == null ) {
       return;
     }
@@ -34,9 +33,7 @@
     
     publishButton.loading = true;
     const draft = Draft.read();
-    // const result = await Draft.publish( draft );
-    const result = { success: false };
-    console.log("reply publishing would happen here.")
+    const result = await Draft.publish( draft );
     publishButton.loading = false;
     
     if ( result.success === true ) {
