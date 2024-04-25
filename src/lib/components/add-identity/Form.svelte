@@ -145,7 +145,7 @@
 
   Submit.validate = () => {
     const context = Validate[ platform ]();
-    const isValid = form.reportValidity();
+    const isValid = form.checkValidity();
     if ( isValid === true ) {
       return context;
     } else {
@@ -223,6 +223,7 @@
     }
     button.loading = true;
 
+    state = "ready";
     await Submit.flow();
     button.loading = false;
     if ( state === "error" ) {

@@ -123,3 +123,7 @@ sl-textarea.required::part(form-control-label)::after {
   position: absolute;
   right: -0.5rem;
 }
+
+sl-alert::part(close-button__base):hover {
+  color: inherit;
+}
