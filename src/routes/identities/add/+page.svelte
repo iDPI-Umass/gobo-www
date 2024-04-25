@@ -6,10 +6,11 @@
   import "@shoelace-style/shoelace/dist/components/option/option.js";
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import BackLink from "$lib/components/primitives/BackLink.svelte";
-  import Form from "$lib/components/add-identity/Form.svelte";
   import Failure from "$lib/components/add-identity/Failure.svelte";
+  import Form from "$lib/components/add-identity/Form.svelte";
   import { onMount } from "svelte";
   import { State } from "$lib/engines/store.js";
+  import * as identityStores from "$lib/stores/identity.js";
 
   export let data;
 
@@ -20,7 +21,8 @@
   };
 
   Render.form = () => {
-    failure = data.bindings?.failure;
+    failure = data.bindings?.failure === "true";
+    identityStores.onboardFailure.put({ failure });
   };
 
   onMount(() => {
@@ -35,7 +37,7 @@
 
 <div class="main-child">
   <BackLink heading="Add Identity"></BackLink>
-  <Failure {failure}></Failure>
+  <Failure></Failure>
   <Form></Form>
 </div>
 

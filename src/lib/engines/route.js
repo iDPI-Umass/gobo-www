@@ -106,14 +106,14 @@ Identity.add = async ( query ) => {
 // Handles callbacks from third-party platforms.
 Callback.identity = async ( query ) => {
   console.log( "Starting add identity callback", query );
-
-  // POSTs aren't idempotent, so we use baseURL to detect duplication.
-  if ( LS.read( "gobo-baseURL" ) == null ) {
-    Identity.clearStorage();
-    return goto( "/identities" );
-  }
   
   try {
+    // POSTs aren't idempotent, so we use baseURL to detect duplication.
+    if ( LS.read( "gobo-baseURL" ) == null ) {
+      Identity.clearStorage();
+      return goto( "/identities" );
+    }
+
     await Identity.add( query );
     Identity.clearStorage();
     LS.write( "gobo-building-feed", true );
@@ -122,7 +122,7 @@ Callback.identity = async ( query ) => {
   } catch ( error ) {
     console.error( error );
     Identity.clearStorage();
-    return goto( "/identities/add?failure=true" );
+    return goto( "/identities/add/failure" );
   }
 };
 

@@ -1,6 +1,6 @@
 import { writable } from "svelte/store";
 
-const createStore = function () {
+const createStore = () => {
   let event = null;
 
   const { subscribe, update } = writable( event );
@@ -15,7 +15,9 @@ const createStore = function () {
 
 
 const singleton = createStore();
+const onboardFailure = createStore();
 
 export {
-  singleton
+  singleton,
+  onboardFailure
 }

@@ -108,3 +108,18 @@ p > a:focus-visible {
 .hidden {
   display: none;
 }
+
+
+sl-input.required::part(form-control-label),
+sl-select.required::part(form-control-label),
+sl-textarea.required::part(form-control-label) {
+  position: relative;
+}
+
+sl-input.required::part(form-control-label)::after,
+sl-select.required::part(form-control-label)::after,
+sl-textarea.required::part(form-control-label)::after {
+  content: "*";
+  position: absolute;
+  right: -0.5rem;
+}
