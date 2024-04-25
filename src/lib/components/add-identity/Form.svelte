@@ -12,7 +12,7 @@
   import { Gobo } from "$lib/engines/account.js";
   import * as identityStores from "$lib/stores/identity.js";
 
-  let form, button, inputs;
+  let button, inputs;
   let state, platform;
   const Render = State.make();
   Render.cleanup = () => {
@@ -45,12 +45,25 @@
   };
 
   Validate.context = () => {
-    const data = new FormData( form );
     const context = {};
-    for ( const [ key, value ] of data.entries() ) {
-      context[ key ] = value;
+    for ( const key in inputs ) {
+      const input = inputs[ key ];
+      if ( input != null ) {
+        context[ key ] = input.value;
+      }
     }
     return context;
+  };
+
+  Validate.report = () => {
+    const results = [];
+    for ( const key in inputs ) {
+      const input = inputs[ key ];
+      if ( input != null ) {
+        results.push( input.reportValidity() );
+      }
+    }
+    return results.every( r => r === true );
   };
 
   Validate.url = ( value ) => {
@@ -145,7 +158,7 @@
 
   Submit.validate = () => {
     const context = Validate[ platform ]();
-    const isValid = form.checkValidity();
+    const isValid = Validate.report();
     if ( isValid === true ) {
       return context;
     } else {
@@ -243,10 +256,7 @@
 </script>
 
 
-<form 
-  bind:this={form}  
-  on:submit={Handle.submit}
-  class="gobo-form">
+<section class="gobo-form">
   
   <h2>Select Platform</h2>
 
@@ -318,13 +328,13 @@
 
   <sl-button
     bind:this={button}
+    on:click={Handle.submit}
     class="submit"
-    type="submit"
     size="medium"
     pill>
     Add Identity
   </sl-button>
-</form>
+</section>
 
 
 <style>
