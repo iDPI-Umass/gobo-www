@@ -6,11 +6,11 @@
   import "@shoelace-style/shoelace/dist/components/option/option.js";
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
   import { onMount } from "svelte";
-  import { goto } from "$app/navigation";
+  import { replaceState } from "$app/navigation";
   import { State } from "$lib/engines/store.js";
   import * as LS from "$lib/helpers/local-storage.js";
   import { Gobo } from "$lib/engines/account.js";
-    import Error from "../../../routes/+error.svelte";
+  import * as identityStores from "$lib/stores/identity.js";
 
   let form, button, inputs;
   let state, platform;
@@ -19,6 +19,22 @@
     state = "ready";
     platform = "bluesky";
     inputs = {};
+  };
+
+  const Inputs = {};
+
+  Inputs.alert = ( name, message ) => {
+    inputs[ name ].setCustomValidity( message );
+  };
+
+  Inputs.reset = ( name ) => {
+    inputs[ name ].setCustomValidity( "" );
+  };
+
+  Inputs.resetAll = () => {
+    for ( const key of inputs ) {
+      Inputs.reset( key );
+    }
   };
 
 
@@ -50,35 +66,28 @@
     }
   };
 
-  Validate.baseURL = () => {
-    const data = new FormData( form );
-    switch ( platform ) {
-      case "bluesky":
-        return "https://bsky.app";
-      case "mastodon":
-        return Validate.url( data.get( "mastodonURL" ));
-      case "reddit":
-        return "https://www.reddit.com";
-      case "smalltown":
-        return Validate.url( data.get( "smalltownURL" ));
-      default:
-        console.error( "unknown platform specified" );
-        return;
-    }
-  }
-
   Validate.bluesky = () => {
     const context = Validate.context();
     context.baseURL = "https://bsky.app";
     
     let login = context.blueskyLogin;
+    if ( !login ) {
+      Inputs.alert( "blueskyLogin", "Please provide a Bluesky username." );
+      return;
+    }
+    
     if ( login.startsWith("@") ) {
       login = login.slice(1);
       context.blueskyLogin = login;
     }
     
     if ( login.length < 1 ) {
-      inputs.blueskyLogin.setCustomValidity( "This is an invalid Bluesky handle." );
+      Inputs.alert( "blueskyLogin", "This is an invalid Bluesky username." );
+      return;
+    }
+
+    if ( !context.blueskySecret ) {
+      Inputs.alert( "blueskySecret", "Please provide a Bluesky secret." );
       return;
     }
     
@@ -87,9 +96,15 @@
 
   Validate.mastodon = () => {
     const context = Validate.context();
+    
+    if ( !context.mastodonURL ) {
+      Inputs.alert( "mastodonURL", "Please provide a Mastodon server URL." );
+      return;
+    }
+
     const url = Validate.url( context.mastodonURL );
     if ( url == null ) {
-      inputs.mastodonURL.setCustomValidity( "This is an invalid URL." );
+      Inputs.alert( "mastodonURL", "This is an invalid URL." );
       return;
     }
 
@@ -100,14 +115,22 @@
 
   // No fields to validate, so mostly a no-op.
   Validate.reddit = () => {
-    return Validate.context();
+    const context = Validate.context();
+    context.baseURL = "https://www.reddit.com";
+    return context;
   };
 
   Validate.smalltown = () => {
     const context = Validate.context();
+    
+    if ( !context.smalltownURL ) {
+      Inputs.alert( "smalltownURL", "Please provide a Smalltown server URL." );
+      return;
+    }
+
     const url = Validate.url( context.smalltownURL );
     if ( url == null ) {
-      inputs.smalltownURL.setCustomValidity( "This is an invalid URL." );
+      Inputs.alert( "smalltownURL", "This is an invalid URL." );
       return;
     }
 
@@ -203,7 +226,8 @@
     await Submit.flow();
     button.loading = false;
     if ( state === "error" ) {
-      goto( `/identities/add?failure=true` );
+      identityStores.onboardFailure.put({ failure: true });
+      replaceState( `/identities/add?failure=true` );
       return;
     }
   };
@@ -246,18 +270,19 @@
       help-text="Your full username, like gobo.bsky.social"
       autocomplete="off"
       size="medium"
-      required>
+      class="required">
     </sl-input>
 
     <sl-input
       bind:this={inputs.blueskySecret}
+      on:input={Validate.clear}
       name="blueskySecret"
       label="Bluesky Secret"
       help-text='On Bluesky, go to Settings > App Passwords and click "Add App Password" to get a secret for Gobo'
       autocomplete="off"
       password
       size="medium"
-      required>
+      class="required">
     </sl-input>
   {/if}
 
@@ -271,7 +296,7 @@
       help-text="For example, https://mastodon.social or mastodon.social (you can omit the prefix for convenience)"
       autocomplete="off"
       size="medium"
-      required>
+      class="required">
     </sl-input>
   {/if}
 
@@ -279,12 +304,13 @@
   {#if platform === "smalltown"}
     <sl-input
       bind:this={inputs.smalltownURL}
+      on:input={Validate.clear}
       name="smalltownURL"
       label="Smalltown Server URL"
       help-text="For example, https://community.publicinfrastructure.org or community.publicinfrastructure.org (you can omit the prefix for convenience)"
       autocomplete="off"
       size="medium"
-      required>
+      class="required">
     </sl-input>
   {/if}
 

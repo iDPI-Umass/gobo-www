@@ -2,37 +2,38 @@
   import "@shoelace-style/shoelace/dist/components/alert/alert.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";;
   import { onMount } from "svelte";
-  import { goto } from "$app/navigation";
+  import { replaceState } from "$app/navigation";
   import { State } from "$lib/engines/store.js";
+  import * as identityStores from "$lib/stores/identity.js";
 
-  export let failure = null;
-
-  let text;
+  let failure;
   const Render = State.make();
   Render.cleanup = () => {
-    text = null;
+    failure = false;
   };
 
-  Render.failure = () => {
-    text = failure;
+  Render.failure = ( value ) => {
+    failure = value.failure ?? false;
+    console.log({ failure });
   };
 
   const Handle = {};
 
   Handle.close = () => {
-    goto( "/identities/add" );
+    identityStores.onboardFailure.put({ failure: false });
+    replaceState( "/identities/add" );
   };
   
+  Render.reset();
   onMount(() => {
+    Render.listen( identityStores.onboardFailure, Render.failure );
     return () => {
       Render.reset();
     };
   });
-
-  $: Render.failure( failure );
 </script>
 
-{#if text != null}
+{#if failure === true}
   <div>
     <sl-alert
       on:sl-hide={Handle.close}
