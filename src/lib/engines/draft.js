@@ -367,7 +367,7 @@ Validate.hasContent = () => {
   return draft.content != null;
 };
 
-Validate.bluesky = () => {
+Validate.bluesky = ( draft ) => {
   if ( !Identity.hasBluesky() ) {
     return true;
   }
@@ -379,10 +379,18 @@ Validate.bluesky = () => {
     );
     return false;
   }
+
+  if ( (draft.content == null) || (draft.content === "") ) {
+    Draft.pushAlert(
+      `Bluesky does not allow empty post content.`
+    );
+    return false;
+  }
+
   return true;
 };
 
-Validate.mastodon = () => {
+Validate.mastodon = ( draft ) => {
   if ( !Identity.hasMastodon() ) {
     return true;
   }
@@ -394,6 +402,14 @@ Validate.mastodon = () => {
     );
     return false;
   }
+
+  if ( (draft.content == null) || (draft.content === "") ) {
+    Draft.pushAlert(
+      `Mastodon does not allow empty post content.`
+    );
+    return false;
+  }
+
   return true;
 };
 
@@ -406,6 +422,13 @@ Validate.reddit = ( draft ) => {
     const number = new Intl.NumberFormat().format( Reddit.characterLimit );
     Draft.pushAlert(
       `Reddit does not accept posts with more than ${ number } characters.`
+    );
+    return false;
+  }
+
+  if ( (draft.content == null) || (draft.content === "") ) {
+    Draft.pushAlert(
+      `Reddit does not allow empty post content.`
     );
     return false;
   }
@@ -428,7 +451,7 @@ Validate.reddit = ( draft ) => {
   return true;
 };
 
-Validate.smalltown = () => {
+Validate.smalltown = ( draft ) => {
   if ( !Identity.hasSmalltown() ) {
     return true;
   }
@@ -440,6 +463,14 @@ Validate.smalltown = () => {
     );
     return false;
   }
+
+  if ( (draft.content == null) || (draft.content === "") ) {
+    Draft.pushAlert(
+      `Smalltown does not allow empty post content.`
+    );
+    return false;
+  }
+
   return true;
 };
 

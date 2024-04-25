@@ -151,14 +151,20 @@
 </script>
 
 
-<h2>Attach Media</h2>
-  
-<sl-checkbox
-  on:sl-change={Handle.sensitive}
-  checked={options.sensitive}
-  size="medium">
-  Mark Media as Sensitive
-</sl-checkbox>
+
+
+<div class="buttons">
+  <h2>Attach Media</h2>
+
+  <sl-button
+    on:click={Handle.fileChrome}
+    on:keydown={Handle.fileChromeKey}
+    size="medium"
+    class="submit"
+    pill>
+    Add Attachment
+  </sl-button>
+</div>
 
 <div 
   class="gobo-table" 
@@ -198,17 +204,16 @@
   multiple=true
   class="hidden">
 
+{#if attachments.length > 0 }
+  <sl-checkbox
+    on:sl-change={Handle.sensitive}
+    checked={options.sensitive}
+    size="medium">
+    Mark Media as Sensitive
+  </sl-checkbox>
+{/if}
 
-<div class="buttons">
-  <sl-button
-    on:click={Handle.fileChrome}
-    on:keydown={Handle.fileChromeKey}
-    size="medium"
-    class="submit"
-    pill>
-    Add Attachment
-  </sl-button>
-</div>
+
 
 <style>
   sl-checkbox {
@@ -216,7 +221,7 @@
   }
 
   .gobo-table {
-    height: 20rem;
+    min-height: 3rem;
     margin-top: var(--gobo-height-spacer-flex);
   }
 
@@ -227,5 +232,6 @@
   .buttons {
     border-top: none;
     padding-top: var(--gobo-height-spacer-flex);
+    justify-content: space-between;
   }
 </style>

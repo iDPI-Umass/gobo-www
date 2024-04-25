@@ -34,13 +34,11 @@
 </script>
 
 
-<section class="panel">
-  <h2>Preview</h2>
-  <p>
-    This section provides an approximation of how your posts will appear on 
-    each platform once submitted. As you edit your post, these previews will update.
-  </p>
-</section>
+<h2>Preview</h2>
+<p>
+  This section provides an approximation of how your posts will appear on 
+  each platform once submitted. As you edit your post, these previews will update.
+</p>
 
 
 {#if hasBluesky}
