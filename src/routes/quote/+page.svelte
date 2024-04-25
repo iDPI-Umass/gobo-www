@@ -80,7 +80,7 @@
   }
 
   .gobo-form .panel {
-    padding: 0 var(--gobo-width-spacer-flex) var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex);
+    padding: var(--gobo-width-spacer-flex) var(--gobo-height-spacer-flex);
     margin: 0;
     border-bottom: var(--gobo-border-panel);
   }
@@ -110,6 +110,10 @@
     font-weight: var(--gobo-font-weight-regular);
     margin-top: 0.5rem;
     margin-bottom: 0;
+  }
+
+  .gobo-form .panel :global(*):first-child {
+    margin-top: 0;
   }
 </style>
 

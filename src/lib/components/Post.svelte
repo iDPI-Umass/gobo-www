@@ -26,6 +26,7 @@
   export let id = null;
   export let fullPage = false;
   export let showWhy = true;
+  export let styleOverrides = {};
 
   let state, post, source, content, published;
   let share, thread, actionTarget, embeds, styles;
@@ -74,7 +75,7 @@
     thread = Post.thread( post );
     actionTarget = Post.actionTarget( post );
     embeds = Post.embeds( post );
-    styles = Post.styles( post, { fullPage });
+    styles = Post.styles( post, { fullPage, styleOverrides });
     state = "ready";
   };
 
@@ -103,11 +104,11 @@
   tabindex={fullPage ? undefined : "0"} 
   aria-label={fullPage ? undefined : "gobo-post"}
   role={fullPage ? undefined : "link"}
+  style:margin-top="{styles.marginTop}"
   style:--cursor="{styles.cursor}"
   style:--max-height="{styles.maxHeight}"
   style:--gradient-stop="{styles.gradientStop}"
   style:--gradient="{styles.gradient}"
-  style:margin-top="{fullPage ? '2rem' : '0'}" 
   on:click={Handle.click}
   on:keydown={Handle.click}>
 
@@ -263,7 +264,6 @@
     background: var(--gobo-color-panel);
     border: var(--gobo-border-panel);
     border-radius: var(--gobo-border-radius);
-    margin-bottom: var(--gobo-height-spacer);
     padding-top: var(--gobo-height-spacer-flex);
     box-sizing: border-box;
     cursor: var(--cursor);

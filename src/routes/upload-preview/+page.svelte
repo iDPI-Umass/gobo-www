@@ -25,28 +25,42 @@
   });
 </script>
 
-<div class="frame">
+<div class="outer">
   <BackLink heading="Preview"></BackLink>
 
-  <img
-    bind:this={previewImage}
-    src="#"
-    alt="preview of upload">
+  <div class="frame">
+    <img
+      bind:this={previewImage}
+      src="#"
+      alt="preview of upload">
+  </div>
 </div>
 
 <style>
-  .frame {
+  .outer {
     height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: start;
+    background: #333;
+    padding-top: 1rem;
+  }
+
+  .frame {
+    flex: 1 1 100%;
+    min-height: 0;
+    width: 100%;
+    padding: 1rem;
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-direction: column;
-    background: #333;
   }
 
   img {
-    height: 90%;
-    width: 95%;
+    height: 100%;
+    width: 100%;
     object-fit: contain;
+    object-position: 50% 50%;
   }
 </style>

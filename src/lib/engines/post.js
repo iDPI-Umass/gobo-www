@@ -138,8 +138,10 @@ Post.styles = ( post, options = {} ) => {
   const styles = {};
   if ( options.fullPage === true ) {
     styles.cursor = "inherit";
+    styles.marginTop = "2rem";
   } else {
     styles.cursor = "pointer";
+    styles.marginTop = "var(--gobo-height-spacer)"
   }
   
   styles.maxHeight = "15rem";
@@ -148,6 +150,12 @@ Post.styles = ( post, options = {} ) => {
     styles.gradient = "none"
   } else {
     styles.gradient = "linear-gradient( 180deg, #000 var(--gradient-stop), transparent )"
+  }
+
+  const overrides = options.styleOverrides ?? {};
+  for ( const key in overrides ) {
+    const style = overrides[ key ];
+    styles[ key ] = style;
   }
 
   return styles;

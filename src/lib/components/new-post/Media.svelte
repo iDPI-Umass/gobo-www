@@ -65,15 +65,19 @@
 
 
   const Handle = {};
+  
   Handle.sensitive = ( event ) => {
     Options.handle( "attachments", "sensitive", event );
   };
+  
   Handle.dragEnter = ( event ) => {
     event.preventDefault();
   };
+  
   Handle.dragLeave = ( event ) => {
     event.preventDefault();
   };
+  
   Handle.drop = ( event ) => {
     event.preventDefault();
 
@@ -148,7 +152,19 @@
       fileInput.removeEventListener( "change", File.listen );
     };
   });
+
+
+  export function dragEnter( event ) {
+    Handle.dragEnter( event );
+  }
+  export function dragLeave( event ) {
+    Handle.dragLeave( event );
+  }
+  export function drop( event ) {
+    Handle.drop( event );
+  }
 </script>
+
 
 
 
@@ -166,45 +182,36 @@
   </sl-button>
 </div>
 
-<div 
-  class="gobo-table" 
-  ondragover="return false" 
-  on:dragenter={Handle.dragEnter}
-  on:dragleave={Handle.dragLeave}
-  on:drop={Handle.drop}>
-  {#each attachments as attachment (attachment.file.name)}
-    <div class="table-row">
-      <a
-        href="/upload-preview"
-        on:click={Handle.preview( attachment )}
-        on:keydown={Handle.preview( attachment )}>
-        { attachment.file.name }
-      </a>
-      <sl-icon-button
-        class="danger"
-        label="Delete File" 
-        src="/icons/trash.svg"
-        on:click={Handle.delete( attachment )}
-        on:keydown={Handle.delete( attachment )}>>
-      </sl-icon-button>
-      <sl-icon-button
-        class="warning"
-        label="Edit Alt" 
-        src="/icons/pencil-square.svg"
-        on:click={Handle.edit( attachment )}
-        on:keydown={Handle.edit( attachment )}>>
-      </sl-icon-button>
-    </div>
-  {/each}
-</div>
-
-<input 
-  bind:this={fileInput}
-  type="file"
-  multiple=true
-  class="hidden">
 
 {#if attachments.length > 0 }
+  <div 
+    class="gobo-table">
+    {#each attachments as attachment (attachment.file.name)}
+      <div class="table-row">
+        <a
+          href="/upload-preview"
+          on:click={Handle.preview( attachment )}
+          on:keydown={Handle.preview( attachment )}>
+          { attachment.file.name }
+        </a>
+        <sl-icon-button
+          class="danger"
+          label="Delete File" 
+          src="/icons/trash.svg"
+          on:click={Handle.delete( attachment )}
+          on:keydown={Handle.delete( attachment )}>>
+        </sl-icon-button>
+        <sl-icon-button
+          class="warning"
+          label="Edit Alt" 
+          src="/icons/pencil-square.svg"
+          on:click={Handle.edit( attachment )}
+          on:keydown={Handle.edit( attachment )}>>
+        </sl-icon-button>
+      </div>
+    {/each}
+  </div>
+
   <sl-checkbox
     on:sl-change={Handle.sensitive}
     checked={options.sensitive}
@@ -213,6 +220,11 @@
   </sl-checkbox>
 {/if}
 
+<input 
+  bind:this={fileInput}
+  type="file"
+  multiple=true
+  class="hidden"/>
 
 
 <style>
@@ -231,7 +243,12 @@
 
   .buttons {
     border-top: none;
-    padding-top: var(--gobo-height-spacer-flex);
+    padding-top: 0;
     justify-content: space-between;
+    align-items: center;
+  }
+
+  .buttons h2 {
+    margin: 0 !important;
   }
 </style>

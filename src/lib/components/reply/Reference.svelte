@@ -7,6 +7,10 @@
   let reference, state;
   const Render = State.make();
 
+  const styleOverrides = {
+    marginTop: "0"
+  };
+
   Render.cycle = async ( draft ) => {
     if ( draft.reply == null ) {
       state = "waiting";
@@ -38,14 +42,12 @@
     <Post
       identity={reference.identity}
       id={reference.id}
-      fullPage={true}>
+      fullPage={true}
+      {styleOverrides}>
     </Post>
   {/if}
 </section>
 
 
 <style>
-  section {
-    padding-top: var(--gobo-height-spacer);
-  }
 </style>

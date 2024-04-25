@@ -94,6 +94,12 @@
   }
   
   :global(.panel) {
-    margin-top: 3rem;
+    margin-top: 1.5rem;
+  }
+
+  @media( min-width: 768px ) {
+    :global(.panel) {
+      margin-top: 3rem;
+    }
   }
 </style>

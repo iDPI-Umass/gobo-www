@@ -37,20 +37,22 @@
   });
 </script>
 
-<div>
-  {#each alerts as a (a.key) }
+{#if alerts?.length > 0 }
+  <div>
+    {#each alerts as a (a.key) }
 
-    <sl-alert
-      on:sl-hide={ Handle.dismiss( a.key )}
-      variant="danger"
-      open
-      closable>
-      <sl-icon slot="icon" src="/icons/exclamation-octagon.svg"></sl-icon>
-      { a.message }
-    </sl-alert>
-  
-  {/each}
-</div>
+      <sl-alert
+        on:sl-hide={ Handle.dismiss( a.key )}
+        variant="danger"
+        open
+        closable>
+        <sl-icon slot="icon" src="/icons/exclamation-octagon.svg"></sl-icon>
+        { a.message }
+      </sl-alert>
+    
+    {/each}
+  </div>
+{/if}
 
 
 
