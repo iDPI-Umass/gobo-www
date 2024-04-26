@@ -12,7 +12,7 @@
   import { Gobo } from "$lib/engines/account.js";
   import * as identityStores from "$lib/stores/identity.js";
 
-  let button, inputs;
+  let form, button, inputs;
   let state, platform;
   const Render = State.make();
   Render.cleanup = () => {
@@ -45,26 +45,14 @@
   };
 
   Validate.context = () => {
-    const context = {};
-    for ( const key in inputs ) {
-      const input = inputs[ key ];
-      if ( input != null ) {
-        context[ key ] = input.value;
-      }
+    const data = new FormData( form );
+    const context = { platform };
+    for ( const [ key, value ] of data.entries() ) {
+      context[ key ] = value;
     }
     return context;
   };
 
-  Validate.report = () => {
-    const results = [];
-    for ( const key in inputs ) {
-      const input = inputs[ key ];
-      if ( input != null ) {
-        results.push( input.reportValidity() );
-      }
-    }
-    return results.every( r => r === true );
-  };
 
   Validate.url = ( value ) => {
     if ( /^http(s):\/\//.test(value) === false ) {
@@ -158,7 +146,7 @@
 
   Submit.validate = () => {
     const context = Validate[ platform ]();
-    const isValid = Validate.report();
+    const isValid = form.reportValidity();
     if ( isValid === true ) {
       return context;
     } else {
@@ -258,13 +246,12 @@
 
 <section class="gobo-form">
   
-  <h2>Select Platform</h2>
-
   <sl-select
     on:sl-change={Handle.select}
     name="platform"
     value="bluesky"
     size="medium"
+    label="Select Platform"
     pill>
     <sl-option value="bluesky">Bluesky</sl-option>
     <sl-option value="mastodon">Mastodon</sl-option>
@@ -272,74 +259,116 @@
     <sl-option value="smalltown">Smalltown</sl-option>
   </sl-select>
 
-  {#if platform === "bluesky"}
-    <sl-input
-      bind:this={inputs.blueskyLogin}
-      on:input={Validate.clear}
-      name="blueskyLogin"
-      label="Bluesky Username"
-      help-text="Your full username, like gobo.bsky.social"
-      autocomplete="off"
-      size="medium"
-      class="required">
-    </sl-input>
 
-    <sl-input
-      bind:this={inputs.blueskySecret}
-      on:input={Validate.clear}
-      name="blueskySecret"
-      label="Bluesky Secret"
-      help-text='On Bluesky, go to Settings > App Passwords and click "Add App Password" to get a secret for Gobo'
-      autocomplete="off"
-      password
-      size="medium"
-      class="required">
-    </sl-input>
+  {#if platform === "bluesky"}
+    <form bind:this={form}>
+      <sl-input
+        bind:this={inputs.blueskyLogin}
+        on:input={Validate.clear}
+        name="blueskyLogin"
+        label="Bluesky Username"
+        help-text="Your full username, like gobo.bsky.social"
+        autocomplete="off"
+        size="medium"
+        class="required">
+      </sl-input>
+
+      <sl-input
+        bind:this={inputs.blueskySecret}
+        on:input={Validate.clear}
+        name="blueskySecret"
+        label="Bluesky Secret"
+        help-text='On Bluesky, go to Settings > App Passwords and click "Add App Password" to get a secret for Gobo'
+        autocomplete="off"
+        password
+        size="medium"
+        class="required">
+      </sl-input>
+
+      <div class="buttons">
+        <sl-button
+          bind:this={button}
+          on:click={Handle.submit}
+          class="submit"
+          size="medium"
+          pill>
+          Add Identity
+        </sl-button>
+      </div>
+    </form>
   {/if}
 
 
   {#if platform === "mastodon"}
-    <sl-input
-      bind:this={inputs.mastodonURL}
-      on:input={Validate.clear}
-      name="mastodonURL"
-      label="Mastodon Server URL"
-      help-text="For example, https://mastodon.social or mastodon.social (you can omit the prefix for convenience)"
-      autocomplete="off"
-      size="medium"
-      class="required">
-    </sl-input>
+    <form bind:this={form}>
+      <sl-input
+        bind:this={inputs.mastodonURL}
+        on:input={Validate.clear}
+        name="mastodonURL"
+        label="Mastodon Server URL"
+        help-text="For example, https://mastodon.social or mastodon.social (you can omit the prefix for convenience)"
+        autocomplete="off"
+        size="medium"
+        class="required">
+      </sl-input>
+      
+      <div class="buttons">
+        <sl-button
+          bind:this={button}
+          on:click={Handle.submit}
+          class="submit"
+          size="medium"
+          pill>
+          Add Identity
+        </sl-button>
+      </div>
+    </form>
+  {/if}
+
+
+  {#if platform === "reddit"}
+    <form bind:this={form}>
+      <div class="buttons">
+        <sl-button
+          bind:this={button}
+          on:click={Handle.submit}
+          class="submit"
+          size="medium"
+          pill>
+          Add Identity
+        </sl-button>
+      </div>
+    </form>
   {/if}
 
 
   {#if platform === "smalltown"}
-    <sl-input
-      bind:this={inputs.smalltownURL}
-      on:input={Validate.clear}
-      name="smalltownURL"
-      label="Smalltown Server URL"
-      help-text="For example, https://community.publicinfrastructure.org or community.publicinfrastructure.org (you can omit the prefix for convenience)"
-      autocomplete="off"
-      size="medium"
-      class="required">
-    </sl-input>
+    <form bind:this={form}>
+      <sl-input
+        bind:this={inputs.smalltownURL}
+        on:input={Validate.clear}
+        name="smalltownURL"
+        label="Smalltown Server URL"
+        help-text="For example, https://community.publicinfrastructure.org or community.publicinfrastructure.org (you can omit the prefix for convenience)"
+        autocomplete="off"
+        size="medium"
+        class="required">
+      </sl-input>
+      
+      <div class="buttons">
+        <sl-button
+          bind:this={button}
+          on:click={Handle.submit}
+          class="submit"
+          size="medium"
+          pill>
+          Add Identity
+        </sl-button>
+      </div>
+    </form>
   {/if}
-
-
-  <sl-button
-    bind:this={button}
-    on:click={Handle.submit}
-    class="submit"
-    size="medium"
-    pill>
-    Add Identity
-  </sl-button>
 </section>
 
 
 <style>
-  .gobo-form sl-select {
-    width: 100%;
-    align-self: flex-start;
-  }
 </style>
