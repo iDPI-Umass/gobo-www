@@ -71,9 +71,7 @@
 
 
 {#if hasMastodon || hasReddit || hasSmalltown }
-  <section class="panel">
-    <h2>{heading}</h2>
-  </section>
+  <h2>{heading}</h2>
   
   {#if hasMastodon }
     <MastodonOptions></MastodonOptions>
@@ -89,8 +87,8 @@
 {/if}
 
 <style>
-  .panel:first-child {
-    margin-top: 0;
+  :global(.panel):first-of-type {
+    margin-top: 1rem;
   }
   
   :global(.panel) {
