@@ -52,6 +52,16 @@
     }
   };
 
+  File.addMany = ( files ) => {
+    for ( const file of files ) {
+      const attachment = attachments.find( a => a.file.name === file.name );
+      if ( attachment == null ) {
+        attachments.push({ file, alt: null });
+      }
+    }
+    attachments = attachments;
+  };
+
   File.listen = () => {
     const _files = fileInput.files;
     if ( _files.length > 0 ) {
@@ -82,20 +92,24 @@
     event.preventDefault();
 
     // Support both item list and file interfaces.
+    const files = [];
     if ( event.dataTransfer.items ) {
-
-      [ ...event.dataTransfer.items ].forEach(( item ) => {
+      for ( const item of event.dataTransfer.items ) {
         // If dropped items aren't files, reject them
         if ( item.kind === "file" ) {
-          const file = item.getAsFile();
-          File.add( file );
+          files.push( item.getAsFile() );
         }
-      });
-
+      }
     } else {
-      [ ...event.dataTransfer.files ].forEach(( file ) => {
-        File.add( file );
-      });
+      for ( const file of event.dataTransfer.files ) {
+        files.push( file );
+      }
+    }
+
+    if ( files.length === 1 ) {
+      File.add( files[0] );
+    } else if ( files.length > 1 ) {
+      File.addMany( files );
     }
   };
 

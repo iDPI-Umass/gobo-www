@@ -1,6 +1,7 @@
 <script>
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/textarea/textarea.js";
+  import BackLink from "$lib/components/primitives/BackLink.svelte";
   import { goto } from "$app/navigation";
   import { onMount } from "svelte";
   import { State, Draft } from "$lib/engines/draft.js";
@@ -67,11 +68,10 @@
 </script>
 
 <div class="main-child">
+
+  <BackLink heading="Image Configuration"></BackLink>
   
   <form class="gobo-form" bind:this={form} on:submit={Handle.submit}>
-    
-    <h2>Image Configuration</h2>
-
     <img
       bind:this={previewImage}
       src="#"
