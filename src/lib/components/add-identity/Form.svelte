@@ -53,7 +53,6 @@
     return context;
   };
 
-
   Validate.url = ( value ) => {
     if ( /^http(s):\/\//.test(value) === false ) {
       value = "https://" + value;
@@ -103,6 +102,11 @@
       return;
     }
 
+    if ( /\w+\.\w+/.test( context.mastodonURL ) === false ) {
+      Inputs.alert( "mastodonURL", "This is an invalid URL." );
+      return;
+    }
+
     const url = Validate.url( context.mastodonURL );
     if ( url == null ) {
       Inputs.alert( "mastodonURL", "This is an invalid URL." );
@@ -126,6 +130,11 @@
     
     if ( !context.smalltownURL ) {
       Inputs.alert( "smalltownURL", "Please provide a Smalltown server URL." );
+      return;
+    }
+
+    if ( /\w+\.\w+/.test( context.smalltownURL ) === false ) {
+      Inputs.alert( "smalltownURL", "This is an invalid URL." );
       return;
     }
 
@@ -261,7 +270,7 @@
 
 
   {#if platform === "bluesky"}
-    <form bind:this={form}>
+    <form bind:this={form} on:submit={Handle.submit}>
       <sl-input
         bind:this={inputs.blueskyLogin}
         on:input={Validate.clear}
@@ -288,7 +297,7 @@
       <div class="buttons">
         <sl-button
           bind:this={button}
-          on:click={Handle.submit}
+          type="submit"
           class="submit"
           size="medium"
           pill>
@@ -300,7 +309,7 @@
 
 
   {#if platform === "mastodon"}
-    <form bind:this={form}>
+    <form bind:this={form} on:submit={Handle.submit}>
       <sl-input
         bind:this={inputs.mastodonURL}
         on:input={Validate.clear}
@@ -315,7 +324,7 @@
       <div class="buttons">
         <sl-button
           bind:this={button}
-          on:click={Handle.submit}
+          type="submit"
           class="submit"
           size="medium"
           pill>
@@ -327,11 +336,11 @@
 
 
   {#if platform === "reddit"}
-    <form bind:this={form}>
+    <form bind:this={form} on:submit={Handle.submit}>
       <div class="buttons">
         <sl-button
           bind:this={button}
-          on:click={Handle.submit}
+          type="submit"
           class="submit"
           size="medium"
           pill>
@@ -343,7 +352,7 @@
 
 
   {#if platform === "smalltown"}
-    <form bind:this={form}>
+    <form bind:this={form} on:submit={Handle.submit}>
       <sl-input
         bind:this={inputs.smalltownURL}
         on:input={Validate.clear}
@@ -358,7 +367,7 @@
       <div class="buttons">
         <sl-button
           bind:this={button}
-          on:click={Handle.submit}
+          type="submit"
           class="submit"
           size="medium"
           pill>

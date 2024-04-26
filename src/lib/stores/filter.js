@@ -15,7 +15,9 @@ const createStore = function () {
 
 
 const singleton = createStore();
+const addFailure = createStore();
 
 export { 
-  singleton
+  singleton,
+  addFailure
 }
