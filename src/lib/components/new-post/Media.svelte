@@ -79,6 +79,14 @@
   Handle.sensitive = ( event ) => {
     Options.handle( "attachments", "sensitive", event );
   };
+
+  Handle.inputFiles = () => {
+    if ( fileInput.files.length === 1 ) {
+      File.add( fileInput.files[0] );
+    } else if ( fileInput.files.length > 1 ) {
+      File.addMany( fileInput.files );
+    }
+  };
   
   Handle.dragEnter = ( event ) => {
     event.preventDefault();
@@ -160,10 +168,10 @@
   onMount(() => {
     Render.listen( "attachments", Render.cycle );
     Render.listen( "options", Render.options );
-    fileInput.addEventListener( "change", File.listen );
+    fileInput.addEventListener( "change", Handle.inputFiles );
     return () => {
       Render.reset();
-      fileInput.removeEventListener( "change", File.listen );
+      fileInput.removeEventListener( "change", Handle.inputFiles );
     };
   });
 
