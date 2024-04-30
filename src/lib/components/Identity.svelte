@@ -122,7 +122,7 @@
       
       <figcaption>
 
-        {#if names[0] != null}
+        {#if names[0] }
           <p class="slot1">{ names[0] }</p>
         {/if}
 
@@ -206,17 +206,23 @@
 
   figcaption .slot1 {
     font-size: var(--gobo-font-size-copy);
-    font-weight: var(--gobo-font-weight-bold);
     text-transform: capitalize;
   }
 
   figcaption .slot2 {
     font-size: var(--gobo-font-size-copy);
-    font-weight: var(--gobo-font-weight-regular);
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-start;
     align-items: center;
+  }
+
+  figcaption p {
+    font-weight: var(--gobo-font-weight-regular);
+  }
+  
+  figcaption p:first-of-type {
+    font-weight: var(--gobo-font-weight-bold);
   }
 
   figcaption .slot2 span {

@@ -8,7 +8,11 @@ export const read = function ( name ) {
 }
 
 export const write = function ( name, object ) {
-  window.localStorage.setItem( name, JSON.stringify( object ));
+  if ( object == null ) {
+    remove( name );
+  } else {
+    window.localStorage.setItem( name, JSON.stringify( object ));
+  }
 }
 
 export const remove = function ( name ) {

@@ -20,6 +20,8 @@ const getPrettyName = function ( identity ) {
         hostname = base_url;
       }      
       return `@${ username }@${ hostname }`;
+    case "linkedin":
+      return username;
   }
 };
 
@@ -33,6 +35,7 @@ const categorize = function ( identity ) {
 
 const sort = function ( identities ) {
   let blueskys = [];
+  let linkedins = [];
   let mastodons = [];
   let reddits = [];
   let smalltowns = [];
@@ -42,6 +45,8 @@ const sort = function ( identities ) {
 
     if ( identity.platform === "bluesky" ) {
       blueskys.push( identity );
+    } else if ( identity.platform === "linkedin" ) {
+      linkedins.push( identity );
     } else if ( identity.platform === "reddit" ) {
       reddits.push( identity );
     } else if ( identity.platform === "mastodon" ) {
@@ -51,7 +56,13 @@ const sort = function ( identities ) {
     }
   }
 
-  return [ ...blueskys, ...mastodons, ...reddits, ...smalltowns ];
+  return [ 
+    ...blueskys,
+    ...linkedins,
+    ...mastodons,
+    ...reddits,
+    ...smalltowns
+  ];
 };
 
 const list = App.unauthorized( async function () {

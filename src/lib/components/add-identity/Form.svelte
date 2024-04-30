@@ -125,6 +125,13 @@
     return context;
   };
 
+  // No fields to validate, so mostly a no-op.
+  Validate.linkedin = () => {
+    const context = Validate.context();
+    context.baseURL = "https://www.linkedin.com";
+    return context;
+  };
+
   Validate.smalltown = () => {
     const context = Validate.context();
     
@@ -263,6 +270,7 @@
     label="Select Platform"
     pill>
     <sl-option value="bluesky">Bluesky</sl-option>
+    <sl-option value="linkedin">LinkedIn</sl-option>
     <sl-option value="mastodon">Mastodon</sl-option>
     <sl-option value="reddit">Reddit</sl-option>
     <sl-option value="smalltown">Smalltown</sl-option>
@@ -294,6 +302,22 @@
         class="required">
       </sl-input>
 
+      <div class="buttons">
+        <sl-button
+          bind:this={button}
+          type="submit"
+          class="submit"
+          size="medium"
+          pill>
+          Add Identity
+        </sl-button>
+      </div>
+    </form>
+  {/if}
+
+
+  {#if platform === "linkedin"}
+    <form bind:this={form} on:submit={Handle.submit}>
       <div class="buttons">
         <sl-button
           bind:this={button}
