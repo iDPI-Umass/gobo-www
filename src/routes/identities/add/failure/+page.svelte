@@ -29,21 +29,21 @@
 
 <div class="main-child">
   <section class="gobo-copy">
-    <h1>Identity Onboarding Error</h1>
+    <h1>Add Identity Error</h1>
     <p>
-      There was a problem adding this new identity to your profile.
-      If you choose to try again, please carefully confirm that your
-      information is correct. You can contact us if you're still 
-      having problems. 
+      There was a problem with adding your identity.
+      Please confirm that the identity information you provided was correct.
+      After confirming and retrying, please contact us if you're still
+      having problems.
     </p>
     
     <div class="buttons">
       <sl-button
-        href="/identities"
+        href="/identities/add"
         class="submit"
         size="medium"
         pill>
-        Identities
+        Add Identity
       </sl-button>
     </div>
   </section>

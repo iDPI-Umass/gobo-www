@@ -11,18 +11,13 @@
   border-radius: var(--gobo-border-radius);
 }
 
-.gobo-copy header {
-  margin-bottom: 2rem;
-}
-
 .gobo-copy h1 {
   font-size: var(--sl-font-size-x-large);
-  margin-bottom: 2rem;
 }
 
 .gobo-copy h2 {
   font-size: var(--sl-font-size-large);
-  margin-bottom: 1rem;
+  margin-top: 1rem;
 }
 
 .gobo-copy p + h2 {
@@ -45,6 +40,10 @@
 
 .gobo-copy sl-divider {
   --color: var(--gobo-color-border-panel);
+}
+
+.gobo-copy .buttons {
+  margin-top: 1rem;
 }
 
 
