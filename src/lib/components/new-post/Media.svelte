@@ -60,6 +60,7 @@
       }
     }
     attachments = attachments;
+    Draft.updateAspect( "attachments", attachments );
   };
 
   File.listen = () => {

@@ -1,16 +1,18 @@
 <script>
   import Bluesky from "$lib/components/new-post/previews/Bluesky.svelte";
+  import Linkedin from "$lib/components/new-post/previews/Linkedin.svelte";
   import Mastodon from "$lib/components/new-post/previews/Mastodon.svelte";
   import Reddit from "$lib/components/new-post/previews/Reddit.svelte";
   import Smalltown from "$lib/components/new-post/previews/Smalltown.svelte";
   import { onMount } from "svelte";
   import { State, Identity } from "$lib/engines/draft.js";
 
-  let hasBluesky, hasMastodon, hasReddit, hasSmalltown;
+  let hasBluesky, hasLinkedin, hasMastodon, hasReddit, hasSmalltown;
   const Render = State.make();
 
   Render.cleanup = () => {
     hasBluesky = false;
+    hasLinkedin = false;
     hasMastodon = false;
     hasReddit = false;
     hasSmalltown = false;
@@ -18,6 +20,7 @@
 
   Render.cycle = ( draft ) => {
     hasBluesky = Identity.hasBluesky();
+    hasLinkedin = Identity.hasLinkedin();
     hasMastodon = Identity.hasMastodon();
     hasReddit = Identity.hasReddit();
     hasSmalltown = Identity.hasSmalltown();
@@ -44,6 +47,11 @@
 {#if hasBluesky}
   <h3 class="preview-header">Bluesky</h3>
   <Bluesky></Bluesky>
+{/if}
+
+{#if hasLinkedin}
+  <h3 class="preview-header">LinkedIn</h3>
+  <Linkedin></Linkedin>
 {/if}
 
 {#if hasMastodon}

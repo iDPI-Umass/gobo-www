@@ -4,7 +4,14 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import { onMount } from "svelte";
   import { Post } from "$lib/engines/post.js";
-  import { State, Bluesky, Mastodon, Smalltown, Reddit } from "$lib/engines/draft.js";
+  import { 
+    State, 
+    Bluesky, 
+    Linkedin,
+    Mastodon, 
+    Smalltown, 
+    Reddit 
+  } from "$lib/engines/draft.js";
 
   export let platform;
   
@@ -13,6 +20,9 @@
   switch ( platform ) {
     case "bluesky":
       Model = Bluesky;
+      break;
+    case "linkedin":
+      Model = Linkedin;
       break;
     case "mastodon":
       Model = Mastodon;

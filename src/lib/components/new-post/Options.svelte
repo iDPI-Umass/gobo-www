@@ -4,18 +4,20 @@
   import "@shoelace-style/shoelace/dist/components/option/option.js";
   import "@shoelace-style/shoelace/dist/components/input/input.js";
   import "@shoelace-style/shoelace/dist/components/checkbox/checkbox.js";
+  import LinkedinOptions from "$lib/components/new-post/LinkedinOptions.svelte";
   import MastodonOptions from "$lib/components/new-post/MastodonOptions.svelte";
   import RedditOptions from "$lib/components/new-post/RedditOptions.svelte";
   import SmalltownOptions from "$lib/components/new-post/SmalltownOptions.svelte";
   import { onMount } from "svelte";
   import { State, Identity, Lock, Options } from "$lib/engines/draft.js";
 
-  let heading, options, hasMastodon, hasReddit, hasSmalltown;
+  let heading, options, hasLinkedin, hasMastodon, hasReddit, hasSmalltown;
   const Render = State.make();
 
   Render.cleanup = () => {
     heading = "Identity Specific Options"
     options = {};
+    hasLinkedin = false;
     hasMastodon = false;
     hasReddit = false;
     hasSmalltown = false;
@@ -45,6 +47,7 @@
   };
 
   Render.identities = ( draft ) => {
+    hasLinkedin = Identity.hasLinkedin();
     hasMastodon = Identity.hasMastodon();
     hasSmalltown = Identity.hasSmalltown();
 
@@ -70,9 +73,13 @@
 </script>
 
 
-{#if hasMastodon || hasReddit || hasSmalltown }
+{#if hasLinkedin || hasMastodon || hasReddit || hasSmalltown }
   <h2>{heading}</h2>
-  
+
+  {#if hasLinkedin }
+    <LinkedinOptions></LinkedinOptions>
+  {/if}
+
   {#if hasMastodon }
     <MastodonOptions></MastodonOptions>
   {/if}

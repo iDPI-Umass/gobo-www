@@ -22,6 +22,9 @@ Draft.make = () => {
       general: {
         title: null,
       },
+      linkedin: {
+        visibility: "public"
+      },
       mastodon: {
         visibility: "public",
         spoilerText: null,
@@ -202,6 +205,7 @@ Identity.hasActive = ( target ) => {
 };
 
 Identity.hasBluesky = Identity.hasActive( "bluesky" );
+Identity.hasLinkedin = Identity.hasActive( "linkedin" );
 Identity.hasMastodon = Identity.hasActive( "mastodon" );
 Identity.hasReddit = Identity.hasActive( "reddit" );
 Identity.hasSmalltown = Identity.hasActive( "smalltown" );
@@ -333,6 +337,7 @@ Validate.isValid = () => {
   const tests = [
     Validate.active,
     Validate.bluesky,
+    Validate.linkedin,
     Validate.mastodon,
     Validate.reddit,
     Validate.smalltown,
@@ -387,6 +392,43 @@ Validate.bluesky = ( draft ) => {
     return false;
   }
 
+  if ( draft.attachments.length > 4 ) {
+    Draft.pushAlert(
+      `Bluesky does not allow more than 4 attachments per post.`
+    );
+    return false;
+  }
+
+  return true;
+};
+
+Validate.linkedin = ( draft ) => {
+  if ( !Identity.hasLinkedin() ) {
+    return true;
+  }
+
+  if ( Linkedin.contentLength() > Linkedin.characterLimit ) {
+    const number = new Intl.NumberFormat().format( Linkedin.characterLimit );
+    Draft.pushAlert(
+      `LinkedIn does not accept posts with more than ${ number } characters.`
+    );
+    return false;
+  }
+
+  if ( (draft.content == null) || (draft.content === "") ) {
+    Draft.pushAlert(
+      `LinkedIn does not allow empty post content.`
+    );
+    return false;
+  }
+
+  if ( draft.attachments.length > 4 ) {
+    Draft.pushAlert(
+      `LinkedIn does not allow more than 4 attachments per post.`
+    );
+    return false;
+  }
+
   return true;
 };
 
@@ -406,6 +448,13 @@ Validate.mastodon = ( draft ) => {
   if ( (draft.content == null) || (draft.content === "") ) {
     Draft.pushAlert(
       `Mastodon does not allow empty post content.`
+    );
+    return false;
+  }
+
+  if ( draft.attachments.length > 4 ) {
+    Draft.pushAlert(
+      `Bluesky does not allow more than 4 attachments per post.`
     );
     return false;
   }
@@ -444,6 +493,13 @@ Validate.reddit = ( draft ) => {
   if ( !draft.options.general.title ) {
     Draft.pushAlert(
       `Please provide a title for this Reddit post.`
+    );
+    return false;
+  }
+
+  if ( draft.attachments.length > 20 ) {
+    Draft.pushAlert(
+      `Bluesky does not allow more than 20 attachments per post.`
     );
     return false;
   }
@@ -643,6 +699,88 @@ Bluesky.build = async ( draft ) => {
 
 
 
+const Linkedin = {};
+Linkedin.characterLimit = 3000;
+
+// These won't be real shortened links, but they approximate the appearance
+// by always coming in at 26 characters.
+Linkedin.urlGlamor = ( _url ) => {
+  if ( _url.length > 26 ) {
+    return "https://lnkd.in/e3rvsvVTsd";
+  } else {
+    return _url;
+  }
+};
+
+// From https://www.linkedin.com/help/linkedin/answer/a521889/short-urls-in-shared-posts
+// "When you share a link that's longer than 26 characters, we automatically 
+// shorten it once you click Post, to make it easier to read."
+Linkedin.contentLength = () => {
+  const draft = Draft.read();
+  if ( draft.content == null ) {
+    return 0;
+  }
+
+  const links = linkify.find( draft.content, "url" );
+  let removed = 0;
+  
+  for ( const link of links ) {
+    if ( link.href.length > 26 ) {
+      removed += link.href.length - 26;
+    }
+  }
+  
+  return draft.content.length - removed;
+};
+
+// TODO: There is a looming problem here on the visiblity question.
+// Unlike the other current platforms, LinkedIn uses a double-opt-in social
+// edge model. So the generic word would be something like "mutals".
+// That affects graph calculations in theory, but we can't acutally do that
+// much with LinkedIn's graph at the moment.
+Linkedin.buildVisibility = ( draft ) => {
+  switch ( draft.options.linkedin.visibility ) {
+    case null:
+    case "public":
+      return "PUBLIC";
+    case "mutuals":
+      return "CONNECTIONS";
+  }
+};
+
+// TODO: This is a copy of the builder function for the Bluesky module. When
+// we generalize link preview generation, revisit this function.
+Linkedin.buildCard = async ( context ) => {
+  if ( context.url == null ) {
+    return;
+  }
+
+  const linkCard = {
+    url: context.url,
+    title: context.title,
+    description: context.description
+  };
+
+  if ( context.image != null && context.image.length > 0 ) {
+    const image = await Bluesky.fetchCardImage( context.image );
+    const id = await Bluesky.uploadCardImage( image.blob );
+    linkCard.image = { id, mime: image.mime };
+  }
+
+  return linkCard;
+};
+
+Linkedin.build = async ( draft ) => {
+  const linkCard = await Linkedin.buildCard( draft.linkPreview );
+
+  return {
+    visibility: Linkedin.buildVisibility( draft ),
+    linkCard,
+  };
+};
+
+
+
 const Mastodon = {};
 Mastodon.characterLimit = 500;
 
@@ -759,6 +897,8 @@ Metadata.build = async ( identity, draft ) => {
   switch ( identity.platform ) {
     case "bluesky":
       return await Bluesky.build( draft );
+    case "linkedin":
+      return await Linkedin.build( draft );
     case "mastodon":
       return Mastodon.build( draft );
     case "reddit":
@@ -863,6 +1003,7 @@ export {
 
   Validate,
   Bluesky,
+  Linkedin,
   Mastodon,
   Reddit,
   Smalltown,
