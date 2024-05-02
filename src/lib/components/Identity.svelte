@@ -17,6 +17,14 @@
     "linkedin"
   ];
 
+  const prettyNames = {
+    bluesky: "Bluesky",
+    linkedin: "LinkedIn",
+    mastodon: "Mastodon",
+    reddit: "Reddit",
+    smalltown: "Smalltown"
+  };
+
   let deleteButton;
   let logo = `/icons/${ identity.platform }.svg`;
   let state, names, avatar, fallback, isWriteOnly, isStale;
@@ -123,7 +131,7 @@
     <header>
       <sl-icon src={logo} class="{identity.platform}"></sl-icon>
       <h2>
-        { identity.platform }
+        { prettyNames[identity.platform] }
       </h2>
 
       {#if isWriteOnly}
