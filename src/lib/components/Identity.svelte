@@ -8,7 +8,7 @@
   import { goto } from "$app/navigation";
   import { State } from "$lib/engines/store.js";
   import { Identity, Name } from "$lib/engines/identity.js";
-  import { Filter } from "$lib/engines/filter";
+  import { Onboard } from "$lib/engines/onboarding.js";
   import * as identityStores from "$lib/stores/identity.js";
 
   export let identity;
@@ -25,7 +25,7 @@
     smalltown: "Smalltown"
   };
 
-  let deleteButton;
+  let deleteButton, reauthorizeButton;
   let logo = `/icons/${ identity.platform }.svg`;
   let state, names, avatar, fallback, isWriteOnly, isStale;
   const Render = State.make();
@@ -86,8 +86,35 @@
     await Identity.update( identity );
   });
 
+  // Here we use some of the abstract model used to onboard people to trigger
+  // a re-authorization flow. This needs some work to better abstract the flow
+  // so it's not this pile of loose parts.
   Handle.reauthorize = async () => {
-    goto("/identities/add");
+    if ( reauthorizeButton.loading === true ) {
+      return;
+    }
+    reauthorizeButton.loading = true;
+
+    // For Bluesky, we don't use a login-redirect flow. So the only thing we
+    // can do is send the Gobo member to the add-identity page.
+    if ( identity.platform === "bluesky" ) {
+      return goto("/identities/add");
+    }
+
+    const context = {
+      platform: identity.platform,
+      baseURL: identity.base_url
+    };
+
+    Onboard.stow( context );
+    await Onboard.start( context );
+    if ( context.onboard == null ) {
+      reauthorizeButton.loading = false;
+      return;
+    }
+
+    const url = Onboard.makeLoginURL( context );
+    window.location = url;
   };
 
 
@@ -151,6 +178,7 @@
             To restore access, please re-authorize Gobo.
           </p>
           <sl-button
+            bind:this={reauthorizeButton}
             on:click={Handle.reauthorize}
             variant="primary"
             class="submit"

@@ -9,8 +9,7 @@
   import { onMount } from "svelte";
   import { replaceState } from "$app/navigation";
   import { State } from "$lib/engines/store.js";
-  import * as LS from "$lib/helpers/local-storage.js";
-  import { Gobo } from "$lib/engines/account.js";
+  import { Onboard } from "$lib/engines/onboarding.js";
   import * as identityStores from "$lib/stores/identity.js";
 
   let form, button, inputs;
@@ -171,59 +170,20 @@
     }
   };
 
-  Submit.stow = ( context ) => {
-    LS.write( "gobo-platform", context.platform );
-    LS.write( "gobo-baseURL", context.baseURL );
-    LS.write( "gobo-bluesky-login", context.blueskyLogin );
-    LS.write( "gobo-bluesky-secret", context.blueskySecret );
-  };
-
-  Submit.onboard = async ( context ) => {
-    const client = await Gobo.get();
-    let result;
-
-    try {
-      result = await client.actionOnboardIdentityStart.post({ 
-        content: {
-          platform: context.platform,
-          base_url: context.baseURL
-        }
-      });
-    } catch ( error ) {
-      console.error( error );
-      return;
-    }
-    
-    console.log( result );
-    context.onboard = result;
-    return context;
-  };
-
-  Submit.getRedirectURL = ( context ) => {
-    if ( context.platform === "bluesky" ) {
-      // For Bluesky, we handle the app password flow differently than OAuth.      
-      return `/add-identity-callback?state=${ context.onboard.state }`;
-    }
-    
-    // Default
-    return context.onboard.redirect_url;
-  };
-
-
   Submit.flow = async () => {
     let context = Submit.validate();
     if ( context == null ) {
       return;
     }
 
-    Submit.stow( context );
-    await Submit.onboard( context );
+    Onboard.stow( context );
+    await Onboard.start( context );
     if ( context.onboard == null ) {
       state = "error";
       return;
     }
 
-    const url = Submit.getRedirectURL( context );
+    const url = Onboard.makeLoginURL( context );
     window.location = url;
   };
 
