@@ -60,7 +60,7 @@
     flex-wrap: wrap;
     justify-content: flex-start;
     align-items: center;
-    padding-top: var(--gobo-height-spacer);
+    padding: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex) 0 var(--gobo-width-spacer-flex);
   }
 
   @media ( max-width: 750px ) {

@@ -39,6 +39,12 @@
     align-items: center;
   }
 
+  @media(min-width: 768px) {
+    header {
+      padding-left: 0;
+    }
+  }
+
   .heading {
     flex: 1 0 100%;
     display: flex;
