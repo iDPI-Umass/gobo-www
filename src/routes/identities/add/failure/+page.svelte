@@ -33,18 +33,14 @@
     <p>
       There was a problem with adding your identity.
       Please confirm that the identity information you provided was correct.
-      After confirming and retrying, please contact us if you're still
-      having problems.
     </p>
     
     <div class="buttons">
-      <sl-button
-        href="/identities/add"
-        class="submit"
-        size="medium"
-        pill>
-        Add Identity
-      </sl-button>
+      <p>
+        <a href="/identities/add">
+          Back to Add Identity
+        </a>   
+      </p>
     </div>
   </section>
 </div>
