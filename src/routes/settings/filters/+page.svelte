@@ -14,13 +14,13 @@
       </sl-button>
     </nav>
 
-    <section class="gobo-copy">
-      <p>
-        Filters include and exclude posts from your feeds. Once you create a filter, you can turn it on and off or delete it entirely.
-      </p> 
-    </section>
-
   </BackLink>
+
+  <section class="gobo-copy">
+    <p>
+      Filters include and exclude posts from your feeds. Once you create a filter, you can turn it on and off or delete it entirely.
+    </p> 
+  </section>
 
   <h2>Block Keyword</h2>
   <FilterTable category="block-keyword"></FilterTable>
