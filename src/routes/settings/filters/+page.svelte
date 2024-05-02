@@ -30,9 +30,6 @@
 
   <h2>Block Domain</h2>
   <FilterTable category="block-domain"></FilterTable>
-
-  <!-- TODO: fix this in the layout refactor. -->
-  <div class="spacer"></div>
 </div>
 
 
@@ -46,10 +43,5 @@
     h2 {
       padding: 0;
     }
-  }
-
-  .spacer {
-    width: 100%;
-    margin-bottom: 10rem;
   }
 </style>
