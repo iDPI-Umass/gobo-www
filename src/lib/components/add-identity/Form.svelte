@@ -320,14 +320,12 @@
   {#if platform === "linkedin"}
     <form bind:this={form} on:submit={Handle.submit}>
       
-      <sl-alert
-        variant="primary"
-        open>
+      <sl-alert open>
         <sl-icon slot="icon" src="/icons/info-circle.svg"></sl-icon>
 
-        Due to LinkedIn's API restrictions, LinkedIn is write-only on Gobo. 
-        This means that on Gobo you can publish to LinkedIn but can't view
-        your LinkedIn feed.
+        Due to LinkedIn's API restrictions, it is write-only on Gobo. 
+        You can publish to LinkedIn but you can't view your feed or 
+        notifications.
       </sl-alert>
       
       <div class="buttons">
@@ -416,9 +414,11 @@
 
 
 <style>
-  form header {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
+  sl-alert::part(base) {
+    border-top-color: var(--gobo-color-text);
+  }
+
+  sl-alert sl-icon {
+    color: var(--gobo-color-text);
   }
 </style>
