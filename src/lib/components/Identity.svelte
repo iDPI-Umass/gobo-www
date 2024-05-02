@@ -128,58 +128,64 @@
 
     </div>
 
-    <header>
-      <sl-icon src={logo} class="{identity.platform}"></sl-icon>
-      <h2>
-        { prettyNames[identity.platform] }
-      </h2>
 
-      {#if isWriteOnly}
-        <div class="badge">
-          Write-Only
-        </div>
-      {/if}
-    </header>
-
-    {#if isStale === true}
-      <sl-alert variant="warning" open>
-        <sl-icon slot="icon" src="/icons/exclamation-triangle.svg"></sl-icon>
-        <p class="message">
-          Gobo is not able to access this identity.
-          To restore access, please re-authorize Gobo.
-        </p>
-        <sl-button
-          on:click={Handle.reauthorize}
-          variant="primary"
-          class="submit"
-          pill>
-          Reauthorize
-        </sl-button>
-      </sl-alert>
-    {/if}
-
-
-    <figure>
-
-      <img
-        src="{avatar}" 
-        alt="profile picture for {identity.prettyName}"
-        onerror="this.onerror=null;this.src='{fallback}'">
-      
-      <figcaption>
-
-        {#if names[0] }
-          <p class="slot1">{ names[0] }</p>
+    <div class="inner">
+      <header>
+        <sl-icon src={logo} class="{identity.platform}"></sl-icon>
+        <h2>
+          { prettyNames[identity.platform] }
+        </h2>
+  
+        {#if isWriteOnly}
+          <div class="badge">
+            Write-Only
+          </div>
         {/if}
-
-        <p class="slot2">
-          {#each names[1] as part}
-            <span>{ part }</span>
-          {/each}
-        </p>
-      </figcaption>
-      
-    </figure>
+      </header>
+  
+      {#if isStale === true}
+        <sl-alert variant="warning" open>
+          <sl-icon slot="icon" src="/icons/exclamation-triangle.svg"></sl-icon>
+          <p class="message">
+            Gobo is not able to access this identity.
+            To restore access, please re-authorize Gobo.
+          </p>
+          <sl-button
+            on:click={Handle.reauthorize}
+            variant="primary"
+            class="submit"
+            pill>
+            Reauthorize
+          </sl-button>
+        </sl-alert>
+      {/if}
+  
+  
+      <figure>
+  
+        <img
+          src="{avatar}" 
+          alt="profile picture for {identity.prettyName}"
+          onerror="this.onerror=null;this.src='{fallback}'">
+        
+        <figcaption>
+  
+          {#if names[0] }
+            <p class="slot1">{ names[0] }</p>
+          {/if}
+  
+          <p class="slot2">
+            {#each names[1] as part}
+              <span>{ part }</span>
+            {/each}
+          </p>
+        </figcaption>
+        
+      </figure>
+    
+    
+    </div>
+    
   
   {/if}
 </section>
@@ -191,11 +197,11 @@
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: stretch;
-    margin-bottom: var(--gobo-height-spacer);
     width: 100%;
     background: var(--gobo-color-panel);
     border: var(--gobo-border-panel);
     border-radius: var(--gobo-border-radius);
+    margin-top: var(--gobo-height-spacer-flex);
   }
 
   @media ( max-width: 680px ) {
@@ -209,21 +215,20 @@
   header {
     width: 100%;
     display: flex;
-    gap: 0.5rem;
     justify-content: flex-start;
     align-items: center;
-    margin: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex);
   }
 
   header sl-icon {
     font-size: 1.25rem;
+    margin-right: 0.5rem;
   }
 
-  h2 {
+  header h2 {
     font-size: 1rem;
     font-weight: var(--gobo-font-weight-black);
     text-transform: capitalize;
-    margin-right: var(--gobo-width-spacer-flex);   
+    margin-right: var(--gobo-width-spacer-flex);
   }
   
   header .badge {
@@ -235,29 +240,32 @@
     border-radius: 1rem;
   }
 
-  sl-alert {
-    margin: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex);
+  .inner {
+    padding: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex);
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: var(--gobo-height-spacer-flex);
   }
 
-  sl-alert::part(message) {
+  .inner sl-alert::part(message) {
     display: flex;
     justify-content: end;
     flex-wrap: wrap;
     gap: var(--gobo-width-spacer-flex) var(--gobo-height-spacer-flex);
   }
 
-  sl-alert sl-button {
+  .inner sl-alert sl-button {
     align-self: center;
   }
 
   @media ( min-width: 500px ) {
-    sl-alert::part(message) {
+    .inner sl-alert::part(message) {
       flex-wrap: nowrap;
     }
   }
 
-  figure {
-    margin: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex);
+  .inner figure {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -265,14 +273,14 @@
     align-items: center;
   }
 
-  figure > img {
+  .inner figure > img {
     height: 3.125rem;
     width: 3.125rem;
     border-radius: var(--sl-border-radius-circle);
     margin-right: var(--gobo-width-spacer-flex);
   }
 
-  figcaption {
+  .inner figcaption {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
@@ -281,12 +289,12 @@
   }
 
 
-  figcaption .slot1 {
+  .inner figcaption .slot1 {
     font-size: var(--gobo-font-size-copy);
     text-transform: capitalize;
   }
 
-  figcaption .slot2 {
+  .inner figcaption .slot2 {
     font-size: var(--gobo-font-size-copy);
     display: flex;
     flex-wrap: wrap;
@@ -294,15 +302,15 @@
     align-items: center;
   }
 
-  figcaption p {
+  .inner figcaption p {
     font-weight: var(--gobo-font-weight-regular);
   }
   
-  figcaption p:first-of-type {
+  .inner figcaption p:first-of-type {
     font-weight: var(--gobo-font-weight-bold);
   }
 
-  figcaption .slot2 span {
+  .inner figcaption .slot2 span {
     flex: 0 0 auto;
     margin: 0;
     word-break: break-all;
