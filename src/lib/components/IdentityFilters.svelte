@@ -9,6 +9,14 @@
   import { Identity } from "$lib/engines/identity.js";
   import * as identityStores from "$lib/stores/identity.js";
 
+  const readable = [
+    "bluesky",
+    "mastodon",
+    "reddit",
+    "smalltown"
+  ];
+
+
   let identities, state;
   const Render = State.make();
   Render.cleanup = () => {
@@ -17,7 +25,7 @@
   };
 
   Render.identities = ( list ) => {
-    identities = list;
+    identities = list.filter( i => readable.includes( i.platform ));
   
     if ( identities.length === 0 ) {
       state = "empty";

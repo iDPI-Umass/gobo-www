@@ -4,10 +4,12 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import LinkPreview from "$lib/components/new-post/previews/LinkPreview.svelte";
   import { onMount } from "svelte";
+  import { Source } from "$lib/engines/post";
   import { State, Identity, Media, Mastodon } from "$lib/engines/draft.js";
   import * as markdown from "$lib/helpers/markdown.js";
 
-  let identity, options, content, displayedFiles, sensitiveOverride, spoilerOverride;
+  let identity, options, content, avatar;
+  let displayedFiles, sensitiveOverride, spoilerOverride;
   const Render = State.make();
   const parser = new DOMParser();
   const serializer = new XMLSerializer();
@@ -23,6 +25,7 @@
 
   Render.identity = ( draft ) => {
     identity = Identity.findActive( "mastodon" ) ?? {};
+    avatar = identity.profile_image ?? Source.fallback( identity );
   };
 
   Render.options = ( draft ) => {
@@ -83,7 +86,10 @@
 
 <article class="outer-frame">
   <header>
-    <div class="pfp"></div>
+    <div class="pfp">
+      <!-- svelte-ignore a11y-missing-attribute -->
+      <img src={avatar}>
+    </div>
     <div class="id">
       <span>{identity.name}</span>
       <span>{identity.prettyName}</span>
@@ -446,8 +452,14 @@
     height: 46px;
     width: 46px;
     border-radius: 0.25rem;
-    background: var(--sl-color-neutral-400);
     margin-right: 10px;
+    overflow: hidden;
+  }
+
+  .outer-frame header .pfp img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
   }
 
   .outer-frame > header > .id {

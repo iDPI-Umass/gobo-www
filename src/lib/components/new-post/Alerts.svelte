@@ -64,12 +64,4 @@
     gap: var(--gobo-height-spacer-flex);
     margin-top: var(--gobo-height-spacer-flex);
   }
-
-  sl-alert::part(base) {
-    background: var(--gobo-color-null);
-  }
-
-  sl-alert::part(message) {
-    color: var(--gobo-color-text);
-  }
 </style>

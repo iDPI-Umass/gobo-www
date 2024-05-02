@@ -127,3 +127,11 @@ sl-textarea.required::part(form-control-label)::after {
 sl-alert::part(close-button__base):hover {
   color: inherit;
 }
+
+sl-alert::part(base) {
+  background: var(--gobo-color-null);
+}
+
+sl-alert::part(message) {
+  color: var(--gobo-color-text);
+}

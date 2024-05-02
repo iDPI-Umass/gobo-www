@@ -353,16 +353,25 @@ Validate.isValid = () => {
 
 Validate.active = () => {
   const draft = Draft.read();
+  
   const actives = draft.identities.filter( i => i.active === true );
   if ( actives.length === 0 ) {
     Draft.pushAlert( "You must select an identity to publish this post." );
     return false;
   }
+  
+  const stales = actives.filter( i => i.stale === true );
+  if ( stales.length > 0 ) {
+    Draft.pushAlert( "One of the selected identities has a lapsed integration and cannot be used publish." );
+    return false;
+  }
+
   const reddits = actives.filter( i => i.platform === "reddit" );
   if ( reddits.length > 1 ) {
     Draft.pushAlert( "You may only publish with on Reddit identity at a time." );
     return false;    
   }
+  
   return true;
 };
 

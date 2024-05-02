@@ -4,13 +4,14 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import LinkPreview from "$lib/components/new-post/previews/LinkedinLinkPreview.svelte";
   import { onMount } from "svelte";
+  import { Source } from "$lib/engines/post";
   import { State, Identity, Media, Linkedin } from "$lib/engines/draft.js";
   import * as markdown from "$lib/helpers/markdown.js";
 
   const parser = new DOMParser();
   const serializer = new XMLSerializer();
 
-  let identity, options, content;
+  let identity, options, content, avatar;
   let displayedFiles, sensitiveOverride;
   const Render = State.make();
   Render.cleanup = () => {
@@ -23,6 +24,7 @@
 
   Render.identity = ( draft ) => {
     identity = Identity.findActive( "linkedin" ) ?? {};
+    avatar = identity.profile_image ?? Source.fallback( identity );
   };
 
   Render.options = ( draft ) => {
@@ -100,15 +102,15 @@
     
   <div class="main">
     <header>
-      <div class="pfp"></div>
+      <div class="pfp">
+        <!-- svelte-ignore a11y-missing-attribute -->
+        <img src={avatar}>
+      </div>
       <div class="rows">
         <div class="row">
           <span class="name">{identity.prettyName}</span>
           <span class="interpunct">·</span>
           <span class="pointer">You</span>
-        </div>
-        <div class="row">
-          <span class="headline">I help professionals 10x their LinkedIn efficiency</span>
         </div>
         <div class="row">
           <span class="timestamp">now</span>
@@ -446,9 +448,16 @@
 
       <div>
         <sl-icon
-          src="/icons/arrow-90deg-right.svg">
+          src="/icons/repeat.svg">
         </sl-icon>
-        <span>Share</span>
+        <span>Repost</span>
+      </div>
+
+      <div>
+        <sl-icon
+          src="/icons/send-fill.svg">
+        </sl-icon>
+        <span>Send</span>
       </div>
     </footer>
   </div>
@@ -484,8 +493,14 @@
     height: 48px;
     width: 48px;
     border-radius: 48px;
-    background: var(--sl-color-neutral-400);
     margin-right: 0.5rem;
+    overflow: hidden;
+  }
+
+  .outer-frame .main header img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
   }
 
   .outer-frame > .main > header .rows {
@@ -531,11 +546,6 @@
     color: rgba(0, 0, 0, 0.6);
   }
 
-  .outer-frame > .main > header .headline {
-    font-size: 12px;
-    color: rgba(0, 0, 0, 0.6);
-  }
-
   .outer-frame > .main > header .pointer {
     font-size: 12px;
     color: rgba(0, 0, 0, 0.6);
@@ -549,7 +559,6 @@
 
   .outer-frame > .main > header .visibility {
     font-size: 15px;
-    min-width: max-content;
     color: rgba(0, 0, 0, 0.6);
   }
 
@@ -822,9 +831,9 @@
     flex-wrap: nowrap;
     justify-content: space-around;
     align-items: center;
-    height: 20px;
-    margin-top: 12px;
     color: #536471;
+    padding: 1rem 0 0.5rem 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.2);
   }
 
   .outer-frame > .main > footer div {
@@ -833,7 +842,7 @@
   }
 
   .outer-frame > .main > footer sl-icon {
-    font-size: 15px;
+    font-size: 20px;
     stroke-width: 2px;
     margin-right: 0.25rem;
   }

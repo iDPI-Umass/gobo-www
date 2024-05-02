@@ -5,6 +5,7 @@
   import "@shoelace-style/shoelace/dist/components/select/select.js";
   import "@shoelace-style/shoelace/dist/components/option/option.js";
   import "@shoelace-style/shoelace/dist/components/divider/divider.js";
+  import "@shoelace-style/shoelace/dist/components/alert/alert.js";
   import { onMount } from "svelte";
   import { replaceState } from "$app/navigation";
   import { State } from "$lib/engines/store.js";
@@ -318,6 +319,17 @@
 
   {#if platform === "linkedin"}
     <form bind:this={form} on:submit={Handle.submit}>
+      
+      <sl-alert
+        variant="primary"
+        open>
+        <sl-icon slot="icon" src="/icons/info-circle.svg"></sl-icon>
+
+        Due to LinkedIn's API restrictions, LinkedIn is write-only on Gobo. 
+        This means that on Gobo you can publish to LinkedIn but can't view
+        your LinkedIn feed.
+      </sl-alert>
+      
       <div class="buttons">
         <sl-button
           bind:this={button}
@@ -404,4 +416,9 @@
 
 
 <style>
+  form header {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
 </style>

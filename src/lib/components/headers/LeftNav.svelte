@@ -170,6 +170,7 @@
 
   nav > .cta::part(base) {
     background: var(--gobo-color-primary);
+    color: var(--gobo-color-primary-text);
     border: 1px solid var(--gobo-color-primary);
     display: flex;
     flex-direction: row;

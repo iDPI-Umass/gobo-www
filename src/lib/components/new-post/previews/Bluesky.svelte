@@ -4,13 +4,14 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import LinkPreview from "$lib/components/new-post/previews/LinkPreview.svelte";
   import { onMount } from "svelte";
+  import { Source } from "$lib/engines/post";
   import { State, Identity, Media, Bluesky } from "$lib/engines/draft.js";
   import * as markdown from "$lib/helpers/markdown.js";
 
   const parser = new DOMParser();
   const serializer = new XMLSerializer();
 
-  let identity, options, content;
+  let identity, options, content, avatar;
   let displayedFiles, sensitiveOverride;
   const Render = State.make();
   Render.cleanup = () => {
@@ -23,6 +24,7 @@
 
   Render.identity = ( draft ) => {
     identity = Identity.findActive( "bluesky" ) ?? {};
+    avatar = identity.profile_image ?? Source.fallback( identity );
   };
 
   // In this case, we only care about "sensitive" on attachments.
@@ -91,7 +93,10 @@
 <article class="outer-frame">
   
   <div class="gutter">
-    <div class="pfp"></div>
+    <div class="pfp">
+      <!-- svelte-ignore a11y-missing-attribute -->
+      <img src={avatar}>
+    </div>
   </div>
   
   
@@ -458,7 +463,14 @@
     height: 48px;
     width: 48px;
     border-radius: 48px;
-    background: var(--sl-color-neutral-400);
+    margin-right: 0.5rem;
+    overflow: hidden;
+  }
+
+  .outer-frame > .gutter > .pfp img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
   }
 
   .outer-frame > .main {

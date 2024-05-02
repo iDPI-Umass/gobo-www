@@ -2,24 +2,32 @@
   import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/switch/switch.js";
+  import "@shoelace-style/shoelace/dist/components/alert/alert.js";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
   import { onMount } from "svelte";
+  import { goto } from "$app/navigation";
   import { State } from "$lib/engines/store.js";
   import { Identity, Name } from "$lib/engines/identity.js";
   import { Filter } from "$lib/engines/filter";
   import * as identityStores from "$lib/stores/identity.js";
 
   export let identity;
-  
+
+  const writeOnlys = [
+    "linkedin"
+  ];
+
   let deleteButton;
   let logo = `/icons/${ identity.platform }.svg`;
-  let state, names, avatar, fallback;
+  let state, names, avatar, fallback, isWriteOnly, isStale;
   const Render = State.make();
   Render.cleanup = () => {
     state = "loading";
     names = [];
     avatar = "";
     fallback = "";
+    isWriteOnly = false;
+    isStale = false;
   };
 
   Render.identity = ( list ) => {
@@ -35,6 +43,8 @@
 
     avatar = Identity.avatar( match );
     fallback = Identity.fallback( match );
+    isWriteOnly = writeOnlys.includes( match.platform );
+    isStale = match.stale === true;
     state = "ready";
   };
 
@@ -67,6 +77,10 @@
     identity.active = event.target.checked;
     await Identity.update( identity );
   });
+
+  Handle.reauthorize = async () => {
+    goto("/identities/add");
+  };
 
 
   Render.reset();
@@ -106,11 +120,35 @@
 
     </div>
 
-
-    <h2>
+    <header>
       <sl-icon src={logo} class="{identity.platform}"></sl-icon>
-      { identity.platform }
-    </h2>
+      <h2>
+        { identity.platform }
+      </h2>
+
+      {#if isWriteOnly}
+        <div class="badge">
+          Write-Only
+        </div>
+      {/if}
+    </header>
+
+    {#if isStale === true}
+      <sl-alert variant="warning" open>
+        <sl-icon slot="icon" src="/icons/exclamation-triangle.svg"></sl-icon>
+        <p class="message">
+          Gobo is not able to access this identity.
+          To restore access, please re-authorize Gobo.
+        </p>
+        <sl-button
+          on:click={Handle.reauthorize}
+          variant="primary"
+          class="submit"
+          pill>
+          Reauthorize
+        </sl-button>
+      </sl-alert>
+    {/if}
 
 
     <figure>
@@ -160,6 +198,56 @@
     }
   }
 
+  header {
+    width: 100%;
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-start;
+    align-items: center;
+    margin: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex);
+  }
+
+  header sl-icon {
+    font-size: 1.25rem;
+  }
+
+  h2 {
+    font-size: 1rem;
+    font-weight: var(--gobo-font-weight-black);
+    text-transform: capitalize;
+    margin-right: var(--gobo-width-spacer-flex);   
+  }
+  
+  header .badge {
+    background-color: var(--gobo-color-null);
+    color: var(--gobo-color-text);
+    font-weight: var(--gobo-font-weight-black);
+    font-size: 14px;
+    padding: 0.25rem 0.5rem;
+    border-radius: 1rem;
+  }
+
+  sl-alert {
+    margin: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex);
+  }
+
+  sl-alert::part(message) {
+    display: flex;
+    justify-content: end;
+    flex-wrap: wrap;
+    gap: var(--gobo-width-spacer-flex) var(--gobo-height-spacer-flex);
+  }
+
+  sl-alert sl-button {
+    align-self: center;
+  }
+
+  @media ( min-width: 500px ) {
+    sl-alert::part(message) {
+      flex-wrap: nowrap;
+    }
+  }
+
   figure {
     margin: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex);
     display: flex;
@@ -182,25 +270,6 @@
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: flex-start;
-  }
-
-  h2 {
-    flex: 1 0 100%;
-    font-size: 1rem;
-    font-weight: var(--gobo-font-weight-black);
-    text-transform: capitalize;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    align-items: center;
-    margin-top: var(--gobo-height-spacer-flex);
-    padding-left: var(--gobo-width-spacer-flex);
-  }
-
-  h2 sl-icon {
-    font-size: 1.25rem;
-    margin-right: 0.5rem;
   }
 
 

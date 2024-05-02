@@ -185,6 +185,8 @@ Source.fallback = ( source ) => {
       return "/icons/bluesky-avatar.png";
     case "reddit":
       return "/icons/reddit-avatar.png";
+    default:
+      return "/icons/mastodon-avatar.png";
   }
 };
 

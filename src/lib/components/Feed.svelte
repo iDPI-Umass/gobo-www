@@ -77,6 +77,14 @@
     Feed.pull( 25 );
   };
 
+  Handle.styleOverrides = ( index ) => {
+    if ( index === 0 ) {
+      return { marginTop: "0" };
+    } else {
+      return {};
+    }
+  };
+
 
   Render.reset();
   onMount(() => {
@@ -110,8 +118,11 @@
       </p> 
     </section>
   {:else if state === "ready"}
-    {#each posts as { identity, post, key } (key) }
-      <Post {identity} id={post.id}></Post>
+    {#each posts as { identity, post, key }, index (key) }
+      <Post 
+        {identity}
+        id={post.id}
+        styleOverrides={Handle.styleOverrides(index)}></Post>
     {/each}
   {:else}
     <section class="gobo-copy">
