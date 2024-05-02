@@ -50,7 +50,7 @@
   <section class="gobo-copy">
     <p>
       Control which identities you would like to include in your Gobo feed. 
-      You can add identities from Bluesky, Linkedin, Mastodon, and Reddit.
+      You can add identities from Bluesky, LinkedIn, Mastodon, and Reddit.
     </p> 
   </section>
   

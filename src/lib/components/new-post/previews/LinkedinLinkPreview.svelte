@@ -46,7 +46,7 @@
       <header>
         <h2>{card.title}</h2>
       </header>
-      <p>{domain} · 3 min read</p>
+      <p>{domain} · x min read</p>
     </section>
   </div>
 {/if}
