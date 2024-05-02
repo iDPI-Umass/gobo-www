@@ -59,6 +59,11 @@ Identity.load = async () => {
   Identity.updateAll();
 };
 
+Identity.refresh = async () => {
+  singletonList = Identity.list();
+  Identity.load();
+};
+
 Identity.update = async ( identity ) => {
   const match = await Identity.find( identity.id );
   Object.assign( match, identity );

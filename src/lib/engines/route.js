@@ -1,6 +1,7 @@
 import { goto } from "$app/navigation";
 import * as LS from  "$lib/helpers/local-storage.js";
 import { App, Clients, Gobo } from "$lib/engines/account.js";
+import { Identity as IdentityEngine } from "$lib/engines/identity.js";
 import * as Welcome from "$lib/helpers/welcome.js";
 
 const exists = function ( value ) {
@@ -117,6 +118,7 @@ Callback.identity = async ( query ) => {
     await Identity.add( query );
     Identity.clearStorage();
     LS.write( "gobo-building-feed", true );
+    IdentityEngine.refresh();
     return goto( "/identities" );
   
   } catch ( error ) {
