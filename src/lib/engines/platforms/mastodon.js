@@ -7,9 +7,18 @@ const Mastodon = {};
 Mastodon.limits = {
   characters: 500,
   attachments: 4,
+
+  // From: https://docs.joinmastodon.org/user/posting/#media
   images: {
-    types: [],
-    size: 1
+    types: [
+      "image/gif",
+      "image/heic",
+      "image/heif",
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+    ],
+    size: 16000000  // 16 MB
   }
 };
 
@@ -74,6 +83,36 @@ Mastodon.build = ( draft ) => {
   };
 };
 
+
+Mastodon.validateAttachments = ( draft ) => {
+  const limits = Mastodon.limits.images;
+  for ( const attachment of draft.attachments ) {
+    const type = attachment.file.type;
+    if ( !type.startsWith( "image" )) {
+      Draft.pushAlert(
+        `Gobo currently supports images only.`
+      );
+      return false;      
+    }
+    
+    if ( !limits.types.includes( type )) {
+      Draft.pushAlert(
+        `Mastodon does not accept attachments of type ${ type }`
+      );
+      return false;
+    }
+
+    const size = attachment.file.size;
+    if ( size > limits.size ) {
+      Draft.pushAlert(
+        `Mastodon does not accept attachments larger than ${filesize( limits.size )}`
+      )
+      return false;
+    }
+  }
+  return true;
+};
+
 Mastodon.validate = ( draft ) => {
   if ( !Identity.hasMastodon() ) {
     return true;
@@ -98,6 +137,10 @@ Mastodon.validate = ( draft ) => {
     Draft.pushAlert(
       `Mastodon does not allow more than ${Mastodon.limits.attachments} attachments per post.`
     );
+    return false;
+  }
+
+  if ( !Mastodon.validateAttachments( draft )) {
     return false;
   }
 

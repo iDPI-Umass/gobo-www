@@ -7,8 +7,15 @@ Reddit.limits = {
   characters: 40000,
   attachments: 20,
   images: {
-    types: [],
-    size: 1
+    types: [
+      "image/gif",
+      "image/heic",
+      "image/heif",
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+    ],
+    size: 20000000  // 20 MB
   }
 };
 
@@ -30,6 +37,36 @@ Reddit.build = ( draft ) => {
     nsfw: draft.options.attachments.sensitive,
     reply
   };
+};
+
+
+Reddit.validateAttachments = ( draft ) => {
+  const limits = Reddit.limits.images;
+  for ( const attachment of draft.attachments ) {
+    const type = attachment.file.type;
+    if ( !type.startsWith( "image" )) {
+      Draft.pushAlert(
+        `Gobo currently supports images only.`
+      );
+      return false;      
+    }
+    
+    if ( !limits.types.includes( type )) {
+      Draft.pushAlert(
+        `Reddit does not accept attachments of type ${ type }`
+      );
+      return false;
+    }
+
+    const size = attachment.file.size;
+    if ( size > limits.size ) {
+      Draft.pushAlert(
+        `Reddit does not accept attachments larger than ${filesize( limits.size )}`
+      )
+      return false;
+    }
+  }
+  return true;
 };
 
 
@@ -72,6 +109,10 @@ Reddit.validate = ( draft ) => {
     Draft.pushAlert(
       `Reddit does not allow more than ${Reddit.limits.attachments} attachments per post.`
     );
+    return false;
+  }
+
+  if ( !Reddit.validateAttachments( draft )) {
     return false;
   }
 

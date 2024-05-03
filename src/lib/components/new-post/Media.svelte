@@ -3,6 +3,7 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
+  import { filesize } from "filesize";
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import { State, Draft, Options, Media } from "$lib/engines/draft.js";
@@ -211,12 +212,17 @@
     class="gobo-table">
     {#each attachments as attachment (attachment.file.name)}
       <div class="table-row">
-        <a
+        <div class="metadata">
+          <a
           href="/upload-preview"
           on:click={Handle.preview( attachment )}
           on:keydown={Handle.preview( attachment )}>
           { attachment.file.name }
-        </a>
+          </a>
+          <p>
+            Size: {filesize( attachment.file.size )}
+          </p>
+        </div>
         <sl-icon-button
           class="danger"
           label="Delete File" 
@@ -260,8 +266,27 @@
     margin-top: var(--gobo-height-spacer-flex);
   }
 
-  .table-row sl-icon-button {
-    margin-left: 1rem;
+  .table-row {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .table-row > .metadata {
+    flex: 1 1 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    justify-content: start;
+    align-items: start;
+  }
+
+  .table-row > .metadata > a {
+    word-break: break-all;
+  }
+
+  .table-row > .metadata > p {
+    font-size: 1rem !important;
+    margin: 0 !important;
   }
 
   .buttons {

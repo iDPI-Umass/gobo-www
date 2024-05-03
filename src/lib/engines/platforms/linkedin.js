@@ -1,4 +1,5 @@
 import * as linkify from "linkifyjs";
+import { filesize } from "filesize";
 import { Draft, Identity } from "$lib/engines/draft.js";
 
 
@@ -7,14 +8,18 @@ const Linkedin = {};
 Linkedin.limits = {
   characters: 3000,
   attachments: 20,
+
+  // From: https://www.linkedin.com/help/linkedin/answer/a564109
   images: {
     types: [
+      "image/gif",
+      "image/heic",
+      "image/heif",
       "image/jpeg",
       "image/png",
       "image/webp",
-      "image/gif"
     ],
-    size: 104857600  // 100 MiB
+    size: 100000000  // 100 MB
   }
 };
 
@@ -83,6 +88,36 @@ Linkedin.build = async ( draft ) => {
 };
 
 
+Linkedin.validateAttachments = ( draft ) => {
+  const limits = Linkedin.limits.images;
+  for ( const attachment of draft.attachments ) {
+    const type = attachment.file.type;
+    if ( !type.startsWith( "image" )) {
+      Draft.pushAlert(
+        `Gobo currently supports images only.`
+      );
+      return false;      
+    }
+
+    if ( !limits.types.includes( type )) {
+      Draft.pushAlert(
+        `LinkedIn does not accept attachments of type ${ type }`
+      );
+      return false;
+    }
+
+    const size = attachment.file.size;
+    if ( size > limits.size ) {
+      Draft.pushAlert(
+        `LinkedIn does not accept attachments larger than ${filesize( limits.size )}`
+      )
+      return false;
+    }
+  }
+  return true;
+};
+
+
 Linkedin.validate = ( draft ) => {
   if ( !Identity.hasLinkedin() ) {
     return true;
@@ -107,6 +142,10 @@ Linkedin.validate = ( draft ) => {
     Draft.pushAlert(
       `LinkedIn does not allow more than ${Linkedin.limits.attachments} attachments per post.`
     );
+    return false;
+  }
+
+  if ( !Linkedin.validateAttachments( draft )) {
     return false;
   }
 

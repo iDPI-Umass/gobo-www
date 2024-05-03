@@ -26,16 +26,6 @@
   font-size: 1.25rem;
 }
 
-.gobo-table > .table-row > *:first-child {
-  margin-left: 0;
-}
-
-.gobo-table > .table-row > *:last-child {
-  margin-left: 1rem;
-  margin-right: 0;
-}
-
-
 .gobo-table > .table-row > * {
   margin: 0;
 }

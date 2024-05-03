@@ -44,14 +44,14 @@
     justify-content: center;
     align-items: start;
     background: #333;
-    padding-top: 1rem;
+    padding: 1rem;
   }
 
   .frame {
     flex: 1 1 100%;
     min-height: 0;
     width: 100%;
-    padding: 1rem;
+    padding-top: 1rem;
     display: flex;
     justify-content: center;
     align-items: center;

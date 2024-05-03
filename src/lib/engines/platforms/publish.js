@@ -83,7 +83,11 @@ Publish.flow = async function ( draft ) {
     post.attachments = await Publish.uploadAttachments( draft );
   } catch ( error ) {
     console.error( error );
-    Draft.pushAlert( "Failed to upload images." );
+    if ( error.status === 413 ) {
+      Draft.pushAlert( "Image was too large to upload" );
+    } else {
+      Draft.pushAlert( "Failed to upload images." );
+    }
     return { success: false };
   }
   

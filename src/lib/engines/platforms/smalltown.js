@@ -7,9 +7,18 @@ const Smalltown = {};
 Smalltown.limits = {
   characters: 500,
   attachments: 4,
+
+  // From: https://docs.joinmastodon.org/user/posting/#media
   images: {
-    types: [],
-    size: 1
+    types: [
+      "image/gif",
+      "image/heic",
+      "image/heif",
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+    ],
+    size: 16000000  // 16 MB
   }
 };
 
@@ -32,6 +41,35 @@ Smalltown.build = ( draft ) => {
   };
 };
 
+
+Smalltown.validateAttachments = ( draft ) => {
+  const limits = Smalltown.limits.images;
+  for ( const attachment of draft.attachments ) {
+    const type = attachment.file.type;
+    if ( !type.startsWith( "image" )) {
+      Draft.pushAlert(
+        `Gobo currently supports images only.`
+      );
+      return false;      
+    }
+    
+    if ( !limits.types.includes( type )) {
+      Draft.pushAlert(
+        `Smalltown does not accept attachments of type ${ type }`
+      );
+      return false;
+    }
+
+    const size = attachment.file.size;
+    if ( size > limits.size ) {
+      Draft.pushAlert(
+        `Smalltown does not accept attachments larger than ${filesize( limits.size )}`
+      )
+      return false;
+    }
+  }
+  return true;
+};
 
 Smalltown.validate = ( draft ) => {
   if ( !Identity.hasSmalltown() ) {
@@ -57,6 +95,10 @@ Smalltown.validate = ( draft ) => {
     Draft.pushAlert(
       `Smalltown does not allow more than ${Smalltown.limits.attachments} attachments per post.`
     );
+    return false;
+  }
+
+  if ( !Smalltown.validateAttachments( draft )) {
     return false;
   }
 

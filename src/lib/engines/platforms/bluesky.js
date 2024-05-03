@@ -1,4 +1,5 @@
 import * as linkify from "linkifyjs";
+import { filesize } from "filesize";
 import { RichText, BskyAgent, UnicodeString } from "@atproto/api";
 import { Draft, Identity } from "$lib/engines/draft.js";
 import * as Image from "$lib/resources/draft-image.js";
@@ -183,6 +184,30 @@ Bluesky.build = async ( draft ) => {
 };
 
 
+
+Bluesky.validateAttachments = ( draft ) => {
+  const limits = Bluesky.limits.images;
+  for ( const attachment of draft.attachments ) {
+    const type = attachment.file.type;
+    if ( !limits.types.includes( type )) {
+      Draft.pushAlert(
+        `Bluesky does not accept attachments of type ${ type }`
+      );
+      return false;
+    }
+
+    const size = attachment.file.size;
+    if ( size > limits.size ) {
+      Draft.pushAlert(
+        `Bluesky does not accept attachments larger than ${filesize( limits.size )}`
+      )
+      return false;
+    }
+  }
+  return true;
+};
+
+
 Bluesky.validate = ( draft ) => {
   if ( !Identity.hasBluesky() ) {
     return true;
@@ -207,6 +232,10 @@ Bluesky.validate = ( draft ) => {
     Draft.pushAlert(
       `Bluesky does not allow more than ${Bluesky.limits.attachments} attachments per post.`
     );
+    return false;
+  }
+
+  if ( !Bluesky.validateAttachments( draft )) {
     return false;
   }
 

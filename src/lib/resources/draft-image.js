@@ -18,6 +18,7 @@ const create = async function ({ file, name, alt }) {
     if ( error.status === 401 ) {
       return await App.logout();
     }
+    throw error;
   }
 };
 
