@@ -353,7 +353,6 @@
     padding: var(--gobo-height-spacer-half) var(--gobo-width-spacer-flex);
     margin-bottom: 0;
     border: none;
-    border-bottom: var(--gobo-border-panel);
     border-radius: var(--gobo-border-radius) var(--gobo-border-radius) 0 0;
   }
 
