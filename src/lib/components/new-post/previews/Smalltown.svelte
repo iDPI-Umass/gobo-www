@@ -5,7 +5,8 @@
   import LinkPreview from "$lib/components/new-post/previews/LinkPreview.svelte";
   import { onMount } from "svelte";
   import { Source } from "$lib/engines/post";
-  import { State, Identity, Media, Smalltown } from "$lib/engines/draft.js";
+  import { State, Identity, Media } from "$lib/engines/draft.js";
+  import { Smalltown } from "$lib/engines/platforms/smalltown.js";
   import * as markdown from "$lib/helpers/markdown.js";
 
   let identity, options, content, avatar;

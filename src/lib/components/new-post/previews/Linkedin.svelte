@@ -5,7 +5,8 @@
   import LinkPreview from "$lib/components/new-post/previews/LinkedinLinkPreview.svelte";
   import { onMount } from "svelte";
   import { Source } from "$lib/engines/post";
-  import { State, Identity, Media, Linkedin } from "$lib/engines/draft.js";
+  import { State, Identity, Media } from "$lib/engines/draft.js";
+  import { Linkedin } from "$lib/engines/platforms/linkedin.js";
   import * as markdown from "$lib/helpers/markdown.js";
 
   const parser = new DOMParser();

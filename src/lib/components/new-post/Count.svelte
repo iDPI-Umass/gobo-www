@@ -4,14 +4,14 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import { onMount } from "svelte";
   import { Post } from "$lib/engines/post.js";
+  import { State } from "$lib/engines/draft.js";
   import { 
-    State, 
     Bluesky, 
     Linkedin,
     Mastodon, 
     Smalltown, 
     Reddit 
-  } from "$lib/engines/draft.js";
+  } from "$lib/engines/platforms/index.js";
 
   export let platform;
   

@@ -2,7 +2,9 @@
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
-  import { State, Draft, Name, Validate } from "$lib/engines/draft.js";
+  import { State, Draft, Name } from "$lib/engines/draft.js";
+  import { Validate, Publish } from "$lib/engines/platforms/index.js";
+
 
   let publishButton, nameParts;
   const Render = State.make();
@@ -33,7 +35,7 @@
     
     publishButton.loading = true;
     const draft = Draft.read();
-    const result = await Draft.publish( draft );
+    const result = await Publish.flow( draft );
     publishButton.loading = false;
     
     if ( result.success === true ) {
