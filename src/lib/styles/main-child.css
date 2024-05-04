@@ -6,14 +6,14 @@
   flex-direction: column;
   flex-wrap: nowrap;
   justify-content: flex-start;
-  padding: 0 0 10rem 0;
+  padding: 0 0 6rem 0;
   max-width: var(--gobo-max-width-primary);
   overflow: scroll;
 }
 
 @media ( min-width: 750px ) {
   .main-child {
-    padding: var(--gobo-height-spacer-flex) var(--gobo-width-spacer) 10rem var(--gobo-width-spacer);
+    padding: var(--gobo-height-spacer-flex) var(--gobo-width-spacer) 3rem var(--gobo-width-spacer);
   }
 }
 
