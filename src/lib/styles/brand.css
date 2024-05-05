@@ -52,3 +52,11 @@ sl-icon.twitter {
 sl-icon.smalltown {
   color: var(--gobo-color-smalltown);
 }
+
+sl-icon.disabled {
+  opacity: 0.4;
+}
+
+sl-icon.warning {
+  color: var(--sl-color-warning-600);
+}

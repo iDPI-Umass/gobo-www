@@ -38,7 +38,7 @@
     isStale = false;
   };
 
-  Render.identity = ( list ) => {
+  Render.identity = async ( list ) => {
     const match = list.find( i => i.id === identity.id );
     if ( match == null ) {
       return;
@@ -53,6 +53,13 @@
     fallback = Identity.fallback( match );
     isWriteOnly = writeOnlys.includes( match.platform );
     isStale = match.stale === true;
+
+    if ( isStale === true && identity.active === true ) {
+      identity.active = false;
+      await Identity.update( identity );
+      return;
+    }
+
     state = "ready";
   };
 
@@ -138,6 +145,7 @@
     <div>
       <sl-switch
         on:sl-change={Handle.toggle}
+        disabled={isStale}
         checked={identity.active}
         size="medium">
         Active
@@ -157,25 +165,12 @@
 
 
     <div class="inner">
-      <header>
-        <sl-icon src={logo} class="{identity.platform}"></sl-icon>
-        <h2>
-          { prettyNames[identity.platform] }
-        </h2>
-  
-        {#if isWriteOnly}
-          <div class="badge">
-            Write-Only
-          </div>
-        {/if}
-      </header>
-  
       {#if isStale === true}
         <sl-alert variant="warning" open>
           <sl-icon slot="icon" src="/icons/exclamation-triangle.svg"></sl-icon>
           <p class="message">
             Gobo is not able to access this identity.
-            To restore access, please re-authorize Gobo.
+            To restore access, please reauthorize Gobo.
           </p>
           <sl-button
             bind:this={reauthorizeButton}
@@ -187,14 +182,32 @@
           </sl-button>
         </sl-alert>
       {/if}
+
+      <header>
+        <sl-icon
+          src={logo} 
+          class:disabled={isStale}
+          class="{identity.platform}">
+        </sl-icon>
+        
+        <h2>
+          { prettyNames[identity.platform] }
+        </h2>
   
-  
+        {#if isWriteOnly}
+          <div class="badge">
+            Write-Only
+          </div>
+        {/if}
+      </header>
+    
       <figure>
   
         <img
-          src="{avatar}" 
+          src="{avatar}"
           alt="profile picture for {identity.prettyName}"
-          onerror="this.onerror=null;this.src='{fallback}'">
+          onerror="this.onerror=null;this.src='{fallback}'"
+          class:disabled={isStale}>
         
         <figcaption>
   
@@ -365,6 +378,10 @@
   section > div > sl-icon-button::part(base),
   section > div > sl-icon-button::part(base):hover {
     color: var(--gobo-color-danger);
+  }
+
+  .disabled {
+    opacity: 0.4;
   }
 
 </style>

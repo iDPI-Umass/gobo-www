@@ -9,20 +9,38 @@
   import { Filter } from "$lib/engines/filter.js";
   import * as identityStores from "$lib/stores/identity.js";
 
-  let state, identities, filters;
+  let state, identities, filters, hasStale;
   const Render = State.make();
   Render.cleanup = () => {
     state = "loading";
     identities = [];
     filters = [];
+    hasStale = false;
   };
 
   Render.menu = async () => {
     const results = await Promise.all([
-      Identity.findActive(),
+      Identity.read(),
       Filter.findActive()
     ]);
-    identities = results[0];
+
+    let allIdentities = results[0];    
+    const list = [];
+    for ( const identity of allIdentities ) {
+      if ( identity.stale === true ) {
+        hasStale = true;
+      }
+      if ( identity.active === true ) {
+        if ( identity.stale === true ) {
+          identity.active = false;
+          await Identity.update( identity );
+          return;
+        }
+        list.push( identity );
+      }
+    }
+    
+    identities = list;
     filters = results[1];
     state = "ready";
   };
@@ -55,6 +73,14 @@
       </sl-icon>
 
       {identities.length}
+
+      {#if hasStale}
+        <sl-icon
+          src="/icons/exclamation-triangle.svg"
+          class="warning"
+          slot="suffix">
+        </sl-icon>
+      {/if}
     </sl-button>
 
 
@@ -115,6 +141,10 @@
   }
 
   nav sl-button sl-icon.lens-label {
+    font-size: 1.25rem;
+  }
+
+  nav sl-button sl-icon.warning {
     font-size: 1.25rem;
   }
 

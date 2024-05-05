@@ -11,8 +11,24 @@
   
   let activeSwitch;
   let logo = `/icons/${ identity.platform }.svg`;
+  let isStale;
   const Render = State.make();
+  
+  Render.cleanup = () => {
+    isStale = false;
+  };
 
+  Render.identity = async () => {
+    if ( identity.stale === true ) {
+      isStale = true;
+    }
+
+    if ( isStale === true && identity.active === true ) {
+      identity.active = false;
+      await Identity.update( identity );
+      return;
+    }
+  };
   
   const Handle = {};
   Handle.toggle = async ( event ) => {
@@ -25,6 +41,7 @@
 
   Render.reset();
   onMount(() => {
+    Render.identity()
     return () => {
       Render.reset();
     };
@@ -33,15 +50,28 @@
 
 <section>
 
-  <span>
-    <sl-icon src={logo} class="{identity.platform}"></sl-icon>
-    <p>{ identity.prettyName }</p>
-  </span>
+  <sl-icon
+    src={logo}
+    class="{identity.platform}"
+    class:disabled={isStale}>
+  </sl-icon>
+  
+  {#if isStale}
+    <sl-icon
+      src="/icons/exclamation-triangle.svg"
+      class="warning">
+    </sl-icon>
+  {/if}
+
+  <p>
+    { identity.prettyName }
+  </p>
 
   <sl-switch
     bind:this={activeSwitch}
     checked={identity.active}
     on:sl-change={Handle.toggle}
+    disabled={isStale}
     size="medium">
   </sl-switch>
 
@@ -51,42 +81,32 @@
   section {
     display: flex;
     flex-direction: row;
-    flex-wrap: nowrap;
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    margin-bottom: var(--gobo-height-spacer-flex);
+    margin-top: var(--gobo-height-spacer-flex);
   }
 
-  section > span {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: space-between;
-    align-items: center;
-    margin-right: 0.5rem;
-  }
-
-  section > span > p {
-    font-size: var(--gobo-font-size-detail);
-    max-width: 11rem;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-  }
-
-  sl-icon {
+  section sl-icon {
+    flex: 0 0 auto;
     font-size: 1.25rem;
     margin-right: 0.5rem;
   }
 
-
-  p {
-    font-size: var(--gobo-font-size-copy);
+  section p {
+    flex: 1 1 100%;
+    font-size: var(--gobo-font-size-detail);
     font-weight: var(--gobo-font-weight-regular);
     color: var(--gobo-color-text-muted);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin-right: 0.5rem;
   }
 
+  section sl-switch {
+    flex: 0 0 auto;
+  }
 </style>
 
 

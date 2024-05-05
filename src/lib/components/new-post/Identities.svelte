@@ -3,7 +3,8 @@
   import "@shoelace-style/shoelace/dist/components/switch/switch.js";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
   import { onMount } from "svelte";
-  import { State, Draft, Lock, Name } from "$lib/engines/draft.js";
+  import { State, Draft, Lock, Name, Identity } from "$lib/engines/draft.js";
+  import { Identity as IdentityEngine } from "$lib/engines/identity.js";
 
   let state, visual, identities, lockedIdentity;
   const Render = State.make();
@@ -15,7 +16,39 @@
     lockedIdentity = null;
   };
 
-  Render.identities = ( draft ) => {
+  const Validate = {};
+
+  Validate.identities = async ( draft ) => {
+    const list = await IdentityEngine.read();
+    const map = {}
+    for ( const identity of list ) {
+      map[ identity.id ] = identity;
+    }
+
+    for ( const identity of draft.identities ) {
+      const match = map[ identity.id ];
+      if ( match == null ) {
+        await Identity.sync()
+        return false;
+      }
+
+      identity.stale = match.stale;
+      if ( identity.stale === true && identity.active === true ) {
+        identity.active = false;
+        Draft.updateAspect( "identities", draft.identities );
+        return false;
+      }
+    }
+    
+    return true;
+  };
+
+  Render.identities = async ( draft ) => {
+    const isValid = await Validate.identities( draft );
+    if ( !isValid ) {
+      return;
+    }
+
     identities = draft.identities;
     lockedIdentity = Lock.getIdentity();
     if ( identities.length === 0 ) {
@@ -88,6 +121,10 @@
       </div>
 
     {:else}
+    <!-- 
+      We are really pushing it here. 
+      Should probably be standalone component  
+    -->
       {#each identities as identity (identity.key)}
         <div class="identity">
           
@@ -95,8 +132,17 @@
             <sl-icon 
               src="/icons/{identity.platform}.svg" 
               class="{identity.platform}"
+              class:disabled={identity.stale}
               size="medium">
             </sl-icon>
+            
+            {#if identity.stale}
+              <sl-icon
+                src="/icons/exclamation-triangle.svg"
+                class="warning">
+              </sl-icon>
+            {/if}
+
             <span>
               {#each Name.split(identity.prettyName) as part}
                 <span>{ part }</span>
@@ -106,7 +152,7 @@
 
           <sl-switch
             checked={identity.active}
-            disabled={false}
+            disabled={identity.stale}
             on:sl-change={Handle.toggle( identity )}
             size="medium">
           </sl-switch>
