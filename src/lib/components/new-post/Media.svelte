@@ -126,11 +126,13 @@
   Handle.fileChrome = ( event ) => {
     fileInput.click();
   };
+  
   Handle.fileChromeKey = ( event ) => {
     if ( event.key === "Enter" ) {
       fileInput.click();
     }
   };
+  
   Handle.preview = ( attachment ) => {
     return ( event ) => {
       event.preventDefault();
@@ -138,6 +140,7 @@
       goto( "/upload-preview" );
     }
   };
+  
   Handle.delete = ( attachment ) => {
     return ( event ) => {
       event.preventDefault();
@@ -153,6 +156,7 @@
       }
     }
   };
+  
   Handle.edit = ( attachment ) => {
     return ( event ) => {
       event.preventDefault();
@@ -230,13 +234,17 @@
           on:click={Handle.delete( attachment )}
           on:keydown={Handle.delete( attachment )}>>
         </sl-icon-button>
-        <sl-icon-button
-          class="warning"
-          label="Edit Alt" 
-          src="/icons/pencil-square.svg"
-          on:click={Handle.edit( attachment )}
-          on:keydown={Handle.edit( attachment )}>>
-        </sl-icon-button>
+
+        {#if Media.isImage(attachment.file)}
+          <sl-icon-button
+            class="warning"
+            label="Edit Alt" 
+            src="/icons/pencil-square.svg"
+            on:click={Handle.edit( attachment )}
+            on:keydown={Handle.edit( attachment )}>>
+          </sl-icon-button>
+        {/if}
+      
       </div>
     {/each}
   </div>

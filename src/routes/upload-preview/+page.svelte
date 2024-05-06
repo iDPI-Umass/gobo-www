@@ -2,18 +2,31 @@
   import BackLink from "$lib/components/primitives/BackLink.svelte";
   import { onMount } from "svelte";
   import { State } from "$lib/engines/store.js";
+  import { Media } from "$lib/engines/draft.js"
   import { previewStore } from "$lib/stores/image-preview.js";
 
-  let previewImage;
+  let attachment, url;
   const Render = State.make();
 
-  Render.attachment = ( attachment ) => {
-    if ( attachment.file.name != null ) {
-      if ( previewImage.src !== "#" ) {
-        URL.revokeObjectURL( previewImage.src );
-      }
-      previewImage.src = URL.createObjectURL( attachment.file );
+  Render.cleanup = () => {
+    attachment = null;
+    Render.url( null );
+  };
+
+  Render.url = ( file ) => {
+    if ( url != null ) {
+      URL.revokeObjectURL( url );
     }
+    if ( file == null ) {
+      url = null;
+    } else {
+      url = URL.createObjectURL( file );
+    }
+  };
+
+  Render.attachment = ( value ) => {
+    attachment = value;
+    Render.url( attachment.file );
   };
 
   Render.reset();
@@ -29,10 +42,23 @@
   <BackLink heading="Preview"></BackLink>
 
   <div class="frame">
-    <img
-      bind:this={previewImage}
-      src="#"
-      alt="preview of upload">
+    {#if attachment}
+      {#if Media.isImage(attachment.file)}
+        <img
+          src={url}
+          alt="preview of upload"/>
+      {:else if Media.isAudio(attachment.file)}
+        <audio
+          src={url}
+          controls>
+        </audio>
+      {:else if Media.isVideo(attachment.file)}
+        <!-- svelte-ignore a11y-media-has-caption -->
+        <video controls>
+          <source src={url} type={attachment.file.type} />
+        </video>
+      {/if}
+    {/if}
   </div>
 </div>
 
@@ -60,6 +86,13 @@
   img {
     height: 100%;
     width: 100%;
+    object-fit: contain;
+    object-position: 50% 50%;
+  }
+
+  video {
+    max-width: 100%;
+    max-height: 100%;
     object-fit: contain;
     object-position: 50% 50%;
   }

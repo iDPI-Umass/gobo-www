@@ -283,7 +283,9 @@ Options.update = ( group, name, value ) => {
 const Media = {
   isFile: ( value ) => Type.isType( File, value ),
   isImage: ( value ) => /^image/.test( value.type ),
+  isAudio: ( value ) => /^audio/.test( value.type ),
   isVideo: ( value ) => /^video/.test( value.type ),
+  isDocument: ( value ) => /^application/.test( value.type ),
 };
 
 
