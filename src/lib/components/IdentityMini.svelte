@@ -19,9 +19,7 @@
   };
 
   Render.identity = async () => {
-    if ( identity.stale === true ) {
-      isStale = true;
-    }
+    isStale = identity.stale === true;
 
     if ( isStale === true && identity.active === true ) {
       identity.active = false;
@@ -41,11 +39,12 @@
 
   Render.reset();
   onMount(() => {
-    Render.identity()
     return () => {
       Render.reset();
     };
   });
+
+  $: Render.identity( identity );
 </script>
 
 <section>
