@@ -6,7 +6,7 @@ const Reddit = {};
 Reddit.limits = {
   characters: 40000,
   attachments: 20,
-  images: {
+  image: {
     types: [
       "image/gif",
       "image/heic",
@@ -14,6 +14,14 @@ Reddit.limits = {
       "image/jpeg",
       "image/png",
       "image/webp",
+    ],
+    size: 20000000  // 20 MB
+  },
+
+  video: {
+    types: [
+      "video/mp4",
+      "video/quicktime",
     ],
     size: 20000000  // 20 MB
   }
@@ -40,35 +48,94 @@ Reddit.build = ( draft ) => {
 };
 
 
-Reddit.validateAttachments = ( draft ) => {
-  const limits = Reddit.limits.images;
-  for ( const attachment of draft.attachments ) {
-    const type = attachment.file.type;
-    if ( !type.startsWith( "image" )) {
-      Draft.pushAlert(
-        `Gobo currently supports images only.`
-      );
-      return false;      
-    }
-    
-    if ( !limits.types.includes( type )) {
-      Draft.pushAlert(
-        `Reddit does not accept attachments of type ${ type }`
-      );
-      return false;
-    }
+const Validate = {};
 
-    const size = attachment.file.size;
-    if ( size > limits.size ) {
-      Draft.pushAlert(
-        `Reddit does not accept attachments larger than ${filesize( limits.size )}`
-      )
-      return false;
-    }
+Validate.image = ( attachment ) => {
+  const limits = Reddit.limits.image
+
+  const type = attachment.file.type;
+  if ( !limits.types.includes(type) ) {
+    Draft.pushAlert(
+      `Reddit does not accept images of type ${ type }`
+    );
+    return false;
   }
+  
+  const size = attachment.file.size;
+  if ( size > limits.size ) {
+    Draft.pushAlert(
+      `Reddit does not accept image files larger than ${filesize( limits.size )}`
+    )
+    return false;
+  }
+
   return true;
 };
 
+Validate.video = ( attachment ) => {
+  const limits = Reddit.limits.video
+
+  const type = attachment.file.type;
+  if ( !limits.types.includes(type) ) {
+    Draft.pushAlert(
+      `Reddit does not accept video of type ${ type }`
+    );
+    return false;
+  }
+  
+  const size = attachment.file.size;
+  if ( size > limits.size ) {
+    Draft.pushAlert(
+      `Reddit does not accept video files larger than ${filesize( limits.size )}`
+    )
+    return false;
+  }
+
+  return true;
+};
+
+
+Reddit.validateAttachments = ( draft ) => {
+  if ( draft.attachments.length > Reddit.limits.attachments ) {
+    Draft.pushAlert(
+      `Reddit does not allow more than ${Reddit.limits.attachments} attachments per post.`
+    );
+    return false;
+  }
+
+  for ( const attachment of draft.attachments ) {
+    const name = attachment.file.name;
+    const category = attachment.file.type.split( "/" )[0];
+    if ( category == null ) {
+      Draft.pushAlert(
+        `Gobo cannot identify the media type of attachment ${ name }`
+      );
+      return false; 
+    }
+
+    if ( Validate[ category ] == null ) {
+      Draft.pushAlert(
+        `Reddit does not support type ${ attachment.file.type }`
+      );
+      return false; 
+    }
+
+    const isValid = Validate[category]( attachment );
+    if ( !isValid ) {
+      return false;
+    }
+  }
+
+  const hasVideo = !!draft.attachments.find( a => a.file.type.startsWith("video") );
+  if ( hasVideo && draft.attachments.length > 1 ) {
+    Draft.pushAlert(
+      `Reddit requires that video posts have no other attachments.`
+    );
+    return false;
+  }
+
+  return true;
+};
 
 Reddit.validate = ( draft ) => {
   if ( !Identity.hasReddit() ) {
@@ -86,28 +153,6 @@ Reddit.validate = ( draft ) => {
   if ( (draft.content == null) || (draft.content === "") ) {
     Draft.pushAlert(
       `Reddit does not allow empty post content.`
-    );
-    return false;
-  }
-
-  const options = draft.options.reddit;
-  if ( !options.subreddit ) {
-    Draft.pushAlert(
-      `Please specify the subreddit for this Reddit post.`
-    );
-    return false;
-  }
-
-  if ( !draft.options.general.title ) {
-    Draft.pushAlert(
-      `Please provide a title for this Reddit post.`
-    );
-    return false;
-  }
-
-  if ( draft.attachments.length > Reddit.limits.attachments ) {
-    Draft.pushAlert(
-      `Reddit does not allow more than ${Reddit.limits.attachments} attachments per post.`
     );
     return false;
   }

@@ -5,7 +5,7 @@ import { Linkedin } from "$lib/engines/platforms/linkedin.js";
 import { Mastodon } from "$lib/engines/platforms/mastodon.js";
 import { Reddit } from "$lib/engines/platforms/reddit.js";
 import { Smalltown } from "$lib/engines/platforms/smalltown.js";
-import * as Image from "$lib/resources/draft-image.js";
+import * as Image from "$lib/resources/draft-file.js";
 import * as Post from "$lib/resources/post.js";
 
 

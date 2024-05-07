@@ -172,6 +172,13 @@
               src={URL.createObjectURL( displayedFiles[0] )}
               alt="uploaded"
               on:load={Handle.singleImage}>
+          {:else if Media.isAudio( displayedFiles[0] )}
+          <!-- svelte-ignore a11y-media-has-caption -->
+          <audio controls>
+            <source 
+              src={URL.createObjectURL( displayedFiles[0] )}
+              type={displayedFiles[0].type}>
+          </audio>
           {:else if Media.isVideo( displayedFiles[0] )}
             <!-- svelte-ignore a11y-media-has-caption -->
             <video 

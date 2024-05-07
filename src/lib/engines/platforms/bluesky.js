@@ -2,7 +2,7 @@ import * as linkify from "linkifyjs";
 import { filesize } from "filesize";
 import { RichText, BskyAgent, UnicodeString } from "@atproto/api";
 import { Draft, Identity } from "$lib/engines/draft.js";
-import * as Image from "$lib/resources/draft-image.js";
+import * as File from "$lib/resources/draft-file.js";
 
 
 const Bluesky = {};
@@ -130,7 +130,7 @@ Bluesky.fetchCardImage = async ( url ) => {
 };
 
 Bluesky.uploadCardImage = async ( file ) => {
-  const draftImage = await Image.create({
+  const draftImage = await File.create({
     file,
     name: "link-card-image",
     alt: ""

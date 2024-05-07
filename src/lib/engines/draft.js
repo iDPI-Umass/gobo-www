@@ -280,12 +280,26 @@ Options.update = ( group, name, value ) => {
 
 
 
-const Media = {
-  isFile: ( value ) => Type.isType( File, value ),
-  isImage: ( value ) => /^image/.test( value.type ),
-  isAudio: ( value ) => /^audio/.test( value.type ),
-  isVideo: ( value ) => /^video/.test( value.type ),
-  isDocument: ( value ) => /^application/.test( value.type ),
+const Media = {};
+
+Media.isFile = ( value ) => Type.isType( File, value );
+
+Media.isImage = ( value ) => /^image/.test( value.type );
+Media.isAudio = ( value ) => /^audio/.test( value.type );
+Media.isVideo = ( value ) => /^video/.test( value.type );
+Media.isDocument = ( value ) => /^application/.test( value.type );
+
+Media.canPreview = ( value ) => {
+  if ( Media.isImage( value )) {
+    return true;
+  }
+  if ( Media.isAudio( value )) {
+    return true;
+  }
+  if ( Media.isVideo( value )) {
+    return true;
+  }
+  return false;
 };
 
 

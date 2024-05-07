@@ -1,6 +1,6 @@
 import * as linkify from "linkifyjs";
 import { filesize } from "filesize";
-import { Draft, Identity } from "$lib/engines/draft.js";
+import { Draft, Identity, Media } from "$lib/engines/draft.js";
 
 
 const Linkedin = {};
@@ -10,7 +10,7 @@ Linkedin.limits = {
   attachments: 20,
 
   // From: https://www.linkedin.com/help/linkedin/answer/a564109
-  images: {
+  image: {
     types: [
       "image/gif",
       "image/heic",
@@ -18,6 +18,58 @@ Linkedin.limits = {
       "image/jpeg",
       "image/png",
       "image/webp",
+    ],
+    size: 100000000  // 100 MB
+  },
+
+  // The above LinkedIn answer lists many media formats, but it must be focused
+  // too much on codecs, rather than mediatypes accepted by the API.
+  // Audio MP3 is explicitly listed, but on this *other* answer:
+  // https://www.linkedin.com/help/learning/answer/a702912
+  // we find out that MP3 audio MIME types are not allowed. You're expected
+  // to format it as a video with a static image, backed by that audio track.
+  // There is more work here.
+  audio: {
+    types: [
+      "audio/aac",
+      // "audio/mpeg", 
+      "audio/flac",
+      "audio/wav",
+      "audio/opus",
+      "audio/vorbis",      
+      "audio/ogg",
+    ],
+    size: 100000000  // 100 MB
+  },
+
+  video: {
+    types: [
+      "video/mp4",
+      "video/quicktime",
+      "video/avi",
+      "video/x-msvideo",
+      "video/webm",
+      "video/x-matroska",
+      "video/x-ms-wmv",
+      "video/x-ms-asf",
+      "video/vc1",
+      "video/mpeg",
+    ],
+    size: 100000000  // 100 MB
+  },
+
+  document: {
+    types: [
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/vnd.oasis.opendocument.text",
+      "application/vnd.ms-powerpoint",
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      "application/pdf",
+      "application/vnd.openxmlformats-officedocument.presentationml.slideshow",
+      "application/vnd.oasis.opendocument.spreadsheet",
+      "application/vnd.ms-excel",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     ],
     size: 100000000  // 100 MB
   }
@@ -88,32 +140,143 @@ Linkedin.build = async ( draft ) => {
 };
 
 
+const Validate = {};
+
+Validate.image = ( attachment ) => {
+  const limits = Linkedin.limits.image
+
+  const type = attachment.file.type;
+  if ( !limits.types.includes(type) ) {
+    Draft.pushAlert(
+      `LinkedIn does not accept images of type ${ type }`
+    );
+    return false;
+  }
+  
+  const size = attachment.file.size;
+  if ( size > limits.size ) {
+    Draft.pushAlert(
+      `LinkedIn does not accept image files larger than ${filesize( limits.size )}`
+    )
+    return false;
+  }
+
+  return true;
+};
+
+Validate.audio = ( attachment ) => {
+  const limits = Linkedin.limits.audio
+
+  const type = attachment.file.type;
+  if ( !limits.types.includes(type) ) {
+    Draft.pushAlert(
+      `LinkedIn does not accept audio of type ${ type }`
+    );
+    return false;
+  }
+  
+  const size = attachment.file.size;
+  if ( size > limits.size ) {
+    Draft.pushAlert(
+      `LinkedIn does not accept audio files larger than ${filesize( limits.size )}`
+    )
+    return false;
+  }
+
+  return true;
+};
+
+Validate.video = ( attachment ) => {
+  const limits = Linkedin.limits.video
+
+  const type = attachment.file.type;
+  if ( !limits.types.includes(type) ) {
+    Draft.pushAlert(
+      `LinkedIn does not accept video of type ${ type }`
+    );
+    return false;
+  }
+  
+  const size = attachment.file.size;
+  if ( size > limits.size ) {
+    Draft.pushAlert(
+      `LinkedIn does not accept video files larger than ${filesize( limits.size )}`
+    )
+    return false;
+  }
+
+  return true;
+};
+
+// TODO: integrate with the document API.
+Validate.application = ( attachment ) => {
+  Draft.pushAlert(
+    `Gobo does not currently support adding documents to LinkedIn posts.`
+  )
+  return false;
+
+  // const limits = Linkedin.limits.document
+
+  // const type = attachment.file.type;
+  // if ( !limits.types.includes(type) ) {
+  //   Draft.pushAlert(
+  //     `LinkedIn does not accept files of type ${ type }`
+  //   );
+  //   return false;
+  // }
+  
+  // const size = attachment.file.size;
+  // if ( size > limits.size ) {
+  //   Draft.pushAlert(
+  //     `LinkedIn does not accept files larger than ${filesize( limits.size )}`
+  //   )
+  //   return false;
+  // }
+
+  // return true;
+};
+
+
+
 Linkedin.validateAttachments = ( draft ) => {
-  const limits = Linkedin.limits.images;
+  if ( draft.attachments.length > Linkedin.limits.attachments ) {
+    Draft.pushAlert(
+      `LinkedIn does not allow more than ${Linkedin.limits.attachments} attachments per post.`
+    );
+    return false;
+  }
+
   for ( const attachment of draft.attachments ) {
-    const type = attachment.file.type;
-    if ( !type.startsWith( "image" )) {
+    const name = attachment.file.name;
+    const category = attachment.file.type.split( "/" )[0];
+    if ( category == null ) {
       Draft.pushAlert(
-        `Gobo currently supports images only.`
+        `Gobo cannot identify the media type of attachment ${ name }`
       );
-      return false;      
+      return false; 
     }
 
-    if ( !limits.types.includes( type )) {
+    if ( Validate[ category ] == null ) {
       Draft.pushAlert(
-        `LinkedIn does not accept attachments of type ${ type }`
+        `LinkedIn does not support type ${ attachment.file.type }`
       );
-      return false;
+      return false; 
     }
 
-    const size = attachment.file.size;
-    if ( size > limits.size ) {
-      Draft.pushAlert(
-        `LinkedIn does not accept attachments larger than ${filesize( limits.size )}`
-      )
+    const isValid = Validate[category]( attachment );
+    if ( !isValid ) {
       return false;
     }
   }
+
+  const hasVideo = !!draft.attachments.find( a => a.file.type.startsWith("video") );
+  if ( hasVideo && draft.attachments.length > 1 ) {
+    Draft.pushAlert(
+      `LinkedIn requires that video posts have no other attachments.`
+    );
+    return false;
+  }
+
   return true;
 };
 
@@ -134,13 +297,6 @@ Linkedin.validate = ( draft ) => {
   if ( (draft.content == null) || (draft.content === "") ) {
     Draft.pushAlert(
       `LinkedIn does not allow empty post content.`
-    );
-    return false;
-  }
-
-  if ( draft.attachments.length > Linkedin.limits.attachments ) {
-    Draft.pushAlert(
-      `LinkedIn does not allow more than ${Linkedin.limits.attachments} attachments per post.`
     );
     return false;
   }

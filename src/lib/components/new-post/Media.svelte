@@ -27,6 +27,7 @@
       }
     }
     attachments = draft.attachments;
+    const types = attachments.map( a => a.file.type );
   };
 
   Render.options = ( draft ) => {
@@ -34,14 +35,14 @@
   };
 
 
-
-  const File = {};
-  File.add = ( file ) => {
+  const Image = {};
+  Image.add = ( file ) => {
     const index = attachments.findIndex( a => a.file.name === file.name );
-
+    
     if ( index < 0 ) {
       altStore.set({ file, alt: null });
       goto("/new-post/alt");
+    
     } else {
       const match = attachments[ index ];
       if ( file.lastModified !== match.file.lastModified ) {
@@ -50,6 +51,34 @@
         Draft.updateAspect( "attachments", attachments );
         goto( "/new-post/alt" );
       }
+    }
+  };
+
+
+  const Attachment = {};
+  Attachment.add = ( file ) => {
+    const index = attachments.findIndex( a => a.file.name === file.name );
+
+    if ( index < 0 ) {
+      attachments.push({ file });
+      Draft.updateAspect( "attachments", attachments );
+    
+    } else {
+      const match = attachments[ index ];
+      if ( file.lastModified !== match.file.lastModified ) {
+        attachments.splice( index, 1, { file });
+        Draft.updateAspect( "attachments", attachments );
+      }
+    }
+  };
+
+
+  const File = {};
+  File.add = ( file ) => {
+    if ( Media.isImage( file )) {
+      Image.add( file );
+    } else {
+      Attachment.add( file );
     }
   };
 
@@ -217,24 +246,23 @@
     {#each attachments as attachment (attachment.file.name)}
       <div class="table-row">
         <div class="metadata">
-          <a
-          href="/upload-preview"
-          on:click={Handle.preview( attachment )}
-          on:keydown={Handle.preview( attachment )}>
-          { attachment.file.name }
-          </a>
+          
+          {#if Media.canPreview(attachment.file)}
+            <a
+              href="/upload-preview"
+              on:click={Handle.preview( attachment )}
+              on:keydown={Handle.preview( attachment )}>
+              { attachment.file.name }
+            </a>
+          {:else}
+            <p>{ attachment.file.name }</p>
+          {/if}
+
           <p>
             Size: {filesize( attachment.file.size )}
           </p>
         </div>
-        <sl-icon-button
-          class="danger"
-          label="Delete File" 
-          src="/icons/trash.svg"
-          on:click={Handle.delete( attachment )}
-          on:keydown={Handle.delete( attachment )}>>
-        </sl-icon-button>
-
+        
         {#if Media.isImage(attachment.file)}
           <sl-icon-button
             class="warning"
@@ -244,6 +272,14 @@
             on:keydown={Handle.edit( attachment )}>>
           </sl-icon-button>
         {/if}
+        
+        <sl-icon-button
+          class="danger"
+          label="Delete File" 
+          src="/icons/trash.svg"
+          on:click={Handle.delete( attachment )}
+          on:keydown={Handle.delete( attachment )}>>
+        </sl-icon-button>
       
       </div>
     {/each}

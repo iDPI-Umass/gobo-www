@@ -3,13 +3,19 @@ import { Gobo, App } from "$lib/engines/account.js";
 
 const create = async function ({ file, name, alt }) {
   const form = new FormData();
-  form.append("image", file, { filename: name ?? file.name });
-  form.append("name", name ?? file.name );
-  form.append("alt", alt );
+  const filename = name ?? file.name;
+  form.append("file", file, { filename });
+  form.append("name", filename );
+  if ( file.type != null && file.type !== "" ) {
+    form.append("mime_type", file.type );
+  } 
+  if ( alt != null && alt !== "" ) {
+    form.append("alt", alt );
+  }
   
   try {
     const client = await Gobo.get();
-    return await client.personDraftImages.post({
+    return await client.personDraftFiles.post({
       parameters: { person_id: client.id },
       content: form,
     });
@@ -26,7 +32,7 @@ const create = async function ({ file, name, alt }) {
 const remove = async function ( draft ) {
   try {
     const client = await Gobo.get();
-    return await client.personDraftImage.delete({
+    return await client.personDraftFile.delete({
       person_id: client.id,
       id: draft.id
     });

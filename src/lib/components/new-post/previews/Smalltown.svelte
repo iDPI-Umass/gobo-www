@@ -158,6 +158,13 @@
               <img 
                 src={URL.createObjectURL( displayedFiles[0] )}
                 alt="uploaded">
+            {:else if Media.isAudio( displayedFiles[0] )}
+              <!-- svelte-ignore a11y-media-has-caption -->
+              <audio controls>
+                <source 
+                  src={URL.createObjectURL( displayedFiles[0] )}
+                  type={displayedFiles[0].type}>
+              </audio>
             {:else if Media.isVideo( displayedFiles[0] )}
               <!-- svelte-ignore a11y-media-has-caption -->
               <video loop controls>
@@ -612,6 +619,9 @@
     height: 100%;
     background: #000;
     border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .outer-frame > .media .image-box > img {
