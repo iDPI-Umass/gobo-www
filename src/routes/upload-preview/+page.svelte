@@ -46,16 +46,23 @@
       {#if Media.isImage(attachment.file)}
         <img
           src={url}
-          alt="preview of upload"/>
+          alt={attachment.alt ?? undefined}/>
       {:else if Media.isAudio(attachment.file)}
         <audio
-          src={url}
-          controls>
+          controls
+          preload="metadata">
+          <source 
+            src={url}
+            type={attachment.file.type} />
         </audio>
       {:else if Media.isVideo(attachment.file)}
         <!-- svelte-ignore a11y-media-has-caption -->
-        <video controls>
-          <source src={url} type={attachment.file.type} />
+        <video
+          controls
+          preload="metadata">
+          <source
+            src={url}
+            type={attachment.file.type} />
         </video>
       {/if}
     {/if}

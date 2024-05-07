@@ -55,7 +55,9 @@
     return () => {
       Render.reset();
     };
-  })
+  });
+
+  $: Render.reason( bindings );
 </script>
 
 

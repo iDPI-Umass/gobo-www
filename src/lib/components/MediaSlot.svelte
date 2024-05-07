@@ -1,5 +1,5 @@
 <script>
-  import { isImage, isVideo } from "$lib/helpers/type.js";
+  import { Media } from "$lib/engines/draft.js";
 
   export let attachment;
   export let identity;
@@ -29,7 +29,7 @@
   }
 </script>
 
-{#if isImage( attachment )}
+{#if Media.isImage( attachment )}
   <a href="{`/display/${ identity }/${ post }/${ id }`}">
     <figure>
       <img 
@@ -39,12 +39,24 @@
         onerror="this.onerror=null;this.src='{mediaFallback}'">
     </figure>
   </a>
-{:else if isVideo( attachment )}
+{:else if Media.isAudio( attachment )}
+  <figure>
+    <audio  
+      controls
+      preload="metadata">
+      <source 
+        src={attachment.url}
+        type={attachment.type}/>
+      <img src={mediaFallback} alt="audio failed to load" />
+    </audio>
+  </figure>
+{:else if Media.isVideo( attachment )}
   <figure>
     <!-- svelte-ignore a11y-media-has-caption -->
     <video 
-      loop 
+      loop
       controls
+      preload="metadata"
       on:loadedmetadata={handleSingleLoad}>
       <source 
         src={attachment.url}
