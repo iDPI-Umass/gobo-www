@@ -13,14 +13,14 @@
   const serializer = new XMLSerializer();
 
   let identity, options, content, avatar;
-  let displayedFiles, sensitiveOverride;
+  let files, urls;
   const Render = State.make();
   Render.cleanup = () => {
     identity = {};
     options = {};
     content = null;
-    displayedFiles = [];
-    sensitiveOverride = false;
+    files = [];
+    urls = [];
   };
 
   Render.identity = ( draft ) => {
@@ -59,9 +59,19 @@
   };
 
   Render.attachments = ( draft ) => {
-    displayedFiles = draft.attachments
+    for ( const url of urls ) {
+      URL.revokeObjectURL( url );
+    }
+    
+    files = draft.attachments
       .slice( 0, 4 )
       .map( attachment => attachment.file );
+    
+    const _urls = [];
+    for ( const file of files ) {
+      _urls.push( URL.createObjectURL( file ));
+    }
+    urls = _urls;
   };
 
 
@@ -80,10 +90,6 @@
       event.target.style.height = "unset";
     }    
   }
-
-  Handle.sensitive = () => {
-    sensitiveOverride = !sensitiveOverride;
-  };
  
 
 
@@ -101,403 +107,136 @@
 
 <article class="outer-frame">
     
-  <div class="main">
-    <header>
-      <div class="pfp">
-        <!-- svelte-ignore a11y-missing-attribute -->
-        <img src={avatar}>
+  <header>
+    <div class="pfp">
+      <!-- svelte-ignore a11y-missing-attribute -->
+      <img src={avatar}>
+    </div>
+    <div class="rows">
+      <div class="row">
+        <span class="name">{identity.prettyName}</span>
+        <span class="interpunct">·</span>
+        <span class="pointer">You</span>
       </div>
-      <div class="rows">
-        <div class="row">
-          <span class="name">{identity.prettyName}</span>
-          <span class="interpunct">·</span>
-          <span class="pointer">You</span>
-        </div>
-        <div class="row">
-          <span class="timestamp">now</span>
-          <span class="interpunct">·</span>
-          {#if options.visibility == "public"}
-            <sl-icon class="visibility" src="/icons/globe-americas.svg"></sl-icon>
-          {:else if options.visibility == "mutuals"}
-            <sl-icon class="visibility" src="/icons/people-fill.svg"></sl-icon>
-          {/if}
-        </div>
+      <div class="row">
+        <span class="timestamp">now</span>
+        <span class="interpunct">·</span>
+        {#if options.visibility == "public"}
+          <sl-icon class="visibility" src="/icons/globe-americas.svg"></sl-icon>
+        {:else if options.visibility == "mutuals"}
+          <sl-icon class="visibility" src="/icons/people-fill.svg"></sl-icon>
+        {/if}
       </div>
-      <div class="spacer"></div>
-      <sl-icon src="icons/three-dots.svg"></sl-icon>  
-    </header>
+    </div>
+    <div class="spacer"></div>
+    <sl-icon src="icons/three-dots.svg"></sl-icon>  
+  </header>
 
 
-    <section>
-      {#if content != null}
-        {@html content}
-      {/if}
-    </section>
+  <section>
+    {#if content != null}
+      {@html content}
+    {/if}
+  </section>
 
-    {#if displayedFiles.length === 0}
-      <LinkPreview></LinkPreview>
-
-    {:else if displayedFiles.length === 1}
-      <div class="media-single">
-        <div class="image-box">
-          {#if (options.sensitive === true) && (sensitiveOverride === true)}
-            <div class="media-hide">
-              <div
-                on:click={Handle.sensitive}
-                on:keydown={Handle.sensitive}
-                tabindex="0"
-                role="button">
-                <span>Hide</span>
-              </div>
-            </div>
-          {/if}
-
-          {#if (options.sensitive === true) && (sensitiveOverride === false)}
-            <div class="media-sensitive">
-              <sl-icon src="/icons/eye-slash.svg"></sl-icon>
-              <p>Content warning: Sensitive content</p>
-              <p>The Tweet author flagged this Tweet as showing sensitive content.</p>
-              <div
-                on:click={Handle.sensitive}
-                on:keydown={Handle.sensitive}
-                tabindex="0"
-                role="button">
-                <span>Show</span>
-              </div>
-            </div>
-          {/if}
-
-          {#if Media.isImage( displayedFiles[0] )}
-            <img 
-              src={URL.createObjectURL( displayedFiles[0] )}
-              alt="uploaded"
-              on:load={Handle.singleImage}>
-          {:else if Media.isAudio( displayedFiles[0] )}
+  {#if files.length === 1}
+    <div class="media-single">
+      <div class="image-box">
+        {#if Media.isImage( files[0] )}
+          <img 
+            src={urls[0]}
+            alt="uploaded"
+            on:load={Handle.singleImage}>
+        {:else if Media.isAudio( files[0] )}
           <!-- svelte-ignore a11y-media-has-caption -->
           <audio controls>
             <source 
-              src={URL.createObjectURL( displayedFiles[0] )}
-              type={displayedFiles[0].type}>
+              src={urls[0]}
+              type={files[0].type}>
           </audio>
-          {:else if Media.isVideo( displayedFiles[0] )}
-            <!-- svelte-ignore a11y-media-has-caption -->
-            <video 
-              loop 
-              controls
-              on:loadedmetadata={Handle.singleImage}>
-              <source 
-                src={URL.createObjectURL( displayedFiles[0] )}
-                type={displayedFiles[0].type}>
-            </video>
-          {/if}
+        {:else if Media.isVideo( files[0] )}
+          <!-- svelte-ignore a11y-media-has-caption -->
+          <video 
+            loop 
+            controls
+            on:loadedmetadata={Handle.singleImage}>
+            <source 
+              src={urls[0]}
+              type={files[0].type}>
+          </video>
+        {/if}
 
-        </div>
       </div>
-    {:else if displayedFiles.length === 2}
-      <div class="media">
-        {#if (options.sensitive === true) && (sensitiveOverride === true)}
-          <div class="media-hide">
-            <div
-              on:click={Handle.sensitive}
-              on:keydown={Handle.sensitive}
-              tabindex="0"
-              role="button">
-              <span>Hide</span>
-            </div>
-          </div>
-        {/if}
-
-        {#if (options.sensitive === true) && (sensitiveOverride === false)}
-          <div class="media-sensitive">
-            <sl-icon src="/icons/eye-slash.svg"></sl-icon>
-            <p>Content warning: Sensitive content</p>
-            <p>The Tweet author flagged this Tweet as showing sensitive content.</p>
-            <div
-              on:click={Handle.sensitive}
-              on:keydown={Handle.sensitive}
-              tabindex="0"
-              role="button">
-              <span>Show</span>
-            </div>
-          </div>
-        {/if}
-
-        <div class="left">
-          <div class="image-box">
-            {#if Media.isImage( displayedFiles[0] )}
-              <img 
-                src={URL.createObjectURL( displayedFiles[0] )}
-                alt="uploaded">
-            {:else if Media.isVideo( displayedFiles[0] )}
-              <!-- svelte-ignore a11y-media-has-caption -->
-              <video loop controls>
-                <source 
-                  src={URL.createObjectURL( displayedFiles[0] )}
-                  type={displayedFiles[0].type}>
-              </video>
-            {/if}
-          </div>
-        </div>
+    </div>
   
-        <div class="right">
-          <div class="image-box">
-            {#if Media.isImage( displayedFiles[1] )}
-              <img 
-                src={URL.createObjectURL( displayedFiles[1] )}
-                alt="uploaded">
-            {:else if Media.isVideo( displayedFiles[1] )}
-              <!-- svelte-ignore a11y-media-has-caption -->
-              <video loop controls>
-                <source 
-                  src={URL.createObjectURL( displayedFiles[1] )}
-                  type={displayedFiles[1].type}>
-              </video>
-            {/if}
-          </div>
+  {:else if files.length > 1}
+    <div class="media">
+      {#each files as file, index (file.name)}
+        <div class="image-box">
+          <img 
+            src={urls[index]}
+            alt="uploaded" />
         </div>
-      </div>
-    {:else if displayedFiles.length === 3}
-      <div class="media">
-        {#if (options.sensitive === true) && (sensitiveOverride === true)}
-          <div class="media-hide">
-            <div
-              on:click={Handle.sensitive}
-              on:keydown={Handle.sensitive}
-              tabindex="0"
-              role="button">
-              <span>Hide</span>
-            </div>
-          </div>
-        {/if}
-
-        {#if (options.sensitive === true) && (sensitiveOverride === false)}
-          <div class="media-sensitive">
-            <sl-icon src="/icons/eye-slash.svg"></sl-icon>
-            <p>Content warning: Sensitive content</p>
-            <p>The Tweet author flagged this Tweet as showing sensitive content.</p>
-            <div
-              on:click={Handle.sensitive}
-              on:keydown={Handle.sensitive}
-              tabindex="0"
-              role="button">
-              <span>Show</span>
-            </div>
-          </div>
-        {/if}
-
-        <div class="left">
-          <div class="image-box">
-            {#if Media.isImage( displayedFiles[0] )}
-              <img 
-                src={URL.createObjectURL( displayedFiles[0] )}
-                alt="uploaded">
-            {:else if Media.isVideo( displayedFiles[0] )}
-              <!-- svelte-ignore a11y-media-has-caption -->
-              <video loop controls>
-                <source 
-                  src={URL.createObjectURL( displayedFiles[0] )}
-                  type={displayedFiles[0].type}>
-              </video>
-            {/if}
-          </div>
-        </div>
+      {/each}
+    </div>
+  {/if}
   
-        <div class="right">
-          <div class="top">
-            <div class="image-box">
-              {#if Media.isImage( displayedFiles[1] )}
-                <img 
-                  src={URL.createObjectURL( displayedFiles[1] )}
-                  alt="uploaded">
-              {:else if Media.isVideo( displayedFiles[1] )}
-                <!-- svelte-ignore a11y-media-has-caption -->
-                <video loop controls>
-                  <source 
-                    src={URL.createObjectURL( displayedFiles[1] )}
-                    type={displayedFiles[1].type}>
-                </video>
-              {/if}
-            </div>
-          </div>
-          <div class="bottom">
-            <div class="image-box">
-              {#if Media.isImage( displayedFiles[2] )}
-                <img 
-                  src={URL.createObjectURL( displayedFiles[2] )}
-                  alt="uploaded">
-              {:else if Media.isVideo( displayedFiles[2] )}
-                <!-- svelte-ignore a11y-media-has-caption -->
-                <video loop controls>
-                  <source 
-                    src={URL.createObjectURL( displayedFiles[2] )}
-                    type={displayedFiles[2].type}>
-                </video>
-              {/if}
-            </div>
-          </div>
-        </div>
-      </div>
-  
-    {:else if displayedFiles.length === 4}
-      <div class="media">
-        {#if (options.sensitive === true) && (sensitiveOverride === true)}
-          <div class="media-hide">
-            <div
-              on:click={Handle.sensitive}
-              on:keydown={Handle.sensitive}
-              tabindex="0"
-              role="button">
-              <span>Hide</span>
-            </div>
-          </div>
-        {/if}
 
-        {#if (options.sensitive === true) && (sensitiveOverride === false)}
-          <div class="media-sensitive">
-            <sl-icon src="/icons/eye-slash.svg"></sl-icon>
-            <p>Content warning: Sensitive content</p>
-            <p>The Tweet author flagged this Tweet as showing sensitive content.</p>
-            <div
-              on:click={Handle.sensitive}
-              on:keydown={Handle.sensitive}
-              tabindex="0"
-              role="button">
-              <span>Show</span>
-            </div>
-          </div>
-        {/if}
+  {#if files.length === 0}
+    <LinkPreview></LinkPreview>
+  {/if}
 
-        <div class="left">
-          <div class="top">
-            <div class="image-box">
-              {#if Media.isImage( displayedFiles[0] )}
-                <img 
-                  src={URL.createObjectURL( displayedFiles[0] )}
-                  alt="uploaded">
-              {:else if Media.isVideo( displayedFiles[0] )}
-                <!-- svelte-ignore a11y-media-has-caption -->
-                <video loop controls>
-                  <source 
-                    src={URL.createObjectURL( displayedFiles[0] )}
-                    type={displayedFiles[0].type}>
-                </video>
-              {/if}
-            </div>
-          </div>
-          <div class="bottom">
-            <div class="image-box">
-              {#if Media.isImage( displayedFiles[2] )}
-                <img 
-                  src={URL.createObjectURL( displayedFiles[2] )}
-                  alt="uploaded">
-              {:else if Media.isVideo( displayedFiles[2] )}
-                <!-- svelte-ignore a11y-media-has-caption -->
-                <video loop controls>
-                  <source 
-                    src={URL.createObjectURL( displayedFiles[2] )}
-                    type={displayedFiles[2].type}>
-                </video>
-              {/if}
-            </div>
-          </div>
-        </div>
-  
-        <div class="right">
-          <div class="top">
-            <div class="image-box">
-              {#if Media.isImage( displayedFiles[1] )}
-                <img 
-                  src={URL.createObjectURL( displayedFiles[1] )}
-                  alt="uploaded">
-              {:else if Media.isVideo( displayedFiles[1] )}
-                <!-- svelte-ignore a11y-media-has-caption -->
-                <video loop controls>
-                  <source 
-                    src={URL.createObjectURL( displayedFiles[1] )}
-                    type={displayedFiles[1].type}>
-                </video>
-              {/if}
-            </div>
-          </div>
-          <div class="bottom">
-            <div class="image-box">
-              {#if Media.isImage( displayedFiles[3] )}
-                <img 
-                  src={URL.createObjectURL( displayedFiles[3] )}
-                  alt="uploaded">
-              {:else if Media.isVideo( displayedFiles[3] )}
-                <!-- svelte-ignore a11y-media-has-caption -->
-                <video loop controls>
-                  <source 
-                    src={URL.createObjectURL( displayedFiles[3] )}
-                    type={displayedFiles[3].type}>
-                </video>
-              {/if}
-            </div>
-          </div>
-        </div>
-      </div>
-    {/if}
-  
-    <footer>
-      <div>
-        <sl-icon
-          src="/icons/hand-thumbs-up.svg">
-        </sl-icon>
-        <span>Like</span>
-      </div>
+  <footer>
+    <div>
+      <sl-icon
+        src="/icons/hand-thumbs-up.svg">
+      </sl-icon>
+      <span>Like</span>
+    </div>
 
-      <div>
-        <sl-icon
-          src="/icons/chat.svg">
-        </sl-icon>
-        <span>Comment</span>
-      </div>
+    <div>
+      <sl-icon
+        src="/icons/chat.svg">
+      </sl-icon>
+      <span>Comment</span>
+    </div>
 
-      <div>
-        <sl-icon
-          src="/icons/repeat.svg">
-        </sl-icon>
-        <span>Repost</span>
-      </div>
+    <div>
+      <sl-icon
+        src="/icons/repeat.svg">
+      </sl-icon>
+      <span>Repost</span>
+    </div>
 
-      <div>
-        <sl-icon
-          src="/icons/send-fill.svg">
-        </sl-icon>
-        <span>Send</span>
-      </div>
-    </footer>
-  </div>
+    <div>
+      <sl-icon
+        src="/icons/send-fill.svg">
+      </sl-icon>
+      <span>Send</span>
+    </div>
+  </footer>
+
   
 </article>
 
 <style>
   .outer-frame {
     display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: stretch;
+    flex-direction: column;
     margin-bottom: 2rem;
-    padding: 12px 16px 0 16px;
     max-width: 566px;
     background: #fff;
     border: 1px solid var(--sl-color-neutral-400);
     border-radius: var(--sl-border-radius-medium);
   }
 
-  .outer-frame > .main {
-    flex: 1 1 0;
-    min-width: 0;
-    margin-bottom: 12px;
-  }
-
-  .outer-frame > .main > header {
+  .outer-frame > header {
     display: flex;
     margin-bottom: 4px;
+    padding: 12px 16px 0 16px;
   }
 
-  .outer-frame .main header .pfp {
+  .outer-frame header .pfp {
     height: 48px;
     width: 48px;
     border-radius: 48px;
@@ -505,13 +244,13 @@
     overflow: hidden;
   }
 
-  .outer-frame .main header img {
+  .outer-frame header img {
     height: 100%;
     width: 100%;
     object-fit: cover;
   }
 
-  .outer-frame > .main > header .rows {
+  .outer-frame > header .rows {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
@@ -520,15 +259,15 @@
     margin-bottom: 4px;
   }
 
-  .outer-frame > .main > header > .spacer {
+  .outer-frame > header > .spacer {
     flex: 1 1 auto;
   }
 
-  .outer-frame > .main > header > sl-icon {
+  .outer-frame > header > sl-icon {
     color: #000;
   }
 
-  .outer-frame > .main > header .row {
+  .outer-frame > header .row {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -537,325 +276,111 @@
     margin-bottom: 0;
   }
 
-  .outer-frame > .main > header span {
+  .outer-frame > header span {
     margin-right: 4px;
     font-family: Arial, sans-serif;
   }
 
-  .outer-frame > .main > header .name {
+  .outer-frame > header .name {
     font-size: 14px;
     font-weight: var(--sl-font-weight-bold);
     color: #000;
   }
 
-  .outer-frame > .main > header .interpunct {
+  .outer-frame > header .interpunct {
     font-size: 14px;
     font-weight: var(--sl-font-weight-bold);
     color: rgba(0, 0, 0, 0.6);
   }
 
-  .outer-frame > .main > header .pointer {
+  .outer-frame > header .pointer {
     font-size: 12px;
     color: rgba(0, 0, 0, 0.6);
   }
 
-  .outer-frame > .main > header .timestamp {
+  .outer-frame > header .timestamp {
     font-size: 12px;
     min-width: max-content;
     color: rgba(0, 0, 0, 0.6);
   }
 
-  .outer-frame > .main > header .visibility {
+  .outer-frame > header .visibility {
     font-size: 15px;
     color: rgba(0, 0, 0, 0.6);
   }
 
-  .outer-frame > .main :global(a) {
+  .outer-frame :global(a) {
     color: var(--gobo-color-preview-link);
   }
 
 
-  .outer-frame > .main > section {
+  .outer-frame > section {
     font-family: var(--sl-font-family-sans);
     font-size: 14px;
     color: #0f1419;
     margin-bottom: 12px;
     min-height: 1.5rem;
+    padding: 0 1rem;
   }
 
-  .outer-frame > .main > .media-single {
+  .outer-frame > .media-single {
     position: relative;
-    max-width: 100%;
-    margin-bottom: 12px;
-    border-radius: 12px;
-  }
-
-  .outer-frame > .main > .media-single > .image-box {
-    position: relative;
-    max-width: 100%;
-    height: max-content;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
+    width: 100%;
     margin-bottom: 12px;
   }
 
-  .outer-frame > .main > .media-single > .image-box > img {
-    object-fit: contain;
-    object-position: top left;
-    border-radius: 12px;
-    border: 1px solid #cfd9de;
-  }
-
-  .outer-frame > .main > .media-single > .image-box > video {
-    object-fit: contain;
-    object-position: top left;
-    border-radius: 12px;
-    border: 1px solid #cfd9de;
-  }
-
-  .outer-frame > .main .media-sensitive {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    backdrop-filter: blur(40px);
-    background-color: rgba( 0, 0, 0, 0.5 );
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 16px 28px;
-    border-radius: 12px;
-  }
-
-  .outer-frame > .main .media-sensitive > sl-icon {
-    align-self: center;
-    font-size: 22px;
-    color: #fff;
-    margin-bottom: 12px;
-  }
-
-  .outer-frame > .main .media-sensitive > p {
-    font-size: 15px;
-    color: #fff;
-    margin-bottom: 12px;
-  }
-
-  .outer-frame > .main .media-sensitive > p:first-of-type {
-    font-weight: var(--sl-font-weight-bold);
-  }
-
-  .outer-frame > .main .media-sensitive > div {
-    align-self: flex-end;
-    background: rgba( 255, 255, 255, 0.25 );
-    backdrop-filter: blur(4px);
-    height: 32px;
-    padding: 0 16px;
-    border-radius: 9999px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    cursor: pointer;
-  }
-
-  .outer-frame > .main .media-sensitive div > span {
-    color: #fff;
-    font-size: 14px;
-    font-weight: var(--sl-font-weight-bold);
-  }
-
-  .outer-frame > .main .media-hide {
-    position: absolute;
-    bottom: 16px;
-    right: 16px;
-    background: rgba( 0, 0, 0, 0.5 );
-    backdrop-filter: blur(4px);
-    height: 32px;
-    padding: 0 16px;
-    border-radius: 9999px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    cursor: pointer;
-  }
-
-  .outer-frame > .main .media-hide > div {
-    color: #fff;
-    font-size: 14px;
-    font-weight: var(--sl-font-weight-bold);
-  }
-
-  .outer-frame > .main > .media {
-    position: relative;
-    height: 286px;
-    width: 100%;
-    border-radius: 12px;
-    border: 1px solid #cfd9de;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: stretch;
-  }
-
-
-  .outer-frame > .main > .media > .left {
-    flex: 1 1 50%;
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    border-top-left-radius: 12px;
-    border-bottom-left-radius: 12px;
-    margin-right: 2px;
-  }
-
-  .outer-frame > .main > .media > .right {
-    flex: 1 1 50%;
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    border-top-right-radius: 12px;
-    border-bottom-right-radius: 12px;
-  }
-
-  .outer-frame > .main > .media > .left > .image-box {
-    height: 100%;
-    width: 100%;
-    border-top-left-radius: 12px;
-    border-bottom-left-radius: 12px;
-    background: #000;
-  }
-
-  .outer-frame > .main > .media > .left > .image-box > img {
-    height: 100%;
-    width: 100%;
-    object-fit: cover;
-    border-top-left-radius: 12px;
-    border-bottom-left-radius: 12px;
-  }
-
-  .outer-frame > .main > .media > .left > .image-box > video {
-    height: 100%;
-    width: 100%;
+  .outer-frame > .media-single > .image-box > img {
     object-fit: contain;
     object-position: center center;
-    border-top-left-radius: 12px;
-    border-bottom-left-radius: 12px;
   }
 
-  .outer-frame > .main > .media > .right > .image-box {
-    height: 100%;
-    width: 100%;
-    border-top-right-radius: 12px;
-    border-bottom-right-radius: 12px;
-    background: #000;
-  }
-
-  .outer-frame > .main > .media > .right > .image-box > img {
-    height: 100%;
-    width: 100%;
-    object-fit: cover;
-    border-top-right-radius: 12px;
-    border-bottom-right-radius: 12px;
-  }
-
-  .outer-frame > .main > .media > .right > .image-box > video {
-    height: 100%;
-    width: 100%;
+  .outer-frame > .media-single > .image-box > video {
     object-fit: contain;
     object-position: center center;
-    border-top-right-radius: 12px;
-    border-bottom-right-radius: 12px;
   }
 
-  .outer-frame > .main > .media > .left > .top {
-    height: 141px;
-    border-top-left-radius: 12px;
-    margin-bottom: 2px;
-  }
-
-  .outer-frame > .main > .media > .left > .bottom {
-    height: 141px;
-    border-bottom-left-radius: 12px;
-  }
-
-  .outer-frame > .main > .media > .right > .top {
-    height: 141px;
-    border-top-right-radius: 12px;
-    margin-bottom: 2px;
-  }
-
-  .outer-frame > .main > .media > .right > .bottom {
-    height: 141px;
-    border-bottom-right-radius: 12px;
-  }
-
-  .outer-frame > .main > .media > .right > .top video,
-  .outer-frame > .main > .media > .right > .bottom video,
-  .outer-frame > .main > .media > .left > .top video,
-  .outer-frame > .main > .media > .left > .bottom video {
-    height: 141px;
-    width: 100%;
-    object-fit: contain;
-    object-position: center center;
-    background: #000;
-  }
-
-  .outer-frame > .main > .media .image-box {
-    height: 100%;
+  .outer-frame > .media {
+    display: flex;
+    gap: 1px;
     width: 100%;
   }
 
-  .outer-frame > .main > .media .image-box > img {
+  .outer-frame > .media > .image-box {
+    flex: 1 1 25%;
+    min-width: 0;
+  }
+
+  .outer-frame > .media > .image-box > img {
     height: 100%;
     width: 100%;
     object-fit: cover;
   }
 
-  .outer-frame > .main > .media > .left > .top > .image-box > img,
-  .outer-frame > .main > .media > .left > .top > .image-box > video {
-    border-top-left-radius: 12px;
-  }
-
-  .outer-frame > .main > .media > .left > .bottom > .image-box > img,
-  .outer-frame > .main > .media > .left > .bottom > .image-box > video {
-    border-bottom-left-radius: 12px;
-  }
-
-  .outer-frame > .main > .media > .right > .top > .image-box > img,
-  .outer-frame > .main > .media > .right > .top > .image-box > video {
-    border-top-right-radius: 12px;
-  }
-
-  .outer-frame > .main > .media > .right > .bottom > .image-box > img,
-  .outer-frame > .main > .media > .right > .bottom > .image-box > video {
-    border-bottom-right-radius: 12px;
-  }
 
 
-
-  .outer-frame > .main > footer {
+  .outer-frame footer {
     display: flex;
     flex-direction: row;
-    flex-wrap: nowrap;
     justify-content: space-around;
     align-items: center;
     color: #536471;
-    padding: 1rem 0 0.5rem 0;
+    margin: 0 1rem;
+    padding: 1rem 0;
     border-top: 1px solid rgba(0, 0, 0, 0.2);
   }
 
-  .outer-frame > .main > footer div {
+  .outer-frame > footer div {
     display: flex;
     align-items: center;
   }
 
-  .outer-frame > .main > footer sl-icon {
+  .outer-frame > footer sl-icon {
     font-size: 20px;
     stroke-width: 2px;
     margin-right: 0.25rem;
   }
 
-  .outer-frame > .main > footer span {
+  .outer-frame > footer span {
     font-size: 15px;
   }
 
