@@ -58,21 +58,23 @@ Linkedin.limits = {
     size: 100000000  // 100 MB
   },
 
-  document: {
-    types: [
-      "application/msword",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      "application/vnd.oasis.opendocument.text",
-      "application/vnd.ms-powerpoint",
-      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-      "application/pdf",
-      "application/vnd.openxmlformats-officedocument.presentationml.slideshow",
-      "application/vnd.oasis.opendocument.spreadsheet",
-      "application/vnd.ms-excel",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    ],
-    size: 100000000  // 100 MB
-  }
+  // TODO: eventually, we'll want to work on supporting uploading documents
+  //  to LinkedIn using their Documents API.
+  // document: {
+  //   types: [
+  //     "application/msword",
+  //     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  //     "application/vnd.oasis.opendocument.text",
+  //     "application/vnd.ms-powerpoint",
+  //     "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  //     "application/pdf",
+  //     "application/vnd.openxmlformats-officedocument.presentationml.slideshow",
+  //     "application/vnd.oasis.opendocument.spreadsheet",
+  //     "application/vnd.ms-excel",
+  //     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  //   ],
+  //   size: 100000000  // 100 MB
+  // }
 };
 
 // These won't be real shortened links, but they approximate the appearance

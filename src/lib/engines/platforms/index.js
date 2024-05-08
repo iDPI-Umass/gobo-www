@@ -35,6 +35,15 @@ Platforms.getAcceptable = () => {
   for ( const identity of identities ) {
     platforms.add( identity.platform );
   }
+
+  // Default behavior is to show acceptable MIME types across *ALL* platforms.
+  if ( platforms.size === 0 ) {
+    platforms.add( "bluesky" );
+    platforms.add( "linkedin" );
+    platforms.add( "mastodon" );
+    platforms.add( "reddit" );
+    platforms.add( "smalltown" );
+  }
   
   const types = new Set();
   for ( const name of platforms ) {
