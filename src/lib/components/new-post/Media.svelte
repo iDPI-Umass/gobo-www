@@ -36,7 +36,7 @@
   };
 
   Render.identities = () => {
-    acceptTypes = Platforms.getAcceptable().join( "," );
+    acceptTypes = Platforms.getAcceptable().join( "," ) || ".text";
   };
 
 
