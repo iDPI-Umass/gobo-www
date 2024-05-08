@@ -7,16 +7,18 @@
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import { State, Draft, Options, Media } from "$lib/engines/draft.js";
+  import { Platforms } from "$lib/engines/platforms/index.js";
   import { previewStore } from "$lib/stores/image-preview.js";
   import { altStore } from "$lib/stores/alt-store.js"
 
-  let options, attachments
   let fileInput;
+  let options, attachments, acceptTypes;
   const Render = State.make();
 
   Render.cleanup = () => {
     options = {};
     attachments = [];
+    acceptTypes = "";
   };
 
   Render.cycle = ( draft ) => {
@@ -27,11 +29,14 @@
       }
     }
     attachments = draft.attachments;
-    const types = attachments.map( a => a.file.type );
   };
 
   Render.options = ( draft ) => {
     options = draft.options
+  };
+
+  Render.identities = () => {
+    acceptTypes = Platforms.getAcceptable().join( "," );
   };
 
 
@@ -203,6 +208,7 @@
   onMount(() => {
     Render.listen( "attachments", Render.cycle );
     Render.listen( "options", Render.options );
+    Render.listen( "identities", Render.identities );
     fileInput.addEventListener( "change", Handle.inputFiles );
     return () => {
       Render.reset();
@@ -297,7 +303,9 @@
   bind:this={fileInput}
   type="file"
   multiple=true
-  class="hidden"/>
+  class="hidden"
+  accept={acceptTypes}
+/>
 
 
 <style>

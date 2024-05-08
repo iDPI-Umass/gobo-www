@@ -10,7 +10,7 @@ const Bluesky = {};
 Bluesky.limits = {
   characters: 300,
   attachments: 4,
-  images: {
+  image: {
     types: [
       "image/jpeg",
       "image/png",
@@ -186,7 +186,7 @@ Bluesky.build = async ( draft ) => {
 
 
 Bluesky.validateAttachments = ( draft ) => {
-  const limits = Bluesky.limits.images;
+  const limits = Bluesky.limits.image;
   for ( const attachment of draft.attachments ) {
     const type = attachment.file.type;
     if ( !limits.types.includes( type )) {

@@ -181,6 +181,11 @@ Identity.load = async () => {
   Draft.updateAspect( "identities", identities );
 };
 
+Identity.list = () => {
+  const draft = Draft.read();
+  return draft.identities;
+};
+
 Identity.find = ( target ) => {
   const draft = Draft.read();
   return draft.identities
@@ -192,7 +197,7 @@ Identity.findActive = ( target ) => {
   return draft.identities.find(({ platform, active }) => {
     return (platform === target) && (active === true);
   });
-}
+};
 
 Identity.hasActive = ( target ) => {
   return () => {
