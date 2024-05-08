@@ -79,8 +79,8 @@
   const Handle = {};
   Handle.singleImage = ( event ) => {
     const previewWidth = event.target.width;
-    const naturalWidth = event.target.naturalWidth || event.target.videoWidth;
-    const naturalHeight = event.target.naturalHeight || event.target.videoHeight;
+    const naturalWidth = event.target.naturalWidth;
+    const naturalHeight = event.target.naturalHeight;
     const ratio = naturalHeight / naturalWidth;
     const previewHeight = Math.round( previewWidth * ratio );
 
@@ -89,7 +89,15 @@
     } else {
       event.target.style.height = "unset";
     }    
-  }
+  };
+
+  Handle.singleVideo = ( event ) => {
+    if ( event.target.videoWidth > 512 ) {
+      event.target.style.height = "512px";
+    } else {
+      event.target.style.height = "unset";
+    }  
+  };
  
 
 
@@ -141,32 +149,29 @@
 
   {#if files.length === 1}
     <div class="media-single">
-      <div class="image-box">
-        {#if Media.isImage( files[0] )}
-          <img 
+      {#if Media.isImage( files[0] )}
+        <img 
+          src={urls[0]}
+          alt="uploaded"
+          on:load={Handle.singleImage}>
+      {:else if Media.isAudio( files[0] )}
+        <!-- svelte-ignore a11y-media-has-caption -->
+        <audio controls>
+          <source 
             src={urls[0]}
-            alt="uploaded"
-            on:load={Handle.singleImage}>
-        {:else if Media.isAudio( files[0] )}
-          <!-- svelte-ignore a11y-media-has-caption -->
-          <audio controls>
-            <source 
-              src={urls[0]}
-              type={files[0].type}>
-          </audio>
-        {:else if Media.isVideo( files[0] )}
-          <!-- svelte-ignore a11y-media-has-caption -->
-          <video 
-            loop 
-            controls
-            on:loadedmetadata={Handle.singleImage}>
-            <source 
-              src={urls[0]}
-              type={files[0].type}>
-          </video>
-        {/if}
-
-      </div>
+            type={files[0].type}>
+        </audio>
+      {:else if Media.isVideo( files[0] )}
+        <!-- svelte-ignore a11y-media-has-caption -->
+        <video 
+          loop 
+          controls
+          on:loadedmetadata={Handle.singleVideo}>
+          <source 
+            src={urls[0]}
+            type={files[0].type}>
+        </video>
+      {/if}
     </div>
   
   {:else if files.length > 1}
@@ -325,28 +330,35 @@
 
   .outer-frame > .media-single {
     position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: 100%;
     margin-bottom: 12px;
   }
 
-  .outer-frame > .media-single > .image-box > img {
+  .outer-frame > .media-single > img {
     object-fit: contain;
     object-position: center center;
   }
 
-  .outer-frame > .media-single > .image-box > video {
+  .outer-frame > .media-single > video {
+    width: 100%;
     object-fit: contain;
     object-position: center center;
+    background-color: black;
   }
 
   .outer-frame > .media {
+    position: relative;
     display: flex;
     gap: 1px;
     width: 100%;
+    max-height: 512px;
   }
 
   .outer-frame > .media > .image-box {
-    flex: 1 1 25%;
+    flex: 1 1 auto;
     min-width: 0;
   }
 
