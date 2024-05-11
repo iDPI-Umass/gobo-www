@@ -14,7 +14,7 @@ const get = App.unauthorized(async ({ identity, id }) => {
 
 const publish = App.unauthorized(async ( post, targets ) => {
   const client = await Gobo.get();
-  await client.personPosts.post({ 
+  return await client.personPosts.post({ 
     parameters: { person_id: client.id },
     content: { post, targets }   
   });

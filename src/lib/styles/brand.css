@@ -57,6 +57,14 @@ sl-icon.disabled {
   opacity: 0.4;
 }
 
+sl-icon.success {
+  color: var(--sl-color-success-600);
+}
+
 sl-icon.warning {
   color: var(--sl-color-warning-600);
+}
+
+sl-icon.danger {
+  color: var(--sl-color-danger-600);
 }
