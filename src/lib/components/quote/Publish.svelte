@@ -32,16 +32,9 @@
       publishButton.loading = false;
       return;
     }
-
-    publishButton.loading = true;
-    const draft = Draft.read();
-    const result = await Publish.flow( draft );
-    publishButton.loading = false;
     
-    if ( result.success === true ) {
-      await Draft.clear();
-      goto("/home");
-    }
+    Publish.start();
+    goto( "/new-post/publish" );
   };
 
   Handle.discard = async () => {
