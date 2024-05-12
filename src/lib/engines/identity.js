@@ -80,7 +80,7 @@ Identity.remove = async ( identity ) => {
 };
 
 Identity.avatar = ( identity ) => {
-  return identity.profile_image ?? Identity.fallback( identity );
+  return identity.profile_image || Identity.fallback( identity );
 };
 
 Identity.fallback = ( identity ) => {

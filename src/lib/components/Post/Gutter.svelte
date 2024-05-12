@@ -9,6 +9,7 @@
   let avatar = Source.avatar( source );
   let fallback = Source.fallback( source );
   let { headingSlot1 } = Source.headings( source );
+  console.log({ avatar });
 </script>
 
 <div class="gutter">
@@ -42,6 +43,10 @@
     width: 2.8125rem;
     border-radius: var(--sl-border-radius-circle);
     margin-right: var(--gobo-width-spacer-half);
+    border: none;
+  }
+
+  div img {
     border: var(--gobo-border-panel);
   }
 

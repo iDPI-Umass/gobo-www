@@ -174,7 +174,7 @@ Source.get = ( id ) => {
 
 Source.href = ( source ) => source.proxyURL ?? source.url;
 
-Source.avatar = ( source ) => source.icon_url ?? Source.fallback( source );
+Source.avatar = ( source ) => source.icon_url || Source.fallback( source );
 
 Source.fallback = ( source ) => {
   switch ( source.platform ) {
@@ -184,7 +184,7 @@ Source.fallback = ( source ) => {
     case "bluesky":
       return "/icons/bluesky-avatar.png";
     case "reddit":
-      return "/icons/reddit-avatar.png";
+      return "/icons/reddit-subreddit-avatar.png";
     default:
       return "/icons/mastodon-avatar.png";
   }
