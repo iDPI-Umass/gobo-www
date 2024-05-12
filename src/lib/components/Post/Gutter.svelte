@@ -9,7 +9,6 @@
   let avatar = Source.avatar( source );
   let fallback = Source.fallback( source );
   let { headingSlot1 } = Source.headings( source );
-  console.log({ avatar });
 </script>
 
 <div class="gutter">
