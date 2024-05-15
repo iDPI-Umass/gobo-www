@@ -185,8 +185,7 @@ Reply.add = async ( id ) => {
 
 
 // Special instantiation, when logged in, to pull data and send to listeners.
-// This cuts down on requests to the API, manages race conditions, and helps
-// mitigate what appear to be service worker effects on the singleton.
+// This cuts down on requests to the API and manages race conditions.
 Feed.startup = async () => {
   if ( (await App.isAllowedAccess()) ) {
     await Feed.refresh();

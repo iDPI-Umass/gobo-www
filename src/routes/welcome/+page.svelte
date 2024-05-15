@@ -10,7 +10,7 @@
   const Handle = {};
   Handle.complete = async () => {
     await Welcome.put();
-    goto("/identities");
+    goto("/settings/identities");
   };
 </script>
 

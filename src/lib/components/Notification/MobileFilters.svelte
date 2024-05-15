@@ -37,7 +37,7 @@
   {:else if state === "ready" }
   
     <sl-button 
-      href="/identities"
+      href="/settings/identities"
       pill>
 
       <sl-icon 

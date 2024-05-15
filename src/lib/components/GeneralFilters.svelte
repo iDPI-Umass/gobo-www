@@ -10,19 +10,9 @@
 <section class="outer-frame">
 
   <header>
+    <sl-icon src="/icons/filter.svg" />
     <h2>Filters</h2>
-    <sl-button
-      pill
-      href="/settings/filters">
-      
-      <sl-icon 
-        class="lens-label"
-        src="/icons/filter.svg" 
-        slot="prefix">
-      </sl-icon>
-      
-      Configure
-  </sl-button>
+    <sl-icon-button src="/icons/arrow-right.svg" href="/settings/filters" />
   </header>
 
   
@@ -54,20 +44,28 @@
   }
 
   header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
     padding: 0.75rem var(--gobo-width-spacer);
     border-bottom: var(--gobo-border-panel);
     margin-bottom: var(--gobo-height-spacer-flex);
     width: 100%;
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: space-between;
-    align-items: center;
+  }
+
+  header sl-icon {
+    font-size: 1.5rem;
   }
 
   header h2 {
+    flex: 1 1 100%;
     font-weight: var(--gobo-font-weight-black);
     font-size: 1.25rem;
     text-transform: capitalize;
+  }
+
+  header sl-icon-button {
+    color: var(--gobo-color-text);
   }
 
   h3 {
@@ -82,11 +80,5 @@
 
   .inner-frame {
     margin: var(--gobo-height-spacer-flex) var(--gobo-width-spacer-flex);
-  }
-
-  header sl-button::part(base) {
-    background-color: var(--gobo-color-panel);
-    border: var(--gobo-border-panel);
-    color: var(--gobo-color-button-lens);
   }
 </style>

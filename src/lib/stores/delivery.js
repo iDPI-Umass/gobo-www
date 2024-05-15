@@ -14,16 +14,10 @@ const createStore = function () {
 };
 
 
-const singleton = createStore();
-const uploads = createStore();
-const draft = createStore();
-const targets = createStore();
-const alerts = createStore();
+const feed = createStore();
+const command = createStore();
 
 export { 
-  singleton,
-  uploads,
-  draft,
-  targets,
-  alerts
+  feed,
+  command
 }

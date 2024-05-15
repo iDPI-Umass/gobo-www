@@ -1,7 +1,7 @@
 <script>
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import { onMount } from "svelte";
-  import { goto } from "$app/navigation";
+  import { replaceState, goto } from "$app/navigation";
   import { State, Draft } from "$lib/engines/draft.js";
   import { Publish, Validate } from "$lib/engines/platforms/index.js";
 
@@ -23,13 +23,16 @@
       return;
     }
 
-    if ( !Validate.isValid() ) {
+    const draft = Draft.read();
+
+    if ( !Validate.isValid( draft )) {
       publishButton.loading = false;
       return;
     }
     
-    Publish.start();
-    goto( "/new-post/publish" );
+    Publish.start( draft );
+    replaceState( "/home" );
+    goto( "/posts" );
   };
 
   Handle.discard = async () => {

@@ -17,7 +17,6 @@ Feed.make = async ( context = {} ) => {
 
   return {
     notifications: [],
-    position: 0,
     view: view,
     weaver: await Weaver.make({ view }),
     isStopped: false,
@@ -138,20 +137,6 @@ Notification.source = ( notification ) => {
 };
 
 
-const Position = {};
-
-Position.read = async () => {
-  const feed = await Feed.read();
-  return feed.position;
-};
-
-Position.write = async ( position ) => {
-  const feed = await Feed.read();
-  feed.position = position;
-};
-
-
-
 
 const Count = {};
 
@@ -197,8 +182,7 @@ Count.clear = async () => {
 
 
 // Special instantiation, when logged in, to pull data and send to listeners.
-// This cuts down on requests to the API, manages race conditions, and helps
-// mitigate what appear to be service worker effects on the singleton.
+// This cuts down on requests to the API and manages race conditions.
 Feed.startup = async () => {
   if ( (await App.isAllowedAccess()) ) {
     // Feed Polling state machine initial events to get started.
@@ -221,6 +205,5 @@ export {
   Feed,
   Notifications,
   Notification,
-  Position,
   Count
 }

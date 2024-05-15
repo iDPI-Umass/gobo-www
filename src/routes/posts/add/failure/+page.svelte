@@ -37,7 +37,7 @@
     
     <div class="buttons">
       <p>
-        <a href="/identities/add">
+        <a href="/settings/identities/add">
           Back to Add Identity
         </a>   
       </p>

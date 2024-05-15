@@ -22,6 +22,10 @@
   border-bottom: var(--gobo-border-panel);
 }
 
+.gobo-table > .table-row:last-child {
+  border-bottom: none;
+}
+
 .gobo-table > .table-row > sl-icon-button {
   font-size: 1.25rem;
 }

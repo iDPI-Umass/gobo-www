@@ -135,3 +135,19 @@ sl-alert::part(base) {
 sl-alert::part(message) {
   color: var(--gobo-color-text);
 }
+
+
+sl-icon-button {
+  color: var(--gobo-color-text);
+}
+
+sl-icon-button:hover::part(base),
+sl-icon-button:focus::part(base) {
+  color: var(--gobo-color-text);
+}
+
+@supports not selector(:focus-visible) {
+  sl-icon-button:focus {
+    color: var(--gobo-color-text);
+  }
+}

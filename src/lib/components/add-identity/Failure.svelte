@@ -20,7 +20,7 @@
 
   Handle.close = () => {
     identityStores.onboardFailure.put({ failure: false });
-    replaceState( "/identities/add" );
+    replaceState( "/settings/identities/add" );
   };
   
   Render.reset();

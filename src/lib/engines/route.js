@@ -112,14 +112,14 @@ Callback.identity = async ( query ) => {
     // POSTs aren't idempotent, so we use baseURL to detect duplication.
     if ( LS.read( "gobo-baseURL" ) == null ) {
       Identity.clearStorage();
-      return goto( "/identities" );
+      return goto( "/settings/identities" );
     }
 
     await Identity.add( query );
     Identity.clearStorage();
     LS.write( "gobo-building-feed", true );
     IdentityEngine.refresh();
-    return goto( "/identities" );
+    return goto( "/settings/identities" );
   
   } catch ( error ) {
     console.error( error );

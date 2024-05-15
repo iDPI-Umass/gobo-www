@@ -5,7 +5,7 @@
   import Notification from "$lib/components/Notification/Notification.svelte";
   
   import { onMount, tick } from "svelte";
-  import { Feed, Position, Count } from "$lib/engines/notification.js";
+  import { Feed, Count } from "$lib/engines/notification.js";
   import { State } from "$lib/engines/store.js";
   import { Scroll } from "$lib/engines/scroll.js";
   // import * as scrollStores from "$lib/stores/scroll.js";
@@ -62,7 +62,7 @@
       case "ready":
         break; // no-op
       default:
-        console.warn("unrecognized feed command", event);
+        console.warn( "unrecognized notification feed command", event );
     }
   };
 
@@ -73,7 +73,6 @@
 
   Handle.scroll = ( event ) => {
     scroll.event( event );
-    Position.write( _feed.scrollTop );
   };
 
   Handle.infiniteScroll = ( event ) => {

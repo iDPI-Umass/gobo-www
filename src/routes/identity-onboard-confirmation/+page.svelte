@@ -11,7 +11,7 @@
 
   const Handle = {};
   Handle.complete = () => {
-    goto("/identities");
+    goto("/settings/identities");
   }
 </script>
 

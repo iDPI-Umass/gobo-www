@@ -1,3 +1,18 @@
+import { writable } from "svelte/store";
+
+const createStore = function ( value ) {
+  let event = value ?? null;
+
+  const { subscribe, update } = writable( event );
+
+  return {
+    subscribe,
+    put: ( value ) => {
+      update(() => value );
+    },
+  };
+};
+
 class State {
   constructor() {
     this.closers = [];
@@ -35,5 +50,6 @@ class State {
 
 
 export {
+  createStore,
   State
 }

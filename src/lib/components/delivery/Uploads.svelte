@@ -4,9 +4,10 @@
   import Spinner from "$lib/components/primitives/Spinner.svelte";
   import { onMount } from "svelte";
   import { State } from "$lib/engines/store.js";
-  import { Delivery } from "$lib/engines/platforms/publish";
-  import * as deliveryStore from "$lib/stores/delivery.js";
 
+  export let frame;
+
+  
   let uploads;
   const Render = State.make();
 
@@ -24,7 +25,7 @@
 
   Render.reset();
   onMount(() => {
-    Render.listen( deliveryStore.uploads, Render.uploads );
+    Render.listen( frame.stores.uploads, Render.uploads );
     return () => {
       Render.reset();
     };

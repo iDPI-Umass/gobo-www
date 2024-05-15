@@ -5,8 +5,9 @@
   import { onMount } from "svelte";
   import { State } from "$lib/engines/store.js";
   import { Name } from "$lib/engines/draft.js";
-  import { Delivery } from "$lib/engines/platforms/publish";
-  import * as deliveryStore from "$lib/stores/delivery.js";
+
+  export let frame;
+
 
   let state, targets;
   const Render = State.make();
@@ -35,6 +36,7 @@
 
   Cycle.run = async () => {
     while ( true ) {
+      console.log("fetching state")
       if ( state == null || state === "halt" ) {
         return;
       }
@@ -42,7 +44,7 @@
         return;
       }
       if ( state === "fetch" ) {
-        await Delivery.sync();
+        await frame.sync();
         await Time.sleep( 2000 );
       }
     }
@@ -59,7 +61,7 @@
 
   Render.reset();
   onMount(() => {
-    Render.listen( deliveryStore.targets, Render.targets );
+    Render.listen( frame.stores.targets, Render.targets );
     Cycle.start();
     return () => {
       Render.reset();

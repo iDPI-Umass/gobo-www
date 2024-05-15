@@ -120,8 +120,7 @@ Name.split = ( name ) => {
 
 
 // Special instantiation, when logged in, to pull data and send to listeners.
-// This cuts down on requests to the API, manages race conditions, and helps
-// mitigate what appear to be service worker effects on the singleton.
+// This cuts down on requests to the API and manages race conditions.
 Identity.startup = async () => {
   if ( (await App.isAllowedAccess()) ) {
     await Identity.load();

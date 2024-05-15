@@ -1,44 +1,34 @@
 <script>
   import Spinner from "$lib/components/primitives/Spinner.svelte";
-  import Post from "$lib/components/Post.svelte";
+  import Delivery from "$lib/components/delivery/Delivery.svelte";
 
   import { onMount, tick } from "svelte";
-  import { Feed } from "$lib/engines/feed.js";
+  import { Feed } from "$lib/engines/delivery.js";
   import { State } from "$lib/engines/store.js";
   import { Scroll } from "$lib/engines/scroll.js";
-  // import * as scrollStores from "$lib/stores/scroll.js";
-  import * as feedStores from "$lib/stores/feed.js";
-  import * as LS from "$lib/helpers/local-storage.js";
+  import * as deliveryStores from "$lib/stores/delivery.js";
 
   let _feed;
-  let posts, state, scroll, styles;
+  let deliveries, state, scroll;
   const Render = State.make();
   Render.cleanup = () => {
-    posts = [];
+    deliveries = [];
     state = "loading";
     scroll = undefined;
   };
 
 
   Render.feed = async ( feed ) => {
-    posts = feed.posts;
+    deliveries = feed.deliveries;
     Render.state();
     Render.scroll( feed );
   };
 
-  Render.state = () => {
-    // Checks to see if we're expecting a delay in feed visibility.
-    const isBuilding = LS.read( "gobo-building-feed" );
-    
-    if ( posts.length === 0 ) {
-      if ( isBuilding === true ) {
-        state = "building feed";
-      } else {
-        state = "empty";
-      }
+  Render.state = () => {    
+    if ( deliveries.length === 0 ) {
+      state = "empty";
     } else {
       state = "ready";
-      LS.remove( "gobo-building-feed" );
     }
   };
 
@@ -58,12 +48,9 @@
         Feed.command( "ready" );
         break;
       case "ready":
-        break; // no-op to save good and ready state.
-      case "hide":
-      case "show":
-        break; // no-ops handled at the overlay level.
+        break; // no-op
       default:
-        console.warn( "unrecognized post feed command", event );
+        console.warn( "unrecognized delivery feed command", event );
     }
   };
 
@@ -75,20 +62,12 @@
     Feed.pull( 25 );
   };
 
-  Handle.styleOverrides = ( index ) => {
-    if ( index === 0 ) {
-      return { marginTop: "0" };
-    } else {
-      return {};
-    }
-  };
-
 
   Render.reset();
   onMount(() => {
     scroll = Scroll.make({ element: _feed });
-    Render.listen( feedStores.singleton, Render.feed );
-    Render.listen( feedStores.command, Handle.command );
+    Render.listen( deliveryStores.feed, Render.feed );
+    Render.listen( deliveryStores.command, Handle.command );
     _feed.addEventListener( "scroll", Handle.scroll );
     _feed.addEventListener( "gobo-infinite-scroll", Handle.infiniteScroll );
     return () => {
@@ -103,31 +82,26 @@
 <section class="feed" bind:this={_feed}>
   {#if state === "loading"}
     <Spinner></Spinner>
-  {:else if state === "building feed"}
-    <section class="gobo-copy">
-      <p>
-        We are fetching your feed. This may take a couple of minutes.
-      </p> 
-    </section>
+
   {:else if state === "empty"}
     <section class="gobo-copy">
       <p>
-        Your feed is empty! Add or activate an identity to get started.
+        No published posts to display.
       </p> 
     </section>
+  
   {:else if state === "ready"}
-    {#each posts as { identity, post, key }, index (key) }
-      <Post 
-        {identity}
-        id={post.id}
-        styleOverrides={Handle.styleOverrides(index)}></Post>
+    {#each deliveries as { delivery, key }, index (key) }
+      <Delivery {delivery} />
     {/each}
+  
   {:else}
     <section class="gobo-copy">
       <p>
-        There was a problem displaying your feed.
+        There was a problem displaying this feed.
       </p> 
     </section>
+  
   {/if}
 </section>
 
@@ -136,6 +110,10 @@
     flex-grow: 1;
     overflow-y: scroll;
     max-height: calc(100dvh - 5rem);
+  }
+
+  section.feed > *:first-child {
+    margin-top: 0;
   }
 
   @media( min-width: 680px ) {

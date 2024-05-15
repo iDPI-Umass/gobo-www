@@ -64,19 +64,6 @@
 
   sl-icon-button {
     font-size: 20px;
-    color: var(--gobo-color-text);
     margin-right: 2rem;
   }
-
-  sl-icon-button:hover::part(base),
-  sl-icon-button:focus::part(base) {
-    color: var(--gobo-color-text);
-  }
-
-  @supports not selector(:focus-visible) {
-    sl-icon-button:focus {
-      color: var(--gobo-color-text);
-    }
-  }
-
 </style>

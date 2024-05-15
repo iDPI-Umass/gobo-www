@@ -105,7 +105,7 @@
     // For Bluesky, we don't use a login-redirect flow. So the only thing we
     // can do is send the Gobo member to the add-identity page.
     if ( identity.platform === "bluesky" ) {
-      return goto("/identities/add");
+      return goto("/settings/identities/add");
     }
 
     const context = {

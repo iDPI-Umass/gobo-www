@@ -3,8 +3,9 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import { onMount } from "svelte";
   import { State } from "$lib/engines/store.js";
-  import { Delivery } from "$lib/engines/platforms/publish";
-  import * as deliveryStore from "$lib/stores/delivery.js";
+
+  export let frame;
+
 
   let alerts;
   const Render = State.make();
@@ -20,13 +21,13 @@
 
   const Handle = {};
   Handle.dismiss = ( key ) => {
-    Delivery.dismissAlert( key );
+    frame.dismissAlert( key );
   };
 
 
   Render.reset();
   onMount(() => {
-    Render.listen( deliveryStore.alerts, Render.alerts );
+    Render.listen( frame.stores.alerts, Render.alerts );
     return () => {
       Render.reset();
     };

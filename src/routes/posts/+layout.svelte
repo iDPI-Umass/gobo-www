@@ -7,8 +7,8 @@
 
 <GuardFrame>
   <MainHeader></MainHeader>
-  <NavPage current="identities">
+  <NavPage current="posts">
     <slot></slot>
   </NavPage>
-  <FooterNav current="identities"></FooterNav>
+  <FooterNav current="posts"></FooterNav>
 </GuardFrame>

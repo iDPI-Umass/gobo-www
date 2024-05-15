@@ -86,10 +86,10 @@
 
     <sl-button
       pill
-      href="/identities"
-      class="{current === "identities" ? "current" : ""} identities">
+      href="/posts"
+      class="{current === "posts" ? "current" : ""} posts">
       <div slot="prefix">
-        <sl-icon src="/icons/identities.svg"></sl-icon>
+        <sl-icon src="/icons/send.svg"></sl-icon>
       </div>
     </sl-button>
 

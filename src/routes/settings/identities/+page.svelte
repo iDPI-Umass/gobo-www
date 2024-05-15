@@ -39,7 +39,7 @@
 
     <nav class="gobo-nav">
       <sl-button
-        href="/identities/add"
+        href="/settings/identities/add"
         pill>
         Add Identity
       </sl-button>

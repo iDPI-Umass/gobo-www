@@ -75,13 +75,13 @@
   </sl-button>  
 
   <sl-button
-    class="identities {current === "identities" ? "current" : ""}"
+    class="posts {current === "posts" ? "current" : ""}"
     pill
-    href="/identities">
+    href="/posts">
     <div slot="prefix">
-      <sl-icon src="/icons/identities.svg" slot="prefix"></sl-icon>
+      <sl-icon src="/icons/send.svg" slot="prefix"></sl-icon>
     </div>
-    Identities
+    Posts
   </sl-button>
 
   <sl-button
@@ -160,8 +160,8 @@
     font-size: 1.25rem;
   }
 
-  nav > .identities::part(prefix) {
-    font-size: 1.625rem; 
+  nav > .posts::part(prefix) {
+    font-size: 1.25rem; 
   }
 
   nav > .settings::part(prefix) {

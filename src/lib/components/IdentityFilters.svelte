@@ -47,7 +47,9 @@
 <section class="outer-frame">
 
   <header>
+    <sl-icon src="/icons/identities.svg"></sl-icon>
     <h2>Identities</h2>
+    <sl-icon-button src="/icons/arrow-right.svg" href="/settings/identities" />
   </header>
 
   {#if state === "loading"}
@@ -79,16 +81,28 @@
   }
 
   header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
     padding: 0.75rem var(--gobo-width-spacer);
     border-bottom: var(--gobo-border-panel);
     margin-bottom: var(--gobo-height-spacer-flex);
     width: 100%;
   }
 
+  header sl-icon {
+    font-size: 2rem;
+  }
+
   h2 {
+    flex: 1 1 100%;
     font-weight: var(--gobo-font-weight-black);
     font-size: 1.25rem;
     text-transform: capitalize;
+  }
+
+  header sl-icon-button {
+    color: var(--gobo-color-text);
   }
 
   .inner-frame {
