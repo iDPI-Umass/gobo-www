@@ -12,11 +12,11 @@ const get = App.unauthorized(async ({ identity, id }) => {
 
 
 
-const publish = App.unauthorized(async ( post, targets ) => {
+const publish = App.unauthorized(async ( newPost ) => {
   const client = await Gobo.get();
   return await client.personPosts.post({ 
     parameters: { person_id: client.id },
-    content: { post, targets }   
+    content: newPost
   });
 });
 

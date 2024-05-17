@@ -5,6 +5,9 @@ import { App } from "$lib/engines/account.js";
 import { createStore } from "$lib/engines/store.js";
 import { Identity } from "$lib/engines/identity.js";
 import * as DeliveryHTTP from "$lib/resources/delivery.js";
+import * as FileHTTP from "$lib/resources/draft-file.js";
+import * as PostHTTP from "$lib/resources/post.js";
+import * as DraftHTTP from "$lib/resources/draft.js";
 import * as Random from "$lib/helpers/random.js";
 
 
@@ -141,122 +144,100 @@ Feed.startup = async () => {
 App.register( Feed.startup );
 
 
+// Eventually, we'll have a more organized way to handle multiple drafts
+// to handle their media attachments. Until then, we include the File instance
+// along with the Gobo file resource.
+class DraftFile {
+  constructor( file, attachment ) {
+    this.file = file;
+    this.attachment = attachment;
+  }
+
+  static async create( attachment ) {
+    const file = await FileHTTP.create();
+    attachment.id = file.id;
+    return new DraftFile( file, attachment );
+  }
+
+  async upload() {
+    if ( this.attachment != null ) {
+      await FileHTTP.upload( this.attachment );
+    }
+  }
+
+  async fail () {
+    this.file.state = "error"
+    try {
+      await FileHTTP.update( this.file );
+    } catch ( error ) {
+      console.error( error );
+    }
+  }
+}
+
+class Draft {
+  constructor( raw, draft, files ) {
+    this._draft = raw;
+    this.draft = draft;
+    this.files = files ?? [];
+  }
+
+  static async create( raw ) {
+    const kernel = {};
+    kernel.content = raw.content;
+    kernel.title = raw.options?.general?.title ?? undefined;
+    // kernel.poll = {};
+    kernel.files = [];
+    kernel.state = "draft";
+
+    const files = [];
+    for ( const attachment of raw.attachments ) {
+      const draftFile = await DraftFile.create( attachment );
+      files.push( draftFile );
+      kernel.files.push( draftFile.file.id );
+    }
+
+    const draft = await DraftHTTP.create( kernel );
+    return new Draft( raw, draft, files );
+  }
+
+  async upload() {
+    for ( const file of this.files ) {
+      try {
+        await file.upload();
+      } catch ( error ) {
+        console.warning( error );
+        await file.fail();
+      }
+    }
+  }
+}
+
+
+class DeliveryTarget {
+  constructor( target ) {
+    this.target = target;
+  }
+}
+
 
 // We need a full class for the delivery abstract model to support its
 // multiplicity on top of its complex internal state and reactivity.
 
 class Delivery {
-  constructor( delivery ) {
-    this.delivery = delivery;
-    this.stores = {
-      singleton: createStore(),
-      uploads: createStore(),
-      draft: createStore(),
-      targets: createStore(),
-      alerts: createStore(),
-    };
-    this.update();
+  constructor( graph ) {
+    this.graph = graph;
   }
 
-  static make( draft ) {
-    const uploads = [];
-    for ( const attachment of draft.attachments ) {
-      uploads.push({ 
-        state: "pending", 
-        ...attachment
-      });
-    }
-
-    const identities = draft.identities.filter( i => i.active === true );
-    const targets = [];
-    for ( const identity of identities ) {
-      targets.push({
-        state: "pending",
-        ...Value.clone( identity )
-      });
-    }
-
-    return new Delivery({
-      uploads,
-      draft,
-      targets,
-      alerts: []
-    });
+  static async create( draft ) {
+    const kernel = { draft };
+    const graph = await DeliveryHTTP.create( kernel );
+    const delivery = new Delivery( graph );
+    return delivery;
   }
 
-  static async fromResource( resource ) {
-    const targets = [];
-    for ( const reference of resource.targets ) {
-      const identity = await Identity.find( reference.identity );
-      if ( identity == null ) {
-        continue;
-      }
-      targets.push({ 
-        state: reference.state,
-        ...Value.clone( identity )
-      });
-    }
-
-    return new Delivery({
-      id: resource.id,
-      uploads: [],
-      draft: {},
-      targets,
-      alerts: []
-    });
-  }
-
-
-  update( value ) {
-    value ??= this.delivery;
-    this.delivery = value;
-    this.stores.singleton.put( value );
-    this.stores.uploads.put( value.uplods );
-    this.stores.draft.put( value.draft );
-    this.stores.targets.put( value.targets );
-    this.stores.alerts.put( value.alerts );
-    return value;
-  }
-
-  updateAspect( name, value ) {
-    this.delivery[ name ] = value;
-    this.stores[ name ].put( value );
-  }
-
-  pushAlert( message ) {
-    this.delivery.alerts.push({
-      key: Random.address(),
-      message
-    });
-    this.updateAspect( "alerts", this.delivery.alerts );
-  }
-
-  dismissAlert( key ) {
-    const index = this.delivery.alerts.findIndex( a => a.key === key );
-    if ( index > -1 ) {
-      this.delivery.alerts.splice( index, 1 );
-      this.updateAspect( "alerts", this.delivery.alerts );
-    }
-  }
-
-  clearAlerts() {
-    this.updateAspect( "alerts", [] );
-  }
-
-  async sync () {
-    const local = this.delivery;
-    if ( local.id != null ) {
-      const delivery = await DeliveryHTTP.get( local );
-    
-      for ( const target of delivery.targets ) {
-        const identity = local.targets.find( t => t.id === target.identity )
-        if ( identity != null ) {
-          identity.state = target.state;
-        }
-      }
-
-      this.updateAspect( "targets", local.targets );
-    }
+  static make( graph ) {
+    return new Delivery( graph );
   }
 }
 
@@ -264,5 +245,6 @@ class Delivery {
 export {
   Feed,
   Deliveries,
+  Draft,
   Delivery,
 }

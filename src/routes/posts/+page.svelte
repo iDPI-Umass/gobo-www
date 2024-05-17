@@ -5,27 +5,13 @@
   import Feed from "$lib/components/delivery/Feed.svelte";
   import { onMount } from "svelte";
   import { State } from "$lib/engines/store.js";
-  import * as identityStores from "$lib/stores/identity.js";
 
-  let state, identities;
   const Render = State.make();
   Render.cleanup = () => {
-    state = "loading";
-    identities = [];
-  };
-  
-  Render.identities = ( list ) => {
-    identities = list;
-    if ( identities.length === 0 ) {
-      state = "empty";
-    } else {
-      state = "ready";
-    }
   };
 
   Render.reset();
   onMount(() => {
-    Render.listen( identityStores.singleton, Render.identities );
     return () => {
       Render.reset();
     }

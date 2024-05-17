@@ -1,82 +1,15 @@
-import { Draft } from "$lib/engines/draft.js";
-import { Delivery } from "$lib/engines/delivery.js";
-import { Validate } from "$lib/engines/platforms/validate.js";
-import { Bluesky } from "$lib/engines/platforms/bluesky.js";
-import { Linkedin } from "$lib/engines/platforms/linkedin.js";
-import { Mastodon } from "$lib/engines/platforms/mastodon.js";
-import { Reddit } from "$lib/engines/platforms/reddit.js";
-import { Smalltown } from "$lib/engines/platforms/smalltown.js";
-import * as File from "$lib/resources/draft-file.js";
-import * as Post from "$lib/resources/post.js";
-
-
-const Metadata = {};
-
-Metadata.build = async ( identity, draft ) => {
-  switch ( identity.platform ) {
-    case "bluesky":
-      return await Bluesky.build( draft );
-    case "linkedin":
-      return await Linkedin.build( draft );
-    case "mastodon":
-      return Mastodon.build( draft );
-    case "reddit":
-      return Reddit.build( draft );
-    case "smalltown":
-      return Smalltown.build( draft );
-    default:
-      throw new Error("unknown platform type");
-  }
-};
+import { Draft, Delivery } from "$lib/engines/delivery.js";
+import { Metadata } from "$lib/engines/platforms/metadata.js";
 
 
 const Publish = {};
 
-Publish.build = ( draft ) => {
-  const post = {};
-  post.content = draft.content;
-  post.title = draft.options?.general?.title ?? undefined;
-  // post.poll = {};
-  return post;
-};
-
-
-Publish.uploadAttachments = async ( uploads ) => {
-  let earlyReturn = false;
-  const ids = [];
-  for ( const upload of uploads ) {
-    try {
-      const file = await File.create( upload );
-      ids.push( file.id );
-      upload.state = "uploaded";
-      Delivery.updateAspect( "uploads", uploads );
-    } catch ( error ) {
-      console.error( error );
-      upload.state = "error";
-      earlyReturn = true;
-      break;
-    }
-  }
-
-  if ( earlyReturn ) {
-    for ( const upload of uploads ) {
-      if ( upload.state === "pending" ) {
-        upload.state = "aborted"
-      }
-    }
-    throw new Error();
-  }
-
-  return ids;
-};
-
-
-Publish.buildTargets = async ( draft ) => {
+Publish.buildTargets = async ( raw ) => {
   const targets = [];
-  for ( const identity of draft.identities ) {
+  for ( const identity of raw.identities ) {
     if ( identity.active === true ) {
       try {
-        const metadata = await Metadata.build( identity, draft );
+        const metadata = await Metadata.build( identity, raw );
         targets.push({ identity: identity.id, metadata });
       } catch ( error ) {
         console.error( error );
@@ -89,40 +22,36 @@ Publish.buildTargets = async ( draft ) => {
   return targets;
 };
 
-
-Publish.start = async function ( delivery ) {
-  let post, targets;
-  const delivery = frame.delivery;
-
-  try {
-    post = Publish.build( delivery.draft );
-  } catch ( error ) {
-    console.error( error );
-    frame.pushAlert( "There was a problem assembling post data." );
-    return;
+Publish.setup = async ( raw ) => {
+  const draft = await Draft.create( raw )
+  const delivery = await Delivery.create( draft.draft );
+  const targets = await Publish.buildTargets( raw );
+  if ( targets === false ) {
+    throw new Error( "early return" );
+  } else {
+    return { draft, delivery, targets };
   }
+};
 
+Publish.start = async function ({ draft, delivery, targets }) {
   try {
-    post.attachments = await Publish.uploadAttachments( delivery.uploads );
+    await draft.upload();
   } catch ( error ) {
-    frame.pushAlert( "Failed to upload images." );
+    console.error( "failed to upload attachments" );
+    console.error( error );
     return;
   }
   
-  targets = await Publish.buildTargets( delivery.draft );
-  if ( targets.includes( false )) {
-    return;
-  }
- 
+  const newPost = {
+    delivery_id: delivery.delivery.id,
+    draft_id: draft.draft.id,
+    targets
+  };
+
   try {
-    const { id } = await Post.publish( post, targets );
-    delivery.id = id;
-    frame.update( delivery );
-    return frame;
+    return await PostHTTP.publish( newPost );   
   } catch ( error ) {
     console.error( error );
-    frame.pushAlert( "Failed to submit post to Gobo API." );
-    return;
   }
 };
 

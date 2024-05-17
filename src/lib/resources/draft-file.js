@@ -1,7 +1,35 @@
 import { Gobo, App } from "$lib/engines/account.js";
 
 
-const create = async function ({ file, name, alt }) {
+const create = App.unauthorized(async ( kernel ) => {
+  const client = await Gobo.get();
+  return await client.personDraftFiles.post({
+    parameters: { person_id: client.id }
+  });
+});
+
+
+const remove = App.unauthorized(async ( file ) => {
+  const client = await Gobo.get();
+  return await client.personDraftFile.delete({
+    person_id: client.id,
+    id: file.id
+  });
+});
+
+
+const update = App.unauthorized(async ( file ) => { 
+  const client = await Gobo.get();
+  return await client.personDraftFile.put({
+    parameters: { 
+      person_id: client.id,
+      id: file.id 
+    },
+    content: file,
+  });
+});
+
+const upload = App.unauthorized(async ({ file, name, alt, id }) => {
   const form = new FormData();
   const filename = name ?? file.name;
   form.append("file", file, { filename });
@@ -13,41 +41,20 @@ const create = async function ({ file, name, alt }) {
     form.append("alt", alt );
   }
   
-  try {
-    const client = await Gobo.get();
-    return await client.personDraftFiles.post({
-      parameters: { person_id: client.id },
-      content: form,
-    });
-
-  } catch ( error ) {
-    if ( error.status === 401 ) {
-      return await App.logout();
-    }
-    throw error;
-  }
-};
-
-
-const remove = async function ( draft ) {
-  try {
-    const client = await Gobo.get();
-    return await client.personDraftFile.delete({
+  const client = await Gobo.get();
+  return await client.personDraftFile.post({
+    parameters: { 
       person_id: client.id,
-      id: draft.id
-    });
-  } catch ( error ) {
-    if ( error.status === 401 ) {
-      return await App.logout();
-    }
-    if ( error.status === 404 ) {
-      console.warn( `The draft image ${ draft.id } is not found` );
-    }
-  }
-};
+      id 
+    },
+    content: form,
+  });
+});
 
 
 export {
   create,
-  remove
+  remove,
+  update,
+  upload
 }

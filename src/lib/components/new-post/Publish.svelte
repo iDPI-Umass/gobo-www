@@ -30,7 +30,17 @@
       return;
     }
     
-    Publish.start( draft );
+    let context;
+    try {
+      context = await Publish.setup( draft );
+    } catch ( error ) {
+      console.error( error );
+      Draft.pushAlert( "There was a problem assembling post data." );
+      publishButton.loading = false;
+      return;
+    }
+    
+    Publish.start( context );
     replaceState( "/home" );
     goto( "/posts" );
   };
