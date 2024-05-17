@@ -1,24 +1,10 @@
+import { Weave } from "$lib/engines/delivery/weave.js";
 import * as Deliveries from "$lib/resources/person-delivery-feeds/_all.js";
 
 // The following classes play an HTTP intermediary role. They are focused on
 // RESTful composition that stablizes this client's request pattern to the GOBO
 // HTTP API while building an integrative layer that provides a unified feed as
 // a transparent interface.
-
-const Weave = {};
-
-Weave.make = ( graph ) => {
-  const deliveries = {};
-  for ( const delivery of graph.deliveries ) {
-    deliveries[ delivery.id ] = delivery;
-  }
-
-  return {
-    feed: graph.feed,
-    deliveries
-  };
-};
-
 
 class Reader {
   constructor ({ per_page }) {
@@ -47,7 +33,7 @@ class Reader {
       return; // Bail if we run into an authorization problem.
     }
 
-    const weave = Weave.make( graph );
+    const weave = await Weave.make( graph );
 
     // Almost done. Place results into outer interface and ready next cycle.
     const feed = [];

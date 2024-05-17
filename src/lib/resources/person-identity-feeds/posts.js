@@ -1,6 +1,6 @@
 import { Identity } from "$lib/engines/identity.js";
 import { Filter } from "$lib/engines/filter.js";
-import { Weave } from "$lib/engines/weave.js";
+import { Weave } from "$lib/engines/feed/weave.js";
 import * as Posts from "$lib/resources/person-identity-feeds/_posts.js";
 import { Cache } from "$lib/resources/cache.js";
 

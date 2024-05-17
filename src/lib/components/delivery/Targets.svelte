@@ -6,67 +6,30 @@
   import { State } from "$lib/engines/store.js";
   import { Name } from "$lib/engines/draft.js";
 
-  export let frame;
+  export let delivery;
 
 
-  let state, targets;
+  let targets;
   const Render = State.make();
 
   Render.cleanup = () => {
-    state = "halt";
     targets = [];
   };
 
-  Render.targets = ( value ) => {
-    targets = value;
+  Render.targets = () => {
+    targets = delivery.targets;
   };
-
-
-  const Target = {};
-
-  Target.isTerminal = ( target ) => {
-    return [ "delivered", "error" ].includes( target.state );
-  };
-
-  const Cycle = {};
-
-  Cycle.isDone = () => {
-    return targets.every( Target.isTerminal );
-  };
-
-  Cycle.run = async () => {
-    while ( true ) {
-      console.log("fetching state")
-      if ( state == null || state === "halt" ) {
-        return;
-      }
-      if ( Cycle.isDone() ) {
-        return;
-      }
-      if ( state === "fetch" ) {
-        await frame.sync();
-        await Time.sleep( 2000 );
-      }
-    }
-  };
-
-  Cycle.start = () => {
-    state = "fetch";
-    Cycle.run();
-  };
-
-
-  const Handle = {};
 
 
   Render.reset();
   onMount(() => {
-    Render.listen( frame.stores.targets, Render.targets );
-    Cycle.start();
+    Render.targets();
     return () => {
       Render.reset();
     };
   });
+
+  $: Render.targets( delivery );
 </script>
 
 
@@ -78,11 +41,11 @@
       <div class="table-row">
         <div class="platform">
           <sl-icon 
-            src="/icons/{target.platform}.svg" 
-            class={target.platform} />
+            src="/icons/{target.identity.platform}.svg" 
+            class={target.identity.platform} />
           
           <p>
-            {#each Name.split(target.prettyName) as part}
+            {#each Name.split(target.identity.prettyName) as part}
               <span>{ part }</span>
             {/each}
           </p>

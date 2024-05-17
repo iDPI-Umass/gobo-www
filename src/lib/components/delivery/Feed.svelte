@@ -3,7 +3,7 @@
   import Delivery from "$lib/components/delivery/Delivery.svelte";
 
   import { onMount, tick } from "svelte";
-  import { Feed } from "$lib/engines/delivery.js";
+  import { Feed } from "$lib/engines/delivery/index.js";
   import { State } from "$lib/engines/store.js";
   import { Scroll } from "$lib/engines/scroll.js";
   import * as deliveryStores from "$lib/stores/delivery.js";

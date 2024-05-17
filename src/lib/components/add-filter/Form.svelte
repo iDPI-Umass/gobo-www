@@ -9,7 +9,7 @@
   import { replaceState, goto } from "$app/navigation";
   import { State } from "$lib/engines/store.js";
   import { Filter } from "$lib/engines/filter.js";
-  import { Feed } from "$lib/engines/feed.js";
+  import { Feed } from "$lib/engines/feed/index.js";
   import * as filterStores from "$lib/stores/filter.js";
 
   let form, button, inputs;

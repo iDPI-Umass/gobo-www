@@ -1,6 +1,6 @@
 import * as Type from "@dashkite/joy/type";
 import { Filter } from "$lib/engines/filter.js";
-import { Weave } from "$lib/engines/weave.js";
+import { Weave } from "$lib/engines/feed/weave.js";
 import { Cache } from "$lib/resources/cache.js";
 import * as Resource from "$lib/resources/post.js";
 import * as Random from "$lib/helpers/random.js";

@@ -4,7 +4,7 @@
   import { onMount } from "svelte";
   import { State } from "$lib/engines/store.js";
   import { Identity } from "$lib/engines/identity.js";
-  import { Feed } from "$lib/engines/feed.js";
+  import { Feed } from "$lib/engines/feed/index.js";
   import { Feed as Notifications } from "$lib/engines/notification.js";
 
   export let identity;

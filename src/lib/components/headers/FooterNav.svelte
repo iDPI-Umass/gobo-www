@@ -4,7 +4,7 @@
   import "@shoelace-style/shoelace/dist/components/badge/badge.js";
   import { onMount } from "svelte";
   import { State } from "$lib/engines/store.js";
-  import { Feed } from "$lib/engines/feed.js";
+  import { Feed } from "$lib/engines/feed/index.js";
   import { Feed as Notifications } from "$lib/engines/notification.js";
   import * as notificationStores from "$lib/stores/notification.js";
 

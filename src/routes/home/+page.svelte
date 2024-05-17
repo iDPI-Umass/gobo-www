@@ -8,8 +8,7 @@
   import MobileFilters from "$lib/components/MobileFilters.svelte";
   import { onMount } from "svelte";
   import { Draft } from "$lib/engines/draft.js";
-  import { Feed } from "$lib/engines/feed.js";
-
+  import { Feed } from "$lib/engines/feed/index.js";
   // As a temporary measure, we reset the draft when we go home. This keeps
   // us from resetting on all navigations, like the image pages.
   onMount(() => {

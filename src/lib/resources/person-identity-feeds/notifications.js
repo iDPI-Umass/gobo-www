@@ -1,5 +1,5 @@
 import { Identity } from "$lib/engines/identity.js";
-import { Weave } from "$lib/engines/weave.js";
+import { Weave } from "$lib/engines/feed/weave.js";
 import * as Notifications from "$lib/resources/person-identity-feeds/_notifications.js";
 import { Cache } from "$lib/resources/cache.js";
 

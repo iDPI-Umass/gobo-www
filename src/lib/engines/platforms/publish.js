@@ -1,5 +1,6 @@
-import { Draft, Delivery } from "$lib/engines/delivery.js";
+import { Draft, Delivery } from "$lib/engines/delivery/index.js";
 import { Metadata } from "$lib/engines/platforms/metadata.js";
+import * as PostHTTP from "$lib/resources/post.js";
 
 
 const Publish = {};
@@ -9,8 +10,8 @@ Publish.buildTargets = async ( raw ) => {
   for ( const identity of raw.identities ) {
     if ( identity.active === true ) {
       try {
-        const metadata = await Metadata.build( identity, raw );
-        targets.push({ identity: identity.id, metadata });
+        const stash = await Metadata.build( identity, raw );
+        targets.push({ identity: identity.id, stash });
       } catch ( error ) {
         console.error( error );
         Delivery.pushAlert( `Unable to prepare post for platform ${ identity?.platform }.` );
@@ -43,8 +44,8 @@ Publish.start = async function ({ draft, delivery, targets }) {
   }
   
   const newPost = {
-    delivery_id: delivery.delivery.id,
-    draft_id: draft.draft.id,
+    delivery_id: delivery.id,
+    draft_id: draft.id,
     targets
   };
 

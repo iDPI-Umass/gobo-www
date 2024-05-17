@@ -3,7 +3,7 @@
   import Post from "$lib/components/Post.svelte";
 
   import { onMount, tick } from "svelte";
-  import { Feed } from "$lib/engines/feed.js";
+  import { Feed } from "$lib/engines/feed/index.js";
   import { State } from "$lib/engines/store.js";
   import { Scroll } from "$lib/engines/scroll.js";
   // import * as scrollStores from "$lib/stores/scroll.js";

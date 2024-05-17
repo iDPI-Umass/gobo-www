@@ -5,7 +5,7 @@
   import { onMount } from "svelte";
   import { State } from "$lib/engines/store.js";
 
-  export let frame;
+  export let delivery;
 
   
   let uploads;
@@ -15,21 +15,20 @@
     uploads = [];
   };
 
-  Render.uploads = ( value ) => {
-    uploads = value;
+  Render.uploads = () => {
+    uploads = delivery.files;
   };
-
-
-  const Handle = {};
 
 
   Render.reset();
   onMount(() => {
-    Render.listen( frame.stores.uploads, Render.uploads );
+    Render.uploads();
     return () => {
       Render.reset();
     };
   });
+
+  $: Render.uploads( delivery );
 </script>
 
 
@@ -37,14 +36,11 @@
   <h2>Uploads</h2>
 
   <div class="gobo-table">
-    {#each uploads as upload (upload.file.name)}
+    {#each uploads as upload (upload.name)}
       <div class="table-row">
         <div class="metadata">
           <p>
-            { upload.file.name }
-          </p>
-          <p>
-            Size: {filesize( upload.file.size )}
+            { upload.name }
           </p>
         </div>
 

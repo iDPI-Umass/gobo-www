@@ -1,36 +1,80 @@
 <script>
+  import * as Time from "@dashkite/joy/time";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/textarea/textarea.js";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
-  import Alerts from "$lib/components/delivery/Alerts.svelte";
+  import Content from "$lib/components/delivery/Content.svelte";
   import Uploads from "$lib/components/delivery/Uploads.svelte";
   import Targets from "$lib/components/delivery/Targets.svelte";
-  import Buttons from "$lib/components/delivery/Buttons.svelte";
   import { onMount } from "svelte";
   import { State } from "$lib/engines/store.js";
-  import { Delivery } from "$lib/engines/delivery.js";
+  import { Delivery } from "$lib/engines/delivery/index.js";
 
   export let delivery;
 
-  let state, frame;
+  let state, current;
   const Render = State.make();
   Render.cleanup = () => {
     state = "loading";
-    frame = null;
+    current = null;
   };
 
-  Render.delivery = async ( value ) => {
-    frame = await Delivery.fromResource( delivery );
+  Render.current = async () => {
+    current = delivery;
     state = "ready";
+
+    while ( Helpers.isActive( current ) ) {
+      current = await Delivery.get( current.id );
+      await Time.sleep( 3000 );
+    }
   };
+
+  const Helpers = {};
+
+  Helpers.isActive = ( delivery ) => {
+    return (delivery != null) &&
+      Helpers.isNew( delivery ) &&
+      Helpers.needsRefresh( delivery );
+  }
+
+  Helpers.isNew = ( delivery ) => {
+    const now = (new Date).toISOString();
+    const timestamp = new Date( delivery.created );
+    timestamp.setUTCMinutes( timestamp.getUTCMinutes() + 5 );
+    return now < timestamp.toISOString();
+  };
+
+  Helpers.needsRefresh = ( delivery ) => {
+    const draft = delivery.draft;
+    if ( draft == null || !["submitted", "error"].includes(draft.state) ) {
+      return true;
+    }
+    
+    for ( const file of draft.files ) {
+      if ( !["uploaded", "error"].includes(file.state) ) {
+        return true;
+      }
+    }
+
+    for ( const target of delivery.targets ) {
+      if ( !["delivered", "error"].includes(target.state) ) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
 
   Render.reset();
   onMount(() => {
-    Render.delivery();
+    Render.current();
     return () => {
       Render.reset();
     };
   });
+
+  $: Render.current( delivery );
 </script>
 
 
@@ -39,17 +83,23 @@
     <Spinner></Spinner>
 
   {:else if state === "ready"}
-    <section class="panel">
-      <Alerts {frame}></Alerts>
-    </section>
+    {#if current.draft?.content}
+      <section class="panel">
+        <Content delivery={current}></Content>
+      </section>
+    {/if}
 
-    <section class="panel">
-      <Uploads {frame}></Uploads>
-    </section>
+    {#if current.files.length > 0}
+      <section class="panel">
+        <Uploads delivery={current}></Uploads>
+      </section>
+    {/if}
 
-    <section class="panel">
-      <Targets {frame}></Targets>
-    </section>
+    {#if current.targets.length > 0}
+      <section class="panel">
+        <Targets delivery={current}></Targets>
+      </section>
+    {/if}
 
   {/if}
 </section>

@@ -8,7 +8,7 @@
 
 <a class="nav-link" href={href} on:click={ action }>
   <slot></slot>
-  <sl-icon src="icons/chevron-right.svg"></sl-icon>
+  <sl-icon src="/icons/chevron-right.svg"></sl-icon>
 </a>
 
 

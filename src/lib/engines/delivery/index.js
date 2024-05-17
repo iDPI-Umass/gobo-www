@@ -1,12 +1,12 @@
 import * as Value from "@dashkite/joy/value";
-import { Feed as Weaver } from "$lib/resources/person-delivery-feeds/all.js";
-import * as stores from "$lib/stores/delivery.js";
 import { App } from "$lib/engines/account.js";
 import { createStore } from "$lib/engines/store.js";
 import { Identity } from "$lib/engines/identity.js";
+import { Weave } from "$lib/engines/delivery/weave.js";
+import * as stores from "$lib/stores/delivery.js";
 import * as DeliveryHTTP from "$lib/resources/delivery.js";
+import { Feed as Weaver } from "$lib/resources/person-delivery-feeds/all.js";
 import * as FileHTTP from "$lib/resources/draft-file.js";
-import * as PostHTTP from "$lib/resources/post.js";
 import * as DraftHTTP from "$lib/resources/draft.js";
 import * as Random from "$lib/helpers/random.js";
 
@@ -179,6 +179,7 @@ class Draft {
   constructor( raw, draft, files ) {
     this._draft = raw;
     this.draft = draft;
+    this.id = this.draft.id;
     this.files = files ?? [];
   }
 
@@ -225,19 +226,24 @@ class DeliveryTarget {
 // multiplicity on top of its complex internal state and reactivity.
 
 class Delivery {
-  constructor( graph ) {
-    this.graph = graph;
+  constructor( delivery ) {
+    this.delivery = delivery;
+    this.id = this.delivery.id;
   }
 
   static async create( draft ) {
-    const kernel = { draft };
-    const graph = await DeliveryHTTP.create( kernel );
-    const delivery = new Delivery( graph );
+    const kernel = { 
+      draft_id: draft.id
+    };
+    const resource = await DeliveryHTTP.create( kernel );
+    const delivery = new Delivery( resource );
     return delivery;
   }
 
-  static make( graph ) {
-    return new Delivery( graph );
+  static async get( id ) {
+    const graph = await DeliveryHTTP.get({ id });
+    const weave = await Weave.make( graph );
+    return weave.deliveries[ weave.feed[0] ];
   }
 }
 
