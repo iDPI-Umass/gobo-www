@@ -53,7 +53,7 @@ const Validate = {};
 Validate.image = ( attachment ) => {
   const limits = Reddit.limits.image
 
-  const type = attachment.file.type;
+  const type = attachment.type;
   if ( !limits.types.includes(type) ) {
     Draft.pushAlert(
       `Reddit does not accept images of type ${ type }`
@@ -61,7 +61,7 @@ Validate.image = ( attachment ) => {
     return false;
   }
   
-  const size = attachment.file.size;
+  const size = attachment.size;
   if ( size > limits.size ) {
     Draft.pushAlert(
       `Reddit does not accept image files larger than ${filesize( limits.size )}`
@@ -75,7 +75,7 @@ Validate.image = ( attachment ) => {
 Validate.video = ( attachment ) => {
   const limits = Reddit.limits.video
 
-  const type = attachment.file.type;
+  const type = attachment.type;
   if ( !limits.types.includes(type) ) {
     Draft.pushAlert(
       `Reddit does not accept video of type ${ type }`
@@ -83,7 +83,7 @@ Validate.video = ( attachment ) => {
     return false;
   }
   
-  const size = attachment.file.size;
+  const size = attachment.size;
   if ( size > limits.size ) {
     Draft.pushAlert(
       `Reddit does not accept video files larger than ${filesize( limits.size )}`
@@ -104,8 +104,8 @@ Reddit.validateAttachments = ( draft ) => {
   }
 
   for ( const attachment of draft.attachments ) {
-    const name = attachment.file.name;
-    const category = attachment.file.type.split( "/" )[0];
+    const name = attachment.name;
+    const category = attachment.type.split( "/" )[0];
     if ( category == null ) {
       Draft.pushAlert(
         `Gobo cannot identify the media type of attachment ${ name }`
@@ -115,7 +115,7 @@ Reddit.validateAttachments = ( draft ) => {
 
     if ( Validate[ category ] == null ) {
       Draft.pushAlert(
-        `Reddit does not support type ${ attachment.file.type }`
+        `Reddit does not support type ${ attachment.type }`
       );
       return false; 
     }
@@ -126,7 +126,7 @@ Reddit.validateAttachments = ( draft ) => {
     }
   }
 
-  const hasVideo = !!draft.attachments.find( a => a.file.type.startsWith("video") );
+  const hasVideo = !!draft.attachments.find( a => a.type.startsWith("video") );
   if ( hasVideo && draft.attachments.length > 1 ) {
     Draft.pushAlert(
       `Reddit requires that video posts have no other attachments.`

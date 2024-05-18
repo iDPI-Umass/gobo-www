@@ -139,7 +139,7 @@
       <div slot="content" class="attributed">
         <DirectMessageAction {source} {notification}/>
       </div>
-      <DirectMessageFooter slot="footer" {identity} {notification} {source} {post} />
+      <DirectMessageFooter slot="footer" {identity} {notification} {source} />
     </Frame>
 
   {:else}

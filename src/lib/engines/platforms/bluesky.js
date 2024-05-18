@@ -188,7 +188,7 @@ Bluesky.build = async ( draft ) => {
 Bluesky.validateAttachments = ( draft ) => {
   const limits = Bluesky.limits.image;
   for ( const attachment of draft.attachments ) {
-    const type = attachment.file.type;
+    const type = attachment.type;
     if ( !limits.types.includes( type )) {
       Draft.pushAlert(
         `Bluesky does not accept attachments of type ${ type }`
@@ -196,7 +196,7 @@ Bluesky.validateAttachments = ( draft ) => {
       return false;
     }
 
-    const size = attachment.file.size;
+    const size = attachment.size;
     if ( size > limits.size ) {
       Draft.pushAlert(
         `Bluesky does not accept attachments larger than ${filesize( limits.size )}`

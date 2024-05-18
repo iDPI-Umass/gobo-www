@@ -29,7 +29,7 @@ const update = App.unauthorized(async ( file ) => {
   });
 });
 
-const upload = App.unauthorized(async ({ file, name, alt, id }) => {
+const upload = App.unauthorized(async ( file, { name, alt, id }) => {
   const form = new FormData();
   const filename = name ?? file.name;
   form.append("file", file, { filename });
@@ -51,10 +51,19 @@ const upload = App.unauthorized(async ({ file, name, alt, id }) => {
   });
 });
 
+const getURL = async ( file ) => { 
+  const client = await Gobo.get();
+  return await client.personDraftFile.url({ 
+    person_id: client.id,
+    id: file.id
+  });
+};
+
 
 export {
   create,
   remove,
   update,
-  upload
+  upload,
+  getURL,
 }

@@ -42,6 +42,9 @@
           <p>
             { upload.name }
           </p>
+          <p>
+            Size: {filesize( upload.size )}
+          </p>
         </div>
 
         {#if upload.state === "pending"}

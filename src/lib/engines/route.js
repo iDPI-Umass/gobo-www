@@ -2,6 +2,7 @@ import { goto } from "$app/navigation";
 import * as LS from  "$lib/helpers/local-storage.js";
 import { App, Clients, Gobo } from "$lib/engines/account.js";
 import { Identity as IdentityEngine } from "$lib/engines/identity.js";
+import { Bootstrap } from "$lib/engines/bootstrap.js";
 import * as Welcome from "$lib/helpers/welcome.js";
 
 const exists = function ( value ) {
@@ -25,7 +26,7 @@ const handleCallbackError = async function () {
 
 const successfulAuth = async () => {
   App.refresh();
-  await App.startup();
+  await Bootstrap.run();
   
   if ( !(await App.isAllowedAccess()) ) {
     return goto( "/permissions" );
@@ -155,7 +156,7 @@ Route.handle = async () => {
   try {
     const url = new URL( document.location );
     const query = extractQuery( url );
-    App.startup();
+    Bootstrap.run();
     
     switch ( url.pathname ) {
       case "/":

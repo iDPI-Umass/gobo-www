@@ -71,7 +71,7 @@ const Validate = {};
 Validate.image = ( attachment ) => {
   const limits = Smalltown.limits.image
 
-  const type = attachment.file.type;
+  const type = attachment.type;
   if ( !limits.types.includes(type) ) {
     Draft.pushAlert(
       `Smalltown does not accept images of type ${ type }`
@@ -79,7 +79,7 @@ Validate.image = ( attachment ) => {
     return false;
   }
   
-  const size = attachment.file.size;
+  const size = attachment.size;
   if ( size > limits.size ) {
     Draft.pushAlert(
       `Smalltown does not accept image files larger than ${filesize( limits.size )}`
@@ -93,7 +93,7 @@ Validate.image = ( attachment ) => {
 Validate.audio = ( attachment ) => {
   const limits = Smalltown.limits.audio
 
-  const type = attachment.file.type;
+  const type = attachment.type;
   if ( !limits.types.includes(type) ) {
     Draft.pushAlert(
       `Smalltown does not accept audio of type ${ type }`
@@ -101,7 +101,7 @@ Validate.audio = ( attachment ) => {
     return false;
   }
   
-  const size = attachment.file.size;
+  const size = attachment.size;
   if ( size > limits.size ) {
     Draft.pushAlert(
       `Smalltown does not accept audio files larger than ${filesize( limits.size )}`
@@ -115,7 +115,7 @@ Validate.audio = ( attachment ) => {
 Validate.video = ( attachment ) => {
   const limits = Smalltown.limits.video
 
-  const type = attachment.file.type;
+  const type = attachment.type;
   if ( !limits.types.includes(type) ) {
     Draft.pushAlert(
       `Smalltown does not accept video of type ${ type }`
@@ -123,7 +123,7 @@ Validate.video = ( attachment ) => {
     return false;
   }
   
-  const size = attachment.file.size;
+  const size = attachment.size;
   if ( size > limits.size ) {
     Draft.pushAlert(
       `Smalltown does not accept video files larger than ${filesize( limits.size )}`
@@ -144,8 +144,8 @@ Smalltown.validateAttachments = ( draft ) => {
   }
 
   for ( const attachment of draft.attachments ) {
-    const name = attachment.file.name;
-    const category = attachment.file.type.split( "/" )[0];
+    const name = attachment.name;
+    const category = attachment.type.split( "/" )[0];
     if ( category == null ) {
       Draft.pushAlert(
         `Gobo cannot identify the media type of attachment ${ name }`
@@ -155,7 +155,7 @@ Smalltown.validateAttachments = ( draft ) => {
 
     if ( Validate[ category ] == null ) {
       Draft.pushAlert(
-        `Smalltown does not support type ${ attachment.file.type }`
+        `Smalltown does not support type ${ attachment.type }`
       );
       return false; 
     }
@@ -166,7 +166,7 @@ Smalltown.validateAttachments = ( draft ) => {
     }
   }
 
-  const hasGIF = !!draft.attachments.find( a => a.file.type === "image/gif" );
+  const hasGIF = !!draft.attachments.find( a => a.type === "image/gif" );
   if ( hasGIF && draft.attachments.length > 1 ) {
     Draft.pushAlert(
       `Smalltown requires that GIF posts have no other attachments.`
@@ -174,7 +174,7 @@ Smalltown.validateAttachments = ( draft ) => {
     return false;
   }
 
-  const hasAudio = !!draft.attachments.find( a => a.file.type.startsWith("audio") );
+  const hasAudio = !!draft.attachments.find( a => a.type.startsWith("audio") );
   if ( hasAudio && draft.attachments.length > 1 ) {
     Draft.pushAlert(
       `Smalltown requires that audio posts have no other attachments.`
@@ -182,7 +182,7 @@ Smalltown.validateAttachments = ( draft ) => {
     return false;
   }
 
-  const hasVideo = !!draft.attachments.find( a => a.file.type.startsWith("video") );
+  const hasVideo = !!draft.attachments.find( a => a.type.startsWith("video") );
   if ( hasVideo && draft.attachments.length > 1 ) {
     Draft.pushAlert(
       `Smalltown requires that video posts have no other attachments.`

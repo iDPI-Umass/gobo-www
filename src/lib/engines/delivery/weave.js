@@ -26,7 +26,10 @@ Weave.make = async ( graph ) => {
     delivery.draft = drafts[ delivery.draft_id ];
     const _files = [];
     for ( const id of delivery.draft.files ) {
-      _files.push( files[id] );
+      const file = files[id];
+      if ( file != null ) {
+        _files.push( files );
+      }
     }
     delivery.files = _files;
     delivery.draft.files = _files;

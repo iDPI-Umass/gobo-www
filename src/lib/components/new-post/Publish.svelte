@@ -4,6 +4,7 @@
   import { replaceState, goto } from "$app/navigation";
   import { State, Draft } from "$lib/engines/draft.js";
   import { Publish, Validate } from "$lib/engines/platforms/index.js";
+  import { Feed as DeliveryFeed } from "$lib/engines/delivery/index.js";
 
   let publishButton;
   const Render = State.make();
@@ -41,6 +42,7 @@
     }
     
     Publish.start( context );
+    DeliveryFeed.refresh();
     replaceState( "/home" );
     goto( "/posts" );
   };

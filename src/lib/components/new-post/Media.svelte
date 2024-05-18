@@ -7,6 +7,7 @@
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import { State, Draft, Options, Media } from "$lib/engines/draft.js";
+  import { DraftFile } from "$lib/engines/draft-file.js";
   import { Platforms } from "$lib/engines/platforms/index.js";
   import { previewStore } from "$lib/stores/image-preview.js";
   import { altStore } from "$lib/stores/alt-store.js"
@@ -41,17 +42,19 @@
 
 
   const Image = {};
-  Image.add = ( file ) => {
-    const index = attachments.findIndex( a => a.file.name === file.name );
+  Image.add = async ( file ) => {
+    const index = attachments.findIndex( a => a.name === file.name );
     
     if ( index < 0 ) {
-      altStore.set({ file, alt: null });
+      const draftFile = await DraftFile.fromFile( file );
+      altStore.set( draftFile );
       goto("/new-post/alt");
     
     } else {
       const match = attachments[ index ];
-      if ( file.lastModified !== match.file.lastModified ) {
-        altStore.set({ file, alt: match.alt });
+      if ( file.lastModified !== match.file?.lastModified ) {
+        const draftFile = await DraftFile.fromFile( file );
+        altStore.set( draftFile );
         attachments.splice( index, 1 );
         Draft.updateAspect( "attachments", attachments );
         goto( "/new-post/alt" );
@@ -61,17 +64,19 @@
 
 
   const Attachment = {};
-  Attachment.add = ( file ) => {
-    const index = attachments.findIndex( a => a.file.name === file.name );
+  Attachment.add = async ( file ) => {
+    const index = attachments.findIndex( a => a.name === file.name );
 
     if ( index < 0 ) {
-      attachments.push({ file });
+      const draftFile = await DraftFile.fromFile( file );
+      attachments.push( draftFile );
       Draft.updateAspect( "attachments", attachments );
     
     } else {
       const match = attachments[ index ];
-      if ( file.lastModified !== match.file.lastModified ) {
-        attachments.splice( index, 1, { file });
+      if ( file.lastModified !== match.file?.lastModified ) {
+        const draftFile = await DraftFile.fromFile( file );
+        attachments.splice( index, 1, draftFile );
         Draft.updateAspect( "attachments", attachments );
       }
     }
@@ -87,11 +92,12 @@
     }
   };
 
-  File.addMany = ( files ) => {
+  File.addMany = async ( files ) => {
     for ( const file of files ) {
-      const attachment = attachments.find( a => a.file.name === file.name );
+      const attachment = attachments.find( a => a.name === file.name );
       if ( attachment == null ) {
-        attachments.push({ file, alt: null });
+        const draftFile = await DraftFile.fromFile( file );
+        attachments.push( draftFile );
       }
     }
     attachments = attachments;
@@ -182,7 +188,7 @@
         return;
       }
 
-      const index = attachments.findIndex( a => a.file.name === attachment.file.name );
+      const index = attachments.findIndex( a => a.name === attachment.name );
 
       if ( index >= 0 ) {
         attachments.splice( index, 1 );
@@ -249,23 +255,23 @@
 {#if attachments.length > 0 }
   <div 
     class="gobo-table">
-    {#each attachments as attachment (attachment.file.name)}
+    {#each attachments as attachment (attachment.name)}
       <div class="table-row">
         <div class="metadata">
           
-          {#if Media.canPreview(attachment.file)}
+          {#if Media.canPreview(attachment)}
             <a
               href="/upload-preview"
               on:click={Handle.preview( attachment )}
               on:keydown={Handle.preview( attachment )}>
-              { attachment.file.name }
+              { attachment.name }
             </a>
           {:else}
-            <p>{ attachment.file.name }</p>
+            <p>{ attachment.name }</p>
           {/if}
 
           <p>
-            Size: {filesize( attachment.file.size )}
+            Size: {filesize( attachment.size )}
           </p>
         </div>
         

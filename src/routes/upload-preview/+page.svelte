@@ -26,7 +26,11 @@
 
   Render.attachment = ( value ) => {
     attachment = value;
-    Render.url( attachment.file );
+    if ( attachment.file != null ) {
+      Render.url( attachment.file );
+    } else {
+      url = attachment.url;
+    }
   };
 
   Render.reset();
@@ -53,7 +57,7 @@
           preload="metadata">
           <source 
             src={url}
-            type={attachment.file.type} />
+            type={attachment.type} />
         </audio>
       {:else if Media.isVideo(attachment.file)}
         <!-- svelte-ignore a11y-media-has-caption -->
@@ -62,7 +66,7 @@
           preload="metadata">
           <source
             src={url}
-            type={attachment.file.type} />
+            type={attachment.type} />
         </video>
       {/if}
     {/if}

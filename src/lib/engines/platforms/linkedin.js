@@ -147,7 +147,7 @@ const Validate = {};
 Validate.image = ( attachment ) => {
   const limits = Linkedin.limits.image
 
-  const type = attachment.file.type;
+  const type = attachment.type;
   if ( !limits.types.includes(type) ) {
     Draft.pushAlert(
       `LinkedIn does not accept images of type ${ type }`
@@ -155,7 +155,7 @@ Validate.image = ( attachment ) => {
     return false;
   }
   
-  const size = attachment.file.size;
+  const size = attachment.size;
   if ( size > limits.size ) {
     Draft.pushAlert(
       `LinkedIn does not accept image files larger than ${filesize( limits.size )}`
@@ -169,7 +169,7 @@ Validate.image = ( attachment ) => {
 Validate.audio = ( attachment ) => {
   const limits = Linkedin.limits.audio
 
-  const type = attachment.file.type;
+  const type = attachment.type;
   if ( !limits.types.includes(type) ) {
     Draft.pushAlert(
       `LinkedIn does not accept audio of type ${ type }`
@@ -177,7 +177,7 @@ Validate.audio = ( attachment ) => {
     return false;
   }
   
-  const size = attachment.file.size;
+  const size = attachment.size;
   if ( size > limits.size ) {
     Draft.pushAlert(
       `LinkedIn does not accept audio files larger than ${filesize( limits.size )}`
@@ -191,7 +191,7 @@ Validate.audio = ( attachment ) => {
 Validate.video = ( attachment ) => {
   const limits = Linkedin.limits.video
 
-  const type = attachment.file.type;
+  const type = attachment.type;
   if ( !limits.types.includes(type) ) {
     Draft.pushAlert(
       `LinkedIn does not accept video of type ${ type }`
@@ -199,7 +199,7 @@ Validate.video = ( attachment ) => {
     return false;
   }
   
-  const size = attachment.file.size;
+  const size = attachment.size;
   if ( size > limits.size ) {
     Draft.pushAlert(
       `LinkedIn does not accept video files larger than ${filesize( limits.size )}`
@@ -219,7 +219,7 @@ Validate.application = ( attachment ) => {
 
   // const limits = Linkedin.limits.document
 
-  // const type = attachment.file.type;
+  // const type = attachment.type;
   // if ( !limits.types.includes(type) ) {
   //   Draft.pushAlert(
   //     `LinkedIn does not accept files of type ${ type }`
@@ -227,7 +227,7 @@ Validate.application = ( attachment ) => {
   //   return false;
   // }
   
-  // const size = attachment.file.size;
+  // const size = attachment.size;
   // if ( size > limits.size ) {
   //   Draft.pushAlert(
   //     `LinkedIn does not accept files larger than ${filesize( limits.size )}`
@@ -249,8 +249,8 @@ Linkedin.validateAttachments = ( draft ) => {
   }
 
   for ( const attachment of draft.attachments ) {
-    const name = attachment.file.name;
-    const category = attachment.file.type.split( "/" )[0];
+    const name = attachment.name;
+    const category = attachment.type.split( "/" )[0];
     if ( category == null ) {
       Draft.pushAlert(
         `Gobo cannot identify the media type of attachment ${ name }`
@@ -260,7 +260,7 @@ Linkedin.validateAttachments = ( draft ) => {
 
     if ( Validate[ category ] == null ) {
       Draft.pushAlert(
-        `LinkedIn does not support type ${ attachment.file.type }`
+        `LinkedIn does not support type ${ attachment.type }`
       );
       return false; 
     }
@@ -271,7 +271,7 @@ Linkedin.validateAttachments = ( draft ) => {
     }
   }
 
-  const hasVideo = !!draft.attachments.find( a => a.file.type.startsWith("video") );
+  const hasVideo = !!draft.attachments.find( a => a.type.startsWith("video") );
   if ( hasVideo && draft.attachments.length > 1 ) {
     Draft.pushAlert(
       `LinkedIn requires that video posts have no other attachments.`

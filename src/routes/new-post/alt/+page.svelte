@@ -7,29 +7,37 @@
   import { State, Draft } from "$lib/engines/draft.js";
   import { altStore } from "$lib/stores/alt-store";
 
-  let alt, attachments, file;
+  let draftFile, alt, attachments, srcURL;
   let form, previewImage;
   const Render = State.make();
   
   Render.cleanup = () => {
+    draftFile = null;
     alt = null;
     attachments = [];
-    file = {};
+    if ( srcURL != null ) {
+      URL.revokeObjectURL( srcURL );
+      srcURL = null;
+    }
   };
 
   Render.attachments = ( draft ) => {
     attachments = draft.attachments;
   };
 
-  Render.preview = ( data ) => {
-    file = data.file;
-    alt = data.alt;
+  Render.preview = ( value ) => {
+    draftFile = value;
+    const file = draftFile.file;
+    alt = draftFile.alt;
 
-    if ( file.name != null ) {
-      if ( previewImage.src !== "#" ) {
-        URL.revokeObjectURL( previewImage.src );
+    if ( file != null ) {
+      if ( srcURL != null ) {
+        URL.revokeObjectURL( srcURL );
       }
-      previewImage.src = URL.createObjectURL( file );
+      srcURL = URL.createObjectURL( file )
+      previewImage.src = srcURL;
+    } else {
+      previewImage.src = draftFile.url;
     }
   };
 
@@ -44,11 +52,12 @@
   Handle.submit = ( event ) => {
     event.preventDefault();
     
-    const attachment = attachments.find( a => a.file.name === file.name );
-    if ( attachment == null ) {
-      attachments.push({ file, alt })
+    const match = attachments.find( a => a.name === draftFile.name );
+    if ( match == null ) {
+      draftFile.alt = alt;
+      attachments.push( draftFile );
     } else {
-      attachment.alt = alt;
+      match.alt = alt;
     }
 
     Draft.updateAspect( "attachments", attachments );

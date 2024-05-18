@@ -113,7 +113,7 @@ const Validate = {};
 Validate.image = ( attachment ) => {
   const limits = Mastodon.limits.image
 
-  const type = attachment.file.type;
+  const type = attachment.type;
   if ( !limits.types.includes(type) ) {
     Draft.pushAlert(
       `Mastodon does not accept images of type ${ type }`
@@ -121,7 +121,7 @@ Validate.image = ( attachment ) => {
     return false;
   }
   
-  const size = attachment.file.size;
+  const size = attachment.size;
   if ( size > limits.size ) {
     Draft.pushAlert(
       `Mastodon does not accept image files larger than ${filesize( limits.size )}`
@@ -135,7 +135,7 @@ Validate.image = ( attachment ) => {
 Validate.audio = ( attachment ) => {
   const limits = Mastodon.limits.audio
 
-  const type = attachment.file.type;
+  const type = attachment.type;
   if ( !limits.types.includes(type) ) {
     Draft.pushAlert(
       `Mastodon does not accept audio of type ${ type }`
@@ -143,7 +143,7 @@ Validate.audio = ( attachment ) => {
     return false;
   }
   
-  const size = attachment.file.size;
+  const size = attachment.size;
   if ( size > limits.size ) {
     Draft.pushAlert(
       `Mastodon does not accept audio files larger than ${filesize( limits.size )}`
@@ -157,7 +157,7 @@ Validate.audio = ( attachment ) => {
 Validate.video = ( attachment ) => {
   const limits = Mastodon.limits.video
 
-  const type = attachment.file.type;
+  const type = attachment.type;
   if ( !limits.types.includes(type) ) {
     Draft.pushAlert(
       `Mastodon does not accept video of type ${ type }`
@@ -165,7 +165,7 @@ Validate.video = ( attachment ) => {
     return false;
   }
   
-  const size = attachment.file.size;
+  const size = attachment.size;
   if ( size > limits.size ) {
     Draft.pushAlert(
       `Mastodon does not accept video files larger than ${filesize( limits.size )}`
@@ -186,8 +186,8 @@ Mastodon.validateAttachments = ( draft ) => {
   }
 
   for ( const attachment of draft.attachments ) {
-    const name = attachment.file.name;
-    const category = attachment.file.type.split( "/" )[0];
+    const name = attachment.name;
+    const category = attachment.type.split( "/" )[0];
     if ( category == null ) {
       Draft.pushAlert(
         `Gobo cannot identify the media type of attachment ${ name }`
@@ -197,7 +197,7 @@ Mastodon.validateAttachments = ( draft ) => {
 
     if ( Validate[ category ] == null ) {
       Draft.pushAlert(
-        `Mastodon does not support type ${ attachment.file.type }`
+        `Mastodon does not support type ${ attachment.type }`
       );
       return false; 
     }
@@ -208,7 +208,7 @@ Mastodon.validateAttachments = ( draft ) => {
     }
   }
 
-  const hasGIF = !!draft.attachments.find( a => a.file.type === "image/gif" );
+  const hasGIF = !!draft.attachments.find( a => a.type === "image/gif" );
   if ( hasGIF && draft.attachments.length > 1 ) {
     Draft.pushAlert(
       `Mastodon requires that GIF posts have no other attachments.`
@@ -216,7 +216,7 @@ Mastodon.validateAttachments = ( draft ) => {
     return false;
   }
 
-  const hasAudio = !!draft.attachments.find( a => a.file.type.startsWith("audio") );
+  const hasAudio = !!draft.attachments.find( a => a.type.startsWith("audio") );
   if ( hasAudio && draft.attachments.length > 1 ) {
     Draft.pushAlert(
       `Mastodon requires that audio posts have no other attachments.`
@@ -224,7 +224,7 @@ Mastodon.validateAttachments = ( draft ) => {
     return false;
   }
 
-  const hasVideo = !!draft.attachments.find( a => a.file.type.startsWith("video") );
+  const hasVideo = !!draft.attachments.find( a => a.type.startsWith("video") );
   if ( hasVideo && draft.attachments.length > 1 ) {
     Draft.pushAlert(
       `Mastodon requires that video posts have no other attachments.`

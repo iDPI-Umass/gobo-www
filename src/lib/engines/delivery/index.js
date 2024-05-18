@@ -6,8 +6,8 @@ import { Weave } from "$lib/engines/delivery/weave.js";
 import * as stores from "$lib/stores/delivery.js";
 import * as DeliveryHTTP from "$lib/resources/delivery.js";
 import { Feed as Weaver } from "$lib/resources/person-delivery-feeds/all.js";
-import * as FileHTTP from "$lib/resources/draft-file.js";
 import * as DraftHTTP from "$lib/resources/draft.js";
+import * as ProofHTTP from "$lib/resources/proof.js";
 import * as Random from "$lib/helpers/random.js";
 
 
@@ -144,80 +144,67 @@ Feed.startup = async () => {
 App.register( Feed.startup );
 
 
-// Eventually, we'll have a more organized way to handle multiple drafts
-// to handle their media attachments. Until then, we include the File instance
-// along with the Gobo file resource.
-class DraftFile {
-  constructor( file, attachment ) {
-    this.file = file;
-    this.attachment = attachment;
-  }
 
-  static async create( attachment ) {
-    const file = await FileHTTP.create();
-    attachment.id = file.id;
-    return new DraftFile( file, attachment );
-  }
-
-  async upload() {
-    if ( this.attachment != null ) {
-      await FileHTTP.upload( this.attachment );
-    }
-  }
-
-  async fail () {
-    this.file.state = "error"
-    try {
-      await FileHTTP.update( this.file );
-    } catch ( error ) {
-      console.error( error );
-    }
-  }
-}
 
 class Draft {
-  constructor( raw, draft, files ) {
-    this._draft = raw;
-    this.draft = draft;
-    this.id = this.draft.id;
-    this.files = files ?? [];
+  constructor( _ ) {
+    this._ = _;
+  }
+
+  get id() {
+    return this._.id;
   }
 
   static async create( raw ) {
-    const kernel = {};
-    kernel.content = raw.content;
-    kernel.title = raw.options?.general?.title ?? undefined;
-    // kernel.poll = {};
-    kernel.files = [];
-    kernel.state = "draft";
+    const { attachments, ...store } = raw;
 
-    const files = [];
-    for ( const attachment of raw.attachments ) {
-      const draftFile = await DraftFile.create( attachment );
-      files.push( draftFile );
-      kernel.files.push( draftFile.file.id );
+    store.files = [];
+    for ( const draftFile of attachments ) {
+      await draftFile.upload();
+      store.files.push( draftFile.id );
     }
-
+    
+    const kernel = { store };
     const draft = await DraftHTTP.create( kernel );
-    return new Draft( raw, draft, files );
+    return new Draft( draft );
+  }
+}
+
+
+class Proof {
+  constructor( _ ) {
+    this._ = _;
   }
 
-  async upload() {
-    for ( const file of this.files ) {
-      try {
-        await file.upload();
-      } catch ( error ) {
-        console.warning( error );
-        await file.fail();
-      }
-    }
+  get id() {
+    return this._.id;
+  }
+
+  get files() {
+    return this._.files;
+  }
+
+  static async create( draft ) {
+    const kernel = {};
+    kernel.content = draft._.content;
+    kernel.title = draft._.options?.general?.title ?? undefined;
+    // kernel.poll = {};
+    kernel.files = draft.files;
+    kernel.state = "draft";
+
+    const proof = await ProofHTTP.create( kernel );
+    return new Proof( proof );
   }
 }
 
 
 class DeliveryTarget {
-  constructor( target ) {
-    this.target = target;
+  constructor( _ ) {
+    this._ = _;
+  }
+
+  get id() {
+    return this._.id;
   }
 }
 
@@ -226,18 +213,26 @@ class DeliveryTarget {
 // multiplicity on top of its complex internal state and reactivity.
 
 class Delivery {
-  constructor( delivery ) {
-    this.delivery = delivery;
-    this.id = this.delivery.id;
+  constructor( _ ) {
+    this._ = _;
   }
 
-  static async create( draft ) {
+  get id() {
+    return this._.id;
+  }
+
+  // TODO: move draft creation out of this flow.
+  static async create( raw ) {
+    const draft = await Draft.create( raw );
+    const proof = await Proof.create( draft );
+
     const kernel = { 
-      draft_id: draft.id
+      draft_id: draft.id,
+      proof_id: proof.id
     };
-    const resource = await DeliveryHTTP.create( kernel );
-    const delivery = new Delivery( resource );
-    return delivery;
+
+    const delivery = await DeliveryHTTP.create( kernel );
+    return new Delivery( delivery );
   }
 
   static async get( id ) {
