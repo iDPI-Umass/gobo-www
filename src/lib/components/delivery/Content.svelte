@@ -16,8 +16,8 @@
   };
 
   Render.content = () => {
-    title = delivery.draft?.title;
-    content = delivery.draft?.content ?? "";
+    title = delivery.proof?.title;
+    content = delivery.proof?.content ?? "";
   };
 
 

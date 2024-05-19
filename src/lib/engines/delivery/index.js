@@ -147,12 +147,17 @@ App.register( Feed.startup );
 
 
 class Draft {
-  constructor( _ ) {
+  constructor( _, attachments ) {
     this._ = _;
+    this.attachments = attachments;
   }
 
   get id() {
     return this._.id;
+  }
+
+  get store() {
+    return this._.store;
   }
 
   static async create( raw ) {
@@ -160,13 +165,22 @@ class Draft {
 
     store.files = [];
     for ( const draftFile of attachments ) {
-      await draftFile.upload();
       store.files.push( draftFile.id );
     }
     
-    const kernel = { store };
+    const kernel = { 
+      store,
+      state: "drafting"
+    };
+    
     const draft = await DraftHTTP.create( kernel );
-    return new Draft( draft );
+    return new Draft( draft, attachments );
+  }
+
+  async upload() {
+    for ( const draftFile of this.attachments ) {
+      await draftFile.upload();
+    }
   }
 }
 
@@ -186,11 +200,11 @@ class Proof {
 
   static async create( draft ) {
     const kernel = {};
-    kernel.content = draft._.content;
-    kernel.title = draft._.options?.general?.title ?? undefined;
+    kernel.content = draft.store.content;
+    kernel.title = draft.store.options?.general?.title ?? undefined;
     // kernel.poll = {};
-    kernel.files = draft.files;
-    kernel.state = "draft";
+    kernel.files = draft.store.files;
+    kernel.state = "pending";
 
     const proof = await ProofHTTP.create( kernel );
     return new Proof( proof );
@@ -221,9 +235,7 @@ class Delivery {
     return this._.id;
   }
 
-  // TODO: move draft creation out of this flow.
-  static async create( raw ) {
-    const draft = await Draft.create( raw );
+  static async create( draft ) {
     const proof = await Proof.create( draft );
 
     const kernel = { 

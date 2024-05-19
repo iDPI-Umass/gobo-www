@@ -6,11 +6,15 @@ const Weave = {};
 Weave.make = async ( graph ) => {
   const feed = [ ...graph.feed ];
   const deliveries = {};
+  const proofs = {};
   const drafts = {};
   const files = {};
   const targets = {};
   for ( const delivery of graph.deliveries ) {
     deliveries[ delivery.id ] = delivery;
+  }
+  for ( const proof of graph.proofs ) {
+    proofs[ proof.id ] = proof;
   }
   for ( const draft of graph.drafts ) {
     drafts[ draft.id ] = draft;
@@ -23,16 +27,17 @@ Weave.make = async ( graph ) => {
   }
 
   for ( const delivery of graph.deliveries ) {
+    delivery.proof = proofs[ delivery.proof_id ]
     delivery.draft = drafts[ delivery.draft_id ];
     const _files = [];
-    for ( const id of delivery.draft.files ) {
-      const file = files[id];
+    for ( const id of delivery.proof.files ) {
+      const file = files[ id ];
       if ( file != null ) {
-        _files.push( files );
+        _files.push( file );
       }
     }
     delivery.files = _files;
-    delivery.draft.files = _files;
+    delivery.proof.files = _files;
 
     const _targets = [];
     for ( const id of delivery.targets ) {

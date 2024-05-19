@@ -25,7 +25,7 @@ Publish.buildTargets = async ( raw ) => {
 
 Publish.setup = async ( raw ) => {
   const draft = await Draft.create( raw )
-  const delivery = await Delivery.create( draft.draft );
+  const delivery = await Delivery.create( draft );
   const targets = await Publish.buildTargets( raw );
   if ( targets === false ) {
     throw new Error( "early return" );
@@ -45,7 +45,6 @@ Publish.start = async function ({ draft, delivery, targets }) {
   
   const newPost = {
     delivery_id: delivery.id,
-    draft_id: draft.id,
     targets
   };
 

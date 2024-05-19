@@ -1,4 +1,4 @@
-import * as Type from "@dashkite/joy/Type";
+import * as Type from "@dashkite/joy/type";
 import * as FileHTTP from "$lib/resources/draft-file.js";
 import { PUBLIC_GOBO_API } from '$env/static/public';
 
@@ -70,4 +70,9 @@ class DraftFile {
       console.error( error );
     }
   }
+}
+
+
+export {
+  DraftFile
 }

@@ -45,12 +45,12 @@
   };
 
   Helpers.needsRefresh = ( delivery ) => {
-    const draft = delivery.draft;
-    if ( draft == null || !["submitted", "error"].includes(draft.state) ) {
+    const proof = delivery.proof;
+    if ( proof == null || !["submitted", "error"].includes(proof.state) ) {
       return true;
     }
     
-    for ( const file of draft.files ) {
+    for ( const file of proof.files ) {
       if ( !["uploaded", "error"].includes(file.state) ) {
         return true;
       }
@@ -83,7 +83,7 @@
     <Spinner></Spinner>
 
   {:else if state === "ready"}
-    {#if current.draft?.content}
+    {#if current.proof?.content}
       <section class="panel">
         <Content delivery={current}></Content>
       </section>
