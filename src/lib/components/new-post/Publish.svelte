@@ -23,6 +23,7 @@
     if ( publishButton.loading === true ) {
       return;
     }
+    publishButton.loading = true;
 
     const draft = Draft.read();
 

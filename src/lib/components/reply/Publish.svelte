@@ -1,9 +1,10 @@
 <script>
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import { onMount } from "svelte";
-  import { goto } from "$app/navigation";
+  import { goto, replaceState } from "$app/navigation";
   import { State, Draft, Name } from "$lib/engines/draft.js";
   import { Validate, Publish } from "$lib/engines/platforms/index.js";
+  import { Feed as DeliveryFeed } from "$lib/engines/delivery/index.js";
 
 
   let publishButton, nameParts;
@@ -27,14 +28,30 @@
     if ( publishButton.loading === true ) {
       return;
     }
+    publishButton.loading = true;
 
-    if ( !Validate.isValid() ) {
+    const draft = Draft.read();
+
+    if ( !Validate.isValid( draft )) {
       publishButton.loading = false;
       return;
     }
     
-    Publish.start();
-    goto( "/new-post/publish" );
+    let context;
+    try {
+      context = await Publish.setup( draft );
+    } catch ( error ) {
+      console.error( error );
+      Draft.pushAlert( "There was a problem assembling post data." );
+      publishButton.loading = false;
+      return;
+    }
+    
+    Publish.start( context );
+    DeliveryFeed.refresh();
+    Draft.clear();
+    replaceState( "/home" );
+    goto( "/posts" );
   };
 
   Handle.discard = async () => {

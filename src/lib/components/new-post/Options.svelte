@@ -43,7 +43,7 @@
     }
    
     Options.update( "reddit", "subreddit", subreddit );
-    Options.update( "general", "title", "blank title" );
+    Options.update( "general", "title", "" );
   };
 
   Render.identities = ( draft ) => {
