@@ -1,7 +1,7 @@
 <script>
   import { filesize } from "filesize";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
-  import Spinner from "$lib/components/primitives/Spinner.svelte";
+  import Badge from "$lib/components/delivery/Badge.svelte";
   import { onMount } from "svelte";
   import { State } from "$lib/engines/store.js";
 
@@ -50,15 +50,12 @@
         </div>
 
         {#if upload.state === "pending"}
-          <Spinner size="1.5rem"></Spinner>
+          <Badge label="Pending" family="neutral"/>
         {:else if upload.state === "uploaded"}
-          <sl-icon src="/icons/check2-circle.svg" class="success" />
+          <Badge label="Uploaded" family="success"/>
         {:else if upload.state === "error"}
-          <sl-icon src="/icons/exclamation-octagon.svg" class="danger" />
-        {:else if upload.state === "aborted"}
-          <sl-icon src="/icons/exclamation-triangle.svg" />
+          <Badge label="Failure" family="danger"/>
         {/if}
-        
         
       </div>
     {/each}

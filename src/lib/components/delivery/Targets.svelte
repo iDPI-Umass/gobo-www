@@ -1,7 +1,6 @@
 <script>
-  import * as Time from "@dashkite/joy/time";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
-  import Spinner from "$lib/components/primitives/Spinner.svelte";
+  import Badge from "$lib/components/delivery/Badge.svelte";
   import { onMount } from "svelte";
   import { State } from "$lib/engines/store.js";
   import { Name } from "$lib/engines/draft.js";
@@ -53,11 +52,13 @@
         </div>
 
         {#if target.state === "pending"}
-          <Spinner size="1.5rem"></Spinner>
+          <Badge label="Pending" family="neutral"/>
         {:else if target.state === "delivered"}
-          <sl-icon src="/icons/check2-circle.svg" class="success" />
+          <Badge label="Delivered" family="success"/>
         {:else if target.state === "error"}
-          <sl-icon src="/icons/exclamation-octagon.svg" class="danger" />
+          <Badge label="Failure" family="danger"/>
+        {:else if target.state === "unpublished"}
+          <Badge label="Deleted" family="inert"/>
         {/if}
         
         
@@ -93,4 +94,6 @@
   .table-row sl-icon {
     font-size: 1.5rem;
   }
+
+
 </style>

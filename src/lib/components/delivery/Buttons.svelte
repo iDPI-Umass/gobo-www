@@ -3,8 +3,12 @@
   import { goto } from "$app/navigation";
   import { onMount } from "svelte";
   import { State } from "$lib/engines/store.js";
+  import { Delivery } from "$lib/engines/delivery/index.js";
+  import { Feed } from "$lib/engines/delivery/index.js";
 
+  export let delivery;
 
+  let redraftButton, deleteButton;
   const Render = State.make();
 
   Render.cleanup = () => {
@@ -13,8 +17,23 @@
 
   const Handle = {};
   
-  Handle.done = () => {
-    goto( "/home" );
+  Handle.redraft = () => {
+    console.log( "redraft tbd" );
+  }
+
+  Handle.delete = async () => {
+    if ( deleteButton.loading === true ) {
+      return;
+    }
+
+    deleteButton.loading = true;
+    try {
+      await Delivery.unpublish( delivery );
+      Feed.refresh();
+    } catch ( error ) {
+      console.error( error );
+    }
+    deleteButton.loading = false;
   }
 
 
@@ -30,11 +49,22 @@
 <div class="buttons">
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <sl-button
-    on:click={Handle.done}
+    bind:this={redraftButton}
+    on:click={Handle.redraft}
     class="submit"
     size="medium"
     pill>
-    OK
+    Re-Draft
+  </sl-button>
+
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <sl-button
+    bind:this={deleteButton}
+    on:click={Handle.delete}
+    class="submit"
+    size="medium"
+    pill>
+    Delete
   </sl-button>
 </div>
 
@@ -44,7 +74,7 @@
   .buttons {
     display: flex;
     flex-direction: row;
-    flex-wrap: nowrap;
+    gap: 1rem;
     justify-content: end;
     align-items: center;
     margin-top: 2rem;
@@ -54,6 +84,6 @@
 
   .buttons sl-button {
     margin-bottom: 0;
-    width: 10rem;
+    width: 7rem;
   }
 </style>

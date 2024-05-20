@@ -6,6 +6,7 @@
   import Content from "$lib/components/delivery/Content.svelte";
   import Uploads from "$lib/components/delivery/Uploads.svelte";
   import Targets from "$lib/components/delivery/Targets.svelte";
+  import Buttons from "$lib/components/delivery/Buttons.svelte";
   import { onMount } from "svelte";
   import { State } from "$lib/engines/store.js";
   import { Delivery } from "$lib/engines/delivery/index.js";
@@ -21,7 +22,7 @@
 
   Render.current = async () => {
     current = delivery;
-    state = "ready";
+    state = "ready";    
 
     while ( Helpers.isActive( current ) ) {
       current = await Delivery.get( current.id );
@@ -33,31 +34,51 @@
 
   Helpers.isActive = ( delivery ) => {
     return (delivery != null) &&
-      Helpers.isNew( delivery ) &&
+      Helpers.hasRecent( delivery ) &&
       Helpers.needsRefresh( delivery );
   }
 
-  Helpers.isNew = ( delivery ) => {
+  Helpers.hasRecent = ( delivery ) => {
     const now = (new Date).toISOString();
-    const timestamp = new Date( delivery.created );
-    timestamp.setUTCMinutes( timestamp.getUTCMinutes() + 5 );
-    return now < timestamp.toISOString();
+    
+    const overall = new Date( delivery.updated );
+    overall.setUTCMinutes( overall.getUTCMinutes() + 5 );
+    if ( now < overall.toISOString() ) {
+      return true;
+    }
+
+    for ( const target of delivery.targets ) {
+      const timestamp = new Date( target.updated );
+      timestamp.setUTCMinutes( timestamp.getUTCMinutes() + 5 );
+      if( now < timestamp.toISOString() ) {
+        return true;
+      }
+    }
+    return false;
   };
+
+  Helpers.states = [
+    "pending"
+  ];
 
   Helpers.needsRefresh = ( delivery ) => {
     const proof = delivery.proof;
-    if ( proof == null || !["submitted", "error"].includes(proof.state) ) {
+    if ( proof == null || Helpers.states.includes(proof.state) ) {
       return true;
     }
     
     for ( const file of proof.files ) {
-      if ( !["uploaded", "error"].includes(file.state) ) {
+      if ( Helpers.states.includes(file.state) ) {
         return true;
       }
     }
 
+    if ( delivery.targets.length === 0 ) {
+      return true;
+    }
+
     for ( const target of delivery.targets ) {
-      if ( !["delivered", "error"].includes(target.state) ) {
+      if ( Helpers.states.includes(target.state) ) {
         return true;
       }
     }
@@ -100,6 +121,10 @@
         <Targets delivery={current}></Targets>
       </section>
     {/if}
+
+    <section class="panel">
+      <Buttons delivery={current}></Buttons>
+    </section>
 
   {/if}
 </section>

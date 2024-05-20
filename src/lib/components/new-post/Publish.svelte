@@ -43,6 +43,7 @@
     
     Publish.start( context );
     DeliveryFeed.refresh();
+    Draft.clear();
     replaceState( "/home" );
     goto( "/posts" );
   };

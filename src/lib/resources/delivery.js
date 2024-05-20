@@ -18,8 +18,19 @@ const get = App.unauthorized(async ({ id }) => {
   });
 });
 
+const unpublish = App.unauthorized(async ({ person_id, id }) => {
+  const client = await Gobo.get();
+  return await client.personDelivery.post({
+    parameters: { person_id, id },
+    content: {
+      action: "unpublish"
+    }
+  });
+});
+
 
 export {
   create,
-  get
+  get,
+  unpublish
 }

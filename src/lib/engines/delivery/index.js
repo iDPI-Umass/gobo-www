@@ -252,6 +252,10 @@ class Delivery {
     const weave = await Weave.make( graph );
     return weave.deliveries[ weave.feed[0] ];
   }
+
+  static async unpublish( delivery ) {
+    return await DeliveryHTTP.unpublish( delivery );
+  } 
 }
 
 
