@@ -13,7 +13,7 @@
   
   Render.cleanup = () => {
     draftFile = null;
-    alt = null;
+    alt = "";
     attachments = [];
     if ( srcURL != null ) {
       URL.revokeObjectURL( srcURL );
@@ -43,7 +43,7 @@
 
 
   const Handle = {};
-  Handle.alt = ( event ) => alt = event.target.value;
+  Handle.alt = ( event ) => alt = event.target.value ?? "";
   
   Handle.cancel = () => {
     goto("/new-post");

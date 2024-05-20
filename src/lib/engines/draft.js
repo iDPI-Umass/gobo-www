@@ -82,6 +82,10 @@ Draft.load = () => {
 
 
 Draft.clear = async () => {
+    const draft = Draft.read();
+    for ( const attachment of draft.attachments ) {
+      attachment.destroy();
+    }
     singletonDraft = Draft.make();
     singletonDraft.identities = await Identity.sync();
     Draft.write();

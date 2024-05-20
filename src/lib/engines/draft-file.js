@@ -44,6 +44,10 @@ class DraftFile {
     this._.mime_type = value;
   }
 
+  static isType( value ) {
+    return Type.isType( DraftFile, value );
+  }
+
   static async fromFile ( file ) {
     const _ = await FileHTTP.create();
     _.mime_type = file.type;
@@ -53,12 +57,17 @@ class DraftFile {
 
     const draftFile = new DraftFile( _ );
     draftFile.file = file;
+    draftFile.url = URL.createObjectURL( file );
     return draftFile
   }
 
+  // Upload also updates the file metadata. If we don't need to upload the file,
+  // we should still issue a PUT on the metadata to make sure it's synced.
   async upload() {
     if ( this.file != null ) {
       await FileHTTP.upload( this.file, this._ );
+    } else {
+      await FileHTTP.update( this._ );
     }
   }
 
@@ -68,6 +77,12 @@ class DraftFile {
       await FileHTTP.update( this._ );
     } catch ( error ) {
       console.error( error );
+    }
+  }
+
+  destroy () {
+    if ( this.file != null ) {
+      URL.revokeObjectURL( this.url );
     }
   }
 }

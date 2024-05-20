@@ -48,7 +48,7 @@
     const oldLength = displayedFiles.length;
     let files = [];
     for ( const attachment of draft.attachments.slice( 0, 20 ) ) {
-      files.push( attachment.file );
+      files.push( attachment );
     }
 
     let videoFile = files.find( f => Media.isVideo( f ) );
@@ -178,7 +178,7 @@
             {#if Media.isImage( file )}
               <img
                 bind:this={mediaFrameChildren[ file.name ]}
-                src={URL.createObjectURL( file )}
+                src={file.url}
                 alt="uploaded"
                 on:load={Handle.singleImage}>
             {/if}
@@ -189,7 +189,7 @@
                 controls
                 bind:this={mediaFrameChildren[ file.name ]}>
                 <source 
-                src={URL.createObjectURL( file )}
+                src={file.url}
                 type={file.type}>
               </video>
             {/if}

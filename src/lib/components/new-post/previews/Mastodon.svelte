@@ -55,8 +55,7 @@
 
   Render.attachments = ( draft ) => {
     displayedFiles = draft.attachments
-      .slice( 0, 4 )
-      .map( attachment => attachment.file );
+      .slice( 0, 4 );
   };
 
 
@@ -155,20 +154,20 @@
           <div class="image-box">
             {#if Media.isImage( displayedFiles[0] )}
               <img 
-                src={URL.createObjectURL( displayedFiles[0] )}
-                alt="uploaded">
+                src={displayedFiles[0].url}
+                alt={displayedFiles[0].alt}>
             {:else if Media.isAudio( displayedFiles[0] )}
               <!-- svelte-ignore a11y-media-has-caption -->
               <audio controls>
                 <source 
-                  src={URL.createObjectURL( displayedFiles[0] )}
+                  src={displayedFiles[0].url}
                   type={displayedFiles[0].type}>
               </audio>
             {:else if Media.isVideo( displayedFiles[0] )}
               <!-- svelte-ignore a11y-media-has-caption -->
               <video loop controls>
                 <source 
-                  src={URL.createObjectURL( displayedFiles[0] )}
+                  src={displayedFiles[0].url}
                   type={displayedFiles[0].type}>
               </video>
             {/if}
@@ -204,13 +203,13 @@
           <div class="image-box">
             {#if Media.isImage( displayedFiles[0] )}
               <img 
-                src={URL.createObjectURL( displayedFiles[0] )}
-                alt="uploaded">
+                src={displayedFiles[0].url}
+                alt={displayedFiles[0].alt}>
             {:else if Media.isVideo( displayedFiles[0] )}
               <!-- svelte-ignore a11y-media-has-caption -->
               <video loop controls>
                 <source 
-                  src={URL.createObjectURL( displayedFiles[0] )}
+                  src={displayedFiles[0].url}
                   type={displayedFiles[0].type}>
               </video>
             {/if}
@@ -221,13 +220,13 @@
           <div class="image-box">
             {#if Media.isImage( displayedFiles[1] )}
               <img 
-                src={URL.createObjectURL( displayedFiles[1] )}
-                alt="uploaded">
+                src={displayedFiles[1].url}
+                alt={displayedFiles[1].alt}>
             {:else if Media.isVideo( displayedFiles[1] )}
               <!-- svelte-ignore a11y-media-has-caption -->
               <video loop controls>
                 <source 
-                  src={URL.createObjectURL( displayedFiles[1] )}
+                  src={displayedFiles[1].url}
                   type={displayedFiles[1].type}>
               </video>
             {/if}
@@ -263,13 +262,13 @@
           <div class="image-box">
             {#if Media.isImage( displayedFiles[0] )}
               <img 
-                src={URL.createObjectURL( displayedFiles[0] )}
-                alt="uploaded">
+                src={displayedFiles[0].url}
+                alt={displayedFiles[0].alt}>
             {:else if Media.isVideo( displayedFiles[0] )}
               <!-- svelte-ignore a11y-media-has-caption -->
               <video loop controls>
                 <source 
-                  src={URL.createObjectURL( displayedFiles[0] )}
+                  src={displayedFiles[0].url}
                   type={displayedFiles[0].type}>
               </video>
             {/if}
@@ -281,13 +280,13 @@
             <div class="image-box">
               {#if Media.isImage( displayedFiles[1] )}
                 <img 
-                  src={URL.createObjectURL( displayedFiles[1] )}
-                  alt="uploaded">
+                  src={displayedFiles[1].url}
+                  alt={displayedFiles[1].alt}>
               {:else if Media.isVideo( displayedFiles[1] )}
                 <!-- svelte-ignore a11y-media-has-caption -->
                 <video loop controls>
                   <source 
-                    src={URL.createObjectURL( displayedFiles[1] )}
+                    src={displayedFiles[1].url}
                     type={displayedFiles[1].type}>
                 </video>
               {/if}
@@ -297,13 +296,13 @@
             <div class="image-box">
               {#if Media.isImage( displayedFiles[2] )}
                 <img 
-                  src={URL.createObjectURL( displayedFiles[2] )}
-                  alt="uploaded">
+                  src={displayedFiles[2].url}
+                  alt={displayedFiles[2].alt}>
               {:else if Media.isVideo( displayedFiles[2] )}
                 <!-- svelte-ignore a11y-media-has-caption -->
                 <video loop controls>
                   <source 
-                    src={URL.createObjectURL( displayedFiles[2] )}
+                    src={displayedFiles[2].url}
                     type={displayedFiles[2].type}>
                 </video>
               {/if}
@@ -342,13 +341,13 @@
             <div class="image-box">
               {#if Media.isImage( displayedFiles[0] )}
                 <img 
-                  src={URL.createObjectURL( displayedFiles[0] )}
-                  alt="uploaded">
+                  src={displayedFiles[0].url}
+                  alt={displayedFiles[0].alt}>
               {:else if Media.isVideo( displayedFiles[0] )}
                 <!-- svelte-ignore a11y-media-has-caption -->
                 <video loop controls>
                   <source 
-                    src={URL.createObjectURL( displayedFiles[0] )}
+                    src={displayedFiles[0].url}
                     type={displayedFiles[0].type}>
                 </video>
               {/if}
@@ -358,13 +357,13 @@
             <div class="image-box">
               {#if Media.isImage( displayedFiles[2] )}
                 <img 
-                  src={URL.createObjectURL( displayedFiles[2] )}
-                  alt="uploaded">
+                  src={displayedFiles[2].url}
+                  alt={displayedFiles[2].alt}>
               {:else if Media.isVideo( displayedFiles[2] )}
                 <!-- svelte-ignore a11y-media-has-caption -->
                 <video loop controls>
                   <source 
-                    src={URL.createObjectURL( displayedFiles[2] )}
+                    src={displayedFiles[2].url}
                     type={displayedFiles[2].type}>
                 </video>
               {/if}
@@ -377,13 +376,13 @@
             <div class="image-box">
               {#if Media.isImage( displayedFiles[1] )}
                 <img 
-                  src={URL.createObjectURL( displayedFiles[1] )}
-                  alt="uploaded">
+                  src={displayedFiles[1].url}
+                  alt={displayedFiles[1].alt}>
               {:else if Media.isVideo( displayedFiles[1] )}
                 <!-- svelte-ignore a11y-media-has-caption -->
                 <video loop controls>
                   <source 
-                    src={URL.createObjectURL( displayedFiles[1] )}
+                    src={displayedFiles[1].url}
                     type={displayedFiles[1].type}>
                 </video>
               {/if}
@@ -393,13 +392,13 @@
             <div class="image-box">
               {#if Media.isImage( displayedFiles[3] )}
                 <img 
-                  src={URL.createObjectURL( displayedFiles[3] )}
-                  alt="uploaded">
+                  src={displayedFiles[3].url}
+                  alt={displayedFiles[3].alt}>
               {:else if Media.isVideo( displayedFiles[3] )}
                 <!-- svelte-ignore a11y-media-has-caption -->
                 <video loop controls>
                   <source 
-                    src={URL.createObjectURL( displayedFiles[3] )}
+                    src={displayedFiles[3].url}
                     type={displayedFiles[3].type}>
                 </video>
               {/if}

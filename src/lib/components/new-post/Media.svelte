@@ -24,7 +24,7 @@
 
   Render.cycle = ( draft ) => {
     for ( const attachment of draft.attachments ) {
-      if ( !Media.isFile( attachment.file )) {
+      if ( !DraftFile.isType(attachment) && !Media.isFile( attachment.file )) {
         attachments = [];
         Draft.updateAspect( "attachments", attachments );
       }
@@ -275,7 +275,7 @@
           </p>
         </div>
         
-        {#if Media.isImage(attachment.file)}
+        {#if Media.isImage(attachment)}
           <sl-icon-button
             class="warning"
             label="Edit Alt" 

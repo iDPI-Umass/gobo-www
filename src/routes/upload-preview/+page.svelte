@@ -10,27 +10,10 @@
 
   Render.cleanup = () => {
     attachment = null;
-    Render.url( null );
-  };
-
-  Render.url = ( file ) => {
-    if ( url != null ) {
-      URL.revokeObjectURL( url );
-    }
-    if ( file == null ) {
-      url = null;
-    } else {
-      url = URL.createObjectURL( file );
-    }
   };
 
   Render.attachment = ( value ) => {
     attachment = value;
-    if ( attachment.file != null ) {
-      Render.url( attachment.file );
-    } else {
-      url = attachment.url;
-    }
   };
 
   Render.reset();
@@ -47,25 +30,25 @@
 
   <div class="frame">
     {#if attachment}
-      {#if Media.isImage(attachment.file)}
+      {#if Media.isImage(attachment)}
         <img
-          src={url}
+          src={attachment.url}
           alt={attachment.alt ?? undefined}/>
-      {:else if Media.isAudio(attachment.file)}
+      {:else if Media.isAudio(attachment)}
         <audio
           controls
           preload="metadata">
           <source 
-            src={url}
+            src={attachment.url}
             type={attachment.type} />
         </audio>
-      {:else if Media.isVideo(attachment.file)}
+      {:else if Media.isVideo(attachment)}
         <!-- svelte-ignore a11y-media-has-caption -->
         <video
           controls
           preload="metadata">
           <source
-            src={url}
+            src={attachment.url}
             type={attachment.type} />
         </video>
       {/if}

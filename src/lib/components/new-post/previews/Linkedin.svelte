@@ -64,12 +64,11 @@
     }
     
     files = draft.attachments
-      .slice( 0, 4 )
-      .map( attachment => attachment.file );
+      .slice( 0, 4 );
     
     const _urls = [];
     for ( const file of files ) {
-      _urls.push( URL.createObjectURL( file ));
+      _urls.push( file.url );
     }
     urls = _urls;
   };

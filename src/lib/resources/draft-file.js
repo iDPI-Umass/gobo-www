@@ -20,13 +20,7 @@ const remove = App.unauthorized(async ( file ) => {
 
 const update = App.unauthorized(async ( file ) => { 
   const client = await Gobo.get();
-  return await client.personDraftFile.put({
-    parameters: { 
-      person_id: client.id,
-      id: file.id 
-    },
-    content: file,
-  });
+  return await client.personDraftFile.put( file );
 });
 
 const upload = App.unauthorized(async ( file, { name, alt, id }) => {

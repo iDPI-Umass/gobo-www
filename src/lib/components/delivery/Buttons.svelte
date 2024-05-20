@@ -1,10 +1,13 @@
 <script>
+  import * as Value from "@dashkite/joy/value";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import { goto } from "$app/navigation";
   import { onMount } from "svelte";
   import { State } from "$lib/engines/store.js";
   import { Delivery } from "$lib/engines/delivery/index.js";
   import { Feed } from "$lib/engines/delivery/index.js";
+  import { Draft } from "$lib/engines/draft";
+  import { DraftFile } from "$lib/engines/draft-file.js";
 
   export let delivery;
 
@@ -18,7 +21,13 @@
   const Handle = {};
   
   Handle.redraft = () => {
-    console.log( "redraft tbd" );
+    const draft = Value.clone( delivery.draft.store );
+    draft.attachments = [];
+    for ( const file of delivery.files ) {
+      draft.attachments.push( new DraftFile(file) );
+    }
+    Draft.update( draft );
+    goto( "/new-post" );
   }
 
   Handle.delete = async () => {
