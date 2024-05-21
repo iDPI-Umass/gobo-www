@@ -62,16 +62,15 @@ Feed.halt = () => {
   }
 };
 
-Feed.clear = async ({ view }) => {
+Feed.clear = async () => {
   // Halt feed weaver pulling before discarding old object.
   Feed.halt();
-  singletonFeed = Feed.make({ view });
+  singletonFeed = Feed.make();
   singletonFeed = await singletonFeed
 };
 
-Feed.refresh = async ( context = {} ) => {
-  const view = context.view ?? "all";
-  await Feed.clear({ view });
+Feed.refresh = async () => {
+  await Feed.clear();
   Feed.command( "refresh" );
 };
 

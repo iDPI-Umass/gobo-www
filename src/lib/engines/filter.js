@@ -422,7 +422,6 @@ Filter.startup = async () => {
 };
 
 App.register( Filter.startup );
-Filter.startup();
 
 
 export {

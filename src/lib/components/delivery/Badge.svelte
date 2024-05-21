@@ -47,15 +47,18 @@
   .badge.success {
     background-color: var(--sl-color-success-300);
     color: var(--gobo-color-text);
+    border: var(--gobo-border-panel);
   }
 
   .badge.danger {
     background-color: var(--sl-color-danger-300);
     color: var(--gobo-color-text);
+    border: var(--gobo-border-panel);
   }
 
   .badge.inert {
     background-color: var(--gobo-color-panel);
     color: var(--gobo-color-text);
+    border: var(--gobo-border-panel);
   }
 </style>

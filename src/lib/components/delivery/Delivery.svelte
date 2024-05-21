@@ -1,5 +1,6 @@
 <script>
   import * as Time from "@dashkite/joy/time";
+  import * as Value from "@dashkite/joy/value";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/textarea/textarea.js";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
@@ -20,20 +21,32 @@
     current = null;
   };
 
-  Render.current = async () => {
+  Render.current = () => {
     current = delivery;
     state = "ready";    
+  };
 
+  Render.start = async () => {
     while ( Helpers.isActive( current ) ) {
       current = await Delivery.get( current.id );
       await Time.sleep( 3000 );
     }
+  }
+
+
+  const Handle = {};
+
+  Handle.unpublish = async () => {
+    current = await Delivery.get( current.id );
+    Render.start();
   };
+
 
   const Helpers = {};
 
   Helpers.isActive = ( delivery ) => {
     return (delivery != null) &&
+      ( state === "ready" ) &&
       Helpers.hasRecent( delivery ) &&
       Helpers.needsRefresh( delivery );
   }
@@ -90,12 +103,11 @@
   Render.reset();
   onMount(() => {
     Render.current();
+    Render.start();
     return () => {
       Render.reset();
     };
   });
-
-  $: Render.current( delivery );
 </script>
 
 
@@ -123,7 +135,10 @@
     {/if}
 
     <section class="panel">
-      <Buttons delivery={current}></Buttons>
+      <Buttons
+        delivery={current}
+        on:unpublish={Handle.unpublish}
+      ></Buttons>
     </section>
 
   {/if}

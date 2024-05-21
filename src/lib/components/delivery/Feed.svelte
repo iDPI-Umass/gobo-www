@@ -109,22 +109,18 @@
   section.feed {
     flex-grow: 1;
     overflow-y: scroll;
-    max-height: calc(100dvh - 5rem);
-  }
-
-  section.feed > *:first-child {
-    margin-top: 0;
+    max-height: calc(100dvh - 7.5rem);
   }
 
   @media( min-width: 680px ) {
     section.feed {
-      padding: var(--gobo-height-spacer) var(--gobo-width-spacer) 15rem var(--gobo-width-spacer); 
+      padding: var(--gobo-height-spacer) var(--gobo-width-spacer) 5rem var(--gobo-width-spacer); 
     }
   }
 
   @media ( max-width: 680px ) {
     section.feed {
-      padding: 0;
+      padding: var(--gobo-height-spacer) 0 5rem 0;
     }
     .gobo-copy {
       margin-left: var(--gobo-width-spacer-flex);

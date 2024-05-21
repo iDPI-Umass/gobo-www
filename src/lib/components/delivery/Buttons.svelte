@@ -2,7 +2,7 @@
   import * as Value from "@dashkite/joy/value";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import { goto } from "$app/navigation";
-  import { onMount } from "svelte";
+  import { onMount, createEventDispatcher } from "svelte";
   import { State } from "$lib/engines/store.js";
   import { Delivery } from "$lib/engines/delivery/index.js";
   import { Feed } from "$lib/engines/delivery/index.js";
@@ -10,12 +10,14 @@
   import { DraftFile } from "$lib/engines/draft-file.js";
 
   export let delivery;
-
+  
   let redraftButton, deleteButton;
   const Render = State.make();
 
   Render.cleanup = () => {
   };
+
+  const dispatch = createEventDispatcher();
 
 
   const Handle = {};
@@ -38,7 +40,7 @@
     deleteButton.loading = true;
     try {
       await Delivery.unpublish( delivery );
-      Feed.refresh();
+      dispatch( "unpublish", {} );
     } catch ( error ) {
       console.error( error );
     }
