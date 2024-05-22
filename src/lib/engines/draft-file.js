@@ -9,7 +9,6 @@ const isFile = Type.isType( File );
 class DraftFile {
   constructor( _, url ) {
     this._ = _;
-    this.url = `${ PUBLIC_GOBO_API }/people/${ _.person_id }/draft-files/${ _.id }`;
   }
 
   get id() {
@@ -32,6 +31,10 @@ class DraftFile {
     return this._.size;
   }
 
+  get state() {
+    return this._.state
+  }
+
   set name( value ) {
     this._.name = value;
   }
@@ -48,8 +51,14 @@ class DraftFile {
     return Type.isType( DraftFile, value );
   }
 
+  static make( _ ) {
+    const draftFile = new DraftFile( _ );
+    draftFile.url = draftFile.buildURL();
+    return draftFile;
+  }
+
   static async fromFile ( file ) {
-    const _ = await FileHTTP.create();
+    const _ = {};
     _.mime_type = file.type;
     _.name = file.name;
     _.size = file.size;
@@ -61,11 +70,28 @@ class DraftFile {
     return draftFile
   }
 
+  buildURL() {
+    const { person_id, id } = this._;
+    return `${ PUBLIC_GOBO_API }/people/${ person_id }/draft-files/${ id }`;
+  }
+
+  // If this instance doesn't yet have a corresponding representation in the
+  // Gobo HTTP API, we create one here. This representation must be available
+  // for other resources that make up the publication graph.
+  async create() {
+    if ( this.id == null ) {
+      const resource = await FileHTTP.create( this._ );
+      this._.id = resource.id;
+    }
+  }
+
   // Upload also updates the file metadata. If we don't need to upload the file,
   // we should still issue a PUT on the metadata to make sure it's synced.
   async upload() {
     if ( this.file != null ) {
-      await FileHTTP.upload( this.file, this._ );
+      this._ = await FileHTTP.upload( this.file, this._ );
+      this.url = this.buildURL();
+      this.revoke();
     } else {
       await FileHTTP.update( this._ );
     }
@@ -80,9 +106,10 @@ class DraftFile {
     }
   }
 
-  destroy () {
+  revoke () {
     if ( this.file != null ) {
       URL.revokeObjectURL( this.url );
+      this.file = null;
     }
   }
 }

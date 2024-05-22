@@ -24,6 +24,9 @@ Publish.buildTargets = async ( raw ) => {
 };
 
 Publish.setup = async ( raw ) => {
+  for ( const draftFile of raw.attachments ) {
+    await draftFile.create();
+  }
   const draft = await Draft.create( raw )
   const delivery = await Delivery.create( draft );
   const targets = await Publish.buildTargets( raw );

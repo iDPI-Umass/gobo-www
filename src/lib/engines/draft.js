@@ -1,6 +1,7 @@
 import * as Value from "@dashkite/joy/value";
 import * as Type from "@dashkite/joy/type";
 import { Identity as IdentityEngine, Name } from "$lib/engines/identity.js";
+import { DraftFile } from "$lib/engines/draft-file.js"
 import * as Post from "$lib/resources/post.js";
 import * as draftStores from "$lib/stores/draft.js";
 import * as LS from "$lib/helpers/local-storage.js";
@@ -47,18 +48,35 @@ Draft.make = () => {
 Draft.read = () => {
   if ( singletonDraft == null ) {
     let draft = LS.read( "gobo-draft" );
+    
     if ( draft == null ) {
-      draft = Draft.make();
+      singletonDraft = Draft.make();
+    
+    } else {  
+      const files = [];
+      for ( const _ of draft.attachments ) {
+        if ( _?.id != null ) {
+          files.push( DraftFile.make(_) );
+        }
+      }
+      draft.attachments = files;
+      singletonDraft = draft;
     }
-    draft.identities ??= [];
-    draft.attachments ??= [];
-    singletonDraft = draft;
   }
   
   return singletonDraft;
 };
 
-Draft.write = () => LS.write( "gobo-draft", singletonDraft );
+Draft.write = () => {
+  const { attachments, ...rest } = singletonDraft;
+  const draft = Value.clone( rest );
+  const files = [];
+  for ( const draftFile of attachments ) {
+    files.push( draftFile._ );
+  }
+  draft.attachments = files;
+  LS.write( "gobo-draft", draft );
+}
 
 
 // Handle broadcast and listening coordination among components.
@@ -84,7 +102,7 @@ Draft.load = () => {
 Draft.clear = async () => {
     const draft = Draft.read();
     for ( const attachment of draft.attachments ) {
-      attachment.destroy();
+      attachment.revoke();
     }
     singletonDraft = Draft.make();
     singletonDraft.identities = await Identity.sync();

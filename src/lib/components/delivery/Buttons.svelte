@@ -26,7 +26,7 @@
     const draft = Value.clone( delivery.draft.store );
     draft.attachments = [];
     for ( const file of delivery.files ) {
-      draft.attachments.push( new DraftFile(file) );
+      draft.attachments.push( DraftFile.make(file) );
     }
     Draft.update( draft );
     goto( "/new-post" );
