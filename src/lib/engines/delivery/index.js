@@ -5,6 +5,7 @@ import { Identity } from "$lib/engines/identity.js";
 import { Weave } from "$lib/engines/delivery/weave.js";
 import * as stores from "$lib/stores/delivery.js";
 import * as DeliveryHTTP from "$lib/resources/delivery.js";
+import * as DeliveryTargetHTTP from "$lib/resources/delivery-target.js";
 import { Feed as Weaver } from "$lib/resources/person-delivery-feeds/all.js";
 import * as DraftHTTP from "$lib/resources/draft.js";
 import * as ProofHTTP from "$lib/resources/proof.js";
@@ -219,6 +220,10 @@ class DeliveryTarget {
   get id() {
     return this._.id;
   }
+
+  static async unpublish( target ) {
+    return await DeliveryTargetHTTP.unpublish( target );
+  } 
 }
 
 
@@ -263,4 +268,5 @@ export {
   Deliveries,
   Draft,
   Delivery,
+  DeliveryTarget,
 }

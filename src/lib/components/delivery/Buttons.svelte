@@ -32,22 +32,6 @@
     goto( "/new-post" );
   }
 
-  Handle.delete = async () => {
-    if ( deleteButton.loading === true ) {
-      return;
-    }
-
-    deleteButton.loading = true;
-    try {
-      await Delivery.unpublish( delivery );
-      dispatch( "unpublish", {} );
-    } catch ( error ) {
-      console.error( error );
-    }
-    deleteButton.loading = false;
-  }
-
-
   Render.reset();
   onMount(() => {
     return () => {
@@ -66,16 +50,6 @@
     size="medium"
     pill>
     Re-Draft
-  </sl-button>
-
-  <!-- svelte-ignore a11y-click-events-have-key-events -->
-  <sl-button
-    bind:this={deleteButton}
-    on:click={Handle.delete}
-    class="submit"
-    size="medium"
-    pill>
-    Delete
   </sl-button>
 </div>
 

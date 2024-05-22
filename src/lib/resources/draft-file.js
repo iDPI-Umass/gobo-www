@@ -4,7 +4,8 @@ import { Gobo, App } from "$lib/engines/account.js";
 const create = App.unauthorized(async ( kernel ) => {
   const client = await Gobo.get();
   return await client.personDraftFiles.post({
-    parameters: { person_id: client.id }
+    parameters: { person_id: client.id },
+    content: kernel
   });
 });
 

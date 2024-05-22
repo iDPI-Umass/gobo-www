@@ -35,30 +35,25 @@
     font-size: 14px;
     padding: 0.25rem 0.5rem;
     border-radius: 1rem;
-    border: none;
   }
 
   .badge.neutral {
     background-color: var(--gobo-color-null);
     color: var(--gobo-color-text);
-    border: var(--gobo-border-panel);
   }
 
   .badge.success {
     background-color: var(--sl-color-success-300);
     color: var(--gobo-color-text);
-    border: var(--gobo-border-panel);
   }
 
   .badge.danger {
     background-color: var(--sl-color-danger-300);
     color: var(--gobo-color-text);
-    border: var(--gobo-border-panel);
   }
 
   .badge.inert {
     background-color: var(--gobo-color-panel);
     color: var(--gobo-color-text);
-    border: var(--gobo-border-panel);
   }
 </style>

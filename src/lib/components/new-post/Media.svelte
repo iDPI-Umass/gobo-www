@@ -269,10 +269,12 @@
           {:else}
             <p>{ attachment.name }</p>
           {/if}
-
-          <p>
-            Size: {filesize( attachment.size )}
-          </p>
+          
+          {#if attachment?.size}
+            <p>
+              Size: {filesize( attachment.size )}
+            </p>
+          {/if}
         </div>
         
         {#if Media.isImage(attachment)}

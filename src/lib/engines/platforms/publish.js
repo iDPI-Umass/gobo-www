@@ -23,6 +23,17 @@ Publish.buildTargets = async ( raw ) => {
   return targets;
 };
 
+Publish.uploadMedia = async ( draft ) => {
+  try {
+    await draft.upload();
+    return true;
+  } catch ( error ) {
+    console.error( error );
+    Delivery.pushAlert( "failed to upload attachments" );
+    return false;
+  }
+}
+
 Publish.setup = async ( raw ) => {
   for ( const draftFile of raw.attachments ) {
     await draftFile.create();
@@ -32,20 +43,17 @@ Publish.setup = async ( raw ) => {
   const targets = await Publish.buildTargets( raw );
   if ( targets === false ) {
     throw new Error( "early return" );
-  } else {
-    return { draft, delivery, targets };
   }
+
+  const media = await Publish.uploadMedia( draft );
+  if ( media === false ) {
+    throw new Error( "early return" );
+  }
+  
+  return { draft, delivery, targets };
 };
 
 Publish.start = async function ({ draft, delivery, targets }) {
-  try {
-    await draft.upload();
-  } catch ( error ) {
-    console.error( "failed to upload attachments" );
-    console.error( error );
-    return;
-  }
-  
   const newPost = {
     delivery_id: delivery.id,
     targets

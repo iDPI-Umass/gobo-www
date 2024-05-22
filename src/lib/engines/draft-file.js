@@ -81,7 +81,7 @@ class DraftFile {
   async create() {
     if ( this.id == null ) {
       const resource = await FileHTTP.create( this._ );
-      this._.id = resource.id;
+      Object.assign( this._, resource );
     }
   }
 

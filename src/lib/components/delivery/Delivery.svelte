@@ -6,6 +6,7 @@
   import Spinner from "$lib/components/primitives/Spinner.svelte";
   import Content from "$lib/components/delivery/Content.svelte";
   import Uploads from "$lib/components/delivery/Uploads.svelte";
+  import Media from "$lib/components/delivery/Media.svelte";
   import Targets from "$lib/components/delivery/Targets.svelte";
   import Buttons from "$lib/components/delivery/Buttons.svelte";
   import { onMount } from "svelte";
@@ -116,29 +117,28 @@
     <Spinner></Spinner>
 
   {:else if state === "ready"}
-    {#if current.proof?.content}
-      <section class="panel">
-        <Content delivery={current}></Content>
-      </section>
-    {/if}
-
-    {#if current.files.length > 0}
-      <section class="panel">
-        <Uploads delivery={current}></Uploads>
-      </section>
-    {/if}
+    <section class="panel">
+      <div class="content">
+        <Content delivery={current} />
+      </div>
+      
+      {#if current.proof.files.length > 0}
+        <div class="media">
+          {#if current.files.length > 0}
+            <Media delivery={current} />
+          {/if}
+        </div>
+      {/if}
+    </section>
 
     {#if current.targets.length > 0}
       <section class="panel">
-        <Targets delivery={current}></Targets>
+        <Targets delivery={current} on:unpublish={Handle.unpublish}/>
       </section>
     {/if}
 
     <section class="panel">
-      <Buttons
-        delivery={current}
-        on:unpublish={Handle.unpublish}
-      ></Buttons>
+      <Buttons delivery={current} />
     </section>
 
   {/if}
@@ -190,5 +190,9 @@
 
   .gobo-copy .panel :global(*):first-child {
     margin-top: 0;
+  }
+
+  .gobo-copy .panel .media {
+    margin-top: 1rem;
   }
 </style>
