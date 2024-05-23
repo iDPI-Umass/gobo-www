@@ -38,6 +38,7 @@
     display: flex;
     align-items: center;
     padding: 0 0.75rem;
+    padding-top: 0.1rem;
     border-radius: 1rem;
   }
 
