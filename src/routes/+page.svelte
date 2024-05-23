@@ -20,7 +20,7 @@
 <PlainHeader></PlainHeader>
 <CenterAlt>
   <section>
-    <h1>A loyal social media client</h1>
+    <h1>All your (open) social media in one place</h1>
     <section class="buttons">
       <sl-button
         variant="primary"
