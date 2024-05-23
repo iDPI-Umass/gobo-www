@@ -68,19 +68,41 @@
   {#if target.state === "pending"}
     <Badge label="Pending" family="neutral"/>
   {:else if target.state === "delivered"}
-    <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <sl-button
+
+    <div class="controls">
+      {#if target.stash.url}
+
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <sl-button
+        href={target.stash.url}
+        target="_blank"
+        rel="noopener noreferrer nofollow"
+        size="small"
+        circle>
+
+        <sl-icon
+          src="/icons/box-arrow-up-right.svg"
+          label="View Post" 
+          class="neutral"/>
+
+        </sl-button>
+      {/if}
+
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <sl-button
       bind:this={unpublishButton}
       on:click={Handle.unpublish}
-      size="large"
+      size="small"
       circle>
-    
+
       <sl-icon
         src="/icons/trash.svg"
         label="Unpublish Post" 
         class="danger"/>
 
-    </sl-button>
+      </sl-button>
+    </div>
+    
   
     <Badge label="Delivered" family="success"/>
   {:else if target.state === "error"}
@@ -97,7 +119,7 @@
 <style>
   .table-row {
     display: flex;
-    gap: 1rem;
+    gap: var(--gobo-width-spacer-flex);
   }
 
   .table-row .platform {
@@ -107,12 +129,27 @@
     align-items: center;
     gap: 0.5rem;
   }
+  .table-row > .platform > sl-icon {
+    font-size: 1.25rem;
+  }
   .table-row > .platform > p {
+    font-size: var(--gobo-font-size-detail);
     margin: 0;
+    display: flex;
+    flex-wrap: wrap;
   }
 
-  .table-row sl-icon {
-    font-size: 1.5rem;
+  .table-row .controls {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .table-row sl-button sl-icon {
+    font-size: 1rem;
+  }
+
+  sl-button {
+    flex: 0 0 auto;
   }
 
   sl-button::part(base) {

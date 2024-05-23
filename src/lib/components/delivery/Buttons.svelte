@@ -62,7 +62,7 @@
     gap: 1rem;
     justify-content: end;
     align-items: center;
-    margin-top: 2rem;
+    margin-top: 1rem;
     border-top: none;
     padding-top: 0;
   }

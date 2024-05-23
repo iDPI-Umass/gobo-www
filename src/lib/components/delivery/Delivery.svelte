@@ -131,13 +131,8 @@
       {/if}
     </section>
 
-    {#if current.targets.length > 0}
-      <section class="panel">
-        <Targets delivery={current} on:unpublish={Handle.unpublish}/>
-      </section>
-    {/if}
-
     <section class="panel">
+      <Targets delivery={current} on:unpublish={Handle.unpublish}/>
       <Buttons delivery={current} />
     </section>
 

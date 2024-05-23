@@ -30,8 +30,6 @@
 
 
 {#if targets.length > 0 }
-  <h2>Identities</h2>
-
   <div class="gobo-table">
     {#each targets as target (target.id)}
       <Target {target} on:unpublish />

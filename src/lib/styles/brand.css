@@ -68,3 +68,7 @@ sl-icon.warning {
 sl-icon.danger {
   color: var(--sl-color-danger-600);
 }
+
+sl-icon.neutral {
+  color: var(--gobo-color-text);
+}

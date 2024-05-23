@@ -31,15 +31,20 @@
 
 <style>
   .badge {
+    flex: 0 0 auto;
     font-weight: var(--gobo-font-weight-black);
     font-size: 14px;
-    padding: 0.25rem 0.5rem;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    padding: 0 0.75rem;
     border-radius: 1rem;
   }
 
   .badge.neutral {
     background-color: var(--gobo-color-null);
     color: var(--gobo-color-text);
+    border: var(--gobo-border-panel);
   }
 
   .badge.success {
