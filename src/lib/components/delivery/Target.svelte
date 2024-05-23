@@ -1,6 +1,6 @@
 <script>
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
-  import "@shoelace-style/shoelace/dist/components/button/button.js";
+  import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
   import Badge from "$lib/components/delivery/Badge.svelte";
   import { onMount, createEventDispatcher } from "svelte";
   import { State } from "$lib/engines/store.js";
@@ -11,31 +11,32 @@
 
   const dispatch = createEventDispatcher();
 
-  let unpublishButton;
+  let state, unpublishButton;
   const Render = State.make();
 
   Render.cleanup = () => {
+    state = "loading";
   };
 
   Render.target = () => {
+    state = target.state;
   };
 
 
   const Handle = {};
 
   Handle.unpublish = async () => {
-    if ( unpublishButton.loading === true ) {
+    if ( state === "loading" ) {
       return;
     }
 
-    unpublishButton.loading = true;
+    state = "loading";
     try {
       await DeliveryTarget.unpublish( target );
       dispatch( "unpublish", {} );
     } catch ( error ) {
       console.error( error );
     }
-    unpublishButton.loading = false;
   }
 
 
@@ -65,50 +66,50 @@
   
   </div>
 
-  {#if target.state === "pending"}
-    <Badge label="Pending" family="neutral"/>
-  {:else if target.state === "delivered"}
-
-    <div class="controls">
-      {#if target.stash.url}
-
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <sl-button
-        href={target.stash.url}
-        target="_blank"
-        rel="noopener noreferrer nofollow"
-        size="small"
-        circle>
-
-        <sl-icon
-          src="/icons/box-arrow-up-right.svg"
-          label="View Post" 
-          class="neutral"/>
-
-        </sl-button>
-      {/if}
-
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <sl-button
-      bind:this={unpublishButton}
-      on:click={Handle.unpublish}
-      size="small"
-      circle>
-
-      <sl-icon
-        src="/icons/trash.svg"
-        label="Unpublish Post" 
-        class="danger"/>
-
-      </sl-button>
-    </div>
-    
+  {#if state === "loading"}
+    <Badge loading={true} family="neutral"></Badge>
   
-    <Badge label="Delivered" family="success"/>
-  {:else if target.state === "error"}
+  {:else if state === "pending"}
+    <Badge label="Pending" family="neutral"/>
+  
+  {:else if state === "delivered"}
+    <div class="status">
+      <div class="controls">
+        {#if target.stash.url}
+  
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
+          <sl-icon-button
+            href={target.stash.url}
+            target="_blank"
+            rel="noopener noreferrer nofollow"
+            size="small"
+            src="/icons/box-arrow-up-right.svg"
+            label="View Post" 
+            class="text" />
+        {:else}
+          <div class="spacer"></div>
+        {/if}
+  
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <sl-icon-button
+          bind:this={unpublishButton}
+          on:click={Handle.unpublish}
+          size="small"
+          src="/icons/trash.svg"
+          label="Unpublish Post" 
+          class="danger" >
+        </sl-icon-button>
+      </div>
+    
+      <Badge label="Delivered" family="success"/>
+    </div>
+  
+  {:else if state === "error"}
     <Badge label="Failure" family="danger"/>
-  {:else if target.state === "unpublished"}
+  
+  {:else if state === "unpublished"}
     <Badge label="Deleted" family="inert"/>
+  
   {/if}
     
 </div>
@@ -123,7 +124,7 @@
   }
 
   .table-row .platform {
-    flex: 1 1 auto;
+    flex: 1 1 max-content;
     height: 100%;
     display: flex;
     align-items: center;
@@ -131,6 +132,8 @@
   }
   .table-row > .platform > sl-icon {
     font-size: 1.25rem;
+    min-width: 1.25rem;
+    min-height: 1.25rem;
   }
   .table-row > .platform > p {
     font-size: var(--gobo-font-size-detail);
@@ -139,27 +142,42 @@
     flex-wrap: wrap;
   }
 
-  .table-row .controls {
+  .table-row .status {
+    flex: 0 0 min-content;
+    gap: var(--gobo-width-spacer-flex);
     display: flex;
-    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
   }
 
-  .table-row sl-button sl-icon {
+  .table-row .controls {
+    flex: 1 0 auto;
+    display: flex;
+    justify-content: space-between;
+    gap: var(--gobo-width-spacer-flex);
+    /* order: 1; */
+  }
+
+  .table-row sl-icon-button {
     font-size: 1rem;
   }
-
-  sl-button {
-    flex: 0 0 auto;
+  .table-row sl-icon-button.danger::part(base),
+  .table-row sl-icon-button.danger::part(base):hover {
+    color: var(--gobo-color-danger);
+  }
+  .table-row sl-icon-button.text::part(base),
+  .table-row sl-icon-button.text::part(base):hover {
+    color: var(--gobo-color-text);
   }
 
-  sl-button::part(base) {
-    background: none;
-    border: none;
-  }
+  @media( min-width: 500px ) {
+    .table-row .status {
+      flex-wrap: nowrap;
+      flex-basis: max-content;
+    }
 
-  sl-button::part(label) {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    /* .table-row .status .controls {
+      order: 0;
+    } */
   }
 </style>

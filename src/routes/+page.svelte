@@ -20,7 +20,7 @@
 <PlainHeader></PlainHeader>
 <CenterAlt>
   <section>
-    <h1>All your (open) social media in one place</h1>
+    <h1>All your (open) social media in one&nbsp;place</h1>
     <section class="buttons">
       <sl-button
         variant="primary"
@@ -54,5 +54,10 @@
     gap: 1rem;
     align-items: center;
     margin-top: 2rem;
+  }
+
+  h1 {
+    text-align: center;
+    text-transform: capitalize;
   }
 </style>

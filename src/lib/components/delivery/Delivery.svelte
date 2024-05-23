@@ -12,10 +12,11 @@
   import { onMount } from "svelte";
   import { State } from "$lib/engines/store.js";
   import { Delivery } from "$lib/engines/delivery/index.js";
+  import { humanize } from "$lib/helpers/humanize.js";
 
   export let delivery;
 
-  let state, current;
+  let state, current, created;
   const Render = State.make();
   Render.cleanup = () => {
     state = "loading";
@@ -24,6 +25,7 @@
 
   Render.current = () => {
     current = delivery;
+    created = humanize( current.created );
     state = "ready";    
   };
 
@@ -118,6 +120,10 @@
 
   {:else if state === "ready"}
     <section class="panel">
+      <div class="header">
+        <time datetime="delivered">{ created }</time>
+      </div>
+      
       <div class="content">
         <Content delivery={current} />
       </div>
@@ -189,5 +195,16 @@
 
   .gobo-copy .panel .media {
     margin-top: 1rem;
+  }
+
+  .gobo-copy .header {
+    display: flex;
+    justify-content: end;
+  }
+
+  .gobo-copy .header time {
+    font-size: var(--gobo-font-size-detail);
+    font-weight: var(--gobo-font-weight-regular);
+    color: var(--gobo-color-text-muted);
   }
 </style>

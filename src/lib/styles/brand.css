@@ -16,8 +16,8 @@ sl-icon.linkedin {
   background: radial-gradient(
     circle, 
     #fff 0%,
-    #fff 70%,
-    transparent 70%,
+    #fff 65%,
+    transparent 65%,
     transparent 100%
   );
 }
@@ -27,8 +27,8 @@ sl-icon.mastodon {
   background: radial-gradient(
     circle at center 40%, 
     #fff 0%,
-    #fff 48%,
-    transparent 48%,
+    #fff 47%,
+    transparent 47%,
     transparent 100%
   );
   border-radius: 50%;
