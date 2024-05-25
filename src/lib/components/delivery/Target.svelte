@@ -120,7 +120,7 @@
 <style>
   .table-row {
     display: flex;
-    gap: var(--gobo-width-spacer-flex);
+    gap: var(--gobo-width-spacer);
   }
 
   .table-row .platform {
