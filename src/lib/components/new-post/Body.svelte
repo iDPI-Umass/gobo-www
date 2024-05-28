@@ -1,6 +1,7 @@
 <script>
   import "@shoelace-style/shoelace/dist/components/checkbox/checkbox.js";
   import "@shoelace-style/shoelace/dist/components/textarea/textarea.js";
+  import TextArea from "$lib/components/new-post/textarea/TextArea.svelte";
   import Count from "$lib/components/new-post/Count.svelte"
   import { onMount } from "svelte";
   import { State, Draft } from "$lib/engines/draft.js";
@@ -63,14 +64,15 @@
 </script>
 
 
-<sl-textarea
+<TextArea />
+<!-- <sl-textarea
   on:sl-input={ Handle.content }
   value={ content }
   { placeholder }
   size="medium"
   resize="none"
   rows=4>
-</sl-textarea>
+</sl-textarea> -->
 
 {#if platforms}
 <div>
