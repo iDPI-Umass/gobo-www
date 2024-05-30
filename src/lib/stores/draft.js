@@ -15,6 +15,7 @@ const createStore = function () {
 
 
 const content = createStore();
+const thread = createStore();
 const linkPreview = createStore();
 const identities = createStore();
 const attachments = createStore();
@@ -25,6 +26,7 @@ const alerts = createStore();
 
 export {
   content,
+  thread,
   linkPreview,
   identities,
   attachments,

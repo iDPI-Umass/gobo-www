@@ -8,7 +8,7 @@ import {
   viewToModelPositionOutsideModelElement
 } from "@ckeditor/ckeditor5-widget";
 
-// editor.execute("gobo-divider", {value: "bluesky"})
+// editor.execute("add-threadpoint", {value: "bluesky"})
 
 const Helpers = {};
 
@@ -25,32 +25,32 @@ class DoubleClickObserver extends DomEventObserver {
 }
 
 
-class AddDividerCommand extends Command {
+class AddThreadpointCommand extends Command {
   execute({ value }) {
       const editor = this.editor;
       const selection = editor.model.document.selection;
 
       editor.model.change( writer => {
-          // Create a <gobo-divider> element with the "platform" attribute (and all the selection attributes)...
-          const divider = writer.createElement( "gobo-divider", {
+          // Create a <threadpoint> element with the "platform" attribute (and all the selection attributes)...
+          const threadpoint = writer.createElement( "threadpoint", {
               ...Object.fromEntries( selection.getAttributes() ),
               platform: value
           } );
 
           // ... and insert it into the document. Put the selection on the inserted element.
-          editor.model.insertObject( divider, null, null, { setSelection: "on" } );
+          editor.model.insertObject( threadpoint, null, null, { setSelection: "on" } );
       } );
   }
 
   refresh() {
       const model = this.editor.model;
       const selection = model.document.selection;
-      const isAllowed = model.schema.checkChild( selection.focus.parent, "gobo-divider" );
+      const isAllowed = model.schema.checkChild( selection.focus.parent, "threadpoint" );
       this.isEnabled = isAllowed;
   }
 }
 
-class RemoveDividerCommand extends Command {
+class RemoveThreadpointCommand extends Command {
   execute({ target }) {
     this.editor.model.change( writer => {
       writer.remove( target );
@@ -60,23 +60,23 @@ class RemoveDividerCommand extends Command {
   refresh() {
       const model = this.editor.model;
       const selection = model.document.selection;
-      const isAllowed = model.schema.checkChild( selection.focus.parent, "gobo-divider" );
+      const isAllowed = model.schema.checkChild( selection.focus.parent, "threadpoint" );
       this.isEnabled = isAllowed;
   }
 }
 
 
-Helpers.matchDivider = ( editor, target ) => {
-  if ( target.hasClass("gobo-divider") ) {
+Helpers.matchThreadpoint = ( editor, target ) => {
+  if ( target.hasClass("threadpoint") ) {
     return editor.editing.mapper.toModelElement( target );
   }
-  if ( target.parent.hasClass("gobo-divider") ) {
+  if ( target.parent.hasClass("threadpoint") ) {
     return editor.editing.mapper.toModelElement( target.parent );
   }
   return;
 };
 
-export default class GoboDividerEditing extends Plugin {
+export default class ThreadpointEditing extends Plugin {
   static get requires() {
     return [ Widget ];
   }
@@ -86,19 +86,19 @@ export default class GoboDividerEditing extends Plugin {
     this._defineConverters();
     
     this.editor.commands.add( 
-      "add-divider",
-      new AddDividerCommand( this.editor )
+      "add-threadpoint",
+      new AddThreadpointCommand( this.editor )
     );
     this.editor.commands.add( 
-      "remove-divider",
-      new RemoveDividerCommand( this.editor )
+      "remove-threadpoint",
+      new RemoveThreadpointCommand( this.editor )
     );
 
     this.editor.editing.mapper.on(
       "viewToModelPosition",
       viewToModelPositionOutsideModelElement( 
         this.editor.model, 
-        viewElement => viewElement.hasClass( "gobo-divider" ) 
+        viewElement => viewElement.hasClass( "threadpoint" ) 
       )
     );
 
@@ -106,9 +106,9 @@ export default class GoboDividerEditing extends Plugin {
     const view = this.editor.editing.view;
     view.addObserver( DoubleClickObserver );    
     this.editor.listenTo( view.document, "dblclick", ( evt, data ) => {
-      const match = Helpers.matchDivider( editor, data.target );
+      const match = Helpers.matchThreadpoint( editor, data.target );
       if ( match != null ) {
-        editor.execute( "remove-divider", { target: match });
+        editor.execute( "remove-threadpoint", { target: match });
       }
     });
 
@@ -118,14 +118,14 @@ export default class GoboDividerEditing extends Plugin {
   _defineSchema() {
     const schema = this.editor.model.schema;
 
-    schema.register( "gobo-divider", {
+    schema.register( "threadpoint", {
       // Behaves like a self-contained inline object (e.g. an inline image)
       // allowed in places where $text is allowed (e.g. in paragraphs).
       // The inline widget can have the same attributes as text 
       // (for example linkHref, bold).
       inheritAllFrom: "$inlineObject",
 
-      // The divider can have many types, like date, name, surname, etc:
+      // The widget can have many types, like date, name, surname, etc:
       allowAttributes: [ "platform" ]
     } );
   }
@@ -137,19 +137,19 @@ export default class GoboDividerEditing extends Plugin {
     conversion.for( "upcast" ).elementToElement( {
       view: {
         name: "span",
-        classes: [ "gobo-divider" ]
+        classes: [ "threadpoint" ]
       },
       model: ( viewElement, { writer } ) => {
         const platform = viewElement.getAttribute( "data-platform" );
-        return writer.createElement( "gobo-divider", { platform } );
+        return writer.createElement( "threadpoint", { platform } );
       }
     } );
 
 
     conversion.for( "editingDowncast" ).elementToElement( {
-      model: "gobo-divider",
+      model: "threadpoint",
       view: ( model, { writer } ) => {
-        const view = createGoboDividerView( model, writer );
+        const view = createThreadpointView( model, writer );
 
         // For edit view only: decorate with platform icon.
         const platform = model.getAttribute( "platform" );
@@ -166,19 +166,19 @@ export default class GoboDividerEditing extends Plugin {
 
 
     conversion.for( "dataDowncast" ).elementToElement( {
-      model: "gobo-divider",
+      model: "threadpoint",
       view: ( model, { writer } ) => {
-        return createGoboDividerView( model, writer );
+        return createThreadpointView( model, writer );
       }
     });
 
 
     // Helper method for both downcast converters.
-    function createGoboDividerView( model, writer ) {
+    function createThreadpointView( model, writer ) {
       const platform = model.getAttribute( "platform" );
 
       return writer.createContainerElement( "span", {
-        class: "gobo-divider",
+        class: "threadpoint",
         "data-platform": platform
       });
     }
@@ -187,12 +187,12 @@ export default class GoboDividerEditing extends Plugin {
 
 
 
-class GoboDivider extends Plugin {
+class Threadpoint extends Plugin {
   static get requires() {
-    return [ GoboDividerEditing ];
+    return [ ThreadpointEditing ];
   }
 }
 
 export {
-  GoboDivider
+  Threadpoint
 }

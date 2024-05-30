@@ -44,7 +44,7 @@ Preview.fromContent = async ( content ) => {
     return;
   }
 
-  const html = markdown.render( content );
+  const html = markdown.toHTML( content );
   const dom = parser.parseFromString( html, "text/html" );
   const link = dom.querySelector( "a" );
   

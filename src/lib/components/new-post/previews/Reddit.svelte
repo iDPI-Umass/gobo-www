@@ -41,7 +41,7 @@
   };
 
   Render.content = ( draft ) => {
-    content = markdown.render( draft.content );
+    content = markdown.toHTML( draft.content );
   };
 
   Render.attachments = ( draft ) => {

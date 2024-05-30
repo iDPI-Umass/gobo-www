@@ -27,9 +27,8 @@ Reddit.limits = {
   }
 };
 
-Reddit.contentLength = () => {
-  const draft = Draft.read();
-  return draft.content?.length ?? 0;
+Reddit.contentLength = ( content ) => {
+  return content?.length ?? 0;
 };
 
 Reddit.build = ( draft ) => {

@@ -5,6 +5,7 @@
   import { onMount } from "svelte";
   import { State, Draft, Lock, Name, Identity } from "$lib/engines/draft.js";
   import { Identity as IdentityEngine } from "$lib/engines/identity.js";
+  import { Thread } from "$lib/engines/thread.js";
 
   let state, visual, identities, lockedIdentity;
   const Render = State.make();
@@ -66,7 +67,9 @@
   Handle.toggle = ( identity ) => {
     return ( event ) => {
       identity.active = event.target.checked;
-      Draft.updateAspect( "identities", identities );
+      const draft = Draft.updateAspect( "identities", identities );
+      const thread = Thread.parse( draft );
+      Draft.updateAspect( "thread", thread );
     };
   };
 

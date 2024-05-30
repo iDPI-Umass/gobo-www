@@ -42,7 +42,7 @@
       return;
     }
 
-    const html = markdown.render( draft.content );
+    const html = markdown.toHTML( draft.content );
 
     const dom = parser.parseFromString( `<div>${ html }</div>`, "text/html" );    
     const links = dom.querySelectorAll( "a" );

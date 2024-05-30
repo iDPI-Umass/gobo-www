@@ -13,6 +13,7 @@
     Reddit 
   } from "$lib/engines/platforms/index.js";
 
+  export let content;
   export let platform;
   
   let logo = Post.logo({ platform });
@@ -38,17 +39,15 @@
   }
 
 
-  let count, maximum, progress, remaining;
+  let maximum, progress, remaining;
   const Render = State.make();
   Render.cleanup = () => {
-    count = 0;
     maximum = Model?.limits.characters ?? 1;
-    progress = 0;
-    remaining = 0;
+    remaining = maximum;
   };
 
   Render.count = () => {
-    count = Model.contentLength();
+    const count = Model.contentLength( content );
     progress = Math.min( 100, Math.floor(100 * count / maximum ));
     remaining = new Intl.NumberFormat()
       .format( maximum - count );
@@ -56,11 +55,12 @@
 
   Render.reset();
   onMount(() => {
-    Render.listen( "content", Render.count );
     return () => {
       Render.reset();
     };
   });
+
+  $: Render.count( content );
 </script>
 
 

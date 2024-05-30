@@ -39,6 +39,7 @@ Draft.make = () => {
       },
     },
     content: null,
+    thread: [],
     linkPreview: {},
     reply: null,
     quote: null
@@ -87,9 +88,10 @@ Draft.put = ( store, value ) =>  draftStores[ store ].put( value );
 // has the latest data. Useful at the page level and for broad changes.
 Draft.load = () => {
   const draft = Draft.read();
-  Draft.put( "content", draft );
-  Draft.put( "linkPreview", draft );
   Draft.put( "identities", draft );
+  Draft.put( "content", draft );
+  Draft.put( "thread", draft );
+  Draft.put( "linkPreview", draft );
   Draft.put( "attachments", draft );
   Draft.put( "reply", draft );
   Draft.put( "quote", draft );
@@ -113,13 +115,14 @@ Draft.update = ( data ) => {
   const draft = Draft.read();
   Object.assign( draft, data );
   Draft.write();
-  Draft.load();
+  return Draft.load();
 };
 Draft.updateAspect = ( aspect, value ) => {
   const draft = Draft.read();
   Object.assign( draft, { [aspect]: value });
   Draft.write();
   Draft.put( aspect, draft );
+  return draft;
 };
 Draft.pushAlert = ( message ) => {
   const draft = Draft.read();

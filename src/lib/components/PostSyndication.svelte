@@ -1,7 +1,7 @@
 <script>
   import { isImage, isVideo } from "$lib/helpers/type.js";
   import { elide } from "$lib/helpers/text.js";
-  import { render } from "$lib/helpers/markdown.js";
+  import { toHTML } from "$lib/helpers/markdown.js";
 
   export let attachments = [];
 
@@ -20,7 +20,7 @@
   if ( !content ) {
     renderedContent = `<p>${elide( 100, sourceURL )}</p>`;
   } else {
-    renderedContent = render( elide( 250, content ));
+    renderedContent = toHTML( elide( 250, content ));
   }
 
 </script>

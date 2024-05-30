@@ -2,15 +2,21 @@
   import { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
   import { Essentials } from "@ckeditor/ckeditor5-essentials";
   import { Paragraph } from "@ckeditor/ckeditor5-paragraph";
-  import { GoboDivider } from "$lib/components/new-post/textarea/gobo-divider.js";
+  import { Threadpoint } from "$lib/components/new-post/textarea/threadpoint.js";
   import { ResizableHeight } from "$lib/components/new-post/textarea/resizable-height.js";
   import { onMount, tick } from "svelte";
   import { State, Draft } from "$lib/engines/draft.js";
+  import { Thread } from "$lib/engines/thread.js";
+  import { Preview } from "$lib/engines/link-preview.js";
 
-  let anchor, editor;
+  export let placeholder = "Write your post";
+  export let content = "";
+
+  let anchor, editor, platforms;
   const Render = State.make();
   
   Render.cleanup = () => {
+    platforms = [];
     if ( editor != null ) {
       editor.model.document.on( "change:data", Handle.content );
       editor.destroy();
@@ -18,35 +24,46 @@
   };
 
   Render.area = async () => {
-    await tick();
+    console.log( "registering editor" );
     anchor = document.querySelector( "#text-edit-anchor" );
     editor = await ClassicEditor.create( anchor, {
       plugins: [
         Essentials,
         Paragraph,
         ResizableHeight,
-        GoboDivider
+        Threadpoint
       ],
-      
+      placeholder: placeholder,
       ui: {
         poweredBy: {
           side: "left"
         }
       },
-
       ResizableHeight: {
         height: "10rem",
       }
     });
 
     editor.model.document.on( "change:data", Handle.content );
+    editor.setData( content );
   };
+
+  Render.content = () => {
+    console.log("setting content")
+    if ( editor != null ) {
+      editor.setData( content );
+    }
+  }
 
 
   const Handle = {};
+
   Handle.content = () => {
     const content = editor.getData();
-    Draft.updateAspect( "content", content );
+    let draft = Draft.updateAspect( "content", content );
+    const thread = Thread.parse( draft );
+    draft = Draft.updateAspect( "thread", thread );
+    Preview.fromContent( content );
   };
 
 
@@ -57,19 +74,11 @@
       Render.reset();
     };
   });
-
-/*
-  <sl-icon
-    src="/icons/bluesky.svg" 
-    class="bluesky" />
-*/
 </script>
 
 
 
 <div id="text-edit-anchor">
-  <p>First post: Hello, World!</p>
-  <p>Second post: Here is more content!</p>
 </div>
 
 
@@ -112,8 +121,12 @@
     display: none;
   }
 
-  :global(.ck.ck-content.ck-editor__editable sl-icon) {
+  :global(.ck.ck-content.ck-editor__editable .threadpoint) {
     cursor: pointer;
+    padding: 0 0.25rem;
+    display: inline-flex;
+    align-items: center;
+    height: 21px;
   }
 
 

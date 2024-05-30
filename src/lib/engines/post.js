@@ -5,7 +5,7 @@ import { Cache } from "$lib/resources/cache.js";
 import * as Resource from "$lib/resources/post.js";
 import * as Random from "$lib/helpers/random.js";
 import { humanize } from "$lib/helpers/humanize.js";
-import { render } from "$lib/helpers/markdown.js";
+import { toHTML } from "$lib/helpers/markdown.js";
 
 class FilteredPost {
   constructor ({ id }) {
@@ -85,7 +85,7 @@ Post.href = ( post ) => post.proxyURL ?? post.url;
 
 Post.logo = ( post ) => `/icons/${ post.platform }.svg`;
 
-Post.content = ( post ) => render( post.content );
+Post.content = ( post ) => toHTML( post.content );
 
 Post.published = ( post ) => humanize( post.published );
 

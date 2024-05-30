@@ -60,14 +60,14 @@ Mastodon.urlGlamor = ( _url ) => {
 
 // From: https://docs.joinmastodon.org/user/posting/
 // "All links are counted as 23 characters, no matter how long they actually are"
-Mastodon.contentLength = () => {
+Mastodon.contentLength = ( content ) => {
   const draft = Draft.read();
-  if ( draft.content == null ) {
+  if ( content == null ) {
     return 0;
   }
 
-  const links = linkify.find( draft.content, "url" );
-  let length = draft.content.length;
+  const links = linkify.find( content, "url" );
+  let length = content.length;
   let surplus = 0;
   
   for ( const link of links ) {

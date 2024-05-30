@@ -1,6 +1,7 @@
 import * as Type from "@dashkite/joy/type";
 import Markdown from "markdown-it";
 import mila from "markdown-it-link-attributes";
+import Turndown from "turndown";
 
 const md = new Markdown({
   html:         true,        // Enable HTML tags in source
@@ -36,12 +37,21 @@ md.use( mila, {
 
 // TODO: is it a meaningful improvement to has the content of the post and use
 // that to build an in-memory cache of the resulting HTML?
-const render = function ( content ) {
+const toHTML = ( content ) => {
   if ( Type.isString(content) && content.length > 0 ) {
     return md.render( content );
   }
-}
+};
+
+
+
+const parser = new Turndown();
+
+const toMarkdown = ( html ) => {
+  return parser.turndown( html );
+};
 
 export {
-  render
+  toHTML,
+  toMarkdown
 }

@@ -22,14 +22,13 @@ Bluesky.limits = {
 
 Bluesky.agent = new BskyAgent({ service: "https://bsky.app" });
 
-Bluesky.contentLength = () => {
-  const draft = Draft.read();
-  if ( draft.content == null ) {
+Bluesky.contentLength = ( content ) => {
+  if ( content == null ) {
     return 0;
   }
 
-  const links = linkify.find( draft.content, "url" );
-  let length = draft.content.length;
+  const links = linkify.find( content, "url" );
+  let length = content.length;
   let surplus = 0;
   
   for ( const link of links ) {

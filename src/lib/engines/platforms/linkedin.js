@@ -90,13 +90,12 @@ Linkedin.urlGlamor = ( _url ) => {
 // From https://www.linkedin.com/help/linkedin/answer/a521889/short-urls-in-shared-posts
 // "When you share a link that's longer than 26 characters, we automatically 
 // shorten it once you click Post, to make it easier to read."
-Linkedin.contentLength = () => {
-  const draft = Draft.read();
-  if ( draft.content == null ) {
+Linkedin.contentLength = ( content ) => {
+  if ( content == null ) {
     return 0;
   }
 
-  const links = linkify.find( draft.content, "url" );
+  const links = linkify.find( content, "url" );
   let removed = 0;
   
   for ( const link of links ) {
@@ -105,7 +104,7 @@ Linkedin.contentLength = () => {
     }
   }
   
-  return draft.content.length - removed;
+  return content.length - removed;
 };
 
 // TODO: There is a looming problem here on the visiblity question.
