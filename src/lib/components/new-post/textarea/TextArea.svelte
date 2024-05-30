@@ -24,7 +24,6 @@
   };
 
   Render.area = async () => {
-    console.log( "registering editor" );
     anchor = document.querySelector( "#text-edit-anchor" );
     editor = await ClassicEditor.create( anchor, {
       plugins: [
@@ -49,7 +48,6 @@
   };
 
   Render.content = () => {
-    console.log("setting content")
     if ( editor != null ) {
       editor.setData( content );
     }
