@@ -9,6 +9,8 @@
   import { Linkedin } from "$lib/engines/platforms/linkedin.js";
   import * as markdown from "$lib/helpers/markdown.js";
 
+  export let rawContent;
+
   const parser = new DOMParser();
   const serializer = new XMLSerializer();
 
@@ -32,13 +34,13 @@
     options = draft.options.linkedin;
   };
 
-  Render.content = ( draft ) => {
-    if ( draft.content == null || draft.content == "" ) {
+  Render.content = ( raw ) => {
+    if ( raw.content == null || raw.content == "" ) {
       content = null;
       return;
     }
 
-    const html = markdown.toHTML( draft.content );
+    const html = markdown.toHTML( raw.content );
 
     const dom = parser.parseFromString( `<div>${ html }</div>`, "text/html" );    
     const links = dom.querySelectorAll( "a" );
@@ -104,12 +106,13 @@
   onMount(() => {
     Render.listen( "identities", Render.identity );
     Render.listen( "options", Render.options );
-    Render.listen( "content", Render.content );
     Render.listen( "attachments", Render.attachments );
     return () => {
       Render.reset();
     }
   });
+
+  $: Render.content( rawContent );
 </script>
 
 <article class="outer-frame">

@@ -6,6 +6,7 @@
   import { onMount } from "svelte";
   import { State } from "$lib/engines/draft.js";
 
+  let textarea;
   let content, placeholder;
   const Render = State.make();
   
@@ -27,7 +28,19 @@
     } else {
       placeholder = "Write your post";
     }
-  }
+  };
+
+
+  const Handle = {};
+
+  Handle.addThreadpoint = ( event ) => {
+    const platform = event?.detail?.platform;
+    if ( platform == null ) {
+      console.error( "got add threadpoint event without platform" );
+    } else {
+      textarea.addThreadpoint( platform );
+    }
+  };
 
 
   Render.reset();
@@ -42,8 +55,15 @@
 </script>
 
 
-<TextArea {placeholder} {content} />
-<Counts />
+<TextArea
+  bind:this={textarea}
+  {placeholder}
+  {content}
+/>
+
+<Counts 
+  on:add-threadpoint={Handle.addThreadpoint}
+/>
 
 
 <style>

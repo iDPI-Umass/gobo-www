@@ -31,14 +31,19 @@ class AddThreadpointCommand extends Command {
       const selection = editor.model.document.selection;
 
       editor.model.change( writer => {
-          // Create a <threadpoint> element with the "platform" attribute (and all the selection attributes)...
+        const position = editor.model.document.selection.getFirstPosition();  
+        
+        // Create a threadpoint model element...
           const threadpoint = writer.createElement( "threadpoint", {
               ...Object.fromEntries( selection.getAttributes() ),
               platform: value
           } );
 
-          // ... and insert it into the document. Put the selection on the inserted element.
+          // ...and insert it into the document model.
           editor.model.insertObject( threadpoint, null, null, { setSelection: "on" } );
+
+          // Set the selection position back to its former value.
+          writer.setSelection( position );
       } );
   }
 

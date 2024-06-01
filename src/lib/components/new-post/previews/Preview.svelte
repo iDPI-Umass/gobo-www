@@ -1,4 +1,5 @@
 <script>
+  import Thread from "$lib/components/new-post/previews/Thread.svelte";
   import Bluesky from "$lib/components/new-post/previews/Bluesky.svelte";
   import Linkedin from "$lib/components/new-post/previews/Linkedin.svelte";
   import Mastodon from "$lib/components/new-post/previews/Mastodon.svelte";
@@ -7,29 +8,45 @@
   import { onMount } from "svelte";
   import { State, Identity } from "$lib/engines/draft.js";
 
-  let hasBluesky, hasLinkedin, hasMastodon, hasReddit, hasSmalltown;
+  let bluesky, linkedin, mastodon, reddit, smalltown;
   const Render = State.make();
 
   Render.cleanup = () => {
-    hasBluesky = false;
-    hasLinkedin = false;
-    hasMastodon = false;
-    hasReddit = false;
-    hasSmalltown = false;
+    bluesky = [];
+    linkedin = [];
+    mastodon = [];
+    reddit = [];
+    smalltown = [];
   }
 
-  Render.cycle = ( draft ) => {
-    hasBluesky = Identity.hasBluesky();
-    hasLinkedin = Identity.hasLinkedin();
-    hasMastodon = Identity.hasMastodon();
-    hasReddit = Identity.hasReddit();
-    hasSmalltown = Identity.hasSmalltown();
+  const Helpers = {};
+
+  Helpers.extract = ( platform, rows ) => {
+    const output = [];
+    
+    for ( const row of rows ) {
+      for ( const item of row ) {
+        if ( item.platform === platform ) {
+          output.push( item );
+        }
+      }
+    }
+
+    return output;
+  };
+
+  Render.thread = ( draft ) => {
+    bluesky = Helpers.extract( "bluesky", draft.thread );
+    linkedin = Helpers.extract( "linkedin", draft.thread );
+    mastodon = Helpers.extract( "mastodon", draft.thread );
+    reddit = Helpers.extract( "reddit", draft.thread );
+    smalltown = Helpers.extract( "smalltown", draft.thread );
   };
 
 
   Render.reset();
   onMount(() => {
-    Render.listen( "identities", Render.cycle );
+    Render.listen( "thread", Render.thread );
     return () => {
       Render.reset()
     };
@@ -44,34 +61,43 @@
 </p>
 
 
-{#if hasBluesky}
+{#if bluesky.length > 0}
   <h3 class="preview-header">Bluesky</h3>
-  <Bluesky></Bluesky>
+  <Thread>
+    {#each bluesky as post, index (index)}
+      <Bluesky rawContent={post} />
+    {/each}
+  </Thread>
 {/if}
 
-{#if hasLinkedin}
+{#if linkedin.length > 0}
   <h3 class="preview-header">LinkedIn</h3>
-  <Linkedin></Linkedin>
+  <Linkedin rawContent={linkedin[0]} />
 {/if}
 
-{#if hasMastodon}
+{#if mastodon.length > 0}
   <h3 class="preview-header">Mastodon</h3>
-  <Mastodon></Mastodon>
+  <Thread>
+    {#each mastodon as post, index (index)}
+      <Mastodon rawContent={post} />
+    {/each}
+  </Thread>
 {/if}
 
-{#if hasReddit}
+{#if reddit.length > 0}
   <h3 class="preview-header">Reddit</h3>
-  <Reddit></Reddit>
+  <Reddit rawContent={reddit[0]} />
 {/if}
 
-{#if hasSmalltown}
+{#if smalltown.length > 0}
   <h3 class="preview-header">Smalltown</h3>
-  <Smalltown></Smalltown>
+  <Thread>
+    {#each smalltown as post, index (index)}
+      <Smalltown rawContent={post} />
+    {/each}
+  </Thread>
 {/if}
 
 
 <style>
-  .panel {
-    max-width: 36rem;
-  }
 </style>

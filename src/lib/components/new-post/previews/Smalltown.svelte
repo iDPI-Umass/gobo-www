@@ -9,6 +9,8 @@
   import { Smalltown } from "$lib/engines/platforms/smalltown.js";
   import * as markdown from "$lib/helpers/markdown.js";
 
+  export let rawContent;
+
   let identity, options, content, avatar;
   let displayedFiles, sensitiveOverride, spoilerOverride;
   const Render = State.make();
@@ -36,13 +38,13 @@
     };
   };
 
-  Render.content = ( draft ) => {
-    if ( draft.content == null || draft.content == "" ) {
+  Render.content = ( raw ) => {
+    if ( raw.content == null || raw.content == "" ) {
       content = null;
       return;
     }
 
-    const html = markdown.toHTML( draft.content );
+    const html = markdown.toHTML( raw.content );
 
     const dom = parser.parseFromString( `<div>${ html }</div>`, "text/html" );    
     const links = dom.querySelectorAll( "a" );
@@ -77,12 +79,13 @@
   onMount(() => {
     Render.listen( "identities", Render.identity );
     Render.listen( "options", Render.options );
-    Render.listen( "content", Render.content );
     Render.listen( "attachments", Render.attachments );
     return () => {
       Render.reset();
     }
   });
+
+  $: Render.content( rawContent );
 
 </script>
 
@@ -441,12 +444,24 @@
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: stretch;
-    margin-bottom: 2rem;
     padding: 1rem;
     max-width: 580px;
     background: #fff;
     border: 1px solid var(--sl-color-neutral-400);
-    border-radius: var(--sl-border-radius-medium);
+    border-top: none;
+    border-bottom: none;
+  }
+
+  .outer-frame:first-child {
+    border-top-left-radius: var(--sl-border-radius-medium);
+    border-top-right-radius: var(--sl-border-radius-medium);
+    border-top: 1px solid var(--sl-color-neutral-400);
+  }
+
+  .outer-frame:last-child {
+    border-bottom-left-radius: var(--sl-border-radius-medium);
+    border-bottom-right-radius: var(--sl-border-radius-medium);
+    border-bottom: 1px solid var(--sl-color-neutral-400);
   }
 
   .outer-frame > header {

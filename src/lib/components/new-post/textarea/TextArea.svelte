@@ -12,6 +12,12 @@
   export let placeholder = "Write your post";
   export let content = "";
 
+  export function addThreadpoint( platform ) {
+    if ( editor != null ) {
+      editor.execute( "add-threadpoint", { value: platform });
+    }
+  }
+
   let anchor, editor, platforms;
   const Render = State.make();
   
@@ -44,7 +50,7 @@
     });
 
     editor.model.document.on( "change:data", Handle.content );
-    editor.setData( content );
+    editor.setData( content ?? "" );
   };
 
   Render.content = () => {

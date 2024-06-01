@@ -9,6 +9,8 @@
   import { Bluesky } from "$lib/engines/platforms/bluesky.js";
   import * as markdown from "$lib/helpers/markdown.js";
 
+  export let rawContent;
+
   const parser = new DOMParser();
   const serializer = new XMLSerializer();
 
@@ -33,13 +35,13 @@
     options = draft.options.attachments;
   };
 
-  Render.content = ( draft ) => {
-    if ( draft.content == null || draft.content == "" ) {
+  Render.content = ( raw ) => {
+    if ( raw.content == null || raw.content == "" ) {
       content = null;
       return;
     }
 
-    const html = markdown.toHTML( draft.content );
+    const html = markdown.toHTML( raw.content );
 
     const dom = parser.parseFromString( `<div>${ html }</div>`, "text/html" );    
     const links = dom.querySelectorAll( "a" );
@@ -88,6 +90,8 @@
       Render.reset();
     }
   });
+
+  $: Render.content( rawContent );
 </script>
 
 <article class="outer-frame">
@@ -441,12 +445,24 @@
     flex-direction: row;
     justify-content: flex-start;
     align-items: stretch;
-    margin-bottom: 2rem;
     padding: 12px 16px 0 16px;
     max-width: 566px;
     background: #fff;
     border: 1px solid var(--sl-color-neutral-400);
-    border-radius: var(--sl-border-radius-medium);
+    border-top: none;
+    border-bottom: none;
+  }
+
+  .outer-frame:first-child {
+    border-top-left-radius: var(--sl-border-radius-medium);
+    border-top-right-radius: var(--sl-border-radius-medium);
+    border-top: 1px solid var(--sl-color-neutral-400);
+  }
+
+  .outer-frame:last-child {
+    border-bottom-left-radius: var(--sl-border-radius-medium);
+    border-bottom-right-radius: var(--sl-border-radius-medium);
+    border-bottom: 1px solid var(--sl-color-neutral-400);
   }
 
   .outer-frame > .gutter {

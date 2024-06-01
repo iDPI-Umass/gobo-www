@@ -16,6 +16,11 @@ Thread.getPlatforms = ( draft ) => {
   return Array.from( current );
 };
 
+Thread.ignoredPlatforms = new Set([
+  "linkedin",
+  "reddit"
+]);
+
 
 Thread.parse = ( draft ) => {
   const thread = draft.content;
@@ -44,14 +49,24 @@ Thread.parse = ( draft ) => {
 
     // Now get back the modified HTML.
     const html = dom.querySelector("#outermost").innerHTML;
+    
+    // We convert this to Markdown for several reasons:
+    // 1. Platforms ultimately expect posts to be in a more plaintext form, not HTML
+    // 2. We need to support arbitrary character splitting, and HTML tags complicate that
+    // 3. Because of (1), our length calculations rely on plaintext characters.
     const markdown = toMarkdown( html );
     const parts = markdown.split( DELIMITER );
-    for ( let i=0; i < parts.length; i++ ) {
-      const content = parts[ i ].trim();
-      posts[ i ] ??= [];
-      posts[ i ].push({ platform, content });
+    
+    // Assemble the parts for this platform alongside the other platforms.
+    let index = 0;
+    for ( const part of parts ) {
+      const content = part.trim();
+      posts[ index ] ??= [];
+      posts[ index ].push({ platform, content });
+      index++;
     }
   }
+
   return posts;
 };
 

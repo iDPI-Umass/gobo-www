@@ -6,6 +6,8 @@
   import { State, Identity, Media } from "$lib/engines/draft.js";
   import * as markdown from "$lib/helpers/markdown.js";
 
+  export let rawContent;
+
   let identity, options, subreddit, content;
   let displayedFiles, mediaFrame, mediaFrameChildren;
   let spoilerOverride;
@@ -40,8 +42,8 @@
     }
   };
 
-  Render.content = ( draft ) => {
-    content = markdown.toHTML( draft.content );
+  Render.content = ( raw ) => {
+    content = markdown.toHTML( raw.content );
   };
 
   Render.attachments = ( draft ) => {
@@ -114,6 +116,8 @@
       Render.reset();
     };
   });
+
+  $: Render.content( rawContent );
 </script>
 
 <article class="outer-frame">
