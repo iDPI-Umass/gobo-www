@@ -9,7 +9,7 @@
   import { Bluesky } from "$lib/engines/platforms/bluesky.js";
   import * as markdown from "$lib/helpers/markdown.js";
 
-  export let rawContent;
+  export let threadItem;
 
   const parser = new DOMParser();
   const serializer = new XMLSerializer();
@@ -53,8 +53,10 @@
   };
 
   Render.attachments = ( draft ) => {
-    displayedFiles = draft.attachments
-      .slice( 0, 4 );
+    if ( threadItem.index === 0) {
+      displayedFiles = draft.attachments
+        .slice( 0, 4 );
+    }
   };
 
 
@@ -84,14 +86,13 @@
   onMount(() => {
     Render.listen( "identities", Render.identity );
     Render.listen( "options", Render.options );
-    Render.listen( "content", Render.content );
     Render.listen( "attachments", Render.attachments );
     return () => {
       Render.reset();
     }
   });
 
-  $: Render.content( rawContent );
+  $: Render.content( threadItem );
 </script>
 
 <article class="outer-frame">
@@ -121,8 +122,11 @@
     </section>
 
     {#if displayedFiles.length === 0}
-      <LinkPreview height="200px"></LinkPreview>
-
+      <LinkPreview 
+        height="200px" 
+        previewURL={threadItem.previewURL} 
+      />
+    
     {:else if displayedFiles.length === 1}
       <div class="media-single">
         <div class="image-box">

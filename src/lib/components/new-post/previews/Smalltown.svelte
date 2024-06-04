@@ -9,7 +9,7 @@
   import { Smalltown } from "$lib/engines/platforms/smalltown.js";
   import * as markdown from "$lib/helpers/markdown.js";
 
-  export let rawContent;
+  export let threadItem;
 
   let identity, options, content, avatar;
   let displayedFiles, sensitiveOverride, spoilerOverride;
@@ -56,9 +56,10 @@
   };
 
   Render.attachments = ( draft ) => {
-    displayedFiles = draft.attachments
-      .slice( 0, 4 )
-      .map( attachment => attachment.file );
+    if ( threadItem.index === 0) {
+      displayedFiles = draft.attachments
+        .slice( 0, 4 );
+    }
   };
 
 
@@ -85,7 +86,7 @@
     }
   });
 
-  $: Render.content( rawContent );
+  $: Render.content( threadItem );
 
 </script>
 
@@ -128,7 +129,10 @@
   
 
     {#if displayedFiles.length === 0}
-      <LinkPreview height="300px"></LinkPreview>
+      <LinkPreview 
+        height="300px" 
+        previewURL={threadItem.previewURL} 
+      />
 
     {:else if displayedFiles.length === 1}
       <div class="media">

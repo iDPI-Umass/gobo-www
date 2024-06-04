@@ -1,3 +1,5 @@
+import { Platforms } from "$lib/engines/platforms/index.js";
+import { Preview } from "$lib/engines/link-preview.js";
 import { toMarkdown } from "$lib/helpers/markdown.js";
 
 const parser = new DOMParser();
@@ -28,6 +30,8 @@ Thread.parse = ( draft ) => {
   
   const posts = [];
   for ( const platform of platforms ) {
+    const Model = Platforms.get( platform );
+
     const dom = parser.parseFromString( 
       `<div id='outermost'> ${thread} </div>`, 
       "text/html"
@@ -61,8 +65,11 @@ Thread.parse = ( draft ) => {
     let index = 0;
     for ( const part of parts ) {
       const content = part.trim();
+      const attachments = [];
+      const item = { index, platform, content, attachments };
+      Preview.decorateItem( item );
       posts[ index ] ??= [];
-      posts[ index ].push({ platform, content });
+      posts[ index ].push( item );
       index++;
     }
   }

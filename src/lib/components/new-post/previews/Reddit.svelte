@@ -6,7 +6,7 @@
   import { State, Identity, Media } from "$lib/engines/draft.js";
   import * as markdown from "$lib/helpers/markdown.js";
 
-  export let rawContent;
+  export let threadItem;
 
   let identity, options, subreddit, content;
   let displayedFiles, mediaFrame, mediaFrameChildren;
@@ -110,14 +110,13 @@
   onMount(() => {
     Render.listen( "identities", Render.identity );
     Render.listen( "options", Render.options );
-    Render.listen( "content", Render.content );
     Render.listen( "attachments", Render.attachments );
     return () => {
       Render.reset();
     };
   });
 
-  $: Render.content( rawContent );
+  $: Render.content( threadItem );
 </script>
 
 <article class="outer-frame">
@@ -245,7 +244,6 @@
     flex-wrap: wrap;
     justify-content: flex-start;
     align-items: stretch;
-    margin-bottom: 2rem;
     padding: 0;
     max-width: 640px;
     background: #fff;

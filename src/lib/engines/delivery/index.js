@@ -1,15 +1,12 @@
-import * as Value from "@dashkite/joy/value";
 import { App } from "$lib/engines/account.js";
-import { createStore } from "$lib/engines/store.js";
-import { Identity } from "$lib/engines/identity.js";
 import { Weave } from "$lib/engines/delivery/weave.js";
+import { Preview } from "$lib/engines/link-preview.js";
 import * as stores from "$lib/stores/delivery.js";
 import * as DeliveryHTTP from "$lib/resources/delivery.js";
 import * as DeliveryTargetHTTP from "$lib/resources/delivery-target.js";
 import { Feed as Weaver } from "$lib/resources/person-delivery-feeds/all.js";
 import * as DraftHTTP from "$lib/resources/draft.js";
 import * as ProofHTTP from "$lib/resources/proof.js";
-import * as Random from "$lib/helpers/random.js";
 
 
 
@@ -163,6 +160,12 @@ class Draft {
   static async create( raw ) {
     const { attachments, ...store } = raw;
 
+    for ( const row of store.thread ) {
+      for ( const item of row ) {
+        item.linkPreview = await Preview.fetch( item.previewURL );
+      }
+    }
+
     store.files = [];
     for ( const draftFile of attachments ) {
       store.files.push( draftFile.id );
@@ -201,6 +204,7 @@ class Proof {
   static async create( draft ) {
     const kernel = {};
     kernel.content = draft.store.content;
+    kernel.thread = draft.store.thread;
     kernel.title = draft.store.options?.general?.title ?? undefined;
     // kernel.poll = {};
     kernel.files = draft.store.files;

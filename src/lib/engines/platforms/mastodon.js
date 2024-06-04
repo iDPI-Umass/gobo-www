@@ -235,23 +235,51 @@ Mastodon.validateAttachments = ( draft ) => {
   return true;
 };
 
+Mastodon.validateThreadElement = ( element ) => {
+  const { index, content } = element;
+  
+  if ( Mastodon.contentLength(content) > Mastodon.limits.characters ) {
+    const number = new Intl.NumberFormat().format( Mastodon.limits.characters );
+    Draft.pushAlert(
+      `Mastodon does not accept posts with more than ${ number } characters. (post ${index + 1})`
+    );
+    return false;
+  }
+
+  if ( (content == null) || (content === "") ) {
+    Draft.pushAlert(
+      `Mastodon does not allow empty post content. (post ${index + 1})`
+    );
+    return false;
+  }
+
+  return true;
+};
+
+Mastodon.validateThread = ( draft ) => {
+  const thread = [];
+  for ( const row of draft.thread ) {
+    const match = row.find( i => i.platform === "mastodon" );
+    if ( match != null ) {
+      thread.push( match );
+    }
+  }
+
+  for ( const element of thread ) {
+    if ( !Mastodon.validateThreadElement( element ) ){
+      return false;
+    }
+  }
+
+  return true;
+};
+
 Mastodon.validate = ( draft ) => {
   if ( !Identity.hasMastodon() ) {
     return true;
   }
 
-  if ( Mastodon.contentLength() > Mastodon.limits.characters ) {
-    const number = new Intl.NumberFormat().format( Mastodon.limits.characters );
-    Draft.pushAlert(
-      `Mastodon does not accept posts with more than ${ number } characters.`
-    );
-    return false;
-  }
-
-  if ( (draft.content == null) || (draft.content === "") ) {
-    Draft.pushAlert(
-      `Mastodon does not allow empty post content.`
-    );
+  if ( !Mastodon.validateThread( draft )) {
     return false;
   }
 

@@ -193,23 +193,51 @@ Smalltown.validateAttachments = ( draft ) => {
   return true;
 };
 
+Smalltown.validateThreadElement = ( element ) => {
+  const { index, content } = element;
+  
+  if ( Smalltown.contentLength(content) > Smalltown.limits.characters ) {
+    const number = new Intl.NumberFormat().format( Smalltown.limits.characters );
+    Draft.pushAlert(
+      `Smalltown does not accept posts with more than ${ number } characters. (post ${index + 1})`
+    );
+    return false;
+  }
+
+  if ( (content == null) || (content === "") ) {
+    Draft.pushAlert(
+      `Smalltown does not allow empty post content. (post ${index + 1})`
+    );
+    return false;
+  }
+
+  return true;
+};
+
+Smalltown.validateThread = ( draft ) => {
+  const thread = [];
+  for ( const row of draft.thread ) {
+    const match = row.find( i => i.platform === "smalltown" );
+    if ( match != null ) {
+      thread.push( match );
+    }
+  }
+
+  for ( const element of thread ) {
+    if ( !Smalltown.validateThreadElement( element ) ){
+      return false;
+    }
+  }
+
+  return true;
+};
+
 Smalltown.validate = ( draft ) => {
   if ( !Identity.hasSmalltown() ) {
     return true;
   }
 
-  if ( Smalltown.contentLength() > Smalltown.limits.characters ) {
-    const number = new Intl.NumberFormat().format( Smalltown.limits.characters );
-    Draft.pushAlert(
-      `Smalltown does not accept posts with more than ${ number } characters.`
-    );
-    return false;
-  }
-
-  if ( (draft.content == null) || (draft.content === "") ) {
-    Draft.pushAlert(
-      `Smalltown does not allow empty post content.`
-    );
+  if ( !Smalltown.validateThread( draft )) {
     return false;
   }
 

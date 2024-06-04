@@ -1,7 +1,9 @@
 <script>
   import { onMount } from "svelte";
   import { State } from "$lib/engines/draft.js";
+  import { Preview } from "$lib/engines/link-preview.js";
 
+  export let previewURL;
   export let height;
 
   let card;
@@ -10,21 +12,24 @@
     card = null;
   };
 
-  Render.card = ( draft ) => {
-    if ( draft.linkPreview.url == null ) {
+  Render.card = async () => {
+    let preview = await Preview.fetch( previewURL );
+    preview ??= {};
+    if ( preview.url == null ) {
       card = null;
     } else {
-      card = draft.linkPreview;
+      card = preview;
     }
   };
 
   Render.reset();
   onMount(() => {
-    Render.listen( "linkPreview", Render.card );
     return () => {
       Render.reset();
     };
   });
+
+  $: Render.card( previewURL );
 </script>
 
 

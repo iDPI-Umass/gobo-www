@@ -1,3 +1,4 @@
+import * as Value from "@dashkite/joy/value";
 import { Draft, Delivery } from "$lib/engines/delivery/index.js";
 import { Metadata } from "$lib/engines/platforms/metadata.js";
 import * as PostHTTP from "$lib/resources/post.js";
@@ -34,7 +35,9 @@ Publish.uploadMedia = async ( draft ) => {
   }
 }
 
-Publish.setup = async ( raw ) => {
+Publish.setup = async ( _raw ) => {
+  const raw = Value.clone( _raw );
+  
   for ( const draftFile of raw.attachments ) {
     await draftFile.create();
   }

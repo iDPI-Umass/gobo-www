@@ -40,7 +40,6 @@ Draft.make = () => {
     },
     content: null,
     thread: [],
-    linkPreview: {},
     reply: null,
     quote: null
   };
@@ -91,7 +90,6 @@ Draft.load = () => {
   Draft.put( "identities", draft );
   Draft.put( "content", draft );
   Draft.put( "thread", draft );
-  Draft.put( "linkPreview", draft );
   Draft.put( "attachments", draft );
   Draft.put( "reply", draft );
   Draft.put( "quote", draft );

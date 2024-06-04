@@ -2,7 +2,9 @@ import * as linkify from "linkifyjs";
 import { filesize } from "filesize";
 import { RichText, BskyAgent, UnicodeString } from "@atproto/api";
 import { Draft, Identity } from "$lib/engines/draft.js";
+import { DraftFile } from "$lib/engines/draft-file.js";
 import * as File from "$lib/resources/draft-file.js";
+import { extract } from "./helpers.js";
 
 
 const Bluesky = {};
@@ -129,12 +131,10 @@ Bluesky.fetchCardImage = async ( url ) => {
 };
 
 Bluesky.uploadCardImage = async ( file ) => {
-  const draftImage = await File.create({
-    file,
-    name: "link-card-image",
-    alt: ""
-  });
-  return draftImage.id;
+  const draftFile = await DraftFile.fromFile( file );
+  await draftFile.create();
+  await draftFile.upload();
+  return draftFile.id;
 };
 
 Bluesky.buildCard = async ( context ) => {
@@ -157,29 +157,37 @@ Bluesky.buildCard = async ( context ) => {
   return linkCard;
 };
 
+Bluesky.buildItem = async ( item ) => {
+  const { facets, text } = await Bluesky.extractFacets( item.content );
+  const linkCard = await Bluesky.buildCard( item.linkPreview );
+
+  item.metadata ??= {};
+  Object.assign( item.metadata, {
+    facets,
+    text,
+    linkCard
+  });
+};
+
 Bluesky.build = async ( draft ) => {
-  let reply;
+  const thread = extract( "bluesky", draft );
+  thread[0].metadata ??= {};
+
   if ( draft.reply?.data != null ) {
     const id = draft.reply.data.feed[0];
-    reply = draft.reply.data.posts.find( p => p.id == id );
+    thread[0].metadata.reply = draft.reply.data.posts.find( p => p.id == id );
   }
 
-  let quote;
   if ( draft.quote?.data != null ) {
     const id = draft.quote.data.feed[0];
-    quote = draft.quote.data.posts.find( p => p.id == id );
+    thread[0].metadata.quote = draft.quote.data.posts.find( p => p.id == id );
   }
 
-  const { facets, text } = await Bluesky.extractFacets( draft.content );
-  const linkCard = await Bluesky.buildCard( draft.linkPreview );
+  for ( const item of thread ) {
+    await Bluesky.buildItem( item );
+  }
   
-  return {
-    reply,
-    quote,
-    facets,
-    linkCard,
-    text
-  };
+  return thread;
 };
 
 
@@ -207,23 +215,51 @@ Bluesky.validateAttachments = ( draft ) => {
 };
 
 
+Bluesky.validateThreadElement = ( element ) => {
+  const { index, content } = element;
+  
+  if ( Bluesky.contentLength(content) > Bluesky.limits.characters ) {
+    const number = new Intl.NumberFormat().format( Bluesky.limits.characters );
+    Draft.pushAlert(
+      `Bluesky does not accept posts with more than ${ number } characters. (post ${index + 1})`
+    );
+    return false;
+  }
+
+  if ( (content == null) || (content === "") ) {
+    Draft.pushAlert(
+      `Bluesky does not allow empty post content. (post ${index + 1})`
+    );
+    return false;
+  }
+
+  return true;
+};
+
+Bluesky.validateThread = ( draft ) => {
+  const thread = [];
+  for ( const row of draft.thread ) {
+    const match = row.find( i => i.platform === "bluesky" );
+    if ( match != null ) {
+      thread.push( match );
+    }
+  }
+
+  for ( const element of thread ) {
+    if ( !Bluesky.validateThreadElement( element ) ){
+      return false;
+    }
+  }
+
+  return true;
+};
+
 Bluesky.validate = ( draft ) => {
   if ( !Identity.hasBluesky() ) {
     return true;
   }
 
-  if ( Bluesky.contentLength() > Bluesky.limits.characters ) {
-    const number = new Intl.NumberFormat().format( Bluesky.limits.characters );
-    Draft.pushAlert(
-      `Bluesky does not accept posts with more than ${ number } characters.`
-    );
-    return false;
-  }
-
-  if ( (draft.content == null) || (draft.content === "") ) {
-    Draft.pushAlert(
-      `Bluesky does not allow empty post content.`
-    );
+  if ( !Bluesky.validateThread( draft )) {
     return false;
   }
 

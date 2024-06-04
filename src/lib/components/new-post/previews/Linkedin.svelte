@@ -9,7 +9,7 @@
   import { Linkedin } from "$lib/engines/platforms/linkedin.js";
   import * as markdown from "$lib/helpers/markdown.js";
 
-  export let rawContent;
+  export let threadItem;
 
   const parser = new DOMParser();
   const serializer = new XMLSerializer();
@@ -112,7 +112,7 @@
     }
   });
 
-  $: Render.content( rawContent );
+  $: Render.content( threadItem );
 </script>
 
 <article class="outer-frame">
@@ -190,7 +190,7 @@
   
 
   {#if files.length === 0}
-    <LinkPreview></LinkPreview>
+    <LinkPreview previewURL={threadItem.previewURL} />
   {/if}
 
   <footer>
@@ -230,7 +230,6 @@
   .outer-frame {
     display: flex;
     flex-direction: column;
-    margin-bottom: 2rem;
     max-width: 566px;
     background: #fff;
     border: 1px solid var(--sl-color-neutral-400);

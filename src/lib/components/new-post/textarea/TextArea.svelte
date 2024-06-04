@@ -67,7 +67,6 @@
     let draft = Draft.updateAspect( "content", content );
     const thread = Thread.parse( draft );
     draft = Draft.updateAspect( "thread", thread );
-    Preview.fromContent( content );
   };
 
 

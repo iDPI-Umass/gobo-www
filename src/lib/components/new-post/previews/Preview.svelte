@@ -6,7 +6,7 @@
   import Reddit from "$lib/components/new-post/previews/Reddit.svelte";
   import Smalltown from "$lib/components/new-post/previews/Smalltown.svelte";
   import { onMount } from "svelte";
-  import { State, Identity } from "$lib/engines/draft.js";
+  import { State } from "$lib/engines/draft.js";
 
   let bluesky, linkedin, mastodon, reddit, smalltown;
   const Render = State.make();
@@ -64,40 +64,51 @@
 {#if bluesky.length > 0}
   <h3 class="preview-header">Bluesky</h3>
   <Thread>
-    {#each bluesky as post, index (index)}
-      <Bluesky rawContent={post} />
+    {#each bluesky as threadItem (threadItem.index)}
+      <Bluesky {threadItem} />
     {/each}
   </Thread>
 {/if}
 
 {#if linkedin.length > 0}
   <h3 class="preview-header">LinkedIn</h3>
-  <Linkedin rawContent={linkedin[0]} />
+  <Thread>
+    {#each linkedin as threadItem (threadItem.index)}
+      <Linkedin {threadItem} />
+    {/each}
+  </Thread>
 {/if}
 
 {#if mastodon.length > 0}
   <h3 class="preview-header">Mastodon</h3>
   <Thread>
-    {#each mastodon as post, index (index)}
-      <Mastodon rawContent={post} />
+    {#each mastodon as threadItem (threadItem.index)}
+      <Mastodon {threadItem} />
     {/each}
   </Thread>
 {/if}
 
 {#if reddit.length > 0}
   <h3 class="preview-header">Reddit</h3>
-  <Reddit rawContent={reddit[0]} />
+  <Thread>
+    {#each reddit as threadItem (threadItem.index)}
+      <Reddit {threadItem} />
+    {/each}
+  </Thread>
 {/if}
 
 {#if smalltown.length > 0}
   <h3 class="preview-header">Smalltown</h3>
   <Thread>
-    {#each smalltown as post, index (index)}
-      <Smalltown rawContent={post} />
+    {#each smalltown as threadItem (threadItem.index)}
+      <Smalltown {threadItem} />
     {/each}
   </Thread>
 {/if}
 
 
 <style>
+  h3.preview-header {
+    margin-top: 2rem !important;
+  }
 </style>

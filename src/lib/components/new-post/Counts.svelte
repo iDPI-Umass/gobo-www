@@ -105,7 +105,7 @@
     flex: 0 1 100%;
     display: flex;
     flex-wrap: wrap;
-    justify-content: start;
+    justify-content: end;
     align-items: center;
     gap: var(--gobo-width-spacer-flex);
   }
