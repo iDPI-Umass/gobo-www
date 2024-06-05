@@ -1,6 +1,7 @@
 import * as linkify from "linkifyjs";
 import { filesize } from "filesize";
 import { Draft, Identity, Media } from "$lib/engines/draft.js";
+import { extract } from "./helpers.js";
 
 
 const Linkedin = {};
@@ -131,13 +132,24 @@ Linkedin.buildCard = async ( context ) => {
   return { url: context.url };
 };
 
-Linkedin.build = async ( draft ) => {
-  const linkCard = await Linkedin.buildCard( draft.linkPreview );
+Linkedin.buildItem = async ( draft, item ) => {
+  const linkCard = await Linkedin.buildCard( item.linkPreview );
+  const visibility = Linkedin.buildVisibility( draft );
 
-  return {
-    visibility: Linkedin.buildVisibility( draft ),
+  item.metadata ??= {};
+  Object.assign( item.metadata, {
     linkCard,
-  };
+    visibility,
+  });
+};
+
+Linkedin.build = async ( draft ) => {
+  const thread = extract( "linkedin", draft );
+  for ( const item of thread ) {
+    await Linkedin.buildItem( draft, item );
+  }
+
+  return thread;
 };
 
 

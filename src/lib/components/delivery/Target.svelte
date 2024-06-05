@@ -11,15 +11,20 @@
 
   const dispatch = createEventDispatcher();
 
-  let state, unpublishButton;
+  let unpublishButton;
+  let state, url;
   const Render = State.make();
 
   Render.cleanup = () => {
     state = "loading";
+    url = null;
   };
 
   Render.target = () => {
     state = target.state;
+    let references = target?.stash?.references ?? [];
+    let reference = references[0] ?? {};
+    url = reference.url;
   };
 
 
@@ -75,11 +80,11 @@
   {:else if state === "delivered"}
     <div class="status">
       <div class="controls">
-        {#if target.stash.url}
+        {#if url}
   
           <!-- svelte-ignore a11y-click-events-have-key-events -->
           <sl-icon-button
-            href={target.stash.url}
+            href={url}
             target="_blank"
             rel="noopener noreferrer nofollow"
             size="small"

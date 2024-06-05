@@ -4,7 +4,7 @@
   import { State } from "$lib/engines/store.js";
   import { Name } from "$lib/engines/draft.js";
   
-  export let label
+  export let label = "";
   export let family = "neutral"
   export let loading = false;
 

@@ -1,5 +1,6 @@
 import { Draft, Identity } from "$lib/engines/draft.js";
 import { Mastodon } from "$lib/engines/platforms/mastodon.js";
+import { extract } from "./helpers.js";
 
 
 const Smalltown = {};
@@ -51,18 +52,32 @@ Smalltown.limits = {
 Smalltown.urlGlamor = Mastodon.urlGlamor;
 Smalltown.contentLength = Mastodon.contentLength;
 
+Smalltown.buildItem = async ( draft, item ) => {
+  const spoiler = draft.options.mastodon.spoilerText;
+  const sensitive = draft.options.attachments.sensitive;
+
+  item.metadata ??= {};
+  Object.assign( item.metadata, {
+    spoiler,
+    sensitive,
+  });
+};
+
+
 Smalltown.build = ( draft ) => {
-  let reply;
+  const thread = extract( "smalltown", draft );
+  thread[0].metadata ??= {};
+
   if ( draft.reply?.data != null ) {
     const id = draft.reply.data.feed[0];
-    reply = draft.reply.data.posts.find( p => p.id == id );
+    thread[0].metadata.reply = draft.reply.data.posts.find( p => p.id == id );
   }
 
-  return {
-    sensitive: draft.options.attachments.sensitive,
-    spoiler: draft.options.smalltown.spoilerText,
-    reply
-  };
+  for ( const item of thread ) {
+    Smalltown.buildItem( draft, item );
+  }
+  
+  return thread;
 };
 
 

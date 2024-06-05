@@ -1,4 +1,5 @@
 import { Draft, Identity } from "$lib/engines/draft.js";
+import { extract } from "./helpers.js";
 
 
 const Reddit = {};
@@ -31,19 +32,35 @@ Reddit.contentLength = ( content ) => {
   return content?.length ?? 0;
 };
 
-Reddit.build = ( draft ) => {
-  let reply;
+Reddit.buildItem = async ( draft, item ) => {
+  const title = draft.options.general.title;
+  const subreddit = draft.options.reddit.subreddit;
+  const spoiler = draft.options.reddit.spoiler;
+  const nsfw = draft.options.attachments.sensitive;
+
+  item.metadata ??= {};
+  Object.assign( item.metadata, {
+    title,
+    subreddit,
+    spoiler,
+    nsfw
+  });
+};
+
+Reddit.build = async ( draft ) => {
+  const thread = extract( "reddit", draft );
+
+  thread[0].metadata ??= {};
   if ( draft.reply?.data != null ) {
     const id = draft.reply.data.feed[0];
-    reply = draft.reply.data.posts.find( p => p.id == id );
+    thread[0].metadata.reply = draft.reply.data.posts.find( p => p.id == id );
   }
 
-  return {
-    subreddit: draft.options.reddit.subreddit,
-    spoiler: draft.options.reddit.spoiler,
-    nsfw: draft.options.attachments.sensitive,
-    reply
-  };
+  for ( const item of thread ) {
+    await Reddit.buildItem( draft, item );
+  }
+
+  return thread;
 };
 
 

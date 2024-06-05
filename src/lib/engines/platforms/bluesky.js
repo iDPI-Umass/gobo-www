@@ -3,7 +3,6 @@ import { filesize } from "filesize";
 import { RichText, BskyAgent, UnicodeString } from "@atproto/api";
 import { Draft, Identity } from "$lib/engines/draft.js";
 import { DraftFile } from "$lib/engines/draft-file.js";
-import * as File from "$lib/resources/draft-file.js";
 import { extract } from "./helpers.js";
 
 

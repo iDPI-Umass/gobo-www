@@ -1,5 +1,6 @@
 import * as linkify from "linkifyjs";
 import { Draft, Identity } from "$lib/engines/draft.js";
+import { extract } from "./helpers.js";
 
 
 const Mastodon = {};
@@ -92,19 +93,34 @@ Mastodon.buildVisibility = ( draft ) => {
   }
 };
 
+Mastodon.buildItem = async ( draft, item ) => {
+  const visibility = Mastodon.buildVisibility( draft );
+  const spoiler = draft.options.mastodon.spoilerText;
+  const sensitive = draft.options.attachments.sensitive;
+
+  item.metadata ??= {};
+  Object.assign( item.metadata, {
+    visibility,
+    spoiler,
+    sensitive,
+  });
+};
+
+
 Mastodon.build = ( draft ) => {
-  let reply;
+  const thread = extract( "mastodon", draft );
+  thread[0].metadata ??= {};
+
   if ( draft.reply?.data != null ) {
     const id = draft.reply.data.feed[0];
-    reply = draft.reply.data.posts.find( p => p.id == id );
+    thread[0].metadata.reply = draft.reply.data.posts.find( p => p.id == id );
   }
 
-  return {
-    visibility: Mastodon.buildVisibility( draft ),
-    spoiler: draft.options.mastodon.spoilerText,
-    sensitive: draft.options.attachments.sensitive,
-    reply
-  };
+  for ( const item of thread ) {
+    Mastodon.buildItem( draft, item );
+  }
+  
+  return thread;
 };
 
 
