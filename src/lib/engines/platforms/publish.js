@@ -35,8 +35,9 @@ Publish.uploadMedia = async ( draft ) => {
   }
 }
 
-Publish.setup = async ( _raw ) => {
-  const raw = Value.clone( _raw );
+Publish.setup = async ({ attachments, ...rest }) => {
+  const raw = Value.clone( rest );
+  raw.attachments = [ ...attachments ];
   
   for ( const draftFile of raw.attachments ) {
     await draftFile.create();

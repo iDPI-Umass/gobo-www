@@ -4,6 +4,7 @@
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/textarea/textarea.js";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
+  import Header from "$lib/components/delivery/Header.svelte";
   import Content from "$lib/components/delivery/Content.svelte";
   import Uploads from "$lib/components/delivery/Uploads.svelte";
   import Media from "$lib/components/delivery/Media.svelte";
@@ -120,21 +121,20 @@
 
   {:else if state === "ready"}
     <section class="panel">
-      <div class="header">
-        <time datetime="delivered">{ created }</time>
-      </div>
-      
+      <Header delivery={current} />
+
       <div class="content">
         <Content delivery={current} />
+        
+        {#if current.proof.files.length > 0}
+          <div class="media">
+            {#if current.files.length > 0}
+              <Media delivery={current} />
+            {/if}
+          </div>
+        {/if}
       </div>
-      
-      {#if current.proof.files.length > 0}
-        <div class="media">
-          {#if current.files.length > 0}
-            <Media delivery={current} />
-          {/if}
-        </div>
-      {/if}
+
     </section>
 
     <section class="panel">
@@ -195,16 +195,5 @@
 
   .gobo-copy .panel .media {
     margin-top: 1rem;
-  }
-
-  .gobo-copy .header {
-    display: flex;
-    justify-content: end;
-  }
-
-  .gobo-copy .header time {
-    font-size: var(--gobo-font-size-detail);
-    font-weight: var(--gobo-font-weight-regular);
-    color: var(--gobo-color-text-muted);
   }
 </style>
