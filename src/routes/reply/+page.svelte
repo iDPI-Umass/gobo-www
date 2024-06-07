@@ -8,6 +8,7 @@
   import Publish from "$lib/components/reply/Publish.svelte";
   import { onMount } from "svelte";
   import { Identity, Draft, Lock } from "$lib/engines/draft.js";
+  import { Thread } from '$lib/engines/thread.js';
 
   // This is asynchronous and affects signalling through the Svelte store.
   // So we must avoid both race conditions and infinite looping.
@@ -18,8 +19,10 @@
       Identity.load(),
       Draft.loadReply(),
     ]);
+    const draft = Lock.close();
+    const thread = Thread.parse( draft );
+    Draft.updateAspect( "thread", thread );
     Draft.load(); // reply can affect options.
-    Lock.close();
   };
 
   onMount(() => {

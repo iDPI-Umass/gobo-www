@@ -261,7 +261,7 @@ const Lock = {
     for ( const identity of identities ) {
       identity.active = identity.id === target;
     }
-    Draft.updateAspect( "identities", identities );
+    return Draft.updateAspect( "identities", identities );
   }
 };
 
