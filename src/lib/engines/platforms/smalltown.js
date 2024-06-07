@@ -230,14 +230,7 @@ Smalltown.validateThreadElement = ( element ) => {
 };
 
 Smalltown.validateThread = ( draft ) => {
-  const thread = [];
-  for ( const row of draft.thread ) {
-    const match = row.find( i => i.platform === "smalltown" );
-    if ( match != null ) {
-      thread.push( match );
-    }
-  }
-
+  const thread = extract( "smalltown", draft );
   for ( const element of thread ) {
     if ( !Smalltown.validateThreadElement( element ) ){
       return false;

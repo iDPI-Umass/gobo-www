@@ -153,23 +153,68 @@ Reddit.validateAttachments = ( draft ) => {
   return true;
 };
 
+Reddit.validateOptions = ( draft ) => {
+  const options = draft.options.reddit;
+  if ( !options.subreddit ) {
+    Draft.pushAlert(
+      `Please specify the subreddit for this Reddit post.`
+    );
+    return false;
+  }
+
+  if ( !draft.options.general.title ) {
+    Draft.pushAlert(
+      `Please provide a title for this Reddit post.`
+    );
+    return false;
+  }
+
+  return true;
+};
+
+Reddit.validateThreadElement = ( element ) => {
+  const { index, content } = element;
+  
+  if ( Reddit.contentLength(content) > Reddit.limits.characters ) {
+    const number = new Intl.NumberFormat().format( Reddit.limits.characters );
+    Draft.pushAlert(
+      `Reddit does not accept posts with more than ${ number } characters. (post ${index + 1})`
+    );
+    return false;
+  }
+  
+  if ( (content == null) || (content === "") ) {
+    Draft.pushAlert(
+      `Reddit does not allow empty post content. (post ${index + 1})`
+    );
+    return false;
+  }
+
+  return true;
+};
+
+Reddit.validateThread = ( draft ) => {
+  const thread = extract( "reddit", draft );
+  for ( const element of thread ) {
+    if ( !Reddit.validateThreadElement( element ) ){
+      return false;
+    }
+  }
+
+  return true;
+};
+
+
 Reddit.validate = ( draft ) => {
   if ( !Identity.hasReddit() ) {
     return true;
   }
 
-  if ( Reddit.contentLength() > Reddit.limits.characters ) {
-    const number = new Intl.NumberFormat().format( Reddit.limits.characters );
-    Draft.pushAlert(
-      `Reddit does not accept posts with more than ${ number } characters.`
-    );
+  if ( !Reddit.validateOptions( draft )) {
     return false;
   }
 
-  if ( (draft.content == null) || (draft.content === "") ) {
-    Draft.pushAlert(
-      `Reddit does not allow empty post content.`
-    );
+  if ( !Reddit.validateThread( draft )) {
     return false;
   }
 

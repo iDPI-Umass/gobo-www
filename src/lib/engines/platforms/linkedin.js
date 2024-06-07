@@ -293,24 +293,45 @@ Linkedin.validateAttachments = ( draft ) => {
   return true;
 };
 
+Linkedin.validateThreadElement = ( element ) => {
+  const { index, content } = element;
+  
+  if ( Linkedin.contentLength(content) > Linkedin.limits.characters ) {
+    const number = new Intl.NumberFormat().format( Linkedin.limits.characters );
+    Draft.pushAlert(
+      `LinkedIn does not accept posts with more than ${ number } characters. (post ${index + 1})`
+    );
+    return false;
+  }
+  
+  if ( (content == null) || (content === "") ) {
+    Draft.pushAlert(
+      `LinkedIn does not allow empty post content. (post ${index + 1})`
+    );
+    return false;
+  }
+
+  return true;
+};
+
+Linkedin.validateThread = ( draft ) => {
+  const thread = extract( "linkedin", draft );
+  for ( const element of thread ) {
+    if ( !Linkedin.validateThreadElement( element ) ){
+      return false;
+    }
+  }
+
+  return true;
+};
+
 
 Linkedin.validate = ( draft ) => {
   if ( !Identity.hasLinkedin() ) {
     return true;
   }
 
-  if ( Linkedin.contentLength() > Linkedin.limits.characters ) {
-    const number = new Intl.NumberFormat().format( Linkedin.limits.characters );
-    Draft.pushAlert(
-      `LinkedIn does not accept posts with more than ${ number } characters.`
-    );
-    return false;
-  }
-
-  if ( (draft.content == null) || (draft.content === "") ) {
-    Draft.pushAlert(
-      `LinkedIn does not allow empty post content.`
-    );
+  if ( !Linkedin.validateThread( draft )) {
     return false;
   }
 

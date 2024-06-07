@@ -273,14 +273,7 @@ Mastodon.validateThreadElement = ( element ) => {
 };
 
 Mastodon.validateThread = ( draft ) => {
-  const thread = [];
-  for ( const row of draft.thread ) {
-    const match = row.find( i => i.platform === "mastodon" );
-    if ( match != null ) {
-      thread.push( match );
-    }
-  }
-
+  const thread = extract( "mastodon", draft );
   for ( const element of thread ) {
     if ( !Mastodon.validateThreadElement( element ) ){
       return false;

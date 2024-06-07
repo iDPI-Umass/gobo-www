@@ -192,6 +192,13 @@ Bluesky.build = async ( draft ) => {
 
 
 Bluesky.validateAttachments = ( draft ) => {
+  if ( draft.attachments.length > Bluesky.limits.attachments ) {
+    Draft.pushAlert(
+      `Bluesky does not allow more than ${Bluesky.limits.attachments} attachments per post.`
+    );
+    return false;
+  }
+
   const limits = Bluesky.limits.image;
   for ( const attachment of draft.attachments ) {
     const type = attachment.type;
@@ -236,14 +243,7 @@ Bluesky.validateThreadElement = ( element ) => {
 };
 
 Bluesky.validateThread = ( draft ) => {
-  const thread = [];
-  for ( const row of draft.thread ) {
-    const match = row.find( i => i.platform === "bluesky" );
-    if ( match != null ) {
-      thread.push( match );
-    }
-  }
-
+  const thread = extract( "bluesky", draft );
   for ( const element of thread ) {
     if ( !Bluesky.validateThreadElement( element ) ){
       return false;
@@ -259,13 +259,6 @@ Bluesky.validate = ( draft ) => {
   }
 
   if ( !Bluesky.validateThread( draft )) {
-    return false;
-  }
-
-  if ( draft.attachments.length > Bluesky.limits.attachments ) {
-    Draft.pushAlert(
-      `Bluesky does not allow more than ${Bluesky.limits.attachments} attachments per post.`
-    );
     return false;
   }
 
