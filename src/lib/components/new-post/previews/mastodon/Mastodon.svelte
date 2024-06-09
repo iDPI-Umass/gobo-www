@@ -578,7 +578,7 @@
   }
 
   .outer-frame .spoiler {
-    margin-bottom: 16px;
+    margin: 1rem 0;
   }
 
   .outer-frame .spoiler > p {

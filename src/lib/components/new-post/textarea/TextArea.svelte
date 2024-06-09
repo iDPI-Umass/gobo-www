@@ -18,6 +18,10 @@
     }
   }
 
+  export function focus() {
+    editor.editing.view.focus();
+  }
+
   let anchor, editor, platforms;
   const Render = State.make();
   

@@ -39,6 +39,7 @@
       console.error( "got add threadpoint event without platform" );
     } else {
       textarea.addThreadpoint( platform );
+      textarea.focus();
     }
   };
 

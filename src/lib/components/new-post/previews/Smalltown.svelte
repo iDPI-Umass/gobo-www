@@ -514,8 +514,8 @@
     color: #4B5D44;
   }
 
-  .outer-frame > .spoiler {
-    margin-bottom: 16px;
+  .outer-frame .spoiler {
+    margin: 1rem 0;
   }
 
   .outer-frame > .spoiler > p {
