@@ -3,29 +3,42 @@
   import { onMount, createEventDispatcher } from "svelte";
   import { State, Draft } from "$lib/engines/draft.js";
   import { Thread } from "$lib/engines/thread.js";
+  import { extract } from "$lib/engines/platforms/helpers.js";
 
   const dispatch = createEventDispatcher();
 
-  let rows, addButtons;
+  let row, addButtons;
   const Render = State.make();
   
   Render.cleanup = () => {
-    rows = [];
+    row = [];
     addButtons = [];
   };
 
-  Render.thread = ( draft ) => {
-    rows = draft.thread;
-    
+  Render.buttons = ( thread = [] ) => {
     const buttons = [];
-    if ( rows[0] != null ) {
-      for ( const item of rows[0] ) {
+    if ( thread[0] != null ) {
+      for ( const item of thread[0] ) {
         if ( !Thread.ignoredPlatforms.has( item.platform) ) {
           buttons.push( item.platform );
         }
       }
     }
     addButtons = buttons;
+  };
+
+  Render.counts = ( draft ) => {
+    const counts = [];
+    for ( const platform of addButtons ) {
+      const items = extract( platform, draft );
+      counts.push( ...items );
+    }
+    row = counts;
+  };
+
+  Render.thread = ( draft ) => {  
+    Render.buttons( draft.thread );  
+    Render.counts( draft );
   };
 
 
@@ -46,7 +59,7 @@
 </script>
 
 
-{#if rows?.length > 0}
+{#if row?.length > 0}
   <div class="vertical">
     <div class="wrapper">
         <div class="adds">
@@ -62,21 +75,18 @@
           {/each}
         </div>
     </div>
-  
+
     
-    {#each rows as rowItems, index (index)}
-      
-      <div class="wrapper">
-        <div class="counts">
-          {#each rowItems as item (item.platform)}
-            <Count
-              platform={item.platform} 
-              content={item.content}
-            />
-          {/each}
-        </div>
+    <div class="wrapper">
+      <div class="counts">
+        {#each row as item, index (`${item.platform}${index}`)}
+          <Count
+            platform={item.platform} 
+            content={item.content}
+          />
+        {/each}
       </div>
-    {/each}
+    </div>
   </div>
 {/if}
 
