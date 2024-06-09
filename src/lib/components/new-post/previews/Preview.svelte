@@ -1,10 +1,10 @@
 <script>
   import Thread from "$lib/components/new-post/previews/Thread.svelte";
-  import Bluesky from "$lib/components/new-post/previews/Bluesky.svelte";
+  import Bluesky from "$lib/components/new-post/previews/bluesky/Thread.svelte";
   import Linkedin from "$lib/components/new-post/previews/Linkedin.svelte";
-  import Mastodon from "$lib/components/new-post/previews/Mastodon.svelte";
+  import Mastodon from "$lib/components/new-post/previews/mastodon/Thread.svelte";
   import Reddit from "$lib/components/new-post/previews/Reddit.svelte";
-  import Smalltown from "$lib/components/new-post/previews/Smalltown.svelte";
+  import Smalltown from "$lib/components/new-post/previews/smalltown/Thread.svelte";
   import { onMount } from "svelte";
   import { State } from "$lib/engines/draft.js";
 
@@ -63,11 +63,7 @@
 
 {#if bluesky.length > 0}
   <h3 class="preview-header">Bluesky</h3>
-  <Thread>
-    {#each bluesky as threadItem (threadItem.index)}
-      <Bluesky {threadItem} />
-    {/each}
-  </Thread>
+  <Bluesky thread={bluesky} />
 {/if}
 
 {#if linkedin.length > 0}
@@ -81,11 +77,7 @@
 
 {#if mastodon.length > 0}
   <h3 class="preview-header">Mastodon</h3>
-  <Thread>
-    {#each mastodon as threadItem (threadItem.index)}
-      <Mastodon {threadItem} />
-    {/each}
-  </Thread>
+  <Mastodon thread={mastodon} />
 {/if}
 
 {#if reddit.length > 0}
@@ -99,11 +91,7 @@
 
 {#if smalltown.length > 0}
   <h3 class="preview-header">Smalltown</h3>
-  <Thread>
-    {#each smalltown as threadItem (threadItem.index)}
-      <Smalltown {threadItem} />
-    {/each}
-  </Thread>
+  <Smalltown thread={smalltown} />
 {/if}
 
 

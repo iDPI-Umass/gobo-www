@@ -10,6 +10,7 @@
   import * as markdown from "$lib/helpers/markdown.js";
 
   export let threadItem;
+  export let spines = {};
 
   const parser = new DOMParser();
   const serializer = new XMLSerializer();
@@ -98,10 +99,18 @@
 <article class="outer-frame">
   
   <div class="gutter">
+    <div 
+      class="top-spine"
+      style:opacity={spines.top ? 1 : 0}
+    ></div>
     <div class="pfp">
       <!-- svelte-ignore a11y-missing-attribute -->
       <img src={avatar}>
     </div>
+    <div 
+      class="bottom-spine"
+      style:opacity={spines.bottom ? 1 : 0}
+    ></div>
   </div>
   
   
@@ -449,7 +458,7 @@
     flex-direction: row;
     justify-content: flex-start;
     align-items: stretch;
-    padding: 12px 16px 0 16px;
+    padding: 0 1rem;
     max-width: 566px;
     background: #fff;
     border: 1px solid var(--sl-color-neutral-400);
@@ -480,6 +489,7 @@
   }
 
   .outer-frame > .gutter > .pfp {
+    flex: 0 0 auto;
     height: 48px;
     width: 48px;
     border-radius: 48px;
@@ -493,10 +503,24 @@
     object-fit: cover;
   }
 
+  .outer-frame > .gutter > .top-spine {
+    height: 12px;
+    width: 4px;
+    margin-right: 0.5rem;
+    background-color: var(--gobo-color-border-panel);
+  }
+
+  .outer-frame > .gutter > .bottom-spine {
+    flex: 1 1 100%;
+    width: 4px;
+    margin-right: 0.5rem;
+    background-color: var(--gobo-color-border-panel);
+  }
+
   .outer-frame > .main {
     flex: 1 1 0;
     min-width: 0;
-    margin-bottom: 12px;
+    margin: 12px 0;
   }
 
   .outer-frame > .main > header {

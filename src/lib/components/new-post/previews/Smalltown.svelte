@@ -6,10 +6,10 @@
   import { onMount } from "svelte";
   import { Source } from "$lib/engines/post";
   import { State, Identity, Media } from "$lib/engines/draft.js";
-  import { Smalltown } from "$lib/engines/platforms/smalltown.js";
+  import { Mastodon } from "$lib/engines/platforms/mastodon.js";
   import * as markdown from "$lib/helpers/markdown.js";
 
-  export let threadItem;
+  export let threadItem
 
   let identity, options, content, avatar;
   let displayedFiles, sensitiveOverride, spoilerOverride;
@@ -27,13 +27,13 @@
   };
 
   Render.identity = ( draft ) => {
-    identity = Identity.findActive( "smalltown" ) ?? {};
+    identity = Identity.findActive( "mastodon" ) ?? {};
     avatar = identity.profile_image ?? Source.fallback( identity );
   };
 
   Render.options = ( draft ) => {
     options = {
-      ...draft.options.smalltown,
+      ...draft.options.mastodon,
       ...draft.options.attachments
     };
   };
@@ -49,7 +49,7 @@
     const dom = parser.parseFromString( `<div>${ html }</div>`, "text/html" );    
     const links = dom.querySelectorAll( "a" );
     for ( const link of links ) {
-      link.text = Smalltown.urlGlamor( link.text );
+      link.text = Mastodon.urlGlamor( link.text );
     }
     
     content = serializer.serializeToString( dom.querySelector( "div" ));
@@ -87,14 +87,13 @@
   });
 
   $: Render.content( threadItem );
-
 </script>
 
 <article class="outer-frame">
   <header>
     <div class="pfp">
-      <!-- svelte-ignore missing-declaration -->
-      <img src={avatar}/>
+      <!-- svelte-ignore a11y-missing-attribute -->
+      <img src={avatar}>
     </div>
     <div class="id">
       <span>{identity.name}</span>
@@ -545,6 +544,7 @@
     font-family: var(--sl-font-family-sans);
     color: #000;
     margin-bottom: 16px;
+    min-height: 1.5rem;
   }
 
   .outer-frame > section :global(a) {
