@@ -25,6 +25,18 @@ sl-button.cancel:hover::part(label)  {
   color: var(--gobo-color-cancel-text);
 }
 
+sl-button.glyph::part(base),
+sl-button.glyph:hover::part(base) {
+  background: var(--gobo-color-panel);
+  border: none;
+  color: var(--gobo-color-border-panel);
+}
+
+sl-button.glyph::part(label),
+sl-button.glyph:hover::part(label)  {
+  color: var(--gobo-color-border-panel);
+}
+
 sl-button.action::part(base),
 sl-button.action:hover::part(base) {
   background: var(--gobo-color-active);

@@ -53,7 +53,7 @@
           {#each addButtons as platform (platform)}
             <sl-button
               on:click={Handle.addThreadpoint(platform)}
-              class="cancel"
+              class="glyph"
               size="medium"
               pill>
               <sl-icon src="/icons/{platform}.svg" class={platform} />
@@ -131,6 +131,8 @@
   }
 
   sl-button sl-icon:nth-child(2) {
-    font-size: 1.5rem;
+    font-size: 1rem;
+    color: var(--gobo-color-text-muted);
+    /* color: var(--gobo-color-border-panel); */
   }
 </style>
