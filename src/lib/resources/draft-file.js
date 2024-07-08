@@ -3,9 +3,15 @@ import { Gobo, App } from "$lib/engines/account.js";
 
 const create = App.unauthorized(async ( kernel ) => {
   const client = await Gobo.get();
+  
+  const content = {};
+  if ( kernel.id ) {
+    content.id = kernel.id;
+  }
+  
   return await client.personDraftFiles.post({
     parameters: { person_id: client.id },
-    content: kernel
+    content
   });
 });
 

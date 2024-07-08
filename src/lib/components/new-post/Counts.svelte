@@ -3,7 +3,7 @@
   import { onMount, createEventDispatcher } from "svelte";
   import { State, Draft } from "$lib/engines/draft.js";
   import { Thread } from "$lib/engines/thread.js";
-  import { extract } from "$lib/engines/platforms/helpers.js";
+  import * as Helpers from "$lib/engines/platforms/helpers.js";
 
   const dispatch = createEventDispatcher();
 
@@ -28,12 +28,7 @@
   };
 
   Render.counts = ( draft ) => {
-    const counts = [];
-    for ( const platform of addButtons ) {
-      const items = extract( platform, draft );
-      counts.push( ...items );
-    }
-    row = counts;
+    row = Helpers.unroll( draft );
   };
 
   Render.thread = ( draft ) => {  

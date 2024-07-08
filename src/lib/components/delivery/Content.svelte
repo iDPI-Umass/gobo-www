@@ -6,6 +6,8 @@
 
   export let delivery;
 
+  const parser = new DOMParser();
+  const serializer = new XMLSerializer();
 
   let title, content;
   const Render = State.make();
@@ -15,9 +17,36 @@
     content = "";
   };
 
+  // Currently, we parse the thread state stored in the content to get out the
+  // threadpoints and manually add the sl-icons. However, there's an issue
+  // with sharing adopted stylesheets that complicates this document fragment
+  // parsing strategy.
+  //
+  // TODO: How do we improve this to be not so hacky?
   Render.content = () => {
     title = delivery.proof?.title;
-    content = delivery.proof?.content ?? "";
+    const raw = delivery.proof?.content ?? "";
+    const dom = parser.parseFromString( 
+      `<div id='outermost'> ${raw} </div>`, 
+      "text/html"
+    );
+    
+    const threadpoints = dom.querySelectorAll( "span.threadpoint" );
+    for ( const el of threadpoints ) {
+      const platform = el.dataset.platform;
+      if (!platform) {
+        continue
+      }
+      const icon = document.createElement( "gobo-replace-span" );
+      icon.classList.add( platform );
+      icon.setAttribute( "src", `/icons/${platform}.svg` );
+      console.log(icon)
+      el.appendChild( icon );
+    }
+
+    content = serializer
+      .serializeToString( dom.querySelector( "div#outermost" ))
+      .replaceAll( "gobo-replace-span", "sl-icon" );
   };
 
 

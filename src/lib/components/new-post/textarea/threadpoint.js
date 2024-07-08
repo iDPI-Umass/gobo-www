@@ -27,31 +27,29 @@ class DoubleClickObserver extends DomEventObserver {
 
 class AddThreadpointCommand extends Command {
   execute({ value }) {
-      const editor = this.editor;
-      const selection = editor.model.document.selection;
+    const editor = this.editor;
+    const selection = editor.model.document.selection;
 
-      editor.model.change( writer => {
-        const position = editor.model.document.selection.getFirstPosition();  
-        
-        // Create a threadpoint model element...
-          const threadpoint = writer.createElement( "threadpoint", {
-              ...Object.fromEntries( selection.getAttributes() ),
-              platform: value
-          } );
+    editor.model.change( writer => {
+      const position = editor.model.document.selection.getFirstPosition();  
+      
+      // Create a threadpoint model element...
+      const threadpoint = writer.createElement( "threadpoint", {
+        ...Object.fromEntries( selection.getAttributes() ),
+        platform: value,
+        id: window.crypto.randomUUID()
+      });
 
-          // ...and insert it into the document model.
-          editor.model.insertObject( threadpoint, null, null, { setSelection: "on" } );
+      // ...and insert it into the document model.
+      editor.model.insertObject( threadpoint, null, null, { setSelection: "on" } );
 
-          // Set the selection position back to its former value.
-          writer.setSelection( position );
-      } );
+      // Set the selection position back to its former value.
+      writer.setSelection( position );
+    });
   }
 
   refresh() {
-      const model = this.editor.model;
-      const selection = model.document.selection;
-      const isAllowed = model.schema.checkChild( selection.focus.parent, "threadpoint" );
-      this.isEnabled = isAllowed;
+    this.isEnabled = true;
   }
 }
 
@@ -63,10 +61,7 @@ class RemoveThreadpointCommand extends Command {
   }
 
   refresh() {
-      const model = this.editor.model;
-      const selection = model.document.selection;
-      const isAllowed = model.schema.checkChild( selection.focus.parent, "threadpoint" );
-      this.isEnabled = isAllowed;
+    this.isEnabled = true;
   }
 }
 
@@ -131,27 +126,28 @@ export default class ThreadpointEditing extends Plugin {
       inheritAllFrom: "$inlineObject",
 
       // The widget can have many types, like date, name, surname, etc:
-      allowAttributes: [ "platform" ]
+      allowAttributes: [ "id", "platform" ]
     } );
   }
 
   _defineConverters() {
     const conversion = this.editor.conversion;
 
-
     conversion.for( "upcast" ).elementToElement( {
       view: {
         name: "span",
-        classes: [ "threadpoint" ]
+        classes: [ "threadpoint" ],
+        attributes: [ "data-id", "data-platform" ]
       },
       model: ( viewElement, { writer } ) => {
+        let id = viewElement.getAttribute( "data-id" )
+        id ??= window.crypto.randomUUID();
         const platform = viewElement.getAttribute( "data-platform" );
-        return writer.createElement( "threadpoint", { platform } );
+        return writer.createElement( "threadpoint", { id, platform });
       }
     } );
 
-
-    conversion.for( "editingDowncast" ).elementToElement( {
+    conversion.for( "editingDowncast" ).elementToElement({
       model: "threadpoint",
       view: ( model, { writer } ) => {
         const view = createThreadpointView( model, writer );
@@ -162,13 +158,12 @@ export default class ThreadpointEditing extends Plugin {
           src: `/icons/${platform}.svg`,
           class: platform
         });
-        writer.insert( writer.createPositionAt( view, 0 ), icon );
+        writer.insert( writer.createPositionAt(view, 0), icon );
         
         // Enable widget handling on an element inside the editing view.
         return toWidget( view, writer );
       }
     } );
-
 
     conversion.for( "dataDowncast" ).elementToElement( {
       model: "threadpoint",
@@ -177,13 +172,14 @@ export default class ThreadpointEditing extends Plugin {
       }
     });
 
-
     // Helper method for both downcast converters.
     function createThreadpointView( model, writer ) {
+      const id = model.getAttribute( "id" );
       const platform = model.getAttribute( "platform" );
 
       return writer.createContainerElement( "span", {
         class: "threadpoint",
+        "data-id": id,
         "data-platform": platform
       });
     }

@@ -8,7 +8,7 @@
 
   export let threadItem;
 
-  let identity, options, subreddit, content;
+  let identity, options, subreddit, content, attachments;
   let displayedFiles, mediaFrame, mediaFrameChildren;
   let spoilerOverride;
   const Render = State.make();
@@ -18,6 +18,7 @@
     options = {};
     subreddit = "";
     content = null;
+    attachments = [];
     displayedFiles = [];
     spoilerOverride = false;
     mediaFrameChildren = {};
@@ -42,15 +43,31 @@
     }
   };
 
-  Render.content = ( raw ) => {
+  Render.attachments = ( draft ) => {
+    attachments = draft.attachments;
+  }
+
+  Render.item = ( mediaFrame, raw ) => {
+    Item.content( raw );
+    Item.attachments( mediaFrame, raw );
+  };
+
+
+
+  const Item = {};
+
+  Item.content = ( raw ) => {
     content = markdown.toHTML( raw.content );
   };
 
-  Render.attachments = ( draft ) => {
-    const oldLength = displayedFiles.length;
+  Item.attachments = ( mediaFrame, raw ) => {    
     let files = [];
-    for ( const attachment of draft.attachments.slice( 0, 20 ) ) {
-      files.push( attachment );
+    const ids = raw.attachments.slice( 0, 20 );
+    for ( const id of ids ) {
+      const match = attachments.find( file => file.id === id );
+      if ( match ) {
+        files.push( match );
+      }
     }
 
     let videoFile = files.find( f => Media.isVideo( f ) );
@@ -60,8 +77,7 @@
       displayedFiles = files;
     }
 
-    // Only complete the styling below if we're removing media.
-    if ( oldLength <= displayedFiles.length ) {
+    if ( !mediaFrame ) {
       return;
     }
 
@@ -116,7 +132,7 @@
     };
   });
 
-  $: Render.content( threadItem );
+  $: Render.item( mediaFrame, threadItem );
 </script>
 
 <article class="outer-frame">

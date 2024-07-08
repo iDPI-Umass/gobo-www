@@ -13,7 +13,7 @@
   export let gutter = false;
   export let spines = {};
 
-  let identity, options, content, avatar;
+  let identity, options, content, attachments, avatar;
   let displayedFiles, sensitiveOverride, spoilerOverride;
   const Render = State.make();
   const parser = new DOMParser();
@@ -23,6 +23,7 @@
     identity = {};
     options = {};
     content = null;
+    attachments = [];
     displayedFiles = [];
     sensitiveOverride = false;
     spoilerOverride = false;
@@ -40,7 +41,20 @@
     };
   };
 
-  Render.content = ( raw ) => {
+  Render.attachments = ( draft ) => {
+    attachments = draft.attachments;
+  }
+
+  Render.item = ( raw ) => {
+    Item.content( raw );
+    Item.attachments( raw );
+  };
+
+
+
+  const Item = {};
+
+  Item.content = ( raw ) => {
     if ( raw.content == null || raw.content == "" ) {
       content = null;
       return;
@@ -57,11 +71,17 @@
     content = serializer.serializeToString( dom.querySelector( "div" ));
   };
 
-  Render.attachments = ( draft ) => {
-    if ( threadItem.index === 0) {
-      displayedFiles = draft.attachments
-        .slice( 0, 4 );
+  Item.attachments = ( raw ) => {
+    const ids = raw.attachments ?? [];
+    const files = []
+    for ( const id of ids ) {
+      const match = attachments.find( file => file.id === id );
+      if ( match ) {
+        files.push( match );
+      }
     }
+
+    displayedFiles = files.slice( 0, 4 );
   };
 
 
@@ -88,7 +108,7 @@
     }
   });
 
-  $: Render.content( threadItem );
+  $: Render.item( threadItem );
 </script>
 
 <article class="outer-frame">

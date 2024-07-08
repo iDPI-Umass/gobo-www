@@ -7,7 +7,6 @@
   import { onMount, tick } from "svelte";
   import { State, Draft } from "$lib/engines/draft.js";
   import { Thread } from "$lib/engines/thread.js";
-  import { Preview } from "$lib/engines/link-preview.js";
 
   export let placeholder = "Write your post";
   export let content = "";

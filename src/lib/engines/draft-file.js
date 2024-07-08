@@ -57,14 +57,15 @@ class DraftFile {
     return draftFile;
   }
 
-  static async fromFile ( file ) {
-    const _ = {};
-    _.mime_type = file.type;
-    _.name = file.name;
-    _.size = file.size;
-    _.alt = null;
+  static fromFile ( file ) {
+    const kernel = {};
+    kernel.mime_type = file.type;
+    kernel.name = file.name;
+    kernel.size = file.size;
+    kernel.alt = null;
+    kernel.id = crypto.randomUUID()
 
-    const draftFile = new DraftFile( _ );
+    const draftFile = new DraftFile( kernel );
     draftFile.file = file;
     draftFile.url = URL.createObjectURL( file );
     return draftFile
@@ -79,7 +80,7 @@ class DraftFile {
   // Gobo HTTP API, we create one here. This representation must be available
   // for other resources that make up the publication graph.
   async create() {
-    if ( this.id == null ) {
+    if ( this.state == null ) {
       const resource = await FileHTTP.create( this._ );
       Object.assign( this._, resource );
     }

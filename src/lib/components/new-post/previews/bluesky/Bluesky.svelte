@@ -15,13 +15,14 @@
   const parser = new DOMParser();
   const serializer = new XMLSerializer();
 
-  let identity, options, content, avatar;
+  let identity, options, content, attachments, avatar;
   let displayedFiles, sensitiveOverride;
   const Render = State.make();
   Render.cleanup = () => {
     identity = {};
     options = {};
     content = null;
+    attachments = [];
     displayedFiles = [];
     sensitiveOverride = false;
   };
@@ -36,14 +37,26 @@
     options = draft.options.attachments;
   };
 
-  Render.content = ( raw ) => {
+  Render.attachments = ( draft ) => {
+    attachments = draft.attachments;
+  }
+
+  Render.item = ( raw ) => {
+    Item.content( raw );
+    Item.attachments( raw );
+  };
+
+
+
+  const Item = {};
+
+  Item.content = ( raw ) => {
     if ( raw.content == null || raw.content == "" ) {
       content = null;
       return;
     }
 
     const html = markdown.toHTML( raw.content );
-
     const dom = parser.parseFromString( `<div>${ html }</div>`, "text/html" );    
     const links = dom.querySelectorAll( "a" );
     for ( const link of links ) {
@@ -53,11 +66,17 @@
     content = serializer.serializeToString( dom.querySelector( "div" ));
   };
 
-  Render.attachments = ( draft ) => {
-    if ( threadItem.index === 0) {
-      displayedFiles = draft.attachments
-        .slice( 0, 4 );
+  Item.attachments = ( raw ) => {
+    const ids = raw.attachments ?? [];
+    const files = []
+    for ( const id of ids ) {
+      const match = attachments.find( file => file.id === id );
+      if ( match ) {
+        files.push( match );
+      }
     }
+
+    displayedFiles = files.slice( 0, 4 );
   };
 
 
@@ -93,7 +112,7 @@
     }
   });
 
-  $: Render.content( threadItem );
+  $: Render.item( threadItem );
 </script>
 
 <article class="outer-frame">

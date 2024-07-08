@@ -7,18 +7,22 @@
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import { State, Draft, Options, Media } from "$lib/engines/draft.js";
+  import { Thread } from "$lib/engines/thread.js";
   import { DraftFile } from "$lib/engines/draft-file.js";
   import { Platforms } from "$lib/engines/platforms/index.js";
+  import * as Helpers from "$lib/engines/platforms/helpers.js";
   import { previewStore } from "$lib/stores/image-preview.js";
   import { altStore } from "$lib/stores/alt-store.js"
 
   let fileInput;
-  let options, attachments, acceptTypes;
+  let options, attachments, thread, slots, acceptTypes;
   const Render = State.make();
 
   Render.cleanup = () => {
     options = {};
     attachments = [];
+    thread = [];
+    slots = [];
     acceptTypes = "";
   };
 
@@ -29,7 +33,7 @@
         Draft.updateAspect( "attachments", attachments );
       }
     }
-    attachments = draft.attachments;
+    attachments = draft.attachments;    
   };
 
   Render.options = ( draft ) => {
@@ -40,69 +44,52 @@
     acceptTypes = Platforms.getAcceptable().join( "," ) || ".text";
   };
 
-
-  const Image = {};
-  Image.add = async ( file ) => {
-    const index = attachments.findIndex( a => a.name === file.name );
-    
-    if ( index < 0 ) {
-      const draftFile = await DraftFile.fromFile( file );
-      altStore.set( draftFile );
-      goto("/new-post/alt");
-    
-    } else {
-      const match = attachments[ index ];
-      if ( file.lastModified !== match.file?.lastModified ) {
-        const draftFile = await DraftFile.fromFile( file );
-        altStore.set( draftFile );
-        attachments.splice( index, 1 );
-        Draft.updateAspect( "attachments", attachments );
-        goto( "/new-post/alt" );
-      }
-    }
-  };
-
-
-  const Attachment = {};
-  Attachment.add = async ( file ) => {
-    const index = attachments.findIndex( a => a.name === file.name );
-
-    if ( index < 0 ) {
-      const draftFile = await DraftFile.fromFile( file );
-      attachments.push( draftFile );
-      Draft.updateAspect( "attachments", attachments );
-    
-    } else {
-      const match = attachments[ index ];
-      if ( file.lastModified !== match.file?.lastModified ) {
-        const draftFile = await DraftFile.fromFile( file );
-        attachments.splice( index, 1, draftFile );
-        Draft.updateAspect( "attachments", attachments );
-      }
-    }
+  Render.thread = ( draft ) => {
+    thread = draft.thread;
+    slots = Helpers.unroll( draft );
   };
 
 
   const File = {};
+
   File.add = ( file ) => {
-    if ( Media.isImage( file )) {
-      Image.add( file );
-    } else {
-      Attachment.add( file );
-    }
+    const draftFile = DraftFile.fromFile( file );
+    altStore.set( draftFile );
+    goto("/new-post/alt");
   };
 
-  File.addMany = async ( files ) => {
+  // TODO: This is similar to the reconcilation we do on the confirmation 
+  // page, but there's also a focus on the alt text there. Do want to try to
+  // merge these two flows together. And how does alt text fit into the
+  // reconcilation? Should we move alt text over to a replacing file?
+  File.addMany = ( files ) => {
     for ( const file of files ) {
-      const attachment = attachments.find( a => a.name === file.name );
-      if ( attachment == null ) {
-        const draftFile = await DraftFile.fromFile( file );
+      const draftFile = DraftFile.fromFile( file )
+      const index = attachments.findIndex( a => a.name === draftFile.name );
+      const match = attachments[ index ];
+      const headRow = thread[0] ?? [];
+    
+      if ( !match ) {
         attachments.push( draftFile );
+        for ( const item of headRow ) {
+          item.attachments.push( draftFile.id );
+        }
+      
+      } else if ( draftFile.file?.lastModified !== match.file?.lastModified ) {
+        attachments.splice( index, 1 );
+        for ( const item of headRow ) {
+          const _index = headRow.attachments.findIndex( id => id === match.id );
+          if ( _index > -1 ) {
+            item.attachments.splice( _index, 1, draftFile.id );
+          }
+        }
       }
     }
-    attachments = attachments;
+    
+    // Update the state in the draft structure.
     Draft.updateAspect( "attachments", attachments );
-  };
+    Draft.updateAspect( "thread", thread );
+  }
 
   File.listen = () => {
     const _files = fileInput.files;
@@ -175,6 +162,9 @@
   
   Handle.preview = ( attachment ) => {
     return ( event ) => {
+      if (event.type === "keydown" && event.key !== "Enter" ) {
+        return;
+      }
       event.preventDefault();
       previewStore.set( attachment );
       goto( "/upload-preview" );
@@ -183,13 +173,11 @@
   
   Handle.delete = ( attachment ) => {
     return ( event ) => {
-      event.preventDefault();
-      if ( event.type === "keydown" && event.key !== "Enter" ) {
+      if (event.type === "keydown" && event.key !== "Enter" ) {
         return;
       }
-
+      event.preventDefault();
       const index = attachments.findIndex( a => a.name === attachment.name );
-
       if ( index >= 0 ) {
         attachments.splice( index, 1 );
         Draft.updateAspect( "attachments", attachments );
@@ -199,14 +187,58 @@
   
   Handle.edit = ( attachment ) => {
     return ( event ) => {
-      event.preventDefault();
-      if ( event.type === "keydown" && event.key !== "Enter" ) {
+      if (event.type === "keydown" && event.key !== "Enter" ) {
         return;
       }
+      event.preventDefault();
       altStore.set( attachment );
       goto("/new-post/alt");
     };
   }
+
+  Handle.anchorClick = ( item, file ) => {
+    return ( event ) => {
+      if (event.type === "keydown" && event.key !== " " ) {
+        return;
+      }
+      event.preventDefault();
+      
+      if ( item.attachments.includes(file.id) ) {
+        Anchor.remove( item, file );
+      } else {
+        Anchor.add( item, file );
+      }
+
+      // Only update the thread once we're done editing this metadata.
+      Draft.updateAspect( "thread", thread );
+    };
+  };
+
+
+  // TODO: this probably belongs in the Thread engine. I don't want to broadcast
+  // from these functions because you might have multiple edits to make.
+  const Anchor = {};
+
+  Anchor.add = ( item, file ) => {
+    const match = Thread.find( thread, item.index, item.platform );
+    if ( match == null ) {
+      console.warn( `unable to match on thread slot ${item.index} ${item.platform}` );
+      return;
+    }
+    match.attachments.push( file.id );
+  };
+
+  Anchor.remove = ( item, file ) => {
+    const match = Thread.find( thread, item.index, item.platform );
+    if ( match == null ) {
+      console.warn( `unable to match on thread slot ${item.index} ${item.platform}` );
+      return;
+    }
+    const index = match.attachments.findIndex( id => id === file.id );
+    if ( index > -1 ) {
+      match.attachments.splice( index, 1 );
+    }
+  };
 
 
 
@@ -215,6 +247,7 @@
     Render.listen( "attachments", Render.cycle );
     Render.listen( "options", Render.options );
     Render.listen( "identities", Render.identities );
+    Render.listen( "thread", Render.thread );
     fileInput.addEventListener( "change", Handle.inputFiles );
     return () => {
       Render.reset();
@@ -275,6 +308,20 @@
               Size: {filesize( attachment.size )}
             </p>
           {/if}
+
+          <div class="anchors">
+            {#each slots as item (`${item.platform}${item.index}`)}
+              <div class="anchor">
+                <sl-checkbox
+                  on:click={Handle.anchorClick(item, attachment)}
+                  on:keydown={Handle.anchorClick(item, attachment)}
+                  checked={item.attachments.includes(attachment.id)}
+                ></sl-checkbox>  
+                <sl-icon src="/icons/{ item.platform }.svg" class="{ item.platform }"></sl-icon>
+                <div class="subscript">{item.index + 1}</div>
+              </div>
+            {/each}
+          </div>
         </div>
         
         {#if Media.isImage(attachment)}
@@ -348,6 +395,41 @@
     font-size: 1rem !important;
     margin: 0 !important;
   }
+
+  .table-row > .metadata > .anchors {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gobo-width-spacer-flex);
+  }
+
+  .table-row > .metadata > .anchors > .anchor {
+    display: flex;
+    height: 1.75rem;
+  }
+  .table-row > .metadata > .anchors > .anchor > sl-checkbox {
+    margin: 0;
+    align-self: start;
+  }
+  .table-row > .metadata > .anchors > .anchor > sl-checkbox::part(control) {
+    background: var(--gobo-color-panel);
+  }
+  .table-row > .metadata > .anchors > .anchor > sl-checkbox::part(control--checked) {
+    background: var(--gobo-color-primary);
+  }
+  .table-row > .metadata > .anchors > .anchor > sl-icon {
+    margin: 0;
+    margin-top: 0.25rem;
+    align-self: start;
+    font-size: 1.1rem;
+  }
+  .table-row > .metadata > .anchors > .anchor > .subscript {
+    align-self: end;
+    font-size: var(--gobo-font-size-detail);
+  }
+
+  /* .table-row > .metadata > .anchors > .anchor {
+    display: flex;
+  } */
 
   .buttons {
     border-top: none;

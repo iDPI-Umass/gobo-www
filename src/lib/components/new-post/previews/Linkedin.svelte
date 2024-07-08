@@ -14,15 +14,15 @@
   const parser = new DOMParser();
   const serializer = new XMLSerializer();
 
-  let identity, options, content, avatar;
-  let files, urls;
+  let identity, options, content, attachments, avatar;
+  let displayFiles;
   const Render = State.make();
   Render.cleanup = () => {
     identity = {};
     options = {};
     content = null;
-    files = [];
-    urls = [];
+    attachments = [];
+    displayFiles = [];
   };
 
   Render.identity = ( draft ) => {
@@ -34,14 +34,26 @@
     options = draft.options.linkedin;
   };
 
-  Render.content = ( raw ) => {
+  Render.attachments = ( draft ) => {
+    attachments = draft.attachments;
+  }
+
+  Render.item = ( raw ) => {
+    Item.content( raw );
+    Item.attachments( raw );
+  };
+
+
+
+  const Item = {};
+
+  Item.content = ( raw ) => {
     if ( raw.content == null || raw.content == "" ) {
       content = null;
       return;
     }
 
     const html = markdown.toHTML( raw.content );
-
     const dom = parser.parseFromString( `<div>${ html }</div>`, "text/html" );    
     const links = dom.querySelectorAll( "a" );
     
@@ -56,23 +68,20 @@
       }
     }
     
-    
     content = serializer.serializeToString( dom.querySelector( "div" ));
   };
 
-  Render.attachments = ( draft ) => {
-    for ( const url of urls ) {
-      URL.revokeObjectURL( url );
+  Item.attachments = ( raw ) => {
+    const ids = raw.attachments ?? [];
+    const files = []
+    for ( const id of ids ) {
+      const match = attachments.find( file => file.id === id );
+      if ( match ) {
+        files.push( match );
+      }
     }
-    
-    files = draft.attachments
-      .slice( 0, 4 );
-    
-    const _urls = [];
-    for ( const file of files ) {
-      _urls.push( file.url );
-    }
-    urls = _urls;
+
+    displayFiles = files.slice( 0, 4 );
   };
 
 
@@ -112,7 +121,7 @@
     }
   });
 
-  $: Render.content( threadItem );
+  $: Render.item( threadItem );
 </script>
 
 <article class="outer-frame">
@@ -149,39 +158,39 @@
     {/if}
   </section>
 
-  {#if files.length === 1}
+  {#if displayFiles.length === 1}
     <div class="media-single">
-      {#if Media.isImage( files[0] )}
+      {#if Media.isImage( displayFiles[0] )}
         <img 
-          src={urls[0]}
+          src={displayFiles[0].url}
           alt="uploaded"
           on:load={Handle.singleImage}>
-      {:else if Media.isAudio( files[0] )}
+      {:else if Media.isAudio( displayFiles[0] )}
         <!-- svelte-ignore a11y-media-has-caption -->
         <audio controls>
           <source 
-            src={urls[0]}
-            type={files[0].type}>
+            src={displayFiles[0].url}
+            type={displayFiles[0].type}>
         </audio>
-      {:else if Media.isVideo( files[0] )}
+      {:else if Media.isVideo( displayFiles[0] )}
         <!-- svelte-ignore a11y-media-has-caption -->
         <video 
           loop 
           controls
           on:loadedmetadata={Handle.singleVideo}>
           <source 
-            src={urls[0]}
-            type={files[0].type}>
+            src={displayFiles[0].url}
+            type={displayFiles[0].type}>
         </video>
       {/if}
     </div>
   
-  {:else if files.length > 1}
+  {:else if displayFiles.length > 1}
     <div class="media">
-      {#each files as file, index (file.name)}
+      {#each displayFiles as file, index (file.name)}
         <div class="image-box">
           <img 
-            src={urls[index]}
+            src={displayFiles[index].url}
             alt="uploaded" />
         </div>
       {/each}
@@ -189,7 +198,7 @@
   {/if}
   
 
-  {#if files.length === 0}
+  {#if displayFiles.length === 0}
     <LinkPreview previewURL={threadItem.previewURL} />
   {/if}
 

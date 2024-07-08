@@ -26,7 +26,7 @@
 </script>
 
 <div class="outer">
-  <BackLink heading="Preview"></BackLink>
+  <BackLink heading="Preview" styles={{color: "#fff"}}></BackLink>
 
   <div class="frame">
     {#if attachment}

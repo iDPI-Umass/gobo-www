@@ -45,6 +45,37 @@ Draft.make = () => {
   };
 };
 
+Draft.checkThread = ( draft ) => {
+  draft.thread ??= [];
+};
+
+Draft.reconcileAttachments = ( draft ) => {
+  const files = [];
+  for ( const _ of draft.attachments ) {
+    if ( _?.state != null ) {
+      files.push( DraftFile.make(_) );
+    }
+  }
+  draft.attachments = files;
+};
+
+Draft.reconcileThreadAttachments = ( draft ) => {
+  const validIDs = draft.attachments.map( a => a.id );
+  for ( const row of draft.thread ) {
+    for ( const item of row ) {
+      const safe = [];
+      for ( const id of item.attachments ) {
+        if ( validIDs.includes(id) ) {
+          safe.push( id );
+        }
+      }
+      item.attachments = safe;
+    }
+  }
+}
+
+
+
 Draft.read = () => {
   if ( singletonDraft == null ) {
     let draft = LS.read( "gobo-draft" );
@@ -52,14 +83,10 @@ Draft.read = () => {
     if ( draft == null ) {
       singletonDraft = Draft.make();
     
-    } else {  
-      const files = [];
-      for ( const _ of draft.attachments ) {
-        if ( _?.id != null ) {
-          files.push( DraftFile.make(_) );
-        }
-      }
-      draft.attachments = files;
+    } else {        
+      Draft.checkThread( draft );
+      Draft.reconcileAttachments( draft );
+      Draft.reconcileThreadAttachments( draft );
       singletonDraft = draft;
     }
   }

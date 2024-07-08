@@ -68,17 +68,17 @@
     </section>
   
     <section class="panel">
-      <Body></Body>
+      <Body/>
     </section>
   
   
     <section 
       class="panel"
-      ondragover="return false" 
+      ondragover="return false"
       on:dragenter={mediaPanel.dragEnter}
       on:dragleave={mediaPanel.dragLeave}
       on:drop={mediaPanel.drop}>
-      <Media bind:this={mediaPanel}></Media>
+      <Media bind:this={mediaPanel}/>
     </section>
   
   

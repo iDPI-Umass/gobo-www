@@ -130,7 +130,7 @@ Bluesky.fetchCardImage = async ( url ) => {
 };
 
 Bluesky.uploadCardImage = async ( file ) => {
-  const draftFile = await DraftFile.fromFile( file );
+  const draftFile = DraftFile.fromFile( file );
   await draftFile.create();
   await draftFile.upload();
   return draftFile.id;

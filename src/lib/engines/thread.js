@@ -24,16 +24,35 @@ Thread.ignoredPlatforms = new Set([
 ]);
 
 
+Thread.find = ( thread, index, platform ) => {
+  const row = thread?.[ index ] ?? []
+  const item = row.find( i => i.platform === platform );
+  return item;
+};
+
+Thread.findID = ( thread, id ) => {
+  for ( const row of thread ) {
+    for ( const item of row ) {
+      if ( item.id === id ) {
+        return item;
+      }
+    }
+  }
+
+  // Like Array#find, returns undefined if it's not here.
+  return;
+}
+
+
 Thread.parse = ( draft ) => {
-  const thread = draft.content;
+  const old = draft.thread;
+  const raw = draft.content;
   const platforms = Thread.getPlatforms( draft );
   
-  const posts = [];
+  const results = [];
   for ( const platform of platforms ) {
-    const Model = Platforms.get( platform );
-
     const dom = parser.parseFromString( 
-      `<div id='outermost'> ${thread} </div>`, 
+      `<div id='outermost'> ${raw} </div>`, 
       "text/html"
     );
 
@@ -45,10 +64,19 @@ Thread.parse = ( draft ) => {
       el.remove();
     }
 
-    // Now convert matching threadpoints to a plaintext-compatible delimiter.
+    // Now gather matching threadpoints
     const matches = dom.querySelectorAll( "span.threadpoint" );
+    
+    // Save the attachment metadata we store on the threadponts.
+    const threadpoints = [];
+    threadpoints.push({ id: "head" });
     for ( const el of matches ) {
-      el.innerHTML = DELIMITER;
+      threadpoints.push({ id: el.dataset.id });
+    }
+    
+    // Convert the threadpoints into plaintext-compatible delimiters.
+    for ( const el of matches ) {
+      el.innerHTML = DELIMITER;      
     }
 
     // Now get back the modified HTML.
@@ -64,17 +92,23 @@ Thread.parse = ( draft ) => {
     // Assemble the parts for this platform alongside the other platforms.
     let index = 0;
     for ( const part of parts ) {
-      const content = part.trim();
-      const attachments = [];
-      const item = { index, platform, content, attachments };
+      const oldItem = Thread.find( old, index, platform );
+      const item = { 
+        id: threadpoints[ index ].id,
+        index,
+        platform, 
+        content: part.trim(), 
+        attachments: oldItem?.attachments ?? []
+      };
+
       Preview.decorateItem( item );
-      posts[ index ] ??= [];
-      posts[ index ].push( item );
+      results[ index ] ??= [];
+      results[ index ].push( item );
       index++;
     }
   }
 
-  return posts;
+  return results;
 };
 
 

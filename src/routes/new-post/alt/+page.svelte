@@ -7,7 +7,7 @@
   import { State, Draft } from "$lib/engines/draft.js";
   import { altStore } from "$lib/stores/alt-store";
 
-  let draftFile, alt, attachments, srcURL;
+  let draftFile, alt, attachments, thread, srcURL;
   let form, previewImage;
   const Render = State.make();
   
@@ -23,6 +23,7 @@
 
   Render.attachments = ( draft ) => {
     attachments = draft.attachments;
+    thread = draft.thread;
   };
 
   Render.preview = ( value ) => {
@@ -51,16 +52,34 @@
 
   Handle.submit = ( event ) => {
     event.preventDefault();
+
+    const index = attachments.findIndex( a => a.name === draftFile.name );
+    const match = attachments[ index ];
+    const headRow = thread[0] ?? [];
     
-    const match = attachments.find( a => a.name === draftFile.name );
-    if ( match == null ) {
+    if ( !match ) {
       draftFile.alt = alt;
       attachments.push( draftFile );
+      for ( const item of headRow ) {
+        item.attachments.push( draftFile.id );
+      }
+    
+    } else if ( draftFile.file?.lastModified !== match.file?.lastModified ) {
+      attachments.splice( index, 1 );
+      for ( const item of headRow ) {
+        const _index = head.attachments.findIndex( id => id === match.id );
+        if ( _index > -1 ) {
+          item.attachments.splice( _index, 1, draftFile.id );
+        }
+      }
+
     } else {
       match.alt = alt;
     }
 
+    // Update the state in the draft structure.
     Draft.updateAspect( "attachments", attachments );
+    Draft.updateAspect( "thread", thread );
     goto("/new-post");
   };
 

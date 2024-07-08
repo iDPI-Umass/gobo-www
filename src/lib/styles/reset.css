@@ -146,6 +146,17 @@ sl-icon-button:focus::part(base) {
   color: var(--gobo-color-text);
 }
 
+sl-checkbox:hover::part(control),
+sl-checkbox:focus::part(control) {
+  border: solid var(--sl-input-border-width) var(--sl-input-border-color);
+}
+sl-checkbox:hover::part(control--checked),
+sl-checkbox:focus::part(control--checked) {
+  background-color: var(--sl-color-primary-600);
+}
+
+
+
 @supports not selector(:focus-visible) {
   sl-icon-button:focus {
     color: var(--gobo-color-text);

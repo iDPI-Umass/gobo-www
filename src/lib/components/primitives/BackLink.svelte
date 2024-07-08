@@ -1,14 +1,17 @@
 <script>
   import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
   export let heading;
+  export let styles = {};
 
   const Handle = {};
   Handle.click = () => history.back();
+
+  let color = styles.color ?? "var(--gobo-color-text)";
 </script>
 
 <header>
   
-  <div class="heading">
+  <div class="heading" style:color={color}>
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <sl-icon-button 
       on:click={Handle.click}
@@ -55,7 +58,7 @@
   header > .heading > h1 {
     font-size: var(--gobo-font-size-x-large);
     font-weight: var(--gobo-font-weight-black);
-    color: var(--gobo-color-text-menu);
+    color: inherit;
   }
 
   .nav {
@@ -65,5 +68,6 @@
   sl-icon-button {
     font-size: 20px;
     margin-right: 2rem;
+    color: inherit;
   }
 </style>
