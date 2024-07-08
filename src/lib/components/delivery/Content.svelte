@@ -40,7 +40,6 @@
       const icon = document.createElement( "gobo-replace-span" );
       icon.classList.add( platform );
       icon.setAttribute( "src", `/icons/${platform}.svg` );
-      console.log(icon)
       el.appendChild( icon );
     }
 
