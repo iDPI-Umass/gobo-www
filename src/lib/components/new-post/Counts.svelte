@@ -53,25 +53,26 @@
   });
 </script>
 
+<div class="vertical">
 
-{#if row?.length > 0}
-  <div class="vertical">
+  {#if addButtons?.length > 0}
     <div class="wrapper">
-        <div class="adds">
-          {#each addButtons as platform (platform)}
-            <sl-button
-              on:click={Handle.addThreadpoint(platform)}
-              class="glyph"
-              size="medium">
-              <sl-icon src="/icons/{platform}.svg" class={platform} />
-              <sl-icon src="/icons/plus-circle.svg" />
-            </sl-button>
-          {/each}
-        </div>
-        <p class='help-text'>Hint: add a threadpoint to break your post up into a thread.</p>
+      <div class="adds">
+        {#each addButtons as platform (platform)}
+          <sl-button
+            on:click={Handle.addThreadpoint(platform)}
+            class="glyph"
+            size="medium">
+            <sl-icon src="/icons/{platform}.svg" class={platform} />
+            <sl-icon src="/icons/plus-circle.svg" />
+          </sl-button>
+        {/each}
+      </div>
+      <p class='help-text'>Hint: add a threadpoint to break your post up into a thread.</p>
     </div>
+  {/if}
 
-    
+  {#if row?.length > 0}
     <div class="wrapper">
       <div class="counts">
         {#each row as item, index (`${item.platform}${index}`)}
@@ -82,8 +83,9 @@
         {/each}
       </div>
     </div>
-  </div>
-{/if}
+  {/if}
+ 
+</div>
 
 
 <style>
