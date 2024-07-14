@@ -62,13 +62,13 @@
             <sl-button
               on:click={Handle.addThreadpoint(platform)}
               class="glyph"
-              size="medium"
-              pill>
+              size="medium">
               <sl-icon src="/icons/{platform}.svg" class={platform} />
               <sl-icon src="/icons/plus-circle.svg" />
             </sl-button>
           {/each}
         </div>
+        <p class='help-text'>Hint: add a threadpoint to break your post up into a thread.</p>
     </div>
 
     
@@ -95,9 +95,10 @@
 
   .wrapper {
     display: flex;
+    flex-direction: column;
+    align-items: end;
     padding: 0;
     padding-top: var(--gobo-height-spacer-flex);
-    gap: var(--gobo-width-spacer);
   }
 
   .label {
@@ -139,5 +140,18 @@
     font-size: 1rem;
     color: var(--gobo-color-text-muted);
     /* color: var(--gobo-color-border-panel); */
+  }
+
+  sl-button.glyph::part(base) {
+    padding: 0;
+  }
+  sl-button.glyph::part(label) {
+    padding: 0;
+  }
+
+  p.help-text {
+    margin: 0 !important;
+    font-size: var(--sl-input-help-text-font-size-medium) !important;
+    color: var(--sl-input-help-text-color) !important;
   }
 </style>

@@ -45,6 +45,7 @@
 
   Render.attachments = ( draft ) => {
     attachments = draft.attachments;
+    Item.attachments( mediaFrame, threadItem );
   }
 
   Render.item = ( mediaFrame, raw ) => {

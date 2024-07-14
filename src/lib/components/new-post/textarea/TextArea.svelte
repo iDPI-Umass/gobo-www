@@ -111,8 +111,7 @@
   :global(.ck.ck-content.ck-editor__editable),
   :global(.ck.ck-content.ck-editor__editable:not(.ck-focused)) {
     background: var(--gobo-color-null);
-    border-radius: var(--gobo-border-radius);
-    border-bottom-right-radius: none;
+    border-radius: 0.375rem;
     border: var(--gobo-border-panel);
     padding: 1rem;
     overflow-y: scroll;

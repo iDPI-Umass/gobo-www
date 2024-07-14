@@ -112,6 +112,31 @@ Thread.parse = ( draft ) => {
 };
 
 
+const Anchor = {};
+
+Anchor.add = ( thread, item, file ) => {
+  const match = Thread.find( thread, item.index, item.platform );
+  if ( match == null ) {
+    console.warn( `unable to match on thread slot ${item.index} ${item.platform}` );
+    return;
+  }
+  match.attachments.push( file.id );
+};
+
+Anchor.remove = ( thread, item, file ) => {
+  const match = Thread.find( thread, item.index, item.platform );
+  if ( match == null ) {
+    console.warn( `unable to match on thread slot ${item.index} ${item.platform}` );
+    return;
+  }
+  const index = match.attachments.findIndex( id => id === file.id );
+  if ( index > -1 ) {
+    match.attachments.splice( index, 1 );
+  }
+};
+
+
 export {
-  Thread
+  Thread,
+  Anchor
 }

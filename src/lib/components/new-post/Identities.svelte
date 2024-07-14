@@ -1,11 +1,12 @@
 <script>
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/switch/switch.js";
+  import * as JoySet from "@dashkite/joy/set"
   import Spinner from "$lib/components/primitives/Spinner.svelte";
   import { onMount } from "svelte";
   import { State, Draft, Lock, Name, Identity } from "$lib/engines/draft.js";
   import { Identity as IdentityEngine } from "$lib/engines/identity.js";
-  import { Thread } from "$lib/engines/thread.js";
+  import { Thread, Anchor } from "$lib/engines/thread.js";
 
   let state, visual, identities, lockedIdentity;
   const Render = State.make();
@@ -66,13 +67,28 @@
   const Handle = {};
   Handle.toggle = ( identity ) => {
     return ( event ) => {
+      const oldPlatforms = Thread.getPlatforms( Draft.read() );
       identity.active = event.target.checked;
       const draft = Draft.updateAspect( "identities", identities );
       const thread = Thread.parse( draft );
       Draft.updateAspect( "thread", thread );
+
+      const newPlatforms = Thread.getPlatforms( draft );
+      const difference = JoySet.difference(newPlatforms, oldPlatforms)
+      if ( difference.size > 0 ) {
+        // We've added a platform. Add all attachments as a starting point.
+        for ( const platform of difference ) {
+          const item = { index: 0, platform }
+          for ( const file of draft.attachments ) {
+            Anchor.add( thread, item, file )
+          }
+        }
+
+        // We've updated the thread here, so we need to broadcast one more time.
+        Draft.updateAspect( "thread", thread );
+      }
     };
   };
-
  
   Render.reset();
   onMount(() => {

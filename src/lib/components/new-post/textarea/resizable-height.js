@@ -20,8 +20,7 @@ class ResizableHeight extends Plugin {
               min-height: 100%;
           }
           .ck .ck.ck-editor__main {
-              border-radius: var(--gobo-border-radius);
-              border-bottom-right-radius: 0;
+              border-radius: 0.375rem;
               border: var(--gobo-border-panel);
           }
           .ck .ck.ck-editor__main.ck-focused {

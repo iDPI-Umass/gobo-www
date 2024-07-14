@@ -36,6 +36,7 @@
 
   Render.attachments = ( draft ) => {
     attachments = draft.attachments;
+    Item.attachments( threadItem );
   }
 
   Render.item = ( raw ) => {

@@ -7,7 +7,7 @@
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import { State, Draft, Options, Media } from "$lib/engines/draft.js";
-  import { Thread } from "$lib/engines/thread.js";
+  import { Thread, Anchor } from "$lib/engines/thread.js";
   import { DraftFile } from "$lib/engines/draft-file.js";
   import { Platforms } from "$lib/engines/platforms/index.js";
   import * as Helpers from "$lib/engines/platforms/helpers.js";
@@ -204,42 +204,15 @@
       event.preventDefault();
       
       if ( item.attachments.includes(file.id) ) {
-        Anchor.remove( item, file );
+        Anchor.remove( thread, item, file );
       } else {
-        Anchor.add( item, file );
+        Anchor.add( thread, item, file );
       }
 
       // Only update the thread once we're done editing this metadata.
       Draft.updateAspect( "thread", thread );
     };
   };
-
-
-  // TODO: this probably belongs in the Thread engine. I don't want to broadcast
-  // from these functions because you might have multiple edits to make.
-  const Anchor = {};
-
-  Anchor.add = ( item, file ) => {
-    const match = Thread.find( thread, item.index, item.platform );
-    if ( match == null ) {
-      console.warn( `unable to match on thread slot ${item.index} ${item.platform}` );
-      return;
-    }
-    match.attachments.push( file.id );
-  };
-
-  Anchor.remove = ( item, file ) => {
-    const match = Thread.find( thread, item.index, item.platform );
-    if ( match == null ) {
-      console.warn( `unable to match on thread slot ${item.index} ${item.platform}` );
-      return;
-    }
-    const index = match.attachments.findIndex( id => id === file.id );
-    if ( index > -1 ) {
-      match.attachments.splice( index, 1 );
-    }
-  };
-
 
 
   Render.reset();
