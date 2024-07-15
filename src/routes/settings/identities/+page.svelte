@@ -5,6 +5,7 @@
   import Spinner from "$lib/components/primitives/Spinner.svelte";
   import Identity from "$lib/components/Identity.svelte";
   import { onMount } from "svelte";
+  import { Identity as IdentityEngine } from "$lib/engines/identity.js"
   import { State } from "$lib/engines/store.js";
   import * as identityStores from "$lib/stores/identity.js";
 
@@ -27,6 +28,7 @@
   Render.reset();
   onMount(() => {
     Render.listen( identityStores.singleton, Render.identities );
+    IdentityEngine.refresh();
     return () => {
       Render.reset();
     }
