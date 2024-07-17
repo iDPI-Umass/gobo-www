@@ -68,7 +68,7 @@
           </sl-button>
         {/each}
       </div>
-      <p class='help-text'>Hint: add a threadpoint to break your post up into a thread.</p>
+      <p class='help-text'>Add threadpoints to break your post up into a thread. Place them where you want a new reply&nbsp;to&nbsp;start.</p>
     </div>
   {/if}
 
@@ -98,7 +98,7 @@
   .wrapper {
     display: flex;
     flex-direction: column;
-    align-items: end;
+    align-items: start;
     padding: 0;
     padding-top: var(--gobo-height-spacer-flex);
   }
@@ -113,7 +113,7 @@
     flex: 0 1 100%;
     display: flex;
     flex-wrap: wrap;
-    justify-content: end;
+    justify-content: start;
     align-items: center;
     gap: var(--gobo-width-spacer-flex);
   }
@@ -122,7 +122,7 @@
     flex: 0 1 100%;
     display: flex;
     flex-wrap: wrap;
-    justify-content: end;
+    justify-content: start;
     align-items: center;
     gap: var(--gobo-width-spacer-flex);
   }
