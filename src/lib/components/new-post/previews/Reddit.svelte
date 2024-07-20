@@ -4,9 +4,11 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import { onMount } from "svelte";
   import { State, Identity, Media } from "$lib/engines/draft.js";
-  import * as markdown from "$lib/helpers/markdown.js";
+  import { getConverter } from "$lib/helpers/markdown.js";
 
   export let threadItem;
+
+  const toHTML = getConverter( "reddit" )
 
   let identity, options, subreddit, content, attachments;
   let displayedFiles, mediaFrame, mediaFrameChildren;
@@ -58,7 +60,7 @@
   const Item = {};
 
   Item.content = ( raw ) => {
-    content = markdown.toHTML( raw.content );
+    content = toHTML( raw.content );
   };
 
   Item.attachments = ( mediaFrame, raw ) => {    
@@ -381,6 +383,14 @@
 
   .outer-frame > .main > section :global(a) {
     color: var(--gobo-color-preview-link);
+  }
+
+  .outer-frame > .main > section :global(blockquote) {
+    margin-top: var(--gobo-height-spacer-half);
+    margin-bottom: var(--gobo-height-spacer-half);
+    margin-left: var(--gobo-width-spacer-half);
+    padding-left: var(--gobo-width-spacer-half);
+    border-left: 3px solid #ccc;
   }
 
   .outer-frame > .main > .media {

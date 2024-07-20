@@ -1,9 +1,11 @@
 <script>
   import { isImage, isVideo } from "$lib/helpers/type.js";
   import { elide } from "$lib/helpers/text.js";
-  import { toHTML } from "$lib/helpers/markdown.js";
+  import { getConverter } from "$lib/helpers/markdown.js";
 
   export let attachments = [];
+
+  const toHTML = getConverter( "gobo" )
 
   const mediaFallback = "/images/gobo-media-fallback.png";
 

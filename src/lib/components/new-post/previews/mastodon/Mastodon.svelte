@@ -7,11 +7,13 @@
   import { Source } from "$lib/engines/post";
   import { State, Identity, Media } from "$lib/engines/draft.js";
   import { Mastodon } from "$lib/engines/platforms/mastodon.js";
-  import * as markdown from "$lib/helpers/markdown.js";
+  import { getConverter } from "$lib/helpers/markdown.js";
 
   export let threadItem;
   export let gutter = false;
   export let spines = {};
+
+  const toHTML = getConverter( "mastodon" )
 
   let identity, options, content, attachments, avatar;
   let displayedFiles, sensitiveOverride, spoilerOverride;
@@ -61,7 +63,7 @@
       return;
     }
 
-    const html = markdown.toHTML( raw.content );
+    const html = toHTML( raw.content );
 
     const dom = parser.parseFromString( `<div>${ html }</div>`, "text/html" );    
     const links = dom.querySelectorAll( "a" );

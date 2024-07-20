@@ -7,11 +7,12 @@
   import { Source } from "$lib/engines/post";
   import { State, Identity, Media } from "$lib/engines/draft.js";
   import { Bluesky } from "$lib/engines/platforms/bluesky.js";
-  import * as markdown from "$lib/helpers/markdown.js";
+  import { getConverter } from "$lib/helpers/markdown.js";
 
   export let threadItem;
   export let spines = {};
 
+  const toHTML = getConverter( "bluesky" )
   const parser = new DOMParser();
   const serializer = new XMLSerializer();
 
@@ -57,7 +58,7 @@
       return;
     }
 
-    const html = markdown.toHTML( raw.content );
+    const html = toHTML( raw.content );
     const dom = parser.parseFromString( `<div>${ html }</div>`, "text/html" );    
     const links = dom.querySelectorAll( "a" );
     for ( const link of links ) {

@@ -1,9 +1,10 @@
 import { Draft } from "$lib/engines/draft.js";
-import * as markdown from "$lib/helpers/markdown.js";
+import { getConverter } from "$lib/helpers/markdown.js";
 import {
   PUBLIC_BLUESKY_LINK_PREVIEW_URL
 } from '$env/static/public';
 
+const toHTML = getConverter( "gobo" )
 
 const parser = new DOMParser();
 const cache = {};
@@ -48,7 +49,7 @@ Preview.decorateItem = ( item ) => {
     return;
   }
 
-  const html = markdown.toHTML( item.content );
+  const html = toHTML( item.content );
   const dom = parser.parseFromString( html, "text/html" );
   const link = dom.querySelector( "a" );
   

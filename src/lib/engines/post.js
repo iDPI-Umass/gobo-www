@@ -5,7 +5,9 @@ import { Cache } from "$lib/resources/cache.js";
 import * as Resource from "$lib/resources/post.js";
 import * as Random from "$lib/helpers/random.js";
 import { humanize } from "$lib/helpers/humanize.js";
-import { toHTML } from "$lib/helpers/markdown.js";
+import { getConverter } from "$lib/helpers/markdown.js";
+
+const toHTML = getConverter( "gobo" )
 
 class FilteredPost {
   constructor ({ id }) {
