@@ -3,6 +3,7 @@
   import BackLink from "$lib/components/primitives/BackLink.svelte";
   import Reference from "$lib/components/new-post/Reference.svelte";
   import Body from "$lib/components/new-post/Body.svelte";
+  import Mentions from "$lib/components/new-post/mentions/Panel.svelte"
   import Media from "$lib/components/new-post/Media.svelte";
   import Identities from "$lib/components/new-post/Identities.svelte";
   import Options from "$lib/components/new-post/Options.svelte";
@@ -71,6 +72,9 @@
       <Body/>
     </section>
   
+    <section class="panel">
+      <Mentions/>
+    </section>
   
     <section 
       class="panel"
@@ -83,23 +87,23 @@
   
   
     <section class="panel">
-      <Identities></Identities>
+      <Identities/>
     </section>
 
     <section class="panel">
-      <Options></Options>
+      <Options/>
     </section>
     
     <section class="panel extra-wide">
-      <NewPostPreview></NewPostPreview>
+      <NewPostPreview/>
     </section>
 
     <section class="panel warning">
-      <Alerts></Alerts>
+      <Alerts/>
     </section>
   
     <section class="panel publish">
-      <Publish></Publish>     
+      <Publish/>     
     </section>
   
   </form>

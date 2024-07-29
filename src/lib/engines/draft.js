@@ -136,12 +136,14 @@ Draft.clear = async () => {
     Draft.write();
     Draft.load();
 };
+
 Draft.update = ( data ) => {
   const draft = Draft.read();
   Object.assign( draft, data );
   Draft.write();
   return Draft.load();
 };
+
 Draft.updateAspect = ( aspect, value ) => {
   const draft = Draft.read();
   Object.assign( draft, { [aspect]: value });
@@ -149,6 +151,12 @@ Draft.updateAspect = ( aspect, value ) => {
   Draft.put( aspect, draft );
   return draft;
 };
+
+Draft.readAspect = ( aspect ) => {
+  const draft = Draft.read();
+  return structuredClone( draft[aspect] );
+};
+
 Draft.pushAlert = ( message ) => {
   const draft = Draft.read();
   draft.alerts.push({

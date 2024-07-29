@@ -1,5 +1,6 @@
 import { Platforms } from "$lib/engines/platforms/index.js";
 import { Preview } from "$lib/engines/link-preview.js";
+import { Mentions } from "$lib/engines/mention.js";
 import { toMarkdown } from "$lib/helpers/markdown.js";
 
 const parser = new DOMParser();
@@ -24,24 +25,20 @@ Thread.ignoredPlatforms = new Set([
 ]);
 
 
-Thread.find = ( thread, index, platform ) => {
-  const row = thread?.[ index ] ?? []
-  const item = row.find( i => i.platform === platform );
-  return item;
-};
-
-Thread.findID = ( thread, id ) => {
-  for ( const row of thread ) {
-    for ( const item of row ) {
-      if ( item.id === id ) {
-        return item;
-      }
-    }
+Thread.splice = ( thread, item ) => {
+  const row = thread[ item.index ];
+  if ( row == null ) {
+    console.warn( "Failed to splice thread. row is not within current thread.");
+    return;
   }
 
-  // Like Array#find, returns undefined if it's not here.
-  return;
-}
+  const target = row.find( i => i.platform === item.platform );
+  if ( target == null ) {
+    console.warn( "Failed to splice thread. platform is not within current row.");
+  }
+
+  Object.assign( target, item );
+};
 
 
 Thread.parse = ( draft ) => {
@@ -92,13 +89,15 @@ Thread.parse = ( draft ) => {
     // Assemble the parts for this platform alongside the other platforms.
     let index = 0;
     for ( const part of parts ) {
+      const content = part.trim();
       const oldItem = Thread.find( old, index, platform );
       const item = { 
         id: threadpoints[ index ].id,
         index,
         platform, 
-        content: part.trim(), 
-        attachments: oldItem?.attachments ?? []
+        content,
+        attachments: oldItem?.attachments ?? [],
+        mentions: Mentions.parse( content, oldItem?.mentions )
       };
 
       Preview.decorateItem( item );
@@ -109,6 +108,10 @@ Thread.parse = ( draft ) => {
   }
 
   return results;
+};
+
+Thread.find = ( thread, index, platform ) => {
+  return thread?.[ index ]?.find( item => item.platform === platform );
 };
 
 
