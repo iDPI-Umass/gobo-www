@@ -255,6 +255,7 @@ Smalltown.validate = ( draft ) => {
 
   return true;
 };
+
 export {
   Smalltown
 }

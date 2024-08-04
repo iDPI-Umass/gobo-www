@@ -1,12 +1,19 @@
+import { Platforms } from "$lib/engines/mention/platforms/index.js"
 
 const Mention = {};
 
-Mention.make = ( name, index ) => {
-  return {
-    name,
-    index,
-    value: name
-  }
+Mention.make = ( platform, name, index ) => {
+  const Model = Platforms.get( platform )
+  const value =  Model.mentionFromName( name );
+  const type = Model.resolveType( value );
+  return { name, index, value, type };
+};
+
+Mention.update = ( mention, platform, value ) => {
+  value ??= "";
+  const Model = Platforms.get( platform );
+  mention.value = value
+  mention.type = Model.resolveType( value );
 };
 
 // Mention.render = ( mention ) => {
@@ -18,18 +25,13 @@ Mention.make = ( name, index ) => {
 //   }
 // };
 
-Mention.fromIndex = ( mentions, index ) => {
-  mentions ??= {};
-  return Object.values(mentions).find( mention => mention.index === index );
-}
-
 
 
 const Mentions = {};
 
-Mentions.regex = /@[^\s.,?!:;'"\(\)\[\]\{\}]*/g;
+Mentions.regex = /@([^\s,?!:;'"\(\)\[\]\{\}])*/g;
 
-Mentions.parse = ( content, previousMentions ) => {
+Mentions.parse = ( content, platform, previousMentions ) => {
   previousMentions ??= {}
   const matches = content.matchAll( Mentions.regex )
   const names = [];
@@ -54,7 +56,7 @@ Mentions.parse = ( content, previousMentions ) => {
     
     } else {
       // We're in the clear to make a default mention from scratch.
-      mentions[ name ] = Mention.make( name, index );
+      mentions[ name ] = Mention.make( platform, name, index );
     }
   }
 

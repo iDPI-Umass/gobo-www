@@ -1,6 +1,5 @@
-import { Platforms } from "$lib/engines/platforms/index.js";
 import { Preview } from "$lib/engines/link-preview.js";
-import { Mentions } from "$lib/engines/mention.js";
+import { Mentions } from "$lib/engines/mention/index.js";
 import { toMarkdown } from "$lib/helpers/markdown.js";
 
 const parser = new DOMParser();
@@ -97,7 +96,7 @@ Thread.parse = ( draft ) => {
         platform, 
         content,
         attachments: oldItem?.attachments ?? [],
-        mentions: Mentions.parse( content, oldItem?.mentions )
+        mentions: Mentions.parse( content, platform, oldItem?.mentions )
       };
 
       Preview.decorateItem( item );

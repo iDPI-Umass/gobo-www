@@ -2,7 +2,7 @@
   import MentionGroup from "$lib/components/new-post/mentions/MentionGroup.svelte";
   import { onMount } from "svelte";
   import { State } from "$lib/engines/draft.js";
-  import { Mentions as MentionsEngine } from "$lib/engines/mention.js";
+  import { Mentions as MentionsEngine } from "$lib/engines/mention/index.js";
 
   let threadMentions;
   const Render = State.make();

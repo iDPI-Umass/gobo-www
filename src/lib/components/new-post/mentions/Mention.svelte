@@ -9,7 +9,7 @@
   import { onMount } from "svelte";
   import { State, Options } from "$lib/engines/draft.js";
   import { Draft } from "$lib/engines/draft.js";
-  import { Mention } from "$lib/engines/mention.js";
+  import { Mention } from "$lib/engines/mention/index.js";
   import { Thread } from "$lib/engines/thread.js";
 
   export let threadItem;
@@ -22,19 +22,19 @@
   ];
 
   let mentionInput, suggestionBox;
-  let platform;
+  let platform, nameType;
   const Render = State.make();
   Render.cleanup = () => {
     platform = "";
+    nameType = "";
   };
 
-  Render.cycle = ( threadItem, indexes ) => {
-    platform = threadItem.platform
+  Render.initalize = ( threadItem, indexes ) => {
+    platform = threadItem.platform;
     const mention = threadItem.mentions[ indexes.name ];
-    if (mentionInput != null) {
-      mentionInput.value = mention?.value ?? "";
-    }
-  }
+    mentionInput.value = mention?.value ?? "";
+    nameType = mention?.type ?? "";
+  };
 
   const Handle = {};
 
@@ -51,32 +51,39 @@
   Handle.update = ( event ) => {
     const item = structuredClone( threadItem );
     const mention = item.mentions[ indexes.name ];
-    mention.value = event.target.value ?? "";
+    if (!mention) {
+      console.warn("trying to update mention that does not exist...")
+      return;
+    }
+
+    Mention.update( mention, platform, event.target.value );
 
     const thread = Draft.readAspect( "thread" );
     Thread.splice( thread, item );
     Draft.updateAspect( "thread", thread );
+    
+    nameType = mention?.type;
   };
  
 
   Render.reset();
   onMount(() => {
+    Render.initalize( threadItem, indexes );
     return () => {
       Render.reset();
     };
   });
-
-  $: Render.cycle( threadItem, indexes );
 </script>
 
 
 <section class="mention">
-  <div class="subheading">
-    <sl-icon 
-      src="/icons/{platform}.svg"
-      class={platform}>
-    </sl-icon>
-    <h4>{platform}</h4>
+  <sl-icon 
+    src="/icons/{platform}.svg"
+    class={platform}>
+  </sl-icon>
+
+  <div class="badge-spacer">
+    <div class="badge">{nameType}</div>
   </div>
 
   <sl-dropdown bind:this={suggestionBox} sync="width">
@@ -110,55 +117,66 @@
 
 <style>
   .mention {
-    margin-top: var(--gobo-height-spacer-half);
+    margin-top: var(--gobo-height-spacer);
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(--gobo-width-spacer-flex);
+    gap: 0.5rem var(--gobo-width-spacer-half);
+    width: 100%;
   }
 
-  .mention:first {
-    margin-top: 0;
+  .mention:first-of-type {
+    margin-top: var(--gobo-height-spacer-half);
   }
 
-  .mention .subheading {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    align-items: center;
-    margin-top: 0;
-  }
-
-  .mention .subheading sl-icon {
+  .mention sl-icon {
+    flex: 0 0 auto;
     font-size: 1.25rem;
-    margin-right: var(--gobo-width-spacer-half);
-    margin-bottom: 0;
+    margin: 0;
   }
 
-  .mention .subheading h4 {
-    margin: 0 !important;
+  .mention sl-dropdown {
+    flex: 1 1 100%;
   }
 
-  sl-input {
+  .mention sl-input {
     margin-top: 0;
-    z-index: 1
   }
 
-  sl-menu {
-    z-index: 5;
+  .mention .badge-spacer {
+    flex: 0 0 6rem;
+    display: flex;
   }
 
-  /* sl-input, sl-select {
-    margin-top: var(--gobo-height-spacer-flex);
+  .mention .badge-spacer .badge {
+    background-color: var(--gobo-color-null);
+    color: var(--gobo-color-text);
+    font-weight: var(--gobo-font-weight-black);
+    font-size: 14px;
+    padding: 0.25rem 0.5rem;
+    border-radius: 1rem;
   }
 
-  sl-select {
-    align-self: flex-start;
-    width: 12rem;
+  .mention .badge:empty {
+    display: none;
   }
 
-  sl-select::part(combobox) {
-    font-weight: var(--gobo-font-weight-medium);
-  } */
+  @media( min-width: 680px ) {
+    .mention {
+      flex-wrap: nowrap;
+    }
+    .mention sl-icon {
+      order: 0;
+    }
+
+    .mention sl-dropdown {
+      order: 1;
+      flex: 1 1 100%;
+    }
+
+    .mention .badge-spacer {
+      order: 2
+    }
+  }
+
 </style>
