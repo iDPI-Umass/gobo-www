@@ -55,7 +55,16 @@
       return;
     }
 
-    const html = toHTML( raw.content );
+    let html = toHTML( raw.content );
+    for ( const mention of Object.values(raw.mentions ?? {})) {
+      if ( mention.type === "handle" ) {
+        const target = `<a data-skip-glamor="true" href="#">${ mention.value }</a>`;
+        html = html.replaceAll( mention.name, target );
+      } else {
+        html = html.replaceAll( mention.name, mention.value );
+      }
+    }
+
     const dom = parser.parseFromString( `<div>${ html }</div>`, "text/html" );    
     const links = dom.querySelectorAll( "a" );
     
@@ -66,7 +75,9 @@
       links[0].remove();
     } else {  
       for ( const link of links ) {
-        link.text = Linkedin.urlGlamor( link.text );
+        if ( link.dataset.skipGlamor !== "true") {
+          link.text = Linkedin.urlGlamor( link.text );
+        }        
       }
     }
     

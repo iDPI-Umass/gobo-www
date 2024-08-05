@@ -52,12 +52,17 @@ Bluesky.contentLength = ( content ) => {
 // Bluesky truncates URLs into a "domain plus 16" format that will ellide
 // URLs that go over the limit while leaving short URLs unchanged.
 Bluesky.shortURL = ( _url ) => {
-  const url = new URL( _url );
-  const target = url.pathname + url.search + url.hash;
-  if ( target.length > 15 ) {
-    return url.host + target.slice( 0, 13 ) + "...";
+  try {
+    const url = new URL( _url );
+    const target = url.pathname + url.search + url.hash;
+    if ( target.length > 15 ) {
+      return url.host + target.slice( 0, 13 ) + "...";
+    }
+    return url.host + target;
+  
+  } catch (error) {
+    return _url
   }
-  return url.host + target;
 };
 
 // This is focused only on how URLs appear in the preview. Currently, it matches

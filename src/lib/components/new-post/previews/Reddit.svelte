@@ -59,8 +59,17 @@
 
   const Item = {};
 
-  Item.content = ( raw ) => {
-    content = toHTML( raw.content );
+  Item.content = ( raw ) => {    
+    let html = toHTML( raw.content );
+    for ( const mention of Object.values(raw.mentions ?? {})) {
+      if ( mention.type === "handle" ) {
+        const target = `<a data-skip-glamor="true" href="#">${ mention.value }</a>`;
+        html = html.replaceAll( mention.name, target );
+      } else {
+        html = html.replaceAll( mention.name, mention.value );
+      }
+    }
+    content = html;
   };
 
   Item.attachments = ( mediaFrame, raw ) => {    
