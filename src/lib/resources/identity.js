@@ -73,6 +73,18 @@ const list = App.unauthorized( async function () {
   return sort( identities );
 });
 
+// Only use GET if you're after the entire representation, including sensitive
+// values. It should only be needed in limited cases. Otherwise, use the 
+// abstractions built around treating identities as a collection.
+const get = App.unauthorized( async ( id ) => {
+  const client = await Gobo.get();
+  const identity = await client.personIdentity.get({ 
+    person_id: client.id,
+    id
+  });
+  return identity;
+});
+
 const remove = App.unauthorized( async function ( identity ) {
   const client = await Gobo.get();
   await client.personIdentity.delete( identity );
@@ -92,6 +104,7 @@ const setActiveState = async function ( identity ) {
 
 export {
   list,
+  get,
   remove,
   setActiveState
 }

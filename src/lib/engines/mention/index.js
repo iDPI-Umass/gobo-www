@@ -6,24 +6,25 @@ Mention.make = ( platform, name, index ) => {
   const Model = Platforms.get( platform )
   const value =  Model.mentionFromName( name );
   const type = Model.resolveType( value );
-  return { name, index, value, type };
+  return { platform, name, index, value, type };
 };
 
-Mention.update = ( mention, platform, value ) => {
+Mention.update = ( mention, value ) => {
   value ??= "";
-  const Model = Platforms.get( platform );
+  const Model = Platforms.get( mention.platform );
   mention.value = value
   mention.type = Model.resolveType( value );
 };
 
-// Mention.render = ( mention ) => {
-//   switch ( mention.selected ) {
-//     case "literal":
-//       return mention.name;
-//     default:
-//       throw new Error( `cannot render unknown mention selection "${mention.selected}"` );
-//   }
-// };
+Mention.getSuggestions = async ( mention, identity, query ) => {
+  const Model = Platforms.get( mention.platform );
+  try {
+    return await Model.getSuggestions( identity, query );
+  } catch ( error ) {
+    console.warn( error );
+    return [];
+  }
+};
 
 
 
@@ -81,20 +82,7 @@ Mentions.lookupName = ( mentions, index ) => {
 }
 
 
-
-const Autocomplete = {};
-
-Autocomplete.fetch = async () => {
-  return [
-    "David Smith",
-    "Dave Casey",
-    "Daniel Thomas"
-  ]
-};
-
-
 export {
   Mention,
-  Mentions,
-  Autocomplete
+  Mentions
 }

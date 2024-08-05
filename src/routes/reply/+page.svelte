@@ -120,5 +120,13 @@
   .gobo-form .panel :global(*):first-child {
     margin-top: 0;
   }
+
+  /**
+    TODO: We should probably rethink this entire "panel" approach with better
+    style control among internal components.
+  */
+  .gobo-form .panel :global(.spinner-box){
+    margin-top: var(--gobo-height-spacer-flex);
+  }
 </style>
 

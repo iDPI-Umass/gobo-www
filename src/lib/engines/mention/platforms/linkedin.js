@@ -36,6 +36,10 @@ Linkedin.resolveType = ( string ) => {
   }
 }
 
+Linkedin.getSuggestions = async ( identity, query ) => {
+  return [];
+};
+
 export {
   Linkedin
 }

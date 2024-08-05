@@ -32,6 +32,10 @@ Reddit.resolveType = ( string ) => {
   }
 }
 
+Reddit.getSuggestions = async ( identity, query ) => {
+  return [];
+};
+
 export {
   Reddit
 }

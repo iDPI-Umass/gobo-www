@@ -6,64 +6,100 @@
   import "@shoelace-style/shoelace/dist/components/dropdown/dropdown.js";
   import "@shoelace-style/shoelace/dist/components/menu/menu.js";
   import "@shoelace-style/shoelace/dist/components/menu-item/menu-item.js";
+  import Spinner from "$lib/components/primitives/Spinner.svelte";
   import { onMount } from "svelte";
   import { State, Options } from "$lib/engines/draft.js";
-  import { Draft } from "$lib/engines/draft.js";
+  import { Draft, Identity } from "$lib/engines/draft.js";
   import { Mention } from "$lib/engines/mention/index.js";
   import { Thread } from "$lib/engines/thread.js";
 
   export let threadItem;
   export let indexes;
 
-  const suggestionsSupported = [
+  const supported = [
     "bluesky",
     "mastodon",
     "smalltown"
   ];
 
   let mentionInput, suggestionBox;
-  let platform, nameType;
+  let scopedItem, mention; 
+  let platform, identity, nameType;
+  let state, suggestions, currentQuery;
   const Render = State.make();
   Render.cleanup = () => {
+    scopedItem = null;
+    mention = null;
     platform = "";
     nameType = "";
+
+    state = "loading";
+    suggestions = [];
+    currentQuery = "";
+  };
+
+  Render.suggestions = () => {
+
   };
 
   Render.initalize = ( threadItem, indexes ) => {
-    platform = threadItem.platform;
-    const mention = threadItem.mentions[ indexes.name ];
-    mentionInput.value = mention?.value ?? "";
-    nameType = mention?.type ?? "";
+    scopedItem = structuredClone( threadItem );
+    mention = scopedItem.mentions[ indexes.name ];
+    
+    platform = mention.platform;
+    identity = Identity.findActive( platform );
+    
+    nameType = mention.type;
+    mentionInput.value = mention.value;
+    suggestionBox.disabled = !supported.includes( platform );
   };
+
 
   const Handle = {};
 
-  Handle.focus = () => {
-    if ( suggestionsSupported.includes(threadItem?.platform) ) {
-      suggestionBox.active = true;
-    }
-  };
-
-  Handle.blur = () => {
-    suggestionBox.active = false;
-  }
-
-  Handle.update = ( event ) => {
-    const item = structuredClone( threadItem );
-    const mention = item.mentions[ indexes.name ];
-    if (!mention) {
-      console.warn("trying to update mention that does not exist...")
-      return;
-    }
-
-    Mention.update( mention, platform, event.target.value );
+  Handle.updateMention = ( value ) => {
+    Mention.update( mention, value );
+    nameType = mention?.type;
+    mentionInput.value = mention.value;
 
     const thread = Draft.readAspect( "thread" );
-    Thread.splice( thread, item );
+    Thread.splice( thread, scopedItem );
     Draft.updateAspect( "thread", thread );
-    
-    nameType = mention?.type;
   };
+
+  Handle.updateSuggestion = async ( query ) => {
+    currentQuery = query;
+    state = "loading";
+    suggestions = await Mention.getSuggestions( mention, identity, query );
+    state = "ready";
+  }
+
+  Handle.update = ( value ) => {
+    Handle.updateMention( value );
+    Handle.updateSuggestion( value );
+  };
+
+  Handle.input = ( event ) => {
+    if (suggestionBox.open !== true) {
+      suggestionBox.show();
+    }
+    Handle.update( event.target.value );
+  };
+
+  Handle.show = async () => {
+    if (currentQuery !== mentionInput.value) {
+      currentQuery = mentionInput.value;
+      Handle.updateSuggestion( mentionInput.value );
+    }
+  };
+
+  Handle.select = ( event ) => {
+    const id = event.detail.item.value;
+    const suggestion = suggestions.find( s => s.id === id )
+    if ( suggestion ) {
+      Handle.update( suggestion.handle )
+    }
+  }
  
 
   Render.reset();
@@ -86,21 +122,48 @@
     <div class="badge">{nameType}</div>
   </div>
 
-  <sl-dropdown bind:this={suggestionBox} sync="width">
+  <sl-dropdown 
+    bind:this={suggestionBox}
+    on:sl-show={Handle.show}
+    sync="width">
+    
     <div slot="trigger">
       <sl-input
         bind:this={mentionInput}
-        on:sl-input={Handle.update}
+        on:sl-input={Handle.input}
         name="mention"
         size="medium"
         pill>
       </sl-input>
     </div>
 
-    <sl-menu>
-      <sl-menu-item value="1">Option 1</sl-menu-item>
-      <sl-menu-item value="2">Option 2</sl-menu-item>
-      <sl-menu-item value="3">Option 3</sl-menu-item>
+    <sl-menu on:sl-select={Handle.select}>
+      {#if state === "ready"}
+        {#if suggestions.length === 0}
+          <div class="no-results">No Results</div>
+        {:else}
+          {#each suggestions as suggestion (suggestion.id)}
+            <sl-menu-item value={suggestion.id}>
+              <div class="menu-item">
+                {#if suggestion.avatar}
+                  <img 
+                    src={suggestion.avatar} 
+                    alt="profile picture for {suggestion.handle}"
+                  />
+                {/if}
+                <div class="names">
+                  <div class="display-name">{suggestion.displayName}</div>
+                  <div class="handle">{suggestion.handle}</div>
+                </div>
+              </div>
+            
+            </sl-menu-item>
+          {/each}
+        {/if}
+      {:else}
+        <Spinner/>
+      {/if} 
+
     </sl-menu>
     
   </sl-dropdown>
@@ -141,6 +204,49 @@
 
   .mention sl-input {
     margin-top: 0;
+  }
+
+  .mention sl-menu {
+    background-color: var(--gobo-color-panel);
+  }
+
+  .mention sl-menu .no-results {
+    margin: 0 var(--gobo-width-spacer-flex);
+  }
+
+  .mention sl-menu .menu-item {
+    display: flex;
+    align-items: center;
+  }
+
+  .mention sl-menu .menu-item img {
+    flex: 0 0 auto;
+    height: 2.25rem;
+    width: 2.25rem;
+    border-radius: 50%;
+    margin-right: var(--gobo-width-spacer-half);
+  }
+
+  .mention sl-menu .menu-item .names {
+    flex: 1 1 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mention sl-menu .menu-item .names .display-name {
+    width: 100%;
+    color: var(--gobo-color-text);
+    font-size: 1rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mention sl-menu .menu-item .handle {
+    width: 100%;
+    color: var(--gobo-color-text-muted);
+    font-size: 0.925rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .mention .badge-spacer {

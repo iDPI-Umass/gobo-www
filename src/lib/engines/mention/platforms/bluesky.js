@@ -1,3 +1,4 @@
+import { Bluesky as BlueskyClient } from "$lib/clients/bluesky/index.js";
 
 // Documentation here:
 // https://atproto.com/specs/handle#handle-identifier-syntax
@@ -30,6 +31,36 @@ Bluesky.resolveType = ( string ) => {
   } else {
     return "placeholder";
   }
+}
+
+
+let clientSingleton;
+
+Bluesky.getClient = ( identity ) => {
+  if (!clientSingleton) {
+    clientSingleton = BlueskyClient.create();
+  }
+  return clientSingleton;
+}
+
+Bluesky._getSuggestions = async ( identity, query ) => {
+  const client = Bluesky.getClient( identity );
+  return client.getAccountSuggestions( query );
+};
+
+Bluesky.getSuggestions = async ( identity, query ) => {
+  const { actors } = await Bluesky._getSuggestions( identity, query );
+  const output = [];
+  for ( const actor of actors ) {
+    output.push({
+      id: window.crypto.randomUUID(),
+      displayName: actor.displayName,
+      handle: "@" + actor.handle,
+      avatar: actor.avatar
+    });
+  }
+
+  return output;
 }
 
 export {

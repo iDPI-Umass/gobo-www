@@ -8,6 +8,8 @@ Smalltown.isHandle = Mastodon.isHandle;
 
 Smalltown.resolveType = Mastodon.resolveType;
 
+Smalltown.getSuggestions = Mastodon.getSuggestions;
+
 export {
   Smalltown
 }
