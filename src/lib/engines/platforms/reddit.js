@@ -28,8 +28,12 @@ Reddit.limits = {
   }
 };
 
-Reddit.contentLength = ( content ) => {
-  return content?.length ?? 0;
+Reddit.contentLength = ( threadItem ) => {
+  if ( threadItem?.content == null ) {
+    return 0;
+  }
+
+  return threadItem.content.length;
 };
 
 Reddit.buildItem = async ( draft, item ) => {
@@ -175,7 +179,7 @@ Reddit.validateOptions = ( draft ) => {
 Reddit.validateThreadElement = ( element ) => {
   const { index, content } = element;
   
-  if ( Reddit.contentLength(content) > Reddit.limits.characters ) {
+  if ( Reddit.contentLength(element) > Reddit.limits.characters ) {
     const number = new Intl.NumberFormat().format( Reddit.limits.characters );
     Draft.pushAlert(
       `Reddit does not accept posts with more than ${ number } characters. (post ${index + 1})`

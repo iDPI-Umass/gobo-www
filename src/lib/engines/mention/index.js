@@ -1,3 +1,4 @@
+import * as Type from "@dashkite/joy/type"
 import { Platforms } from "$lib/engines/mention/platforms/index.js"
 
 const Mention = {};
@@ -30,7 +31,15 @@ Mention.getSuggestions = async ( mention, identity, query ) => {
 
 const Mentions = {};
 
-Mentions.regex = /@([^\s,?!:;'"\(\)\[\]\{\}])*/g;
+Mentions.beforeBoundary = `(?<=[\\s,.?!¿¡‽:;'"()[\\]{}<>|]|^)`;
+Mentions.afterBoundary = `(?=[\\s,.?!¿¡‽:;'"()[\\]{}<>|]|$)`;
+Mentions.allowed = `[^\\s,?!¿¡‽:;'"()[\\]{}<>|]`;
+Mentions.buildRegex = ( core ) => {
+  const string = Mentions.beforeBoundary + core + Mentions.afterBoundary;
+  return new RegExp( string, "gu" );
+};
+
+Mentions.regex = Mentions.buildRegex( `@${ Mentions.allowed }*` );
 
 Mentions.parse = ( content, platform, previousMentions ) => {
   previousMentions ??= {}
@@ -80,6 +89,99 @@ Mentions.sort = ( mentions ) => {
 Mentions.lookupName = ( mentions, index ) => {
   return mentions?.[ index ]?.name ?? ""
 }
+
+
+/**
+ * This looks weird, but we have a tricky problem to solve:
+ * 1. Mentions have an appearance specific to the textarea HX
+ * 2. For each target platform, we want that to appear differently
+ * 
+ * Those are two different domain. In issuing a regex replacement, we need to
+ * avoid collisions across mentions *and* across domains represented by (1) and (2).
+ * 
+ * That's hard because we don't know how many there are or in what order
+ * they might appear. So this approach uses a third domain, a "shatter space"
+ * to keep intermediate string values safely organized in a way that's
+ * orthogonal to any pending string mutations.
+ * 
+ * So we transition fully from domain (1) into the shatter space, so we can
+ * get safe regex locks. That creates a tree of nested arrays containing
+ * string fragments.
+ * 
+ * Then we transition from shatter space int domain (2), reassembling the
+ * string with the desired replacement values.
+ */
+
+
+Mentions.split = ( shattered, regex ) => {
+  if ( Type.isString(shattered[0]) ) {
+    for (let i = 0; i < shattered.length; i++) {
+      const current = shattered[i];
+      console.log( current, current.split( regex ));
+      shattered[i] = current.split( regex );
+    }
+  } else {
+    for ( const item of shattered ) {
+      Mentions.split( item, regex )
+    }
+  }
+};
+
+Mentions.join = ( shattered, separator ) => {
+  if ( Type.isString(shattered[0][0]) ) {
+    for (let i = 0; i < shattered.length; i++) {
+      const current = shattered[i];
+      shattered[i] = current.join( separator );
+    }
+  } else {
+    for (const item of shattered) {
+      Mentions.join( item, separator );
+    }
+  }
+};
+
+Mentions.renderPlaintext = ( threadItem ) => {
+  const parts = [ threadItem?.content ?? '' ]
+  const values = []
+  for (const mention of Object.values(threadItem.mentions)) {
+    values.push( mention.value );
+    const regex = Mentions.buildRegex( mention.name );
+    console.log(JSON.stringify(parts, null, 2))
+    Mentions.split( parts, regex )
+  }
+  console.log(JSON.stringify(parts, null, 2))
+
+  for ( const value of values.reverse() ) {
+    Mentions.join( parts, value );
+  }
+
+  console.log(JSON.stringify(parts, null, 2))
+  return parts[0];
+};
+
+Mentions.renderHTML = ( threadItem, html ) => {
+  const parts = [ html ?? '' ]
+  const values = []
+  for (const mention of Object.values(threadItem.mentions)) {
+    if ( mention.type === "handle" ) {
+      values.push( `<a data-skip-glamor="true" href="#">${ mention.value }</a>` );
+    } else {
+      values.push( mention.value );
+    }
+    
+    const regex = Mentions.buildRegex( mention.name );
+    console.log(JSON.stringify(parts, null, 2))
+    Mentions.split( parts, regex )
+  }
+  console.log(JSON.stringify(parts, null, 2))
+
+  for ( const value of values.reverse() ) {
+    Mentions.join( parts, value );
+  }
+
+  console.log(JSON.stringify(parts, null, 2))
+  return parts[0];
+};
 
 
 export {

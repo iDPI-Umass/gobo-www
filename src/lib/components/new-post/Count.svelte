@@ -7,22 +7,30 @@
   import { State } from "$lib/engines/draft.js";
   import { Platforms } from "$lib/engines/platforms/index.js";
 
-  export let content;
-  export let platform;
+  export let threadItem;
   
-  let logo = Post.logo({ platform });
-  let Model = Platforms.get( platform );
-
+  let platform, logo, Model;
   let maximum, progress, remaining, tooMany;
   const Render = State.make();
   Render.cleanup = () => {
-    maximum = Model?.limits.characters ?? 1;
+    maximum = 1;
     remaining = maximum;
     tooMany = false;
   };
 
+  Render.initialize = () => {
+    platform = threadItem.platform;
+    logo = Post.logo({ platform });
+    Model = Platforms.get( platform );
+    maximum = Model?.limits.characters ?? 1;
+  }
+
   Render.count = () => {
-    const count = Model.contentLength( content );
+    if (!platform) {
+      return;
+    }
+
+    const count = Model.contentLength( threadItem );
     const ratio = Math.floor(100 * count / maximum );
     tooMany = ratio > 100;
     progress = Math.min( 100, ratio );
@@ -32,12 +40,13 @@
 
   Render.reset();
   onMount(() => {
+    Render.initialize();
     return () => {
       Render.reset();
     };
   });
 
-  $: Render.count( content );
+  $: Render.count( threadItem );
 </script>
 
 

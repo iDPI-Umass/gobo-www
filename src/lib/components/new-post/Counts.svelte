@@ -76,10 +76,7 @@
     <div class="wrapper">
       <div class="counts">
         {#each row as item, index (`${item.platform}${index}`)}
-          <Count
-            platform={item.platform} 
-            content={item.content}
-          />
+          <Count threadItem={item} />
         {/each}
       </div>
     </div>

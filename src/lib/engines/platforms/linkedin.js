@@ -91,21 +91,22 @@ Linkedin.urlGlamor = ( _url ) => {
 // From https://www.linkedin.com/help/linkedin/answer/a521889/short-urls-in-shared-posts
 // "When you share a link that's longer than 26 characters, we automatically 
 // shorten it once you click Post, to make it easier to read."
-Linkedin.contentLength = ( content ) => {
-  if ( content == null ) {
+Linkedin.contentLength = ( threadItem ) => {
+  if ( threadItem?.content == null ) {
     return 0;
   }
 
-  const links = linkify.find( content, "url" );
-  let removed = 0;
-  
+  const length = threadItem.content.length;
+  let surplus = 0;
+
+  const links = linkify.find( threadItem.content, "url" );  
   for ( const link of links ) {
     if ( link.href.length > 26 ) {
-      removed += link.href.length - 26;
+      surplus += link.href.length - 26;
     }
   }
   
-  return content.length - removed;
+  return length - surplus;
 };
 
 // TODO: There is a looming problem here on the visiblity question.
@@ -296,7 +297,7 @@ Linkedin.validateAttachments = ( draft ) => {
 Linkedin.validateThreadElement = ( element ) => {
   const { index, content } = element;
   
-  if ( Linkedin.contentLength(content) > Linkedin.limits.characters ) {
+  if ( Linkedin.contentLength(element) > Linkedin.limits.characters ) {
     const number = new Intl.NumberFormat().format( Linkedin.limits.characters );
     Draft.pushAlert(
       `LinkedIn does not accept posts with more than ${ number } characters. (post ${index + 1})`

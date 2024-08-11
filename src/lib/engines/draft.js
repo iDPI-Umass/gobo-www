@@ -47,6 +47,9 @@ Draft.make = () => {
 
 Draft.checkThread = ( draft ) => {
   draft.thread ??= [];
+  for ( const item of draft.thread ) {
+    item.mentions ??= {} 
+  }
 };
 
 Draft.reconcileAttachments = ( draft ) => {

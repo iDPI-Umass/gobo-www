@@ -4,6 +4,7 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import { onMount } from "svelte";
   import { State, Identity, Media } from "$lib/engines/draft.js";
+  import { Mentions } from "$lib/engines/mention/index.js";
   import { getConverter } from "$lib/helpers/markdown.js";
 
   export let threadItem;
@@ -61,14 +62,7 @@
 
   Item.content = ( raw ) => {    
     let html = toHTML( raw.content );
-    for ( const mention of Object.values(raw.mentions ?? {})) {
-      if ( mention.type === "handle" ) {
-        const target = `<a data-skip-glamor="true" href="#">${ mention.value }</a>`;
-        html = html.replaceAll( mention.name, target );
-      } else {
-        html = html.replaceAll( mention.name, mention.value );
-      }
-    }
+    html = Mentions.renderHTML( raw, html );
     content = html;
   };
 

@@ -68,6 +68,7 @@ const getConverter = ( platform ) => {
   }
 
   md.set({linkify: true})
+  md.linkify.add('mailto:', null) // disable matching on email links 
 
   md.use( mila, {
     attrs: {

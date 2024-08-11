@@ -7,6 +7,7 @@
   import { Source } from "$lib/engines/post";
   import { State, Identity, Media } from "$lib/engines/draft.js";
   import { Mastodon } from "$lib/engines/platforms/mastodon.js";
+  import { Mentions } from "$lib/engines/mention/index.js";
   import { getConverter } from "$lib/helpers/markdown.js";
 
   export let threadItem;
@@ -64,14 +65,7 @@
     }
 
     let html = toHTML( raw.content );
-    for ( const mention of Object.values(raw.mentions ?? {})) {
-      if ( mention.type === "handle" ) {
-        const target = `<a data-skip-glamor="true" href="#">${ mention.value }</a>`;
-        html = html.replaceAll( mention.name, target );
-      } else {
-        html = html.replaceAll( mention.name, mention.value );
-      }
-    }
+    html = Mentions.renderHTML( raw, html );
 
     const dom = parser.parseFromString( `<div>${ html }</div>`, "text/html" );    
     const links = dom.querySelectorAll( "a" );

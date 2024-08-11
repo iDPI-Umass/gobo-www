@@ -3,6 +3,7 @@ import { filesize } from "filesize";
 import { RichText, BskyAgent, UnicodeString } from "@atproto/api";
 import { Draft, Identity } from "$lib/engines/draft.js";
 import { DraftFile } from "$lib/engines/draft-file.js";
+import { Mentions } from "$lib/engines/mention/index.js";
 import { extract } from "./helpers.js";
 
 
@@ -23,27 +24,39 @@ Bluesky.limits = {
 
 Bluesky.agent = new BskyAgent({ service: "https://bsky.app" });
 
-Bluesky.contentLength = ( content ) => {
-  if ( content == null ) {
+
+// Bluesky uses what we're calling their "domain plus 16" format for URLs.
+// Bluesky uses the direct character count of mentions, but we'll need to render
+// the specific values into the underlying thread item's content.
+Bluesky.contentLength = ( threadItem ) => {
+  if ( threadItem?.content == null ) {
     return 0;
   }
 
-  const links = linkify.find( content, "url" );
-  let length = content.length;
+  let content = threadItem.content
+  // console.log(Mentions.renderPlaintext(threadItem));
+
+
+  let length = threadItem.content.length;
   let surplus = 0;
   
+  const links = linkify.find( threadItem.content, "url" );
   for ( const link of links ) {
     const url = new URL( link.href );
     if ( url.pathname.length > 16 ) {
       surplus += ( url.pathname.length - 16 );
     }
-    if ( link.value.startsWith("https://") ) {
-      surplus += 8;
-    }
-    else if ( link.value.startsWith("http://") ) {
-      surplus += 7;
-    }
+    // Capture protocol plus colon plus two forward slashes.
+    surplus += url.protocol.length + 2
   }
+
+  // const renderedString = content;
+  // for ( const mention of Object.values(threadItem.mentions)) {
+  //   if ( mention.type === "handle" ) {
+  //     renderedString.replaceAll( mention.name, mention.value );
+  //   }
+  // }
+  // const mentions = 
   
   return length - surplus;
 };
@@ -115,6 +128,20 @@ Bluesky.extractFacets = async ( content ) => {
   const rt = new RichText({ text: content });
   await rt.detectFacets( Bluesky.agent );
   let facets = rt.facets ?? [];
+  
+  // {
+  //   "$type": "app.bsky.richtext.facet",
+  //   "index": {
+  //       "byteStart": 3,
+  //       "byteEnd": 20
+  //   },
+  //   "features": [
+  //       {
+  //           "$type": "app.bsky.richtext.facet#mention",
+  //           "did": ""
+  //       }
+  //   ]
+  // }
   
   // Go through each facet and update the rich text instance.
   for ( const facet of facets ) {
@@ -229,7 +256,7 @@ Bluesky.validateAttachments = ( draft ) => {
 Bluesky.validateThreadElement = ( element ) => {
   const { index, content } = element;
   
-  if ( Bluesky.contentLength(content) > Bluesky.limits.characters ) {
+  if ( Bluesky.contentLength(element) > Bluesky.limits.characters ) {
     const number = new Intl.NumberFormat().format( Bluesky.limits.characters );
     Draft.pushAlert(
       `Bluesky does not accept posts with more than ${ number } characters. (post ${index + 1})`

@@ -61,19 +61,22 @@ Mastodon.urlGlamor = ( _url ) => {
 
 // From: https://docs.joinmastodon.org/user/posting/
 // "All links are counted as 23 characters, no matter how long they actually are"
-Mastodon.contentLength = ( content ) => {
-  const draft = Draft.read();
-  if ( content == null ) {
+// From: https://github.com/mastodon/mastodon/issues/12829
+// "domain names in mentions do not count at all."
+Mastodon.contentLength = ( threadItem ) => {
+  if ( threadItem?.content == null ) {
     return 0;
   }
 
-  const links = linkify.find( content, "url" );
-  let length = content.length;
+  const length = threadItem.content.length;
   let surplus = 0;
   
+  const links = linkify.find( threadItem.content, "url" );
   for ( const link of links ) {
     surplus -= 23 - link.href.length;
   }
+  
+  // const mentions = content.matchAll(//)
   
   return length - surplus;
 };
@@ -254,7 +257,7 @@ Mastodon.validateAttachments = ( draft ) => {
 Mastodon.validateThreadElement = ( element ) => {
   const { index, content } = element;
   
-  if ( Mastodon.contentLength(content) > Mastodon.limits.characters ) {
+  if ( Mastodon.contentLength(element) > Mastodon.limits.characters ) {
     const number = new Intl.NumberFormat().format( Mastodon.limits.characters );
     Draft.pushAlert(
       `Mastodon does not accept posts with more than ${ number } characters. (post ${index + 1})`
