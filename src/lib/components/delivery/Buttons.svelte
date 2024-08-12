@@ -24,10 +24,8 @@
   
   Handle.redraft = () => {
     const draft = Value.clone( delivery.draft.store );
-    draft.attachments = [];
-    for ( const file of delivery.files ) {
-      draft.attachments.push( DraftFile.make(file) );
-    }
+    draft.attachments = delivery.files;
+    Draft.reconcile( draft );
     Draft.update( draft );
     goto( "/new-post" );
   }

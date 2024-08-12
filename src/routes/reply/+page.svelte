@@ -3,6 +3,7 @@
   import Spinner from "$lib/components/primitives/Spinner.svelte";
   import Reference from "$lib/components/reply/Reference.svelte";
   import Body from "$lib/components/new-post/Body.svelte";
+  import Mentions from "$lib/components/new-post/mentions/Panel.svelte"
   import Options from "$lib/components/new-post/Options.svelte";
   import Alerts from "$lib/components/new-post/Alerts.svelte";
   import Publish from "$lib/components/reply/Publish.svelte";
@@ -59,6 +60,10 @@
 
       <section class="panel">
         <Body></Body>
+      </section>
+
+      <section class="panel">
+        <Mentions/>
       </section>
 
       <section class="panel">

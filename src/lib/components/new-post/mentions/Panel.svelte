@@ -14,17 +14,15 @@
   Render.mentions = async ( draft ) => {
     const list = [];
 
-    let displayIndex = 1;
     for (const threadRow of draft.thread ) {
-      const mentions = MentionsEngine.sort( threadRow[0]?.mentions );
+      const mentions = MentionsEngine.unroll( threadRow );
       for ( const mention of mentions ) {
+        const row = threadRow[0].index;
         const indexes = {
           name: mention.name,
-          mention: mention.index,
-          panel: `${threadRow[0].index}-${mention.index}-${mention.name}`,
-          display: displayIndex
+          row: row,
+          panel: `${row}-${mention.name}`,
         };
-        displayIndex++;
         list.push({ threadRow, indexes });
       }
     }

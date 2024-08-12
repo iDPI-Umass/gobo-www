@@ -4,6 +4,7 @@ import { RichText, BskyAgent, UnicodeString } from "@atproto/api";
 import { Draft, Identity } from "$lib/engines/draft.js";
 import { DraftFile } from "$lib/engines/draft-file.js";
 import { Mentions } from "$lib/engines/mention/index.js";
+import { Bluesky as BlueskyClient } from "$lib/clients/bluesky/index.js";
 import { extract } from "./helpers.js";
 
 
@@ -33,14 +34,11 @@ Bluesky.contentLength = ( threadItem ) => {
     return 0;
   }
 
-  let content = threadItem.content
-  // console.log(Mentions.renderPlaintext(threadItem));
-
-
-  let length = threadItem.content.length;
+  const content = Mentions.renderPlaintext( threadItem );
+  let length = content.length;
   let surplus = 0;
   
-  const links = linkify.find( threadItem.content, "url" );
+  const links = linkify.find( content, "url" );
   for ( const link of links ) {
     const url = new URL( link.href );
     if ( url.pathname.length > 16 ) {
@@ -50,14 +48,6 @@ Bluesky.contentLength = ( threadItem ) => {
     surplus += url.protocol.length + 2
   }
 
-  // const renderedString = content;
-  // for ( const mention of Object.values(threadItem.mentions)) {
-  //   if ( mention.type === "handle" ) {
-  //     renderedString.replaceAll( mention.name, mention.value );
-  //   }
-  // }
-  // const mentions = 
-  
   return length - surplus;
 };
 
@@ -89,9 +79,18 @@ Bluesky.findLink = ( facet ) => {
   return facet.features.find( f => f.$type === type );
 };
 
+Bluesky.findMention = ( facet ) => {
+  const type = "app.bsky.richtext.facet#mention";
+  return facet.features.find( f => f.$type === type );
+};
+
 Bluesky.isLink = ( facet ) => {
   return Bluesky.findLink( facet ) != null;
-}
+};
+
+Bluesky.isMention = ( facet ) => {
+  return Bluesky.findMention( facet ) != null;
+};
 
 Bluesky.shortenLink = ( rt, facet ) => {
   const { byteStart, byteEnd } = facet.index;
@@ -107,7 +106,41 @@ Bluesky.shortenLink = ( rt, facet ) => {
 
   // remove the old URL, now placed after the inserted short URL.
   rt.delete( byteStart + shortened.length, byteEnd + shortened.length );
-}
+};
+
+
+// {
+//   "$type": "app.bsky.richtext.facet",
+//   "index": {
+//       "byteStart": 3,
+//       "byteEnd": 20
+//   },
+//   "features": [
+//       {
+//           "$type": "app.bsky.richtext.facet#mention",
+//           "did": ""
+//       }
+//   ]
+// }
+Bluesky.applyMention = async ( rt, facet ) => {
+  const { byteStart, byteEnd } = facet.index;
+  const value = rt.unicodeText.slice( byteStart, byteEnd );
+  
+  // TODO: There is a CORS issue that's difficult to address between @atproto
+  // and Sveltekit. So we cannot automatically get the mention's DID when parsed.
+  // For now, we retrieve it ourselves.
+  const client = BlueskyClient.make();
+  try {
+    const response = await client.resolveHandle( value.slice(1) );
+    const feature = Bluesky.findMention( facet );
+    feature.did = response.did;
+  } catch {
+    // We pull double duty here. If we can't resolve the handle, then we're
+    // forced to proceed as a placeholder. Mark the facet for removal.
+    // TODO: We might want some sort of validation here.
+    facet.remove = true;
+  }
+};
 
 // TODO: Do we need to perform this extraction?
 // 1. We can hand-code what validation stuff we need, then use the Bluesky 
@@ -129,26 +162,22 @@ Bluesky.extractFacets = async ( content ) => {
   await rt.detectFacets( Bluesky.agent );
   let facets = rt.facets ?? [];
   
-  // {
-  //   "$type": "app.bsky.richtext.facet",
-  //   "index": {
-  //       "byteStart": 3,
-  //       "byteEnd": 20
-  //   },
-  //   "features": [
-  //       {
-  //           "$type": "app.bsky.richtext.facet#mention",
-  //           "did": ""
-  //       }
-  //   ]
-  // }
-  
   // Go through each facet and update the rich text instance.
   for ( const facet of facets ) {
     if ( Bluesky.isLink( facet )) {
       Bluesky.shortenLink( rt, facet );
+    } else if ( Bluesky.isMention( facet )) {
+      await Bluesky.applyMention( rt, facet );
     }
   }
+
+  const _facets = [];
+  for ( const facet of facets ) {
+    if ( !facet.remove ) {
+      _facets.push(facet)
+    }
+  }
+  facets = _facets;
 
   // Return the resulting text computation.
   return { facets, text: rt.text };
@@ -189,6 +218,7 @@ Bluesky.buildCard = async ( context ) => {
 };
 
 Bluesky.buildItem = async ( item ) => {
+  item.content = Mentions.renderPlaintext( item );
   const { facets, text } = await Bluesky.extractFacets( item.content );
   const linkCard = await Bluesky.buildCard( item.linkPreview );
 

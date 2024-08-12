@@ -114,6 +114,7 @@
     Render.listen( "identities", Render.identity );
     Render.listen( "options", Render.options );
     Render.listen( "attachments", Render.attachments );
+    Render.item( threadItem );
     return () => {
       Render.reset();
     }

@@ -5,7 +5,7 @@ class Mastodon {
     this.token = identity.oauth_token;
   }
 
-  static create( identity ) {
+  static make( identity ) {
     return new Mastodon( identity );
   }
 

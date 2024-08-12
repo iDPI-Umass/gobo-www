@@ -46,7 +46,7 @@ const queryCache = {};
 
 Mastodon.createClientInstance = async ( identity ) => {
   const fullIdentity = await IdentityHTTP.get( identity.id );
-  return MastodonClient.create( fullIdentity );
+  return MastodonClient.make( fullIdentity );
 };
 
 Mastodon.getClient = async ( identity ) => {

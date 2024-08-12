@@ -23,6 +23,7 @@
     logo = Post.logo({ platform });
     Model = Platforms.get( platform );
     maximum = Model?.limits.characters ?? 1;
+    Render.count();
   }
 
   Render.count = () => {

@@ -11,7 +11,7 @@
   import * as LS from "$lib/helpers/local-storage.js";
 
   let _feed;
-  let posts, state, scroll, styles;
+  let posts, state, scroll;
   const Render = State.make();
   Render.cleanup = () => {
     posts = [];

@@ -1,6 +1,7 @@
 import * as linkify from "linkifyjs";
 import { filesize } from "filesize";
-import { Draft, Identity, Media } from "$lib/engines/draft.js";
+import { Draft, Identity } from "$lib/engines/draft.js";
+import { Mentions } from "$lib/engines/mention/index.js";
 import { extract } from "./helpers.js";
 
 
@@ -96,10 +97,11 @@ Linkedin.contentLength = ( threadItem ) => {
     return 0;
   }
 
-  const length = threadItem.content.length;
+  const content = Mentions.renderPlaintext( threadItem );
+  const length = content.length;
   let surplus = 0;
 
-  const links = linkify.find( threadItem.content, "url" );  
+  const links = linkify.find( content, "url" );  
   for ( const link of links ) {
     if ( link.href.length > 26 ) {
       surplus += link.href.length - 26;
@@ -134,6 +136,7 @@ Linkedin.buildCard = async ( context ) => {
 };
 
 Linkedin.buildItem = async ( draft, item ) => {
+  item.content = Mentions.renderPlaintext( item );
   const linkCard = await Linkedin.buildCard( item.linkPreview );
   const visibility = Linkedin.buildVisibility( draft );
 

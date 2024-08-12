@@ -11,6 +11,7 @@
   import { State, Options } from "$lib/engines/draft.js";
   import { Draft, Identity } from "$lib/engines/draft.js";
   import { Mention } from "$lib/engines/mention/index.js";
+  import { Query } from "$lib/engines/mention/query.js";
   import { Thread } from "$lib/engines/thread.js";
 
   export let threadItem;
@@ -22,10 +23,10 @@
     "smalltown"
   ];
 
-  let mentionInput, suggestionBox;
+  let _mention, mentionInput, suggestionBox;
   let scopedItem, mention; 
   let platform, identity, nameType;
-  let state, suggestions, currentQuery;
+  let queryHandle, state, suggestions, currentQuery;
   const Render = State.make();
   Render.cleanup = () => {
     scopedItem = null;
@@ -33,13 +34,10 @@
     platform = "";
     nameType = "";
 
+    queryHandle = undefined;
     state = "loading";
     suggestions = [];
     currentQuery = "";
-  };
-
-  Render.suggestions = () => {
-
   };
 
   Render.initalize = ( threadItem, indexes ) => {
@@ -52,6 +50,17 @@
     nameType = mention.type;
     mentionInput.value = mention.value;
     suggestionBox.disabled = !supported.includes( platform );
+
+    queryHandle.listen();
+  };
+
+  Render.suggestionsIncoming = ( event ) => {
+    state = "loading";
+  }
+
+  Render.suggestions = ( event ) => {
+    suggestions = event.detail.suggestions;
+    state = "ready";
   };
 
 
@@ -69,10 +78,9 @@
 
   Handle.updateSuggestion = async ( query ) => {
     currentQuery = query;
-    state = "loading";
-    suggestions = await Mention.getSuggestions( mention, identity, query );
-    state = "ready";
-  }
+    queryHandle.query( query, 
+      Mention.getSuggestions( mention, identity, query ));
+  };
 
   Handle.update = ( value ) => {
     Handle.updateMention( value );
@@ -104,15 +112,21 @@
 
   Render.reset();
   onMount(() => {
+    queryHandle = Query.make({ element: _mention });
+    _mention.addEventListener( "gobo-mention-suggestions-incoming", Render.suggestionsIncoming );
+    _mention.addEventListener( "gobo-mention-suggestions", Render.suggestions );
     Render.initalize( threadItem, indexes );
     return () => {
+      _mention.removeEventListener( "gobo-mention-suggestions-incoming", Render.suggestionsIncoming );
+      _mention.removeEventListener( "gobo-mention-suggestions", Render.suggestions );
+      queryHandle.halt();
       Render.reset();
     };
   });
 </script>
 
 
-<section class="mention">
+<section class="mention" bind:this={_mention}>
   <sl-icon 
     src="/icons/{platform}.svg"
     class={platform}>
@@ -204,6 +218,11 @@
 
   .mention sl-input {
     margin-top: 0;
+    color: var(--gobo-color-text);
+  }
+
+  .mention sl-input::part(input) {
+    -webkit-text-fill-color: var(--gobo-color-text);
   }
 
   .mention sl-menu {

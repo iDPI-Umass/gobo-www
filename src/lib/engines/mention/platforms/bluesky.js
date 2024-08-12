@@ -38,7 +38,7 @@ let clientSingleton;
 
 Bluesky.getClient = ( identity ) => {
   if (!clientSingleton) {
-    clientSingleton = BlueskyClient.create();
+    clientSingleton = BlueskyClient.make();
   }
   return clientSingleton;
 }

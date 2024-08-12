@@ -5,9 +5,15 @@ const Mention = {};
 
 Mention.make = ( platform, name, index ) => {
   const Model = Platforms.get( platform )
-  const value =  Model.mentionFromName( name );
-  const type = Model.resolveType( value );
-  return { platform, name, index, value, type };
+  const value = Model.mentionFromName( name );
+  return { 
+    platform, 
+    name, 
+    index, 
+    value,
+    type: Model.resolveType( value ),
+    regex: Mentions.buildRegex( name ),
+  };
 };
 
 Mention.update = ( mention, value ) => {
@@ -73,43 +79,53 @@ Mentions.parse = ( content, platform, previousMentions ) => {
   return mentions;
 }
 
-Mentions.sort = ( mentions ) => {
-  mentions ??= {};
-  return Object.values(mentions).sort((A, B) => {
-    if ( A.index < B.index ) {
-      return -1;
+Mentions.unroll = ( threadRow ) => {
+  const seen = new Set();
+  const mentions = [];
+  for (const item of threadRow) {
+    for (const mention of Object.values(item.mentions)) {
+      const { name } = mention;
+      if ( !seen.has(name) ) {
+        seen.add( name );
+        mentions.push( mention );
+      }
     }
-    if ( A.index > B.index ) {
-      return 1;
-    }
-    return 0;
-  });
+  }
+  return mentions;
 }
 
-Mentions.lookupName = ( mentions, index ) => {
-  return mentions?.[ index ]?.name ?? ""
-}
+Mentions.fromValue = ( threadItem, value ) => {
+  if (threadItem?.mentions) {
+    return Object.values(threadItem.mentions).find( m => m.value === value );
+  }
+};
 
 
 /**
- * This looks weird, but we have a tricky problem to solve:
+ * This looks weird, but there is a problem here that, in its general form is tricky.:
  * 1. Mentions have an appearance specific to the textarea HX
  * 2. For each target platform, we want that to appear differently
  * 
- * Those are two different domain. In issuing a regex replacement, we need to
+ * Those are two different domains. In issuing a regex replacement, we need to
  * avoid collisions across mentions *and* across domains represented by (1) and (2).
  * 
- * That's hard because we don't know how many there are or in what order
- * they might appear. So this approach uses a third domain, a "shatter space"
- * to keep intermediate string values safely organized in a way that's
- * orthogonal to any pending string mutations.
+ * We can guard against that with careful regex building, and we do, but
+ * beware the general case. We don't know how many mentions there are or
+ * in what order they might appear. Or what features/formats we'll need to support.
  * 
- * So we transition fully from domain (1) into the shatter space, so we can
- * get safe regex locks. That creates a tree of nested arrays containing
- * string fragments.
+ * We can eliminate the need for cross-domain checks with the following:
  * 
- * Then we transition from shatter space int domain (2), reassembling the
- * string with the desired replacement values.
+ * - I'm calling this third domain a "shatter space" because it uses
+ *   String.prototype.split to create virtual placeholders that we don't need
+ *   to name. That space can expand indefinitely, and it's all orthogonal
+ *   to the collision concerns of (1) and (2).
+ * 
+ * - Transition fully from domain (1) into the shatter space, so we can
+ *   get safe regex locks. That creates a tree of nested arrays containing
+ *   string fragments.
+ * 
+ * - Then we transition from shatter space int domain (2), reassembling the
+ *   string with the desired replacement values.
  */
 
 
@@ -117,7 +133,6 @@ Mentions.split = ( shattered, regex ) => {
   if ( Type.isString(shattered[0]) ) {
     for (let i = 0; i < shattered.length; i++) {
       const current = shattered[i];
-      console.log( current, current.split( regex ));
       shattered[i] = current.split( regex );
     }
   } else {
@@ -146,16 +161,13 @@ Mentions.renderPlaintext = ( threadItem ) => {
   for (const mention of Object.values(threadItem.mentions)) {
     values.push( mention.value );
     const regex = Mentions.buildRegex( mention.name );
-    console.log(JSON.stringify(parts, null, 2))
     Mentions.split( parts, regex )
   }
-  console.log(JSON.stringify(parts, null, 2))
 
   for ( const value of values.reverse() ) {
     Mentions.join( parts, value );
   }
 
-  console.log(JSON.stringify(parts, null, 2))
   return parts[0];
 };
 
@@ -168,18 +180,13 @@ Mentions.renderHTML = ( threadItem, html ) => {
     } else {
       values.push( mention.value );
     }
-    
-    const regex = Mentions.buildRegex( mention.name );
-    console.log(JSON.stringify(parts, null, 2))
-    Mentions.split( parts, regex )
+    Mentions.split( parts, mention.regex )
   }
-  console.log(JSON.stringify(parts, null, 2))
 
   for ( const value of values.reverse() ) {
     Mentions.join( parts, value );
   }
 
-  console.log(JSON.stringify(parts, null, 2))
   return parts[0];
 };
 

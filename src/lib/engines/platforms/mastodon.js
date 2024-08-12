@@ -1,5 +1,6 @@
 import * as linkify from "linkifyjs";
 import { Draft, Identity } from "$lib/engines/draft.js";
+import { Mentions } from "$lib/engines/mention/index.js";
 import { extract } from "./helpers.js";
 
 
@@ -63,21 +64,32 @@ Mastodon.urlGlamor = ( _url ) => {
 // "All links are counted as 23 characters, no matter how long they actually are"
 // From: https://github.com/mastodon/mastodon/issues/12829
 // "domain names in mentions do not count at all."
+// Looks like everything after the second @ does not count.
 Mastodon.contentLength = ( threadItem ) => {
   if ( threadItem?.content == null ) {
     return 0;
   }
 
-  const length = threadItem.content.length;
+  const content = Mentions.renderPlaintext( threadItem );
+  const length = content.length;
   let surplus = 0;
   
-  const links = linkify.find( threadItem.content, "url" );
+  const links = linkify.find( content, "url" );
   for ( const link of links ) {
-    surplus -= 23 - link.href.length;
+    surplus += link.href.length - 23;
   }
   
-  // const mentions = content.matchAll(//)
-  
+  for (const mention of Object.values(threadItem.mentions) ) {
+    if ( mention.type !== "handle" ) {
+      continue;
+    }
+
+    const parts = mention.value.split( "@" );
+    if ( parts.length === 3 ) {
+      surplus += parts[2].length
+    }
+  } 
+
   return length - surplus;
 };
 
@@ -97,6 +109,7 @@ Mastodon.buildVisibility = ( draft ) => {
 };
 
 Mastodon.buildItem = async ( draft, item ) => {
+  item.content = Mentions.renderPlaintext( item );
   const visibility = Mastodon.buildVisibility( draft );
   const spoiler = draft.options.mastodon.spoilerText;
   const sensitive = draft.options.attachments.sensitive;

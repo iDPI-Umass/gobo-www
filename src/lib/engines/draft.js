@@ -2,6 +2,7 @@ import * as Value from "@dashkite/joy/value";
 import * as Type from "@dashkite/joy/type";
 import { Identity as IdentityEngine, Name } from "$lib/engines/identity.js";
 import { DraftFile } from "$lib/engines/draft-file.js"
+import { Mentions } from "$lib/engines/mention/index.js";
 import * as Post from "$lib/resources/post.js";
 import * as draftStores from "$lib/stores/draft.js";
 import * as LS from "$lib/helpers/local-storage.js";
@@ -47,8 +48,15 @@ Draft.make = () => {
 
 Draft.checkThread = ( draft ) => {
   draft.thread ??= [];
-  for ( const item of draft.thread ) {
-    item.mentions ??= {} 
+  for ( const row of draft.thread ) {
+    for (const item of row) {
+      item.mentions ??= {}
+      for (const mention of Object.values(item.mentions)) {
+        if (!Type.isRegExp(mention.regex)) {
+          mention.regex = Mentions.buildRegex( mention.name );
+        }
+      }
+    }
   }
 };
 
@@ -77,6 +85,11 @@ Draft.reconcileThreadAttachments = ( draft ) => {
   }
 }
 
+Draft.reconcile = ( draft ) => {
+  Draft.checkThread( draft );
+  Draft.reconcileAttachments( draft );
+  Draft.reconcileThreadAttachments( draft );
+};
 
 
 Draft.read = () => {
@@ -87,9 +100,7 @@ Draft.read = () => {
       singletonDraft = Draft.make();
     
     } else {        
-      Draft.checkThread( draft );
-      Draft.reconcileAttachments( draft );
-      Draft.reconcileThreadAttachments( draft );
+      Draft.reconcile( draft );
       singletonDraft = draft;
     }
   }

@@ -1,31 +1,11 @@
 import * as It from "@dashkite/joy/iterable";
 import * as Talos from "@dashkite/talos";
 
-/*
-Accept scroll events from the DOM and convert them into an event target that
-signals when additional resources should be added to the bottom of the
-scrollable element. 
-
-This is written to be resuable across needed contexts. As of this writing,
-those are the post and notificaiton feeds. But this formulation is flexible
-enough to describe the infinite scrolling HX pattern generally within
-Web browsers.
-*/
 
 const When = {};
 When.wait = ( talos, event ) => event.name === "wait";
 When.listen = ( talos, event ) => event.name === "listen";
-When.scroll = ( talos, event ) => event.name === "scroll";
-
-When.nearBottom = ( talos, event ) => {
-  if ( !When.scroll( talos, event )) {
-    return false;
-  }
-
-  const { element } = talos.context;
-  const current = element.scrollHeight - element.scrollTop;
-  return current < 3 * element.offsetHeight;
-};
+When.query = ( talos, event ) => event.name === "query";
 
 
 const Run = {};
@@ -34,24 +14,32 @@ Run.make = ( talos, event ) => {
   talos.context.element = event.element;
 };
 
-Run.emit = ( talos ) => {
+Run.emit = async ( talos, event ) => {
   const { element } = talos.context;
-  const detail = { marker: element.scrollHeight };
-  const event = new CustomEvent( "gobo-infinite-scroll", { detail });
-  element.dispatchEvent( event );
+  const { query, promise } = event;
+  const incoming = new CustomEvent( "gobo-mention-suggestions-incoming", { 
+    detail: { query }
+  });
+  element.dispatchEvent( incoming );
+  
+  const suggestions = await promise;
+  const payload = new CustomEvent( "gobo-mention-suggestions", { 
+    detail: { query, suggestions }
+  });
+  element.dispatchEvent( payload );
 };
 
 
-const machine = Talos.Machine.make( "infinite scroll", {
+const machine = Talos.Machine.make( "mention query", {
   start: {
     run: Run.make,
     move: "wait"
   },
   listen: {
     emit: {
-      when: When.nearBottom,
+      when: When.query,
       run: Run.emit,
-      move: "wait",
+      move: "listen",
     },
     wait: When.wait,
     default: "listen"
@@ -64,12 +52,9 @@ const machine = Talos.Machine.make( "infinite scroll", {
 
 
 
-// We can rely on Scroll.make's closure, along with the Talos context to
-// provide reuse without needing to go all the way to formal classes.
-const Scroll = {};
+const Query = {};
 
-Scroll.make = ({ element }) => {
-  // Setup the queue that will map incoming events into a reactor talos can consume.
+Query.make = ({ element }) => {
   const queue = It.Queue.create();
   const push = ( event ) => queue.enqueue( event );
   const wait = () => queue.dequeue();
@@ -100,7 +85,7 @@ Scroll.make = ({ element }) => {
     push,
     listen: () => push({ name: "listen" }),
     wait: () => push({ name: "wait" }),
-    event: ( event ) => push({ name: "scroll", event }),
+    query: ( query, promise ) => push({ name: "query", query, promise }),
     halt: () => push({ name: "halt" }),
   };
   
@@ -111,5 +96,5 @@ Scroll.make = ({ element }) => {
 
 
 export {
-  Scroll
+  Query
 }

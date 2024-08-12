@@ -1,4 +1,5 @@
 import { Draft, Identity } from "$lib/engines/draft.js";
+import { Mentions } from "$lib/engines/mention/index.js";
 import { extract } from "./helpers.js";
 
 
@@ -33,10 +34,12 @@ Reddit.contentLength = ( threadItem ) => {
     return 0;
   }
 
-  return threadItem.content.length;
+  const content = Mentions.renderPlaintext( threadItem );
+  return content.length;
 };
 
 Reddit.buildItem = async ( draft, item ) => {
+  item.content = Mentions.renderPlaintext( item );
   const title = draft.options.general.title;
   const subreddit = draft.options.reddit.subreddit;
   const spoiler = draft.options.reddit.spoiler;

@@ -1,5 +1,6 @@
 import { Draft, Identity } from "$lib/engines/draft.js";
 import { Mastodon } from "$lib/engines/platforms/mastodon.js";
+import { Mentions } from "$lib/engines/mention/index.js";
 import { extract } from "./helpers.js";
 
 
@@ -53,6 +54,7 @@ Smalltown.urlGlamor = Mastodon.urlGlamor;
 Smalltown.contentLength = Mastodon.contentLength;
 
 Smalltown.buildItem = async ( draft, item ) => {
+  item.content = Mentions.renderPlaintext( item );
   const spoiler = draft.options.mastodon.spoilerText;
   const sensitive = draft.options.attachments.sensitive;
 

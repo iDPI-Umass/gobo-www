@@ -8,15 +8,16 @@ class Bluesky {
     this.token = undefined;
   }
 
-  static create( identity ) {
+  static make( identity ) {
     return new Bluesky( identity );
   }
 
-  async _get( url, headers = {} ) {
+  async _get( url, headers = {}, overrides ) {
     const options = {
       method: "GET", 
-      headers
-    }
+      headers,
+      ...overrides
+    };
   
     const response = await fetch( url, options );
     if ( response.status !== 200 ) {
@@ -57,6 +58,29 @@ class Bluesky {
     };
   
     return this.get( url, headers );
+  }
+
+  async resolveHandle( handle ) {
+    if ( !handle ) {
+      return;
+    }
+
+    const path = '/xrpc/com.atproto.identity.resolveHandle'
+    const url = new URL( path, this.ORIGIN );
+    url.searchParams.set( "handle", handle );
+
+    const headers = {
+      accept: "application/json"
+    };
+
+    // We're getting an error stating that CORS headers are not set on this
+    // resource. So we need to put fetch into a different mode to successfully
+    // retrieve the DID for this account.
+    const overrides = {
+      mode: 'no-cors'
+    };
+
+    return this.get( url, headers, overrides );
   }
 }
 

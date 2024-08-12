@@ -133,6 +133,7 @@
     Render.listen( "identities", Render.identity );
     Render.listen( "options", Render.options );
     Render.listen( "attachments", Render.attachments );
+    Render.item( mediaFrame, threadItem );
     return () => {
       Render.reset();
     };
