@@ -8,7 +8,7 @@
   import { State, Draft } from "$lib/engines/draft.js";
   import { Thread } from "$lib/engines/thread.js";
 
-  export let placeholder = "Write your post";
+  export let placeholder = "Write your post! Use @ for mentions :)";
   export let content = "";
 
   export function addThreadpoint( platform ) {

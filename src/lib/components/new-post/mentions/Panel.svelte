@@ -46,6 +46,7 @@
 
 {#if threadMentions.length > 0}
   <h2>Mentions</h2>
+  <p class="help-text">Hint: you can choose to provide placeholder text instead of a handle. The @ will be replaced with the text you provide. If you choose to provide a placeholder and leave it blank, the mention will&nbsp;be&nbsp;deleted.</p>
 {/if}
 
 {#each threadMentions as {threadRow, indexes} (indexes.panel)}
@@ -69,5 +70,11 @@
     :global(.panel) {
       margin-top: 3rem;
     }
+  }
+
+  p.help-text {
+    margin: 0 !important;
+    font-size: var(--sl-input-help-text-font-size-medium) !important;
+    color: var(--sl-input-help-text-color) !important;
   }
 </style>
