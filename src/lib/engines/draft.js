@@ -50,12 +50,7 @@ Draft.checkThread = ( draft ) => {
   draft.thread ??= [];
   for ( const row of draft.thread ) {
     for (const item of row) {
-      item.mentions ??= {}
-      for (const mention of Object.values(item.mentions)) {
-        if (!Type.isRegExp(mention.regex)) {
-          mention.regex = Mentions.buildRegex( mention.name );
-        }
-      }
+      item.mentions ??= {};
     }
   }
 };

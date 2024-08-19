@@ -13,6 +13,7 @@
   import { Mention } from "$lib/engines/mention/index.js";
   import { Query } from "$lib/engines/mention/query.js";
   import { Thread } from "$lib/engines/thread.js";
+  import { bodyEvents } from "$lib/stores/draft.js";
 
   export let threadItem;
   export let indexes;
@@ -42,7 +43,7 @@
 
   Render.initalize = ( threadItem, indexes ) => {
     scopedItem = structuredClone( threadItem );
-    mention = scopedItem.mentions[ indexes.name ];
+    mention = scopedItem.mentions[ indexes.id ];
     
     platform = mention.platform;
     identity = Identity.findActive( platform );
@@ -107,7 +108,23 @@
     if ( suggestion ) {
       Handle.update( suggestion.handle )
     }
-  }
+  };
+
+  Handle.focus = () => {
+    const event = new CustomEvent( "focus-mention", { 
+      detail: { id: indexes.id }
+    });
+
+    bodyEvents.put( event );
+  };
+
+  Handle.blur = () => {
+    const event = new CustomEvent( "blur-mention", { 
+      detail: { id: indexes.id }
+    });
+    
+    bodyEvents.put( event );
+  };
  
 
   Render.reset();
@@ -132,10 +149,6 @@
     class={platform}>
   </sl-icon>
 
-  <div class="badge-spacer">
-    <div class="badge">{nameType}</div>
-  </div>
-
   <sl-dropdown 
     bind:this={suggestionBox}
     on:sl-show={Handle.show}
@@ -145,6 +158,8 @@
       <sl-input
         bind:this={mentionInput}
         on:sl-input={Handle.input}
+        on:sl-focus={Handle.focus}
+        on:sl-blur={Handle.blur}
         name="mention"
         size="medium"
         pill>
@@ -268,24 +283,6 @@
     text-overflow: ellipsis;
   }
 
-  .mention .badge-spacer {
-    flex: 0 0 6rem;
-    display: flex;
-  }
-
-  .mention .badge-spacer .badge {
-    background-color: var(--gobo-color-null);
-    color: var(--gobo-color-text);
-    font-weight: var(--gobo-font-weight-black);
-    font-size: 14px;
-    padding: 0.25rem 0.5rem;
-    border-radius: 1rem;
-  }
-
-  .mention .badge:empty {
-    display: none;
-  }
-
   @media( min-width: 680px ) {
     .mention {
       flex-wrap: nowrap;
@@ -297,10 +294,6 @@
     .mention sl-dropdown {
       order: 1;
       flex: 1 1 100%;
-    }
-
-    .mention .badge-spacer {
-      order: 2
     }
   }
 

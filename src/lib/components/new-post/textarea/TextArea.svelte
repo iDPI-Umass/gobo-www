@@ -2,11 +2,14 @@
   import { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
   import { Essentials } from "@ckeditor/ckeditor5-essentials";
   import { Paragraph } from "@ckeditor/ckeditor5-paragraph";
-  import { Threadpoint } from "$lib/components/new-post/textarea/threadpoint.js";
   import { ResizableHeight } from "$lib/components/new-post/textarea/resizable-height.js";
-  import { onMount, tick } from "svelte";
+  import { Threadpoint } from "$lib/components/new-post/textarea/threadpoint.js";
+  import { Mention } from "$lib/components/new-post/textarea/mention.js";
+  import { onMount } from "svelte";
+  import { State as EventState } from "$lib/engines/store.js";
   import { State, Draft } from "$lib/engines/draft.js";
   import { Thread } from "$lib/engines/thread.js";
+  import { bodyEvents } from "$lib/stores/draft.js";
 
   export let placeholder = "Write your post! Use @ for mentions :)";
   export let content = "";
@@ -23,6 +26,7 @@
 
   let anchor, editor, platforms;
   const Render = State.make();
+  const Event = EventState.make();
   
   Render.cleanup = () => {
     platforms = [];
@@ -39,7 +43,8 @@
         Essentials,
         Paragraph,
         ResizableHeight,
-        Threadpoint
+        Threadpoint,
+        Mention,
       ],
       placeholder: placeholder,
       ui: {
@@ -52,6 +57,7 @@
       }
     });
 
+    editor.editing.view.document.on( "keydown", Handle.mentionCreation );
     editor.model.document.on( "change:data", Handle.content );
     editor.setData( content ?? "" );
   };
@@ -65,6 +71,32 @@
 
   const Handle = {};
 
+  Handle.mentionCreation = ( event, data ) => {
+    if ( data.domEvent.key === "@" ) {
+      event.stop();
+      data.preventDefault();
+      editor.execute( "add-mention", {} );
+    }
+  };
+
+  Handle.bodyEvents = ( event ) => {
+    switch (event.type) {
+      case "focus-mention": {
+        editor.execute( "focus-mention", event.detail );
+        break;
+      }
+
+      case "blur-mention": {
+        editor.execute( "blur-mention", event.detail );
+        break;
+      }
+
+      default: {
+        console.warning( "got unknown body event", event )
+      }
+    }
+  };
+
   Handle.content = () => {
     const content = editor.getData();
     let draft = Draft.updateAspect( "content", content );
@@ -76,7 +108,9 @@
   Render.reset();
   onMount(() => {
     Render.area();
+    Event.listen( bodyEvents, Handle.bodyEvents );
     return () => {
+      Event.reset();
       Render.reset();
     };
   });
@@ -135,5 +169,16 @@
     height: 21px;
   }
 
+  :global(.ck.ck-content.ck-editor__editable .mention) {
+    cursor: pointer;
+    padding: 0 0.25rem;
+    display: inline-flex;
+    align-items: center;
+    height: 21px;
+  }
 
+  :global(.ck.ck-content.ck-editor__editable .mention[data-focus="true"]) {
+    background-color: var(--gobo-color-primary);
+    border-radius: 0.2rem;
+  }
 </style>

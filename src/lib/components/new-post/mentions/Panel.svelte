@@ -16,14 +16,17 @@
 
     for (const threadRow of draft.thread ) {
       const mentions = MentionsEngine.unroll( threadRow );
+      let displayIndex = 1;
       for ( const mention of mentions ) {
         const row = threadRow[0].index;
         const indexes = {
-          name: mention.name,
-          row: row,
-          panel: `${row}-${mention.name}`,
+          row,
+          displayIndex,
+          id: mention.id,
+          panel: `${row}-${mention.id}`,
         };
         list.push({ threadRow, indexes });
+        displayIndex++;
       }
     }
 
@@ -31,7 +34,6 @@
   };
 
 
-  const Handle = {};
 
  
   Render.reset();

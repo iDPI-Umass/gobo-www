@@ -22,6 +22,7 @@ const reply = createStore();
 const quote = createStore();
 const options = createStore();
 const alerts = createStore();
+const bodyEvents = createStore();
 
 export {
   content,
@@ -31,5 +32,6 @@ export {
   reply,
   quote,
   options,
-  alerts
+  alerts,
+  bodyEvents
 }

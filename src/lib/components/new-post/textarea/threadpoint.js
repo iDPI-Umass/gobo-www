@@ -1,5 +1,3 @@
-import { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
-import { Essentials } from "@ckeditor/ckeditor5-essentials";
 import { Command, Plugin } from "@ckeditor/ckeditor5-core";
 import DomEventObserver from "@ckeditor/ckeditor5-engine/src/view/observer/domeventobserver";
 import { 
@@ -8,7 +6,6 @@ import {
   viewToModelPositionOutsideModelElement
 } from "@ckeditor/ckeditor5-widget";
 
-// editor.execute("add-threadpoint", {value: "bluesky"})
 
 const Helpers = {};
 
@@ -67,10 +64,10 @@ class RemoveThreadpointCommand extends Command {
 
 
 Helpers.matchThreadpoint = ( editor, target ) => {
-  if ( target.hasClass("threadpoint") ) {
+  if ( target?.hasClass("threadpoint") ) {
     return editor.editing.mapper.toModelElement( target );
   }
-  if ( target.parent.hasClass("threadpoint") ) {
+  if ( target?.parent?.hasClass("threadpoint") ) {
     return editor.editing.mapper.toModelElement( target.parent );
   }
   return;
@@ -111,8 +108,6 @@ export default class ThreadpointEditing extends Plugin {
         editor.execute( "remove-threadpoint", { target: match });
       }
     });
-
-    window.editor = editor;
   }
 
   _defineSchema() {

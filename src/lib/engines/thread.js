@@ -1,9 +1,9 @@
 import { Preview } from "$lib/engines/link-preview.js";
-import { Mentions } from "$lib/engines/mention/index.js";
+import { Mentions, Mention } from "$lib/engines/mention/index.js";
 import { toMarkdown } from "$lib/helpers/markdown.js";
 
 const parser = new DOMParser();
-const DELIMITER = "GOBO-THREADPOINT--";
+const DELIMITER = "--GOBO-THREADPOINT--";
 
 const Thread = {};
 
@@ -41,11 +41,21 @@ Thread.splice = ( thread, item ) => {
 
 
 Thread.parse = ( draft ) => {
-  const old = draft.thread;
+  const existingThread = draft.thread;
   const raw = draft.content;
+
+  const existingMentions = {};
+  for ( const row of existingThread ) {
+    for ( const item of row ) {
+      existingMentions[ item.platform ] ??= {};
+      for ( const mention of Object.values(item.mentions) ) {
+        existingMentions[ item.platform ][ mention.id ] = mention;
+      }
+    }
+  }
+
+  const thread = [];
   const platforms = Thread.getPlatforms( draft );
-  
-  const results = [];
   for ( const platform of platforms ) {
     const dom = parser.parseFromString( 
       `<div id='outermost'> ${raw} </div>`, 
@@ -60,19 +70,27 @@ Thread.parse = ( draft ) => {
       el.remove();
     }
 
-    // Now gather matching threadpoints
-    const matches = dom.querySelectorAll( "span.threadpoint" );
+    // Now gather matching threadpoint spans
+    const threadpointElements = dom.querySelectorAll( "span.threadpoint" );
     
     // Save the attachment metadata we store on the threadponts.
     const threadpoints = [];
     threadpoints.push({ id: "head" });
-    for ( const el of matches ) {
+    for ( const el of threadpointElements ) {
       threadpoints.push({ id: el.dataset.id });
     }
     
     // Convert the threadpoints into plaintext-compatible delimiters.
-    for ( const el of matches ) {
+    for ( const el of threadpointElements ) {
       el.innerHTML = DELIMITER;      
+    }
+
+    // Now gather mention spans
+    const mentionElements = dom.querySelectorAll( "span.mention" ); 
+    
+    // Convert the mentions unique references we can parse from plaintext.
+    for (const el of mentionElements ) {
+      el.innerHTML = `mention:${ el.dataset.id }`
     }
 
     // Now get back the modified HTML.
@@ -88,25 +106,28 @@ Thread.parse = ( draft ) => {
     // Assemble the parts for this platform alongside the other platforms.
     let index = 0;
     for ( const part of parts ) {
+      const existingItem = Thread.find( existingThread, index, platform );
       const content = part.trim();
-      const oldItem = Thread.find( old, index, platform );
+      const mentionIDs = Mentions.parse( content );
+      const mentions = Mentions.preserveExisting( platform, existingMentions, mentionIDs );
+      
       const item = { 
         id: threadpoints[ index ].id,
         index,
         platform, 
         content,
-        attachments: oldItem?.attachments ?? [],
-        mentions: Mentions.parse( content, platform, oldItem?.mentions )
+        attachments: existingItem?.attachments ?? [],
+        mentions,
       };
 
       Preview.decorateItem( item );
-      results[ index ] ??= [];
-      results[ index ].push( item );
+      thread[ index ] ??= [];
+      thread[ index ].push( item );
       index++;
     }
   }
 
-  return results;
+  return thread;
 };
 
 Thread.find = ( thread, index, platform ) => {

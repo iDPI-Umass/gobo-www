@@ -17,7 +17,7 @@
   Render.cycle = ( threadRow, _indexes ) => {
     const list = [];
     for ( const threadItem of threadRow ) {
-      if ( threadItem.mentions[_indexes.name] == null ) {
+      if ( threadItem.mentions[_indexes.id] == null ) {
         continue;
       }
       const indexes = structuredClone( _indexes );
@@ -26,10 +26,10 @@
     }
 
     displayIndex = _indexes.row + 1;
-    displayName = _indexes.name;
+    displayName = `Mention ${_indexes.displayIndex}`;
     groupList = list;
   };
- 
+
 
   Render.reset();
   onMount(() => {
@@ -44,11 +44,11 @@
 
 <section class="mention-group">
   <div class="subheading">
-    <h3>Post {displayIndex}: {displayName}</h3>
+    <h3>Post {displayIndex}, {displayName}</h3>
   </div>
 
   {#each groupList as { threadItem, indexes } (indexes.group)}
-    <Mention 
+    <Mention
       {threadItem}
       {indexes}
     />

@@ -3,16 +3,14 @@ import { Platforms } from "$lib/engines/mention/platforms/index.js"
 
 const Mention = {};
 
-Mention.make = ( platform, name, index ) => {
+Mention.make = ( platform, id ) => {
   const Model = Platforms.get( platform )
-  const value = Model.mentionFromName( name );
+  const value = "@"
   return { 
     platform, 
-    name, 
-    index, 
+    id,
     value,
     type: Model.resolveType( value ),
-    regex: Mentions.buildRegex( name ),
   };
 };
 
@@ -37,43 +35,28 @@ Mention.getSuggestions = async ( mention, identity, query ) => {
 
 const Mentions = {};
 
-Mentions.beforeBoundary = `(?<=[\\s,.?!¿¡‽:;'"()[\\]{}<>|]|^)`;
-Mentions.afterBoundary = `(?=[\\s,.?!¿¡‽:;'"()[\\]{}<>|]|$)`;
-Mentions.allowed = `[^\\s,?!¿¡‽:;'"()[\\]{}<>|]`;
-Mentions.buildRegex = ( core ) => {
-  const string = Mentions.beforeBoundary + core + Mentions.afterBoundary;
-  return new RegExp( string, "gu" );
+// Match on v4 UUID we get from the Crypto API (with type prefix).
+Mentions.regex = /mention:([a-fA-F0-9-]{36})/g;
+
+Mentions.parse = ( content ) => {
+  const matches = content.matchAll( Mentions.regex )
+  const ids = [];
+  for ( const matchArray of matches ) {
+    ids.push( matchArray[1] );
+  }
+  return ids;
 };
 
-Mentions.regex = Mentions.buildRegex( `@${ Mentions.allowed }*` );
-
-Mentions.parse = ( content, platform, previousMentions ) => {
-  previousMentions ??= {}
-  const matches = content.matchAll( Mentions.regex )
-  const names = [];
-  for ( const matchArray of matches ) {
-    names.push( matchArray[0] );
+Mentions.preserveExisting = ( platform, existingMentions, mentionIDs ) => {
+  const mentions = {};
+  if ( mentionIDs.length === 0 ) {
+    return mentions;
   }
 
-  const mentions = {};
-  for ( const [ index, name ] of names.entries() ) {
-    const current = mentions[ name ];
-    if ( current != null ) {
-      // By fiat, duplicate mentions share their configuration.
-      continue;
-    }
-
-    const previous = structuredClone( previousMentions[name] )
-    if ( previous != null ) {
-      // We want to retain the configuration of previously existing mentions,
-      // but we need to adjust their index to capture order changes.
-      previous.index = index;
-      mentions[ name ] = previous;
-    
-    } else {
-      // We're in the clear to make a default mention from scratch.
-      mentions[ name ] = Mention.make( platform, name, index );
-    }
+  const existing = existingMentions[ platform ] ?? {};
+  
+  for ( const id of mentionIDs ) {
+    mentions[ id ] = existing[ id ] ?? Mention.make( platform, id );
   }
 
   return mentions;
@@ -84,9 +67,9 @@ Mentions.unroll = ( threadRow ) => {
   const mentions = [];
   for (const item of threadRow) {
     for (const mention of Object.values(item.mentions)) {
-      const { name } = mention;
-      if ( !seen.has(name) ) {
-        seen.add( name );
+      const { id } = mention;
+      if ( !seen.has(id) ) {
+        seen.add( id );
         mentions.push( mention );
       }
     }
@@ -156,38 +139,40 @@ Mentions.join = ( shattered, separator ) => {
 };
 
 Mentions.renderPlaintext = ( threadItem ) => {
-  const parts = [ threadItem?.content ?? '' ]
-  const values = []
-  for (const mention of Object.values(threadItem.mentions)) {
-    values.push( mention.value );
-    const regex = Mentions.buildRegex( mention.name );
-    Mentions.split( parts, regex )
-  }
+  // const parts = [ threadItem?.content ?? '' ]
+  // const values = []
+  // for (const mention of Object.values(threadItem.mentions)) {
+  //   values.push( mention.value );
+  //   const regex = Mentions.buildRegex( mention.name );
+  //   Mentions.split( parts, regex )
+  // }
 
-  for ( const value of values.reverse() ) {
-    Mentions.join( parts, value );
-  }
+  // for ( const value of values.reverse() ) {
+  //   Mentions.join( parts, value );
+  // }
 
-  return parts[0];
+  // return parts[0];
+  return ""
 };
 
 Mentions.renderHTML = ( threadItem, html ) => {
-  const parts = [ html ?? '' ]
-  const values = []
-  for (const mention of Object.values(threadItem.mentions)) {
-    if ( mention.type === "handle" ) {
-      values.push( `<a data-skip-glamor="true" href="#">${ mention.value }</a>` );
-    } else {
-      values.push( mention.value );
-    }
-    Mentions.split( parts, mention.regex )
-  }
+  // const parts = [ html ?? '' ]
+  // const values = []
+  // for (const mention of Object.values(threadItem.mentions)) {
+  //   if ( mention.type === "handle" ) {
+  //     values.push( `<a data-skip-glamor="true" href="#">${ mention.value }</a>` );
+  //   } else {
+  //     values.push( mention.value );
+  //   }
+  //   Mentions.split( parts, mention.regex )
+  // }
 
-  for ( const value of values.reverse() ) {
-    Mentions.join( parts, value );
-  }
+  // for ( const value of values.reverse() ) {
+  //   Mentions.join( parts, value );
+  // }
 
-  return parts[0];
+  // return parts[0];
+  return ""
 };
 
 
