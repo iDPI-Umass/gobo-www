@@ -13,7 +13,7 @@
 const Reddit = {};
 
 Reddit.mentionFromName = ( name = "" ) => {
-  if (name.startsWith('@')) {
+  if ( name.startsWith('@') ) {
     return 'u/' + name.slice(1);
   } else {
     return 'u/' + name;

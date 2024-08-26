@@ -90,7 +90,7 @@
     nameType = mention?.type;
 
     const thread = Draft.readAspect( "thread" );
-    Thread.splice( thread, scopedItem );
+    Thread.updateMention( thread, scopedItem, mention );
     Draft.updateAspect( "thread", thread );
   };
 
@@ -100,34 +100,20 @@
       Mention.getSuggestions( mention, identity, query ));
   };
 
-  Handle.matchMentionEvent = ( event ) => {
-    return (event.type === "focus-mention") &&
-      (event.detail.id === indexes.id) &&
-      (threadItem.platform === indexes.firstPlatform);
+  Handle.updateInput = ( value ) => {
+    mentionInput.value = value;
   };
 
-  // This is very suspicious. Why isn't the underlying input field ready?
-  // The Svelte component is mounted because this gets called from onMount.
-  // The Shoelace component exists because it successfully knows about the
-  // method focus. But the input is not registered with the Shoelace component,
-  // or at least input.input is undefined until we try again.
-  Handle.mentionEvents = async ( event, count ) => {
-    count ??= 0;
+  Handle.update = ( value ) => {
+    Handle.updateMention( value );
+    Handle.updateSuggestion( value );
+  };
 
-    if ( Handle.matchMentionEvent(event) ) {
-      try {
-        mentionInput.focus();
-      } catch {
-        if (count > 3) {
-          console.warn('failed to focus mention input');
-          return;
-        }
-        await Time.sleep(100);
-        count++;
-        Handle.mentionEvents( event, count );
-      }
-      mentionEvents.put( null );
+  Handle.input = ( event ) => {
+    if (suggestionBox.open !== true) {
+      suggestionBox.show();
     }
+    Handle.update( event.target.value );
   };
 
   Handle.arrowKeys = [
@@ -152,22 +138,6 @@
     if ( Handle.arrowKeys.includes(event.key) ) {
       suggestionBox.show();
     }
-  };
-
-  Handle.updateInput = ( value ) => {
-    mentionInput.value = value;
-  };
-
-  Handle.update = ( value ) => {
-    Handle.updateMention( value );
-    Handle.updateSuggestion( value );
-  };
-
-  Handle.input = ( event ) => {
-    if (suggestionBox.open !== true) {
-      suggestionBox.show();
-    }
-    Handle.update( event.target.value );
   };
 
   Handle.show = async () => {
@@ -200,6 +170,36 @@
     });
     
     bodyEvents.put( event );
+  };
+
+  Handle.matchMentionEvent = ( event ) => {
+    return (event.type === "focus-mention") &&
+      (event.detail.id === indexes.id) &&
+      (threadItem.platform === indexes.firstPlatform);
+  };
+
+  // This is very suspicious. Why isn't the underlying input field ready?
+  // The Svelte component is mounted because this gets called from onMount.
+  // The Shoelace component exists because it successfully knows about the
+  // method focus. But the input is not registered with the Shoelace component,
+  // or at least input.input is undefined until we try again.
+  Handle.mentionEvents = async ( event, count ) => {
+    count ??= 0;
+
+    if ( Handle.matchMentionEvent(event) ) {
+      try {
+        mentionInput.focus();
+      } catch {
+        if (count > 3) {
+          console.warn('failed to focus mention input');
+          return;
+        }
+        await Time.sleep(100);
+        count++;
+        Handle.mentionEvents( event, count );
+      }
+      mentionEvents.put( null );
+    }
   };
  
 

@@ -38,8 +38,18 @@
         continue
       }
       const icon = document.createElement( "gobo-replace-span" );
+      icon.classList.add( "content" );
       icon.classList.add( platform );
       icon.setAttribute( "src", `/icons/${platform}.svg` );
+      el.appendChild( icon );
+    }
+
+    const mentions = dom.querySelectorAll( "span.mention" );
+    for ( const el of mentions ) {
+      const icon = document.createElement( "gobo-replace-span" );
+      icon.classList.add( "content" );
+      icon.classList.add( "filled" );
+      icon.setAttribute( "src", `/icons/at.svg` );
       el.appendChild( icon );
     }
 
@@ -75,4 +85,13 @@
 
 
 <style>
+  :global(sl-icon.content) {
+    padding: 0.1rem 0.25rem;
+    border-radius: 0.25rem;
+    margin-bottom: -0.2rem;
+  }
+
+  :global(sl-icon.content.filled) {
+    background: var(--gobo-color-primary);
+  }
 </style>

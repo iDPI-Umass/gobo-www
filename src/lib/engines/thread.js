@@ -39,6 +39,21 @@ Thread.splice = ( thread, item ) => {
   Object.assign( target, item );
 };
 
+Thread.updateMention = ( thread, item, mention ) => {
+  const row = thread[ item.index ];
+  if ( row == null ) {
+    console.warn( "Failed to splice thread. row is not within current thread.");
+    return;
+  }
+
+  const target = row.find( i => i.platform === item.platform );
+  if ( target == null ) {
+    console.warn( "Failed to splice thread. platform is not within current row.");
+  }
+
+  target.mentions[ mention.id ] = mention;
+};
+
 
 Thread.parse = ( draft ) => {
   const existingThread = draft.thread;

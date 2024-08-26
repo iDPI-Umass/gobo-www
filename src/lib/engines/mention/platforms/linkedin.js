@@ -20,8 +20,14 @@
 
 const Linkedin = {};
 
+// We can't currently provide first-class LinkedIn mentions, so we want avoid 
+// using the @ symbol until that changes.
 Linkedin.mentionFromName = ( name = "" ) => {
-  return name;
+  if ( name.startsWith('@') ) {
+    return name.slice(1);
+  } else {
+    return name;
+  }
 };
 
 Linkedin.isHandle = ( string = "" ) => {
