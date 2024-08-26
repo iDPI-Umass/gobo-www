@@ -7,18 +7,28 @@
   import "@shoelace-style/shoelace/dist/components/menu/menu.js";
   import "@shoelace-style/shoelace/dist/components/menu-item/menu-item.js";
   import Spinner from "$lib/components/primitives/Spinner.svelte";
-  import { onMount } from "svelte";
+  import { onMount, tick } from "svelte";
+  import * as Time from "@dashkite/joy/time";
   import { State, Options } from "$lib/engines/draft.js";
+  import { State as EventState } from "$lib/engines/store.js";
   import { Draft, Identity } from "$lib/engines/draft.js";
   import { Mention } from "$lib/engines/mention/index.js";
   import { Query } from "$lib/engines/mention/query.js";
   import { Thread } from "$lib/engines/thread.js";
-  import { bodyEvents } from "$lib/stores/draft.js";
+  import { Platforms } from "$lib/engines/platforms/index.js";
+  import { bodyEvents, mentionEvents } from "$lib/stores/draft.js";
 
   export let threadItem;
   export let indexes;
 
-  const supported = [
+  const mentionSupported = [
+    "bluesky",
+    "mastodon",
+    "reddit",
+    "smalltown"
+  ];
+
+  const lookupSupported = [
     "bluesky",
     "mastodon",
     "smalltown"
@@ -26,14 +36,17 @@
 
   let _mention, mentionInput, suggestionBox;
   let scopedItem, mention; 
-  let platform, identity, nameType;
+  let platform, identity, nameType, helpText;
   let queryHandle, state, suggestions, currentQuery;
   const Render = State.make();
+  const Event = EventState.make();
+
   Render.cleanup = () => {
     scopedItem = null;
     mention = null;
     platform = "";
     nameType = "";
+    helpText = null;
 
     queryHandle = undefined;
     state = "loading";
@@ -47,10 +60,15 @@
     
     platform = mention.platform;
     identity = Identity.findActive( platform );
+
+    if ( !mentionSupported.includes(platform) ) {
+      const displayPlatform = Platforms.displayName( platform );
+      helpText = `Gobo doesn't support mentions for ${displayPlatform} but you can edit your post on ${displayPlatform} to add mentions once it's published.`;
+    }
     
     nameType = mention.type;
     mentionInput.value = mention.value;
-    suggestionBox.disabled = !supported.includes( platform );
+    suggestionBox.disabled = !lookupSupported.includes( platform );
 
     queryHandle.listen();
   };
@@ -70,7 +88,6 @@
   Handle.updateMention = ( value ) => {
     Mention.update( mention, value );
     nameType = mention?.type;
-    mentionInput.value = mention.value;
 
     const thread = Draft.readAspect( "thread" );
     Thread.splice( thread, scopedItem );
@@ -81,6 +98,64 @@
     currentQuery = query;
     queryHandle.query( query, 
       Mention.getSuggestions( mention, identity, query ));
+  };
+
+  Handle.matchMentionEvent = ( event ) => {
+    return (event.type === "focus-mention") &&
+      (event.detail.id === indexes.id) &&
+      (threadItem.platform === indexes.firstPlatform);
+  };
+
+  // This is very suspicious. Why isn't the underlying input field ready?
+  // The Svelte component is mounted because this gets called from onMount.
+  // The Shoelace component exists because it successfully knows about the
+  // method focus. But the input is not registered with the Shoelace component,
+  // or at least input.input is undefined until we try again.
+  Handle.mentionEvents = async ( event, count ) => {
+    count ??= 0;
+
+    if ( Handle.matchMentionEvent(event) ) {
+      try {
+        mentionInput.focus();
+      } catch {
+        if (count > 3) {
+          console.warn('failed to focus mention input');
+          return;
+        }
+        await Time.sleep(100);
+        count++;
+        Handle.mentionEvents( event, count );
+      }
+      mentionEvents.put( null );
+    }
+  };
+
+  Handle.arrowKeys = [
+    "ArrowRight",
+    "ArrowLeft"
+  ];
+
+  Handle.keydown = ( event ) => {
+    // The space key will also toggle the dropdown because of where the input
+    // happens to be in the current HX. This prevents that so we pickup the
+    // spaces as textual inputs without interruption.
+
+    // By itself, this would break a11y patterns, but we make sure to open the
+    // suggestion dropdown whenever the input receieves input. As designed by
+    // Shoelace, the dropdown opens for up and down arrow keys. I decided
+    // to extend that to left and right keys as well.
+    if ( event.key === " " ) {
+      event.stopPropagation();
+      return;
+    }
+
+    if ( Handle.arrowKeys.includes(event.key) ) {
+      suggestionBox.show();
+    }
+  };
+
+  Handle.updateInput = ( value ) => {
+    mentionInput.value = value;
   };
 
   Handle.update = ( value ) => {
@@ -106,6 +181,7 @@
     const id = event.detail.item.value;
     const suggestion = suggestions.find( s => s.id === id )
     if ( suggestion ) {
+      Handle.updateInput( suggestion.handle );
       Handle.update( suggestion.handle )
     }
   };
@@ -133,6 +209,7 @@
     _mention.addEventListener( "gobo-mention-suggestions-incoming", Render.suggestionsIncoming );
     _mention.addEventListener( "gobo-mention-suggestions", Render.suggestions );
     Render.initalize( threadItem, indexes );
+    Event.listen( mentionEvents, Handle.mentionEvents );
     return () => {
       _mention.removeEventListener( "gobo-mention-suggestions-incoming", Render.suggestionsIncoming );
       _mention.removeEventListener( "gobo-mention-suggestions", Render.suggestions );
@@ -158,11 +235,18 @@
       <sl-input
         bind:this={mentionInput}
         on:sl-input={Handle.input}
+        on:keydown={Handle.keydown}
         on:sl-focus={Handle.focus}
         on:sl-blur={Handle.blur}
         name="mention"
         size="medium"
+        type="text"
+        autocomplete="off"
         pill>
+
+        {#if helpText}
+          <div slot="help-text">{helpText}</div>
+        {/if}
       </sl-input>
     </div>
 
@@ -196,15 +280,6 @@
     </sl-menu>
     
   </sl-dropdown>
-
-  <!-- <sl-input
-    bind:this={inputs.spoilerText}
-    on:sl-input={Handle.spoilerText}
-    label="Spoiler Text"
-    help-text="Provide text that contextualizes content behind warning."
-    autocomplete="off"
-    size="medium">
-  </sl-input> -->
 </section>
 
 <style>

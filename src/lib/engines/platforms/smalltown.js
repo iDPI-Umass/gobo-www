@@ -6,6 +6,8 @@ import { extract } from "./helpers.js";
 
 const Smalltown = {};
 
+Smalltown.displayName = "Smalltown";
+
 Smalltown.limits = {
   characters: 500,
   attachments: 4,

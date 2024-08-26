@@ -48,7 +48,7 @@
 
 {#if threadMentions.length > 0}
   <h2>Mentions</h2>
-  <p class="help-text">Hint: you can choose to provide placeholder text instead of a handle. The @ will be replaced with the text you provide. If you choose to provide a placeholder and leave it blank, the mention will&nbsp;be&nbsp;deleted.</p>
+  <p class="help-text">Hint: The @ in the compose box will be replaced with the text you provide. You can provide placeholder text (e.g., "accountless John Doe") instead of an&nbsp;account&nbsp;handle.</p>
 {/if}
 
 {#each threadMentions as {threadRow, indexes} (indexes.panel)}

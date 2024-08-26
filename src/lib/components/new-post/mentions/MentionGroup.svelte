@@ -16,11 +16,16 @@
 
   Render.cycle = ( threadRow, _indexes ) => {
     const list = [];
+    let first = null;
     for ( const threadItem of threadRow ) {
       if ( threadItem.mentions[_indexes.id] == null ) {
         continue;
       }
+      if ( first == null ) {
+        first = threadItem.platform;
+      }
       const indexes = structuredClone( _indexes );
+      indexes.firstPlatform = first;
       indexes.group = `${indexes.panel}-${threadItem.platform}`;
       list.push({ threadItem, indexes });
     }

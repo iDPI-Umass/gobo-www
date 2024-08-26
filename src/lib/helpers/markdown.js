@@ -81,6 +81,8 @@ const getConverter = ( platform ) => {
   const convert = ( content ) => {
     if ( Type.isString(content) && content.length > 0 ) {
       return md.render( content );
+    } else {
+      return "";
     }
   }
 

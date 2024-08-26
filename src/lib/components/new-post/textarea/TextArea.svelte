@@ -9,9 +9,9 @@
   import { State as EventState } from "$lib/engines/store.js";
   import { State, Draft } from "$lib/engines/draft.js";
   import { Thread } from "$lib/engines/thread.js";
-  import { bodyEvents } from "$lib/stores/draft.js";
+  import { bodyEvents, mentionEvents } from "$lib/stores/draft.js";
 
-  export let placeholder = "Write your post! Use @ for mentions :)";
+  export let placeholder = "Write your post! Use @ for mentions.";
   export let content = "";
 
   export function addThreadpoint( platform ) {
@@ -25,6 +25,7 @@
   }
 
   let anchor, editor, platforms;
+  let newMention;
   const Render = State.make();
   const Event = EventState.make();
   
@@ -34,6 +35,7 @@
       editor.model.document.on( "change:data", Handle.content );
       editor.destroy();
     }
+    newMention = null;
   };
 
   Render.area = async () => {
@@ -73,9 +75,10 @@
 
   Handle.mentionCreation = ( event, data ) => {
     if ( data.domEvent.key === "@" ) {
-      event.stop();
       data.preventDefault();
-      editor.execute( "add-mention", {} );
+      event.stop();
+      newMention = { id: window.crypto.randomUUID() };
+      editor.execute( "add-mention", newMention );
     }
   };
 
@@ -83,11 +86,13 @@
     switch (event.type) {
       case "focus-mention": {
         editor.execute( "focus-mention", event.detail );
+        bodyEvents.put(null);
         break;
       }
 
       case "blur-mention": {
         editor.execute( "blur-mention", event.detail );
+        bodyEvents.put(null);
         break;
       }
 
@@ -97,11 +102,18 @@
     }
   };
 
-  Handle.content = () => {
+  Handle.content = async () => {
     const content = editor.getData();
     let draft = Draft.updateAspect( "content", content );
     const thread = Thread.parse( draft );
     draft = Draft.updateAspect( "thread", thread );
+    
+    if ( newMention != null ) {
+      const detail = newMention;
+      newMention = null;
+      const mentionEvent = new CustomEvent( "focus-mention", { detail });
+      mentionEvents.put( mentionEvent );
+    }
   };
 
 

@@ -29,6 +29,11 @@ Platforms.get = ( name ) => {
   }
 }
 
+Platforms.displayName = ( name ) => {
+  const model = Platforms.get( name );
+  return model.displayName;
+};
+
 Platforms.getAcceptable = () => {
   const identities = Identity.list().filter( i => i.active === true );
   const platforms = new Set();

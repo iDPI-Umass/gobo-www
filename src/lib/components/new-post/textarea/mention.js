@@ -34,14 +34,14 @@ class AddMentionCommand extends Command {
       const mention = writer.createElement( "mention", {
         ...Object.fromEntries( selection.getAttributes() ),
         focus: false,
-        id: window.crypto.randomUUID()
+        id: detail.id
       });
 
       // ...and insert it into the document model.
-      editor.model.insertObject( mention, null, null, { setSelection: "on" } );
-
-      // Set the selection position back to its former value.
-      writer.setSelection( position );
+      editor.model.insertObject( mention, null, "before", {
+        findOptimalPosition: "before",
+        setSelection: "after"
+      });
     });
   }
 
@@ -64,7 +64,6 @@ class RemoveMentionCommand extends Command {
 
 class FocusMentionCommand extends Command {
   execute({ id }) {
-    console.log(`focusing ${id}`)
     const dom = document.querySelector( `span.mention[data-id="${id}"]`);
     if (!dom) {
       return;
@@ -89,7 +88,6 @@ class FocusMentionCommand extends Command {
 
 class BlurMentionCommand extends Command {
   execute({ id }) {
-    console.log(`blurring ${id}`)
     const dom = document.querySelector( `span.mention[data-id="${id}"]`);
     if (!dom) {
       return;
@@ -195,7 +193,8 @@ export default class MentionEditing extends Plugin {
       model: ( viewElement, { writer } ) => {
         let id = viewElement.getAttribute( "data-id" )
         id ??= window.crypto.randomUUID();
-        const focus = viewElement.getAttribute( "data-focus" ) === "true";
+        // Always load in with the mention unfocused.
+        const focus = false; //viewElement.getAttribute( "data-focus" ) === "true";
         return writer.createElement( "mention", { id, focus });
       }
     } );

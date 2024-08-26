@@ -22,7 +22,10 @@ const reply = createStore();
 const quote = createStore();
 const options = createStore();
 const alerts = createStore();
+
+// How should these be named? They're aimed for the consumer, not the source.
 const bodyEvents = createStore();
+const mentionEvents = createStore();
 
 export {
   content,
@@ -33,5 +36,7 @@ export {
   quote,
   options,
   alerts,
-  bodyEvents
+
+  bodyEvents,
+  mentionEvents
 }

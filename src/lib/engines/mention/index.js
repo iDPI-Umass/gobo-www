@@ -5,7 +5,7 @@ const Mention = {};
 
 Mention.make = ( platform, id ) => {
   const Model = Platforms.get( platform )
-  const value = "@"
+  const value = Model.mentionFromName( "@" );
   return { 
     platform, 
     id,
@@ -84,95 +84,30 @@ Mentions.fromValue = ( threadItem, value ) => {
 };
 
 
-/**
- * This looks weird, but there is a problem here that, in its general form is tricky.:
- * 1. Mentions have an appearance specific to the textarea HX
- * 2. For each target platform, we want that to appear differently
- * 
- * Those are two different domains. In issuing a regex replacement, we need to
- * avoid collisions across mentions *and* across domains represented by (1) and (2).
- * 
- * We can guard against that with careful regex building, and we do, but
- * beware the general case. We don't know how many mentions there are or
- * in what order they might appear. Or what features/formats we'll need to support.
- * 
- * We can eliminate the need for cross-domain checks with the following:
- * 
- * - I'm calling this third domain a "shatter space" because it uses
- *   String.prototype.split to create virtual placeholders that we don't need
- *   to name. That space can expand indefinitely, and it's all orthogonal
- *   to the collision concerns of (1) and (2).
- * 
- * - Transition fully from domain (1) into the shatter space, so we can
- *   get safe regex locks. That creates a tree of nested arrays containing
- *   string fragments.
- * 
- * - Then we transition from shatter space int domain (2), reassembling the
- *   string with the desired replacement values.
- */
-
-
-Mentions.split = ( shattered, regex ) => {
-  if ( Type.isString(shattered[0]) ) {
-    for (let i = 0; i < shattered.length; i++) {
-      const current = shattered[i];
-      shattered[i] = current.split( regex );
-    }
-  } else {
-    for ( const item of shattered ) {
-      Mentions.split( item, regex )
-    }
-  }
-};
-
-Mentions.join = ( shattered, separator ) => {
-  if ( Type.isString(shattered[0][0]) ) {
-    for (let i = 0; i < shattered.length; i++) {
-      const current = shattered[i];
-      shattered[i] = current.join( separator );
-    }
-  } else {
-    for (const item of shattered) {
-      Mentions.join( item, separator );
-    }
-  }
-};
-
 Mentions.renderPlaintext = ( threadItem ) => {
-  // const parts = [ threadItem?.content ?? '' ]
-  // const values = []
-  // for (const mention of Object.values(threadItem.mentions)) {
-  //   values.push( mention.value );
-  //   const regex = Mentions.buildRegex( mention.name );
-  //   Mentions.split( parts, regex )
-  // }
-
-  // for ( const value of values.reverse() ) {
-  //   Mentions.join( parts, value );
-  // }
-
-  // return parts[0];
-  return ""
+  return threadItem.content.replaceAll( Mentions.regex, (match, id) => {
+    const mention = threadItem.mentions[ id ];
+    if ( mention == null ) {
+      console.warn( `unable to match on ${id}`, threadItem );
+      return match;
+    } else {
+      return mention.value;
+    }
+  });
 };
 
 Mentions.renderHTML = ( threadItem, html ) => {
-  // const parts = [ html ?? '' ]
-  // const values = []
-  // for (const mention of Object.values(threadItem.mentions)) {
-  //   if ( mention.type === "handle" ) {
-  //     values.push( `<a data-skip-glamor="true" href="#">${ mention.value }</a>` );
-  //   } else {
-  //     values.push( mention.value );
-  //   }
-  //   Mentions.split( parts, mention.regex )
-  // }
-
-  // for ( const value of values.reverse() ) {
-  //   Mentions.join( parts, value );
-  // }
-
-  // return parts[0];
-  return ""
+  return html.replaceAll( Mentions.regex, (match, id) => {
+    const mention = threadItem.mentions[ id ];
+    if ( mention == null ) {
+      console.warn( `unable to match on ${id}`, threadItem );
+      return match;
+    } else if ( mention.type === "handle" ) {
+      return `<a data-skip-glamor="true" href="#">${ mention.value }</a>`;
+    } else {
+      return mention.value;
+    }
+  });
 };
 
 

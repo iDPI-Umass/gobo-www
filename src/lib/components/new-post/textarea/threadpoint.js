@@ -38,10 +38,7 @@ class AddThreadpointCommand extends Command {
       });
 
       // ...and insert it into the document model.
-      editor.model.insertObject( threadpoint, null, null, { setSelection: "on" } );
-
-      // Set the selection position back to its former value.
-      writer.setSelection( position );
+      editor.model.insertObject( threadpoint, null, null, { setSelection: "after" } );
     });
   }
 

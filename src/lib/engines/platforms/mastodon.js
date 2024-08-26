@@ -6,6 +6,8 @@ import { extract } from "./helpers.js";
 
 const Mastodon = {};
 
+Mastodon.displayName = "Mastodon";
+
 Mastodon.limits = {
   characters: 500,
   attachments: 4,

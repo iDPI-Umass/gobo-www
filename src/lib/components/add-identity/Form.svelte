@@ -203,10 +203,10 @@
 
     state = "ready";
     await Submit.flow();
-    button.loading = false;
     if ( state === "error" ) {
       identityStores.onboardFailure.put({ failure: true });
       replaceState( `/identities/add?failure=true` );
+      button.loading = false;
       return;
     }
   };

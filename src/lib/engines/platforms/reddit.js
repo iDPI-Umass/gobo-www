@@ -5,6 +5,8 @@ import { extract } from "./helpers.js";
 
 const Reddit = {};
 
+Reddit.displayName = "Reddit";
+
 Reddit.limits = {
   characters: 40000,
   attachments: 20,

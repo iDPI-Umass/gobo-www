@@ -10,6 +10,8 @@ import { extract } from "./helpers.js";
 
 const Bluesky = {};
 
+Bluesky.displayName = "Bluesky";
+
 Bluesky.limits = {
   characters: 300,
   attachments: 4,

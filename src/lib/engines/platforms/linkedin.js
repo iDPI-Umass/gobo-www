@@ -7,6 +7,8 @@ import { extract } from "./helpers.js";
 
 const Linkedin = {};
 
+Linkedin.displayName = "LinkedIn";
+
 Linkedin.limits = {
   characters: 3000,
   attachments: 20,
