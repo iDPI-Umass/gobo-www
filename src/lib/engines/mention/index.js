@@ -95,7 +95,6 @@ Mentions.fromValue = ( threadItem, value ) => {
 Mentions.renderPlaintext = ( threadItem ) => {
   return threadItem.content.replaceAll( Mentions.replaceRegex, (match, ...rest) => {
     const groups = rest.at(-1);
-    console.log(groups)
     const { before = "", after = "", id } = groups;
     const mention = threadItem.mentions[ id ];
     if ( mention == null ) {
