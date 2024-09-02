@@ -36,7 +36,13 @@ Mention.getSuggestions = async ( mention, identity, query ) => {
 const Mentions = {};
 
 // Match on v4 UUID we get from the Crypto API (with type prefix).
-Mentions.regex = /mention:([a-fA-F0-9-]{36})/g;
+Mentions.regex = /mention:(?<id>[a-fA-F0-9-]{36})/g;
+Mentions.replaceRegex = new RegExp(
+  '(?<before> |\u00A0)?' +
+  Mentions.regex.source + 
+  '(?<after> |\u00A0)?',
+  'g'
+);
 
 Mentions.parse = ( content ) => {
   const matches = content.matchAll( Mentions.regex )
@@ -84,28 +90,47 @@ Mentions.fromValue = ( threadItem, value ) => {
 };
 
 
+// If someone enters an empty string into the placeholder, we need to avoid
+// a double space situation in the post preview.
 Mentions.renderPlaintext = ( threadItem ) => {
-  return threadItem.content.replaceAll( Mentions.regex, (match, id) => {
+  return threadItem.content.replaceAll( Mentions.replaceRegex, (match, ...rest) => {
+    const groups = rest.at(-1);
+    console.log(groups)
+    const { before = "", after = "", id } = groups;
     const mention = threadItem.mentions[ id ];
     if ( mention == null ) {
       console.warn( `unable to match on ${id}`, threadItem );
       return match;
+    }
+
+    if ( mention.value === "" ) {
+      return " ";
     } else {
-      return mention.value;
+      return before + mention.value + after;
     }
   });
 };
 
 Mentions.renderHTML = ( threadItem, html ) => {
-  return html.replaceAll( Mentions.regex, (match, id) => {
+  return html.replaceAll( Mentions.replaceRegex, (match, ...rest) => {
+    const groups = rest.at(-1);
+    const { before = "", after = "", id } = groups;
     const mention = threadItem.mentions[ id ];
     if ( mention == null ) {
       console.warn( `unable to match on ${id}`, threadItem );
       return match;
-    } else if ( mention.type === "handle" ) {
-      return `<a data-skip-glamor="true" href="#">${ mention.value }</a>`;
+    }
+
+    if ( mention.value === "" ) {
+      return " ";
+    }
+
+    if ( mention.type === "handle" ) {
+      return before + 
+        `<a data-skip-glamor="true" href="#">${ mention.value }</a>` +
+        after;
     } else {
-      return mention.value;
+      return before + mention.value + after;
     }
   });
 };
