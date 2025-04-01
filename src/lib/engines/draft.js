@@ -141,7 +141,7 @@ Draft.clear = async () => {
       attachment.revoke();
     }
     singletonDraft = Draft.make();
-    singletonDraft.identities = await Identity.sync();
+    singletonDraft.identities = await IdentityEngine.read();
     Draft.write();
     Draft.load();
 };
