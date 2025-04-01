@@ -141,7 +141,7 @@ Draft.clear = async () => {
       attachment.revoke();
     }
     singletonDraft = Draft.make();
-    singletonDraft.identities = await IdentityEngine.read();
+    singletonDraft.identities = await Identity.clone()
     Draft.write();
     Draft.load();
 };
@@ -239,6 +239,15 @@ Identity.sync = async () => {
     const identity = Value.clone( _identity );
     identity.active = actives[ identity.id ] ?? false;
     identities.push( identity );
+  }
+  return identities;
+};
+
+Identity.clone = async () => {  
+  const canon = await IdentityEngine.read();
+  const identities = [];
+  for ( const identity of canon ) {
+    identities.push( Value.clone( identity ));
   }
   return identities;
 };
