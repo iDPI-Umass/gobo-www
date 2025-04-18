@@ -1,10 +1,18 @@
 # gobo-www
 Web Client Frontend for the Gobo Project
 
+## Installation
+
+This project uses [pnpm](https://www.npmjs.com/package/pnpm) for its package management. After cloning this repository, install its packages.
+
+```bash
+git clone git@github.com:iDPI-Umass/gobo-www.git
+pnpm install
+```
 
 ## Developing
 
-Once you've created a project and installed dependencies with `npm install` (or `npm install` or `yarn`), start a development server:
+You can work on this codebase with a live development server. Start one with:
 
 ```bash
 npm run dev
