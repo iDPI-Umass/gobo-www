@@ -13,14 +13,12 @@ production-www:
       verification: gobo.social
     origins:
       - domain: gobo.social.s3-website-us-east-1.amazonaws.com
+        protocol: http
+      - domain: www.gobo.social.s3-website-us-east-1.amazonaws.com
         protocol: http     
     aliases:
       - gobo.social
       - www.gobo.social
-    ttl:
-      default: 86400
-      min: 0
-      max: 31536000 # 1 year
 
 production-api:
   namespace: gobo
@@ -34,13 +32,6 @@ production-api:
         port: 5000
     aliases:
       - api.gobo.social
-    ttl:
-      default: 0
-      min: 0
-      max: 31536000 # 1 year
-    headers:
-      - Host
-      - Authorization
 
 production-login:
   namespace: gobo

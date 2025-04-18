@@ -5,6 +5,7 @@ import * as Route53 from "@dashkite/dolores/route53";
 import * as CF from "@dashkite/dolores/stack";
 import * as Distro from "@dashkite/dolores/cloudfront";
 import _Templates from "@dashkite/template";
+import {log, logError} from '../helpers.js';
 const Templates = _Templates.default;
 
 
@@ -165,21 +166,28 @@ const deploy = async function ( config ) {
   };
 
   const yaml = await templates.render( "cloudfront.yaml", options );
+  log( `starting deployment of cloudfront distribution ${namespace} ...`);
   await CF.deployStack( getStackName(config), yaml );
+  log( `cloudfront distribution ${namespace} deployment complete!` );
 };
 
 const teardown = async function ( config ) {
+  log( `starting deployment of cloudfront distribution ${config.namespace} ...` );
   const name = getStackName( config );
   await CF.deleteStack( name );
+  log( `cloudfront distribution ${config.namespace} teardown complete!` );
 };
 
 
 const invalidate = async function ( config ) {
-  await Distro.invalidatePaths({
-    domain: config.edge.aliases[0],
-    paths: [ "/*" ]
-  });
-}
+  for (const alias of config.edge.aliases) {
+    log( `starting cache invalidation for ${alias} ...` );
+    await Distro.invalidatePaths({
+      domain: alias,
+      paths: [ "/*" ]
+    });
+  }
+};
 
 export {
   deploy,

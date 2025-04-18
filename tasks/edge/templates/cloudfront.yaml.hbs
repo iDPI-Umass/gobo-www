@@ -14,102 +14,9 @@ Resources:
         {{/each}}
       {{/if}}
 
-  CachePolicy:
-    Type: "AWS::CloudFront::CachePolicy"
-    Properties:
-      CachePolicyConfig:
-        Name: {{{ namespace }}}-{{{ name }}}-{{{ environment }}}-cache-policy
-        DefaultTTL: {{{ cache.ttl.default }}}
-        MinTTL: {{{ cache.ttl.min }}}
-        MaxTTL: {{{ cache.ttl.max }}}
-        ParametersInCacheKeyAndForwardedToOrigin:
-          CookiesConfig: 
-            CookieBehavior: none
-          EnableAcceptEncodingBrotli: {{{ cache.compress }}}
-          EnableAcceptEncodingGzip: {{{ cache.compress }}}
-          HeadersConfig:
-            {{#if cache.headers }}
-            HeaderBehavior: whitelist
-            Headers:
-              {{#each cache.headers}}
-              - {{{ . }}}
-              {{/each}}
-            {{else}}
-            HeaderBehavior: none
-            {{/if}}
-          QueryStringsConfig: 
-            QueryStringBehavior: {{{ cache.queries }}}
-
-  OriginRequestPolicy:
-    Type: "AWS::CloudFront::OriginRequestPolicy"
-    Properties:
-      OriginRequestPolicyConfig:
-        Name: {{{ namespace }}}-{{{ name }}}-{{{ environment }}}-origin-request-policy
-        CookiesConfig: 
-          CookieBehavior: none
-        HeadersConfig: 
-          HeaderBehavior: allViewer
-        QueryStringsConfig:
-          QueryStringBehavior: all
-
-  ResponseHeadersPolicy:
-    Type: "AWS::CloudFront::ResponseHeadersPolicy"
-    Properties:
-      ResponseHeadersPolicyConfig:
-        Name: {{{ namespace }}}-{{{ name }}}-{{{ environment }}}-response-headers-policy
-        CorsConfig: 
-          AccessControlAllowCredentials: true
-          AccessControlAllowHeaders:
-            Items: [ authorization ]
-          AccessControlAllowMethods: 
-            Items: [ GET, HEAD, PUT, POST, PATCH, DELETE, OPTIONS ]
-          AccessControlAllowOrigins: 
-            {{!-- TODO use the list of aliases here? --}}
-            Items: [ "*" ]
-          AccessControlExposeHeaders: 
-            Items:
-              - www-authenticate
-              - location
-              - credentials
-          {{!-- 
-
-            Chrome max is 7200
-            https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Max-Age#directives
-          
-          --}}
-          AccessControlMaxAgeSec: 7200
-          OriginOverride: false
-        CustomHeadersConfig:
-          Items: []
-        SecurityHeadersConfig: 
-          ContentSecurityPolicy: 
-            ContentSecurityPolicy: >-
-              default-src https: data: blob: ;
-              script-src https: blob: 'unsafe-inline' 'unsafe-eval' ;
-              style-src https: 'unsafe-inline' ;
-            Override: false
-          ContentTypeOptions: 
-            Override: true
-          FrameOptions: 
-            FrameOption: DENY
-            Override: true
-          ReferrerPolicy: 
-            Override: true
-            ReferrerPolicy: no-referrer
-          StrictTransportSecurity: 
-            AccessControlMaxAgeSec: 63072000
-            IncludeSubdomains: true
-            Preload: true
-            Override: true
-        ServerTimingHeadersConfig: 
-          Enabled: false
-
   Distribution:
     Type: "AWS::CloudFront::Distribution"
     DependsOn:
-      - CachePolicy
-      - OriginRequestPolicy
-      - ResponseHeadersPolicy
       - Certificate
     Properties:
       DistributionConfig:
@@ -123,9 +30,11 @@ Resources:
           AllowedMethods: [ GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE ]
           CachedMethods: [ GET, HEAD, OPTIONS ]
           Compress: true
-          CachePolicyId: !Ref CachePolicy
-          OriginRequestPolicyId: !Ref OriginRequestPolicy
-          ResponseHeadersPolicyId: !Ref ResponseHeadersPolicy
+          # These are set to iDPI's general purpose policies. If you're not using
+          # iDPI infrastructure, you'll need to update these.
+          CachePolicyId: 84846bbc-3766-4e57-bc67-7a7de544dfa4
+          OriginRequestPolicyId: 54a5ba0c-06d5-4020-9d2a-b5583fdcdb96
+          ResponseHeadersPolicyId: b6ac2f51-97f8-42c0-a6d0-c8fc6018c5bb
           ViewerProtocolPolicy: redirect-to-https
           {{#if handlers }}
           LambdaFunctionAssociations:
